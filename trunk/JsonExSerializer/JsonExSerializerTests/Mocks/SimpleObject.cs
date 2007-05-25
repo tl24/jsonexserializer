@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace JsonExSerializerTests
+namespace JsonExSerializerTests.Mocks
 {
     /// <summary>
     /// Contains simple primitive properties for testing

@@ -133,7 +133,7 @@ namespace JsonExSerializer
                 }
                 else if (IsQuotedString(tok))
                 {
-                    ParseString();
+                    ParseString(desiredType);
                 }
                 else if (tok == LSquareToken)
                 {
@@ -281,7 +281,7 @@ namespace JsonExSerializer
             _values.Push(result);
         }
 
-        private void ParseString()
+        private void ParseString(Type desiredType)
         {
             Token tok = ReadToken();
             string val = null;
@@ -297,7 +297,14 @@ namespace JsonExSerializer
                 val = tok.value.Replace("\\t", "\t");
                 val = tok.value.Replace("\\n", "\n");
             }
-            _values.Push(val);
+            if (desiredType == typeof(char))
+            {
+                _values.Push(Convert.ChangeType(val, typeof(char)));
+            }
+            else
+            {
+                _values.Push(val);
+            }
         }
 
         private void RequireToken(Token expected, Token actual, string message)

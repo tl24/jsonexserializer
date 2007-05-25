@@ -14,51 +14,61 @@ namespace JsonExSerializer
 {
     public class Parser
     {
+        #region Member Variables
+
         private Type _deserializedType;
         private LinkedList<Token> _tokens;
         private Stack _values;
+        private SerializerOptions _options;
+
+        #endregion
+
+        #region Token Constants
 
         // Define some constants
         /// <summary> &gt; </summary>
-        private Token GenericArgsStart = new Token(TokenType.Symbol, "<");
+        private readonly Token GenericArgsStart = new Token(TokenType.Symbol, "<");
 
         /// <summary> &lt; </summary>
-        private Token GenericArgsEnd = new Token(TokenType.Symbol, ">");
+        private readonly Token GenericArgsEnd = new Token(TokenType.Symbol, ">");
 
         /// <summary> new </summary>
-        private Token NewToken = new Token(TokenType.Identifier, "new");
+        private readonly Token NewToken = new Token(TokenType.Identifier, "new");
 
         /// <summary> : </summary>
-        private Token ColonToken = new Token(TokenType.Symbol, ":");
+        private readonly Token ColonToken = new Token(TokenType.Symbol, ":");
         /// <summary> . </summary>
-        private Token PeriodToken = new Token(TokenType.Symbol, ".");
+        private readonly Token PeriodToken = new Token(TokenType.Symbol, ".");
 
         /// <summary> , </summary>
-        private Token CommaToken = new Token(TokenType.Symbol, ",");
+        private readonly Token CommaToken = new Token(TokenType.Symbol, ",");
 
         /// <summary> ( </summary>
-        private Token LParenToken = new Token(TokenType.Symbol, "(");
+        private readonly Token LParenToken = new Token(TokenType.Symbol, "(");
 
         /// <summary> ) </summary>
-        private Token RParenToken = new Token(TokenType.Symbol, ")");
+        private readonly Token RParenToken = new Token(TokenType.Symbol, ")");
 
         /// <summary> ( </summary>
-        private Token LSquareToken = new Token(TokenType.Symbol, "[");
+        private readonly Token LSquareToken = new Token(TokenType.Symbol, "[");
 
         /// <summary> ) </summary>
-        private Token RSquareToken = new Token(TokenType.Symbol, "]");
+        private readonly Token RSquareToken = new Token(TokenType.Symbol, "]");
 
         /// <summary> ( </summary>
-        private Token LBraceToken = new Token(TokenType.Symbol, "{");
+        private readonly Token LBraceToken = new Token(TokenType.Symbol, "{");
 
         /// <summary> ) </summary>
-        private Token RBraceToken = new Token(TokenType.Symbol, "}");
+        private readonly Token RBraceToken = new Token(TokenType.Symbol, "}");
 
-        public Parser(Type t, LinkedList<Token> tokens)
+        #endregion
+
+        public Parser(Type t, LinkedList<Token> tokens, SerializerOptions options)
         {
             _deserializedType = t;
             _tokens = tokens;
             _values = new Stack();
+            _options = options;
         }
 
         public object Parse()

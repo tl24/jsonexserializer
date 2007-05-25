@@ -14,6 +14,7 @@ namespace JsonExSerializer
     public class Serializer
     {
         private Type _serializedType;
+        private SerializerOptions _options;
 
         /// <summary>
         /// Gets a serializer for the given type
@@ -29,65 +30,30 @@ namespace JsonExSerializer
         private Serializer(Type t)
         {
             _serializedType = t;
+            _options = new SerializerOptions();
         }
+
+        #region SerializerOptions
+
+        /// <summary>
+        /// If true, string output will be as compact as possible with minimal spacing.  Thus, cutting
+        /// down on space.  This option has no effect on Deserialization.
+        /// </summary>
+        public bool IsCompact
+        {
+            get { return _options.IsCompact; }
+            set { _options.IsCompact = value; }
+        }
+
+        #endregion
+
+        #region Serialization
 
         public void Serialize(object o, TextWriter writer)
         {
-            if (o == null) {
-                writer.Write("null");
-            }
-            else if (o.GetType().IsPrimitive && !(o is char))
-            {
-                string val;
-                if (o is double)
-                {
-                    val = ((double)o).ToString("R");
-                }
-                else if (o is float)
-                {
-                    val = ((float)o).ToString("R");
-                }
-                else
-                {
-                    val = Convert.ToString(o);
-                }
-                writer.Write(val);
-            }
-            else if (o.GetType() == typeof(string) || o.GetType() == typeof(char))
-            {
-                string val = o.ToString();
-                writer.Write('"');
-                writer.Write(val.Replace("\"", "\\\""));
-                writer.Write('"');
-            }
-            else
-            {
-                SerializeObject(o, writer);
-            }
+            SerializerHelper helper = new SerializerHelper(_serializedType, _options, writer);
+            helper.Serialize(o);
 
-        }
-
-        private void SerializeObject(object o, TextWriter writer)
-        {
-            TypeHandler handler = TypeHandler.GetHandler(_serializedType);
-            writer.Write("{\n");
-            bool addComma = false;
-            string indent = "   ";
-            foreach (TypeHandlerProperty prop in handler.Properties)
-            {
-                if (addComma)
-                {
-                    writer.Write(',');
-                    writer.Write(Environment.NewLine);
-                }
-                writer.Write(indent);
-                Serialize(prop.Name, writer);
-                writer.Write(":");
-                Serialize(prop.GetValue(o), writer);
-                addComma = true;
-            }
-            writer.Write(Environment.NewLine);
-            writer.Write('}');
         }
 
         public string Serialize(object o)
@@ -99,9 +65,13 @@ namespace JsonExSerializer
             return s;
         }
 
+        #endregion
+
+        #region Deserialization
+
         public object Deserialize(TextReader reader)
         {
-            Deserializer d = new Deserializer(_serializedType, reader);
+            Deserializer d = new Deserializer(_serializedType, reader, _options);
             return d.Deserialize();
         }
 
@@ -112,5 +82,8 @@ namespace JsonExSerializer
             rdr.Close();
             return result;
         }
+
+        #endregion
+
     }
 }

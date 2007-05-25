@@ -15,18 +15,20 @@ namespace JsonExSerializer
         private Type _deserializedType;
         private TextReader _reader;
         private LinkedList<Token> _tokens;
+        private SerializerOptions _options;
 
-        public Deserializer(Type t, TextReader reader)
+        public Deserializer(Type t, TextReader reader, SerializerOptions options)
         {
             _deserializedType = t;
             _reader = reader;
+            _options = options;
         }
 
         public object Deserialize()
         {
-            Tokenizer tokenizer = new Tokenizer(_reader);
+            Tokenizer tokenizer = new Tokenizer(_reader, _options);
             _tokens = tokenizer.Tokenize();
-            Parser p = new Parser(_deserializedType, _tokens);
+            Parser p = new Parser(_deserializedType, _tokens, _options);
             return p.Parse();            
         }
 

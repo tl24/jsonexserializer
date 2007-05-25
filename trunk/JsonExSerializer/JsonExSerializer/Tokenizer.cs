@@ -10,20 +10,27 @@ using System.IO;
 
 namespace JsonExSerializer
 {
-    public class Tokenizer {
+    public class Tokenizer
+    {
+
+        #region Member Variables
 
         private TextReader _reader;
         private LinkedList<Token> _tokens;
         private char[] _symbols;
+        private SerializerOptions _options;
 
-        public Tokenizer(TextReader reader)
+        #endregion
+
+        public Tokenizer(TextReader reader, SerializerOptions options)
         {
             _reader = reader;
             _tokens = new LinkedList<Token>();
             _symbols = "[]<>():,{}".ToCharArray();
             Array.Sort<char>(_symbols);
-
+            _options = options;
         }
+
 
         public LinkedList<Token> Tokenize()
         {
@@ -55,6 +62,8 @@ namespace JsonExSerializer
             return _tokens;
 
         }
+
+        #region Read Methods
 
         private void ReadMultilineComment(char ch)
         {
@@ -228,6 +237,18 @@ namespace JsonExSerializer
                     {
                         buffer.Append(ch);
                     }
+                    else if (ch == 't')
+                    {
+                        buffer.Append('\t');
+                    }
+                    else if (ch == 'n')
+                    {
+                        buffer.Append('\n');
+                    }
+                    else if (ch == '\\')
+                    {
+                        buffer.Append('\\');
+                    }
                     else
                     {
                         buffer.Append('\\').Append(ch);
@@ -253,6 +274,10 @@ namespace JsonExSerializer
             }
             throw new ParseException("Unterminated string constant");
         }
+
+        #endregion
+
+        #region Token Predicates
 
         private bool IsQuoteStart(char ch)
         {
@@ -283,5 +308,8 @@ namespace JsonExSerializer
         {
             return (ch == '/' && _reader.Peek() == '*');
         }
+
+        #endregion
+
     }
 }

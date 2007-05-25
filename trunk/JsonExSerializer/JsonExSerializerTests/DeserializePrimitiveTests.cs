@@ -80,6 +80,9 @@ namespace JsonExSerializerTests
             result = (float)s.Deserialize("  " + value.ToString() + "  ");
             Assert.AreEqual(value, result, "Negative float not deserialized correctly with whitespace");
 
+            value = float.MaxValue;
+            result = (float)s.Deserialize(value.ToString("R"));
+            Assert.AreEqual(value, result, "Error deserializing float max value");
         }
 
         [Test]

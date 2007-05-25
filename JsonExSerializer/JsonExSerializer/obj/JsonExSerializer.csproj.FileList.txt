@@ -1,5 +1,0 @@
-obj\Debug\ResolveAssemblyReference.cache
-bin\Debug\JsonExSerializer.dll
-bin\Debug\JsonExSerializer.pdb
-obj\Debug\JsonExSerializer.dll
-obj\Debug\JsonExSerializer.pdb

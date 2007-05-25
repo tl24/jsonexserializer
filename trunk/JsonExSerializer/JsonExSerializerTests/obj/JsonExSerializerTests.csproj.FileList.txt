@@ -1,8 +1,0 @@
-obj\Debug\ResolveAssemblyReference.cache
-bin\Debug\JsonExSerializerTests.dll
-bin\Debug\JsonExSerializerTests.pdb
-bin\Debug\JsonExSerializer.dll
-bin\Debug\nunit.framework.dll
-bin\Debug\JsonExSerializer.pdb
-obj\Debug\JsonExSerializerTests.dll
-obj\Debug\JsonExSerializerTests.pdb

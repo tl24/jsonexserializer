@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonExSerializer", "JsonExSerializer\JsonExSerializer.csproj", "{D0C83979-A672-4C06-99BC-B82D81749405}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonExSerializerTests", "JsonExSerializerTests\JsonExSerializerTests.csproj", "{726BE6B3-1D44-453D-9039-B181D0D22F9C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0C83979-A672-4C06-99BC-B82D81749405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0C83979-A672-4C06-99BC-B82D81749405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0C83979-A672-4C06-99BC-B82D81749405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0C83979-A672-4C06-99BC-B82D81749405}.Release|Any CPU.Build.0 = Release|Any CPU
+		{726BE6B3-1D44-453D-9039-B181D0D22F9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{726BE6B3-1D44-453D-9039-B181D0D22F9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{726BE6B3-1D44-453D-9039-B181D0D22F9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{726BE6B3-1D44-453D-9039-B181D0D22F9C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

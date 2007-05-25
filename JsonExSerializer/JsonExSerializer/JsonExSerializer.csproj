@@ -38,6 +38,8 @@
     <Compile Include="Parser.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerializerHelper.cs" />
+    <Compile Include="SerializerOptions.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="TypeHandler.cs" />

@@ -26,7 +26,7 @@ namespace JsonExSerializer
         {
             _reader = reader;
             _tokens = new LinkedList<Token>();
-            _symbols = "[]<>():,{}".ToCharArray();
+            _symbols = "[]<>():,{}.".ToCharArray();
             Array.Sort<char>(_symbols);
             _options = options;
         }
@@ -286,7 +286,10 @@ namespace JsonExSerializer
 
         private bool IsNumberStart(char ch)
         {
-            return ch == '+' || ch == '-' || char.IsDigit(ch) || ch == '.';
+            if (ch == '.' && char.IsDigit((char)_reader.Peek()))
+                return true;
+            else
+                return ch == '+' || ch == '-' || char.IsDigit(ch);
         }
 
         private bool IsIdentifierStart(char ch)

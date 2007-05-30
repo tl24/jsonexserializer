@@ -4,6 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using JsonExSerializer;
 using System.Collections;
+using JsonExSerializerTests.Mocks;
 
 namespace JsonExSerializerTests
 {
@@ -11,11 +12,75 @@ namespace JsonExSerializerTests
     public class CollectionsTests
     {
         [Test]
-        public void StringCollectionTest()
+        public void StringArrayListTest()
         {
             Serializer s = Serializer.GetSerializer(typeof(ArrayList));
-            string str = "[ \"one\", \"two\", \"three\" ]";
-            object result = s.Deserialize(str);
+            ArrayList strings = new ArrayList();
+            strings.Add("one");
+            strings.Add("two");
+            strings.Add("3");
+            string result = s.Serialize(strings);
+            ArrayList actual = (ArrayList) s.Deserialize(result);
+            Assert.AreEqual(strings, actual);
+        }
+
+        [Test]
+        public void IntListTest()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(List<int>));
+            List<int> ints = new List<int>();
+            ints.Add(0);
+            ints.Add(int.MinValue);
+            ints.Add(int.MaxValue);
+            ints.Add(-23);
+            ints.Add(456);
+            ints.Add(int.MaxValue - 1);
+            ints.Add(int.MinValue + 1);
+            string result = s.Serialize(ints);
+            List<int> actual = (List<int>)s.Deserialize(result);
+            Assert.AreEqual(ints, actual);
+        }
+
+        [Test]
+        public void SimpleObjectLinkedList()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(LinkedList<SimpleObject>));
+            LinkedList<SimpleObject> objects = new LinkedList<SimpleObject>();
+            SimpleObject obj = null;
+            
+            // object 1
+            obj = new SimpleObject();
+            obj.BoolValue = true;
+            obj.ByteValue = 0xf1;
+            obj.CharValue = 'a';
+            obj.DoubleValue = double.MinValue;
+            obj.FloatValue = float.MinValue;
+            obj.IntValue = 32;
+            obj.LongValue = 39000;
+            obj.ShortValue = 255;
+            obj.StringValue = "AA";
+
+            objects.AddLast(obj);
+
+            // object 2
+            obj = new SimpleObject();
+            obj.BoolValue = false;
+            obj.ByteValue = 0xf2;
+            obj.CharValue = 'b';
+            obj.DoubleValue = double.MaxValue;
+            obj.FloatValue = float.MaxValue;
+            obj.IntValue = 33;
+            obj.LongValue = 39001;
+            obj.ShortValue = 256;
+            obj.StringValue = "BB";
+
+            objects.AddLast(obj);
+
+            string result = s.Serialize(objects);
+
+            LinkedList<SimpleObject> actual = (LinkedList<SimpleObject>)s.Deserialize(result);
+
+            Assert.AreEqual(objects, actual);
         }
     }
 }

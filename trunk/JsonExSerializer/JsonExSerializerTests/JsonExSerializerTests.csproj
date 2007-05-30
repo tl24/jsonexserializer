@@ -37,8 +37,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayTests.cs" />
     <Compile Include="CollectionsTests.cs" />
-    <Compile Include="DeserializeCollectionsTests.cs" />
     <Compile Include="DeserializePrimitiveTests.cs" />
     <Compile Include="Mocks\SemiComplexObject.cs" />
     <Compile Include="SerializeObjectTests.cs" />

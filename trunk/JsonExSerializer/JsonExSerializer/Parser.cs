@@ -166,38 +166,34 @@ namespace JsonExSerializer
             ParseExpression(t);
         }
 
-        private void ParseCollection(object constructedObject, Type desiredType)
+        private void ParseCollection(ICollectionBuilder collBuilder, Type desiredType)
         {
-            if (constructedObject == null)
+            Token tok = ReadToken();
+            Debug.Assert(tok == LSquareToken);
+
+            Type elemType = typeof(object);
+            TypeHandler handler = TypeHandler.GetHandler(desiredType);
+            if (desiredType != typeof(object))
+            {                
+                elemType = handler.GetElementType();
+            }
+            if (collBuilder == null)
             {
-                //TODO: more fancy stuff with ICollection interfaces and stuff
-                if (desiredType == typeof(object) || desiredType.IsArray || desiredType == typeof(ICollection))
+                if (desiredType == typeof(object))
                 {
-                    constructedObject = new ArrayList();
+                    collBuilder = new ListCollectionBuilder(typeof(ArrayList));
                 }
                 else
                 {
-                    constructedObject = Activator.CreateInstance(desiredType);
+                    collBuilder = handler.GetCollectionBuilder();
                 }
             }
-            Token tok = ReadToken();
-            Debug.Assert(tok == LSquareToken);
-            //TODO: figure out member type
-            while (ReadAhead(CommaToken, RSquareToken, new ParserMethod(ParseExpression), typeof(object)))
+            while (ReadAhead(CommaToken, RSquareToken, new ParserMethod(ParseExpression), elemType))
             {
-                ((IList)constructedObject).Add(_values.Pop());
+                collBuilder.Add(_values.Pop());
             }
 
-            if (desiredType.IsArray)
-            {
-                Array result = Array.CreateInstance(desiredType.GetElementType(), ((ArrayList)constructedObject).Count);
-                ((ArrayList)constructedObject).CopyTo(result);
-                _values.Push(result);
-            }
-            else
-            {
-                _values.Push(constructedObject);
-            }
+            _values.Push(collBuilder.GetResult());
         }
 
         private void ParseObject(Type desiredType)
@@ -208,7 +204,14 @@ namespace JsonExSerializer
             }
             Token tok = ReadToken();
             Debug.Assert(tok == LBraceToken);
-            _values.Push(Activator.CreateInstance(desiredType));
+            if (desiredType == typeof(object))
+            {
+                _values.Push(new Hashtable());
+            }
+            else
+            {
+                _values.Push(Activator.CreateInstance(desiredType));
+            }
             while (ReadAhead(CommaToken, RBraceToken, new ParserMethod(ParseKeyValue), desiredType))
             {
             }
@@ -220,14 +223,23 @@ namespace JsonExSerializer
             Token tok = ReadToken();
             string name = tok.value;
             tok = ReadToken();
-            RequireToken(ColonToken, tok, "Syntax error, key should be followed by :.");
-            TypeHandler handler = TypeHandler.GetHandler(desiredType);
-            TypeHandlerProperty prop = handler.FindProperty(name);
-            if (prop == null)
-                throw new ParseException("Could not find property: " + name + " on type: " + handler.ForType.FullName);
-
-            ParseExpression(prop.PropertyType);
-            prop.SetValue(instance, _values.Pop());
+            RequireToken(ColonToken, tok, "Syntax error, key should be followed by :.");            
+            if (instance is IDictionary)
+            {
+                ParseExpression(typeof(object));
+                ((IDictionary)instance)[name] = _values.Pop();                
+            } 
+            else 
+            {
+                TypeHandler handler = TypeHandler.GetHandler(desiredType);
+                TypeHandlerProperty prop = handler.FindProperty(name);
+                if (prop == null)
+                    throw new ParseException("Could not find property: " + name + " on type: " + handler.ForType.FullName);
+                ParseExpression(prop.PropertyType);
+                prop.SetValue(instance, _values.Pop());
+            }
+            
+            
         }
 
         private delegate void ParserMethod(Type desiredType);

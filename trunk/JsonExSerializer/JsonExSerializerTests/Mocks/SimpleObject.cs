@@ -73,5 +73,45 @@ namespace JsonExSerializerTests.Mocks
             set { this._charValue = value; }
         }
 
+        public override bool Equals(object obj)
+        {
+            if (base.Equals(obj))
+            {
+                return true;
+            }
+            else if (obj != null && obj.GetType() == typeof(SimpleObject))
+            {
+                SimpleObject other = (SimpleObject)obj;
+                return other._boolValue == this._boolValue
+                    && other._byteValue == this._byteValue
+                    && other._charValue == this._charValue
+                    && other._doubleValue == this._doubleValue
+                    && other._floatValue == this._floatValue
+                    && other._intValue == this._intValue
+                    && other._longValue == this._longValue
+                    && other._shortValue == this._shortValue
+                    && other._stringValue == this._stringValue;
+
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(_boolValue);
+            sb.Append(_byteValue);
+            sb.Append(_charValue);
+            sb.Append(_doubleValue);
+            sb.Append(_floatValue);
+            sb.Append(_intValue);
+            sb.Append(_longValue);
+            sb.Append(_shortValue);
+            sb.Append(_stringValue);
+            return sb.ToString().GetHashCode();
+        }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using System.Collections;
 
 namespace JsonExSerializer
 {
@@ -85,16 +86,17 @@ namespace JsonExSerializer
         /// <returns></returns>
         public Type GetElementType()
         {
+            // This is very crude, but it will work for now
             if (_handledType.HasElementType)
             {
                 return _handledType.GetElementType();
             }
-            else if (_handledType.IsGenericType && _handledType == typeof(IDictionary<string, object>).GetGenericTypeDefinition())
+            else if (_handledType.IsGenericType && typeof(IDictionary).IsAssignableFrom(_handledType))
             {
                 // get the type of the 
                 return _handledType.GetGenericArguments()[1];
             }
-            else if (_handledType.IsGenericType && _handledType == typeof(ICollection<object>).GetGenericTypeDefinition())
+            else if (_handledType.IsGenericType && typeof(ICollection).IsAssignableFrom(_handledType))
             {
                 // get the type of the collection
                 return _handledType.GetGenericArguments()[0];
@@ -102,6 +104,27 @@ namespace JsonExSerializer
             else
             {
                 return typeof(object);
+            }
+        }
+
+        public ICollectionBuilder GetCollectionBuilder()
+        {
+            if (_handledType.IsArray || typeof(ICollection).IsAssignableFrom(_handledType))
+            {
+                if (_handledType.IsGenericType && typeof(LinkedList<object>).GetGenericTypeDefinition().IsAssignableFrom(_handledType.GetGenericTypeDefinition()))
+                {
+                    Type cbType = typeof(LinkedListCollectionBuilder<object>).GetGenericTypeDefinition();
+                    cbType = cbType.MakeGenericType(new Type[] { this.GetElementType() });
+                    return (ICollectionBuilder)Activator.CreateInstance(cbType, new object[] { _handledType });
+                }
+                else
+                {
+                    return new ListCollectionBuilder(_handledType);
+                }
+            }
+            else
+            {
+                throw new Exception("GetCollectionBuilder called on an object that is not a collection");
             }
         }
     }

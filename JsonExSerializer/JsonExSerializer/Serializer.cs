@@ -33,20 +33,6 @@ namespace JsonExSerializer
             _options = new SerializerOptions();
         }
 
-        #region SerializerOptions
-
-        /// <summary>
-        /// If true, string output will be as compact as possible with minimal spacing.  Thus, cutting
-        /// down on space.  This option has no effect on Deserialization.
-        /// </summary>
-        public bool IsCompact
-        {
-            get { return _options.IsCompact; }
-            set { _options.IsCompact = value; }
-        }
-
-        #endregion
-
         #region Serialization
 
         public void Serialize(object o, TextWriter writer)
@@ -84,6 +70,11 @@ namespace JsonExSerializer
         }
 
         #endregion
+
+        public SerializerOptions Options
+        {
+            get { return this._options; }
+        }
 
     }
 }

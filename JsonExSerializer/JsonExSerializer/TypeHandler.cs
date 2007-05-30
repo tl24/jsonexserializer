@@ -38,25 +38,33 @@ namespace JsonExSerializer
         private TypeHandler(Type t)
         {
             _handledType = t;
-            _properties = new List<TypeHandlerProperty>();
             LoadProperties();
         }
 
         private void LoadProperties()
         {
-            PropertyInfo[] pInfos = _handledType.GetProperties();
-            foreach(PropertyInfo pInfo in pInfos) {
-                _properties.Add(new TypeHandlerProperty(pInfo));
+            if (_properties == null)
+            {
+                _properties = new List<TypeHandlerProperty>();
+                PropertyInfo[] pInfos = _handledType.GetProperties();
+                foreach (PropertyInfo pInfo in pInfos)
+                {
+                    _properties.Add(new TypeHandlerProperty(pInfo));
+                }
             }
         }
 
         public IList<TypeHandlerProperty> Properties
         {
-            get { return _properties; }
+            get {
+                LoadProperties();
+                return _properties; 
+            }
         }
 
         public TypeHandlerProperty FindProperty(string Name)
         {
+            LoadProperties();
             foreach (TypeHandlerProperty prop in _properties)
             {
                 if (prop.Name == Name)
@@ -70,6 +78,32 @@ namespace JsonExSerializer
             get { return _handledType; }
         }
 
+        /// <summary>
+        /// If the object is a collection or array gets the type 
+        /// of its elements.
+        /// </summary>
+        /// <returns></returns>
+        public Type GetElementType()
+        {
+            if (_handledType.HasElementType)
+            {
+                return _handledType.GetElementType();
+            }
+            else if (_handledType.IsGenericType && _handledType == typeof(IDictionary<string, object>).GetGenericTypeDefinition())
+            {
+                // get the type of the 
+                return _handledType.GetGenericArguments()[1];
+            }
+            else if (_handledType.IsGenericType && _handledType == typeof(ICollection<object>).GetGenericTypeDefinition())
+            {
+                // get the type of the collection
+                return _handledType.GetGenericArguments()[0];
+            }
+            else
+            {
+                return typeof(object);
+            }
+        }
     }
 
     public class TypeHandlerProperty

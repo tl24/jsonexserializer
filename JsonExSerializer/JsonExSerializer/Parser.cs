@@ -115,15 +115,6 @@ namespace JsonExSerializer
         /// </summary>
         public void ParseStart()
         {
-            if (_tokens.Count > 1)
-            {
-                LinkedListNode<Token> node = _tokens.First;
-                if (IsKey(node.Value) && IsKeyValueSep(node.Next.Value))
-                {
-                    _tokens.RemoveFirst();
-                    _tokens.RemoveFirst();
-                }
-            }
             ParseExpression(_deserializedType);
         }
 
@@ -153,6 +144,10 @@ namespace JsonExSerializer
                 {
                     ParseObject(desiredType);
                 }
+                else if (tok == LParenToken)
+                {
+                    ParseCast(desiredType);
+                }
                 else if (tok == NewToken)
                 {
                     ParseConstructorSpec(desiredType);
@@ -160,12 +155,30 @@ namespace JsonExSerializer
             }
         }
 
+        private void ParseCast(Type desiredType)
+        {
+            Token tok = ReadToken();
+            Debug.Assert(tok == LParenToken, "Invalid starting token for ParseCast: " + tok);
+            ParseTypeSpecifier();
+            tok = ReadToken();
+            RequireToken(RParenToken, tok, "Invalid Type Cast Syntax");
+            Type t = (Type) _values.Pop();
+            ParseExpression(t);
+        }
+
         private void ParseCollection(object constructedObject, Type desiredType)
         {
             if (constructedObject == null)
             {
                 //TODO: more fancy stuff with ICollection interfaces and stuff
-                constructedObject = Activator.CreateInstance(desiredType);
+                if (desiredType == typeof(object) || desiredType.IsArray || desiredType == typeof(ICollection))
+                {
+                    constructedObject = new ArrayList();
+                }
+                else
+                {
+                    constructedObject = Activator.CreateInstance(desiredType);
+                }
             }
             Token tok = ReadToken();
             Debug.Assert(tok == LSquareToken);
@@ -174,10 +187,25 @@ namespace JsonExSerializer
             {
                 ((IList)constructedObject).Add(_values.Pop());
             }
+
+            if (desiredType.IsArray)
+            {
+                Array result = Array.CreateInstance(desiredType.GetElementType(), ((ArrayList)constructedObject).Count);
+                ((ArrayList)constructedObject).CopyTo(result);
+                _values.Push(result);
+            }
+            else
+            {
+                _values.Push(constructedObject);
+            }
         }
 
         private void ParseObject(Type desiredType)
         {
+            if (desiredType.IsArray)
+            {
+                throw new ParseException("Invalid collection type for object " + desiredType);
+            }
             Token tok = ReadToken();
             Debug.Assert(tok == LBraceToken);
             _values.Push(Activator.CreateInstance(desiredType));
@@ -234,12 +262,22 @@ namespace JsonExSerializer
             Debug.Assert(tok == NewToken);
             ParseTypeSpecifier();
 
-            string type = (string) _values.Pop();
+            Type type = (Type)_values.Pop();
             tok = ReadToken();
             RequireToken(LParenToken, tok, "Missing constructor arguments");
 
         }
 
+        /// <summary>
+        /// Parses a type specifier, used by cast and constructor types.  The final
+        /// result is "Type" which is then pushed on the values stack. 
+        /// Examples:
+        ///   System.Int32    -- int
+        ///   System.Object[]   -- obect array
+        ///   System.Collections.Generic.List&lt;System.String&gt; -- list of strings
+        ///   System.Collections.Generic.List&lt;System.String&gt;[]  -- array of list of strings
+        ///   System.Collections.Generic.List&lt;System.String[]&gt;  -- list of string arrays
+        /// </summary>
         private void ParseTypeSpecifier()
         {
             StringBuilder typeSpec = new StringBuilder();
@@ -262,32 +300,79 @@ namespace JsonExSerializer
             }
             // should we parse these into a type?
             // look for generic type args
+
+            Type builtType = Type.GetType(typeSpec.ToString(), true);
             
-            
-            if (PeekToken() == GenericArgsStart)
+            if (builtType.IsGenericTypeDefinition && PeekToken() == GenericArgsStart)
             {
-                tok = ReadToken();
-                typeSpec.Append(tok.value);
+                List<Type> genericTypes = new List<Type>();
+                tok = ReadToken();                
                 ParseTypeSpecifier();
-                typeSpec.Append(_values.Pop());
+                genericTypes.Add((Type)_values.Pop());
                 
                 while (PeekToken() == CommaToken)
-                {
-                    typeSpec.Append(',');
+                {                    
                     ParseTypeSpecifier();
-                    typeSpec.Append(_values.Pop());
+                    genericTypes.Add((Type)_values.Pop());
                 }
                 tok = ReadToken();
                 RequireToken(GenericArgsEnd, tok, "Unterminated generic type arguments");
-                typeSpec.Append(tok.value);
+                builtType = builtType.MakeGenericType(genericTypes.ToArray());
             }
-            _values.Push(typeSpec.ToString());
+            // array spec
+            if (PeekToken() == LParenToken)
+            {                
+                tok = ReadToken();
+                RequireToken(RParenToken, ReadToken(), "Expected array type specifier");
+                builtType = builtType.MakeArrayType();
+            }            
+
+            _values.Push(builtType);
         }
 
         private void ParsePrimitive(Type desiredType)
         {
             Token tok = ReadToken();
-            object result = Convert.ChangeType(tok.value, desiredType);
+            object result = null;
+            if (desiredType == typeof(object))
+            {
+                // no type info, try to figure out the closest type
+                switch (tok.type)
+                {
+                    case TokenType.Number:
+                        if (tok.value.IndexOf('.') != -1)
+                        {
+                            result = Convert.ToDouble(tok.value);
+                        }
+                        else
+                        {
+                            result = Convert.ToInt32(tok.value);
+                        }
+                        break;
+                    case TokenType.Identifier:
+                        if (tok.value.Equals("true", StringComparison.CurrentCultureIgnoreCase)
+                        || tok.value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            result = Convert.ToBoolean(tok.value);
+                        }
+                        else if (tok.value.Equals("null"))
+                        {
+                            result = null;
+                        }
+                        else
+                        {
+                            result = tok.value;
+                        }
+                        break;
+                    default:
+                        result = tok.value;
+                        break;
+                }
+            }
+            else
+            {
+                result = Convert.ChangeType(tok.value, desiredType);
+            }
             _values.Push(result);
         }
 
@@ -325,10 +410,6 @@ namespace JsonExSerializer
             }
         }
 
-        private bool IsKeyValueSep(Token tok)
-        {
-            return (tok == ColonToken);
-        }
         private bool IsKey(Token tok)
         {
             return (IsQuotedString(tok) && IsIdentifier(tok));

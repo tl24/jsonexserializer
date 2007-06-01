@@ -93,11 +93,11 @@ namespace JsonExSerializer
                 Serialize(prop.Name, subindent);
                 _writer.Write(":");
                 object value = prop.GetValue(o);
-                if (_options._outputTypeInformation && value.GetType() != prop.PropertyType)
+                if (value != null && _options._outputTypeInformation && value.GetType() != prop.PropertyType)
                 {
                     WriteCast(value.GetType());
                 }
-                Serialize(prop.GetValue(o), subindent);
+                Serialize(value, subindent);
                 addComma = true;
             }
             if (!_options.IsCompact)

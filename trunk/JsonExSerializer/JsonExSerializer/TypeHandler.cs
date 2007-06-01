@@ -50,7 +50,15 @@ namespace JsonExSerializer
                 PropertyInfo[] pInfos = _handledType.GetProperties();
                 foreach (PropertyInfo pInfo in pInfos)
                 {
-                    _properties.Add(new TypeHandlerProperty(pInfo));
+                    // must be able to read and write the prop, otherwise its not 2-way 
+                    if (pInfo.CanRead && pInfo.CanWrite)
+                    {
+                        // ignore attribute
+                        if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false))
+                        {
+                            _properties.Add(new TypeHandlerProperty(pInfo));
+                        }
+                    }
                 }
             }
         }

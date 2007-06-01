@@ -8,6 +8,14 @@ namespace JsonExSerializerTests.Mocks
     {
         private string _name;
         private SimpleObject _simpleObject;
+        private int _count;
+
+        public SemiComplexObject(int count) {
+            this._count = count;
+        }
+
+        public SemiComplexObject() : this(0) { }
+
 
         public string Name
         {
@@ -21,6 +29,9 @@ namespace JsonExSerializerTests.Mocks
             set { this._simpleObject = value; }
         }
 
-
+        public int Count
+        {
+            get { return _count; }
+        }
     }
 }

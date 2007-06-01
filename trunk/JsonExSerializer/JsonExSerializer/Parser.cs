@@ -61,6 +61,9 @@ namespace JsonExSerializer
         /// <summary> ) </summary>
         private readonly Token RBraceToken = new Token(TokenType.Symbol, "}");
 
+        /// <summary> null </summary>
+        private readonly Token NullToken = new Token(TokenType.Identifier, "null");
+
         #endregion
 
         public Parser(Type t, LinkedList<Token> tokens, SerializerOptions options)
@@ -383,7 +386,14 @@ namespace JsonExSerializer
             }
             else
             {
-                result = Convert.ChangeType(tok.value, desiredType);
+                if (tok == NullToken)
+                {
+                    result = null;
+                }
+                else
+                {
+                    result = Convert.ChangeType(tok.value, desiredType);
+                }
             }
             _values.Push(result);
         }

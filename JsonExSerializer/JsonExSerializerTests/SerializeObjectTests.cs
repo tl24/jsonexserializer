@@ -54,6 +54,54 @@ namespace JsonExSerializerTests
             ValidateSimpleObjects(complex.SimpleObject, complexDest.SimpleObject);            
         }
 
+        [Test]
+        public void NullValueTest()
+        {
+            SpecializedMock expected = new SpecializedMock();
+            expected.Name = null;
+            Serializer s = Serializer.GetSerializer(typeof(SpecializedMock));
+            string result = s.Serialize(expected);
+            SpecializedMock actual = (SpecializedMock)s.Deserialize(result);
+            Assert.IsNull(actual.Name, "Null value not serialized, deserialized correctly");
+        }
+
+        [Test]
+        public void GetOnlyPropertyTest()
+        {
+            SpecializedMock co = new SpecializedMock(33);
+            co.Name = "ThirtyThree";
+            Serializer s = Serializer.GetSerializer(typeof(SpecializedMock));
+            string result = s.Serialize(co);
+            SpecializedMock actual = (SpecializedMock)s.Deserialize(result);
+            Assert.AreEqual(co.Name, actual.Name, "Name properties don't match");
+            Assert.AreNotEqual(co.Count, actual.Count, "Read only property not deserialized correctly");
+        }
+
+        [Test]
+        public void IgnoreAttributeTest()
+        {
+            SpecializedMock co = new SpecializedMock(33);
+            co.Name = "ThirtyThree";
+            co.IgnoredProp = "IgnoreMe";
+            Serializer s = Serializer.GetSerializer(typeof(SpecializedMock));
+            string result = s.Serialize(co);
+            SpecializedMock actual = (SpecializedMock)s.Deserialize(result);
+            Assert.AreNotEqual(co.IgnoredProp, actual.IgnoredProp, "Ignored property not ignored");
+        }
+
+        [Test]
+        public void SubClassTest()
+        {
+            SubClassMock co = new SubClassMock();
+            co.Name = "ThirtyThree";
+            co.SubClassProp = "Some Subclass";
+            Serializer s = Serializer.GetSerializer(typeof(SubClassMock));
+            string result = s.Serialize(co);
+            SubClassMock actual = (SubClassMock)s.Deserialize(result);
+            Assert.AreEqual(co.Name, actual.Name, "Base class properties don't match");
+            Assert.AreEqual(co.SubClassProp, actual.SubClassProp, "Sub Class properties don't match");
+        }
+
         public void ValidateSimpleObjects(SimpleObject src, SimpleObject dst)
         {
             Assert.AreEqual(src.BoolValue, dst.BoolValue, "SimpleObject.BoolValue not equal");

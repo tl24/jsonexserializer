@@ -41,6 +41,8 @@
     <Compile Include="CollectionsTests.cs" />
     <Compile Include="DeserializePrimitiveTests.cs" />
     <Compile Include="Mocks\SemiComplexObject.cs" />
+    <Compile Include="Mocks\SpecializedMock.cs" />
+    <Compile Include="Mocks\SubClassMock.cs" />
     <Compile Include="SerializeObjectTests.cs" />
     <Compile Include="SerializePrimitiveTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="Deserializer.cs" />
     <Compile Include="ICollectionBuilder.cs" />
+    <Compile Include="JsonExIgnoreAttribute.cs" />
     <Compile Include="LinkedListCollectionBuilder.cs" />
     <Compile Include="ListCollectionBuilder.cs" />
     <Compile Include="ParseException.cs" />

@@ -14,7 +14,6 @@ namespace JsonExSerializer
     {
         private Type _deserializedType;
         private TextReader _reader;
-        private LinkedList<Token> _tokens;
         private SerializerOptions _options;
 
         public Deserializer(Type t, TextReader reader, SerializerOptions options)
@@ -26,9 +25,8 @@ namespace JsonExSerializer
 
         public object Deserialize()
         {
-            Tokenizer tokenizer = new Tokenizer(_reader, _options);
-            _tokens = tokenizer.Tokenize();
-            Parser p = new Parser(_deserializedType, _tokens, _options);
+            TokenStream tokenStream = new TokenStream(_reader, _options);
+            Parser p = new Parser(_deserializedType, tokenStream, _options);
             return p.Parse();            
         }
 

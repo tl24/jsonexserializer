@@ -10,29 +10,56 @@ using System.IO;
 
 namespace JsonExSerializer
 {
-    public class Tokenizer
+    public class TokenStream
     {
 
         #region Member Variables
 
         private TextReader _reader;
-        private LinkedList<Token> _tokens;
+        private Stack<Token> _tokens;
         private char[] _symbols;
         private SerializerOptions _options;
 
         #endregion
 
-        public Tokenizer(TextReader reader, SerializerOptions options)
+        public TokenStream(TextReader reader, SerializerOptions options)
         {
             _reader = reader;
-            _tokens = new LinkedList<Token>();
+            _tokens = new Stack<Token>();
             _symbols = "[]<>():,{}.".ToCharArray();
             Array.Sort<char>(_symbols);
             _options = options;
         }
 
 
-        public LinkedList<Token> Tokenize()
+        public Token PeekToken()
+        {
+            if (_tokens.Count == 0)
+            {
+                _tokens.Push(ReadToken());
+            }
+
+            return _tokens.Peek();
+        }
+
+        public Token ReadToken()
+        {
+            if (_tokens.Count > 0)
+            {
+                return _tokens.Pop();
+            }
+            else
+            {
+                return ReadTokenFromReader();
+            }
+        }
+
+        public bool IsEmpty()
+        {
+            return PeekToken() == Token.Empty;
+        }
+
+        private Token ReadTokenFromReader()
         {
             StringBuilder buffer = new StringBuilder();
             int c;
@@ -41,26 +68,25 @@ namespace JsonExSerializer
             while ((c = _reader.Read()) != -1) {
                 ch = (char) c;
                 if (IsQuoteStart(ch)) {
-                    _tokens.AddLast(GetQuotedString(ch, buffer));
+                    return GetQuotedString(ch, buffer);
                 } else if (IsNumberStart(ch)) {
-                    _tokens.AddLast(GetNumber(ch, buffer));
+                    return GetNumber(ch, buffer);
                 } else if (char.IsWhiteSpace(ch)) {
                     // nothing
                 } else if (IsIdentifierStart(ch)) {
-                    _tokens.AddLast(GetIdentifier(ch, buffer));
+                    return  GetIdentifier(ch, buffer);
                 } else if (IsLineCommentStart(ch)) {
                     ReadLineComment(ch);
                 } else if (IsMultilineCommentStart(ch)) {
                     ReadMultilineComment(ch);
                 } else if (IsSymbolStart(ch)) {
-                    _tokens.AddLast(GetSymbol(ch, buffer));
+                    return GetSymbol(ch, buffer);
                 } else {
                     throw new ParseException("Invalid character");
                 }
                 buffer.Length = 0;
             }
-            return _tokens;
-
+            return Token.Empty;
         }
 
         #region Read Methods

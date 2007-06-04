@@ -45,7 +45,7 @@
     <Compile Include="SerializerHelper.cs" />
     <Compile Include="SerializerOptions.cs" />
     <Compile Include="Token.cs" />
-    <Compile Include="Tokenizer.cs" />
+    <Compile Include="TokenStream.cs" />
     <Compile Include="TypeHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

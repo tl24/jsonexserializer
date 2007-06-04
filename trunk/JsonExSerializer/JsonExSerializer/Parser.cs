@@ -17,7 +17,7 @@ namespace JsonExSerializer
         #region Member Variables
 
         private Type _deserializedType;
-        private LinkedList<Token> _tokens;
+        private TokenStream _tokenStream;
         private Stack _values;
         private SerializerOptions _options;
 
@@ -66,17 +66,17 @@ namespace JsonExSerializer
 
         #endregion
 
-        public Parser(Type t, LinkedList<Token> tokens, SerializerOptions options)
+        public Parser(Type t, TokenStream tokenStream, SerializerOptions options)
         {
             _deserializedType = t;
-            _tokens = tokens;
+            _tokenStream = tokenStream;
             _values = new Stack();
             _options = options;
         }
 
         public object Parse()
         {
-            ParseStart();
+            ParseExpression(_deserializedType);
             object result = null;
             if (_values.Count > 1)
             {
@@ -94,10 +94,7 @@ namespace JsonExSerializer
         /// <returns>the token</returns>
         private Token PeekToken()
         {
-            Token tok = Token.Empty;
-            if (_tokens.Count > 0)
-                tok = _tokens.First.Value;
-            return tok;
+            return _tokenStream.PeekToken();
         }
 
         /// <summary>
@@ -106,24 +103,12 @@ namespace JsonExSerializer
         /// <returns>the next toke</returns>
         private Token ReadToken()
         {
-            Token tok = Token.Empty;
-            if (_tokens.Count > 0)
-                tok = _tokens.First.Value;
-            _tokens.RemoveFirst();
-            return tok;
-        }
-
-        /// <summary>
-        /// Start := (Key : expr) | expr
-        /// </summary>
-        public void ParseStart()
-        {
-            ParseExpression(_deserializedType);
+            return _tokenStream.ReadToken();
         }
 
         private void ParseExpression(Type desiredType)
         {
-            if (_tokens.Count == 0)
+            if (_tokenStream.IsEmpty())
             {
                 return;
             }
@@ -389,6 +374,10 @@ namespace JsonExSerializer
                 if (tok == NullToken)
                 {
                     result = null;
+                }
+                else if (desiredType.IsEnum)
+                {
+                    result = Enum.Parse(desiredType, tok.value);
                 }
                 else
                 {

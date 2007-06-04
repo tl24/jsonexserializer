@@ -32,41 +32,94 @@ namespace JsonExSerializer
                 _writer.WriteLine("*/");
             }
             Serialize(o, indent);
+            
         }
 
         public void Serialize(object o, string indent)
         {
-            if (o == null) {
+            if (o == null)
+            {
                 _writer.Write("null");
             }
-            else if (o.GetType().IsPrimitive && !(o is char))
-            {
-                string val;
-                if (o is double)
-                    val = ((double)o).ToString("R");
-                else if (o is float)
-                    val = ((float)o).ToString("R");
-                else
-                    val = Convert.ToString(o);
-
-                _writer.Write(val);
-            }
-            else if (o.GetType() == typeof(string) || o.GetType() == typeof(char))
-            {
-                string val = o.ToString();
-                _writer.Write('"');
-                _writer.Write(EscapeString(val));
-                _writer.Write('"');
-            }
-            else if (o is ICollection || o.GetType().IsArray)
-            {
-                SerializeCollection(o, indent);
-            } 
             else
             {
-                SerializeObject(o, indent);
-            }
+                switch (Type.GetTypeCode(o.GetType()))
+                {
+                    case TypeCode.Char:
+                        WriteChar((char)o, indent);
+                        break;
+                    case TypeCode.String:
+                        WriteString((string)o, indent);
+                        break;
+                    case TypeCode.Double:
+                        WriteDouble((double) o, indent);
+                        break;
+                    case TypeCode.Single:
+                        WriteFloat((float)o, indent);
+                        break;
+                    case TypeCode.Object:
+                        if (o.GetType().IsEnum)
+                        {
+                            SerializeEnum(o, indent);
+                        }
+                        else if (o is ICollection || o.GetType().IsArray)
+                        {
+                            SerializeCollection(o, indent);
+                        }
+                        else
+                        {
+                            SerializeObject(o, indent);
+                        }
+                        break;
+                    case TypeCode.DateTime:
+                        WriteDateTime((DateTime)o, indent);
+                        break;
+                    case TypeCode.Boolean:
+                        WriteBoolean((bool)o, indent);
+                        break;
+                    case TypeCode.Byte:
+                        WriteByte((byte)o, indent);
+                        break;
+                    case TypeCode.DBNull:
+                        WriteDBNull((DBNull)o, indent);
+                        break;
+                    case TypeCode.Empty:
+                        throw new Exception("Unsupported value (Empty): " + o);
+                    case TypeCode.Int16:
+                        WriteInt16((short)o, indent);
+                        break;
+                    case TypeCode.Int32:
+                        WriteInt32((int)o, indent);
+                        break;
+                    case TypeCode.Int64:
+                        WriteInt64((long)o, indent);
+                        break;
+                    case TypeCode.SByte:
+                        WriteSByte((sbyte)o, indent);
+                        break;
 
+                    case TypeCode.UInt16:
+                        WriteUInt16((ushort)o, indent);
+                        break;
+                    case TypeCode.UInt32:
+                        WriteUInt32((uint)o, indent);
+                        break;
+                    case TypeCode.UInt64:
+                        WriteUInt64((ulong)o, indent);
+                        break;
+                    case TypeCode.Decimal:
+                        WriteDecimal((decimal)o, indent);
+                        break;
+                    default:
+                        _writer.Write(Convert.ToString(o));
+                        break;
+                }
+            }
+        }
+
+        private void SerializeEnum(object o, string indent)
+        {
+            _writer.Write(Enum.Format(o.GetType(), o, "d"));
         }
 
         private void SerializeObject(object o, string indent)
@@ -146,6 +199,79 @@ namespace JsonExSerializer
                 _writer.Write(indent);
             }
             _writer.Write(']');
+        }
+
+        protected void WriteDateTime(DateTime value, string indent)
+        {
+            _writer.Write(value.ToString());
+        }
+        protected void WriteBoolean(bool value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteByte(byte value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteDBNull(DBNull value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteInt16(short value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteInt32(int value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteInt64(long value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteSByte(sbyte value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteUInt16(ushort value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteUInt32(uint value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteUInt64(ulong value, string indent)
+        {
+            _writer.Write(value);
+        }
+        protected void WriteDecimal(decimal value, string indent)
+        {
+            _writer.Write(value);
+        }
+
+        protected void WriteDouble(double value, string indent)
+        {
+            _writer.Write(value.ToString("R"));
+        }
+
+        protected void WriteFloat(float value, string indent)
+        {
+            _writer.Write(value.ToString("R"));
+        }
+
+        protected void WriteChar(char value, string indent)
+        {
+            _writer.Write('"');
+            _writer.Write(EscapeString(value.ToString()));
+            _writer.Write('"');
+        }
+
+        protected void WriteString(string value, string indent)
+        {
+            _writer.Write('"');
+            _writer.Write(EscapeString(value));
+            _writer.Write('"');
         }
 
         private void WriteCast(Type t)

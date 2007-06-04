@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using JsonExSerializer;
+using JsonExSerializerTests.Mocks;
 
 namespace JsonExSerializerTests
 {
@@ -215,6 +216,15 @@ namespace JsonExSerializerTests
             string result = s.Serialize(expected);
             Assert.AreEqual("\"simple\"", result, "String did not serialize correctly.");
 
+        }
+
+        [Test]
+        public void SerializeEnumTest()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(SimpleEnum));
+            string result = s.Serialize(SimpleEnum.EnumValue2);
+            SimpleEnum se = (SimpleEnum)s.Deserialize(result);
+            Assert.AreEqual(SimpleEnum.EnumValue2, se, "Enum values not correct");
         }
     }
 }

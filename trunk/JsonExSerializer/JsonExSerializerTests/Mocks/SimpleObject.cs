@@ -4,6 +4,13 @@ using System.Text;
 
 namespace JsonExSerializerTests.Mocks
 {
+    public enum SimpleEnum
+    {
+        EnumValue1,
+        EnumValue2,
+        EnumValue3,
+    }
+
     /// <summary>
     /// Contains simple primitive properties for testing
     /// </summary>
@@ -18,6 +25,7 @@ namespace JsonExSerializerTests.Mocks
         private bool _boolValue;
         private string _stringValue;
         private char _charValue;
+        private SimpleEnum _enumValue;
 
         public byte ByteValue
         {
@@ -73,6 +81,7 @@ namespace JsonExSerializerTests.Mocks
             set { this._charValue = value; }
         }
 
+
         public override bool Equals(object obj)
         {
             if (base.Equals(obj))
@@ -112,6 +121,12 @@ namespace JsonExSerializerTests.Mocks
             sb.Append(_shortValue);
             sb.Append(_stringValue);
             return sb.ToString().GetHashCode();
+        }
+
+        public SimpleEnum EnumValue
+        {
+            get { return this._enumValue; }
+            set { this._enumValue = value; }
         }
     }
 }

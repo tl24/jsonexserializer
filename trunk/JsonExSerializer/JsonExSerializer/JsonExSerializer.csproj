@@ -33,11 +33,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CollectionBuilder\NonStandardCollectionBuilder.cs" />
+    <Compile Include="CollectionBuilder\NonStandardGenericCollectionBuilder.cs" />
     <Compile Include="Deserializer.cs" />
-    <Compile Include="ICollectionBuilder.cs" />
+    <Compile Include="CollectionBuilder\ICollectionBuilder.cs" />
     <Compile Include="JsonExIgnoreAttribute.cs" />
-    <Compile Include="LinkedListCollectionBuilder.cs" />
-    <Compile Include="ListCollectionBuilder.cs" />
+    <Compile Include="CollectionBuilder\LinkedListCollectionBuilder.cs" />
+    <Compile Include="CollectionBuilder\ListCollectionBuilder.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Serializer.cs" />

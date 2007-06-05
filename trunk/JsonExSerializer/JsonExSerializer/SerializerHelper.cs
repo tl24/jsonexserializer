@@ -58,11 +58,7 @@ namespace JsonExSerializer
                         WriteFloat((float)o, indent);
                         break;
                     case TypeCode.Object:
-                        if (o.GetType().IsEnum)
-                        {
-                            SerializeEnum(o, indent);
-                        }
-                        else if (o is ICollection || o.GetType().IsArray)
+                        if (o is ICollection || o.GetType().IsArray)
                         {
                             SerializeCollection(o, indent);
                         }

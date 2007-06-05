@@ -82,5 +82,33 @@ namespace JsonExSerializerTests
 
             Assert.AreEqual(objects, actual);
         }
+
+        [Test]
+        public void NonGenericQueueTest()
+        {
+            Queue expectedQueue = new Queue();
+            expectedQueue.Enqueue(4);
+            expectedQueue.Enqueue(2);
+            expectedQueue.Enqueue(1);
+            Serializer s = Serializer.GetSerializer(typeof(Queue));
+            string result = s.Serialize(expectedQueue);
+
+            Queue actualQueue = (Queue)s.Deserialize(result);
+            Assert.AreEqual(expectedQueue, actualQueue, "Non-generic queues not equal");
+        }
+
+        [Test]
+        public void GenericQueueTest()
+        {
+            Queue<float> expectedQueue = new Queue<float>();
+            expectedQueue.Enqueue(4.3f);
+            expectedQueue.Enqueue(2.9934f);
+            expectedQueue.Enqueue(-0.456f);
+            Serializer s = Serializer.GetSerializer(typeof(Queue<float>));
+            string result = s.Serialize(expectedQueue);
+
+            Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
+            Assert.AreEqual(expectedQueue, actualQueue, "Generic queues not equal");
+        }
     }
 }

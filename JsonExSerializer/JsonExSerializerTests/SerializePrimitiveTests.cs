@@ -226,5 +226,15 @@ namespace JsonExSerializerTests
             SimpleEnum se = (SimpleEnum)s.Deserialize(result);
             Assert.AreEqual(SimpleEnum.EnumValue2, se, "Enum values not correct");
         }
+
+        [Test]
+        public void SerializeFlagsEnumTest()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(MockFlagsEnum));
+            MockFlagsEnum expected = MockFlagsEnum.BitOne | MockFlagsEnum.BitFour | MockFlagsEnum.BitFive;
+            string result = s.Serialize(expected);
+            MockFlagsEnum actual = (MockFlagsEnum)s.Deserialize(result);
+            Assert.AreEqual(expected, actual, "Flags Enum values not correct");
+        }
     }
 }

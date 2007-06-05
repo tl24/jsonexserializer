@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace JsonExSerializer
+namespace JsonExSerializer.CollectionBuilder
 {
     /// <summary>
     /// Interface for an item that can build a collection object

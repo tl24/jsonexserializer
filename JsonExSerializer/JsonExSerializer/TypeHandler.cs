@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.Collections;
+using JsonExSerializer.CollectionBuilder;
 
 namespace JsonExSerializer
 {
@@ -117,24 +118,29 @@ namespace JsonExSerializer
 
         public ICollectionBuilder GetCollectionBuilder()
         {
-            if (_handledType.IsArray || typeof(ICollection).IsAssignableFrom(_handledType))
+            //TODO: this is ugly code, there has to be a better way
+            if (_handledType.IsArray || typeof(IList).IsAssignableFrom(_handledType))
             {
-                if (_handledType.IsGenericType && typeof(LinkedList<object>).GetGenericTypeDefinition().IsAssignableFrom(_handledType.GetGenericTypeDefinition()))
+                return new ListCollectionBuilder(_handledType);
+            } else if (typeof(ICollection).IsAssignableFrom(_handledType)) {
+                // make a strongly typed IEnumerable interface to compare against
+                Type ienumGeneric = typeof(IEnumerable<object>).GetGenericTypeDefinition().MakeGenericType(new Type[] { this.GetElementType() });
+                if (_handledType.IsGenericType && ienumGeneric.IsAssignableFrom(_handledType))
                 {
-                    Type cbType = typeof(LinkedListCollectionBuilder<object>).GetGenericTypeDefinition();
+                    Type cbType = typeof(NonStandardGenericCollectionBuilder<object>).GetGenericTypeDefinition();
                     cbType = cbType.MakeGenericType(new Type[] { this.GetElementType() });
                     return (ICollectionBuilder)Activator.CreateInstance(cbType, new object[] { _handledType });
                 }
                 else
                 {
-                    return new ListCollectionBuilder(_handledType);
+                    return new NonStandardCollectionBuilder(_handledType);
                 }
             }
             else
             {
                 throw new Exception("GetCollectionBuilder called on an object that is not a collection");
             }
-        }
+        }       
     }
 
     public class TypeHandlerProperty

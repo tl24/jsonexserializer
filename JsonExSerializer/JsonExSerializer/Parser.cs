@@ -9,6 +9,7 @@ using System.Text;
 using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
+using JsonExSerializer.CollectionBuilder;
 
 namespace JsonExSerializer
 {

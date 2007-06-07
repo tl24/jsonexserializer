@@ -14,9 +14,9 @@ namespace JsonExSerializer
     {
         private Type _deserializedType;
         private TextReader _reader;
-        private SerializerOptions _options;
+        private SerializationContext _options;
 
-        public Deserializer(Type t, TextReader reader, SerializerOptions options)
+        public Deserializer(Type t, TextReader reader, SerializationContext options)
         {
             _deserializedType = t;
             _reader = reader;

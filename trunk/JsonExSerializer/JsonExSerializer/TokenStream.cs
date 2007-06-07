@@ -18,11 +18,11 @@ namespace JsonExSerializer
         private TextReader _reader;
         private Stack<Token> _tokens;
         private char[] _symbols;
-        private SerializerOptions _options;
+        private SerializationContext _options;
 
         #endregion
 
-        public TokenStream(TextReader reader, SerializerOptions options)
+        public TokenStream(TextReader reader, SerializationContext options)
         {
             _reader = reader;
             _tokens = new Stack<Token>();

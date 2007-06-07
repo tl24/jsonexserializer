@@ -9,11 +9,11 @@ namespace JsonExSerializer
     public class SerializerHelper
     {
         private Type _serializedType;
-        private SerializerOptions _options;
+        private SerializationContext _options;
         private TextWriter _writer;
         private const string indentLevel = "   ";
 
-        internal SerializerHelper(Type t, SerializerOptions options, TextWriter writer)
+        internal SerializerHelper(Type t, SerializationContext options, TextWriter writer)
         {
             _serializedType = t;
             _options = options;
@@ -30,6 +30,10 @@ namespace JsonExSerializer
                 _writer.WriteLine("  Assembly: " + o.GetType().Assembly.ToString());
                 _writer.WriteLine("  Type: " + o.GetType().FullName);
                 _writer.WriteLine("*/");
+            }
+            if (o != null && _options._outputTypeInformation && o.GetType() != _serializedType)
+            {
+                WriteCast(o.GetType());
             }
             Serialize(o, indent);
             
@@ -276,10 +280,43 @@ namespace JsonExSerializer
                 _writer.Write('(');
                 //TODO: Write simple type name for primitive types 
                 // such as "int" instead of "System.Int32"
-                _writer.Write(t.FullName);
+                WriteTypeInfo(t);
                 _writer.Write(')');
             }
         }
+
+        /// <summary>
+        /// Writes out the type for an object in regular C# code syntax
+        /// </summary>
+        /// <param name="t">the type to write</param>
+        private void WriteTypeInfo(Type t)
+        {
+            if (t.IsArray)
+            {
+                WriteTypeInfo(t.GetElementType());
+                _writer.Write("[]");
+            }
+            else if (t.IsGenericType)
+            {
+                string genericName = t.GetGenericTypeDefinition().FullName;
+                _writer.Write(genericName.Substring(0, genericName.LastIndexOf('`')));
+                _writer.Write('<');
+                bool writeComma = false;
+                foreach (Type genArgType in t.GetGenericArguments())
+                {
+                    if (writeComma)
+                        _writer.Write(',');
+                    writeComma = true;
+                    WriteTypeInfo(genArgType);
+                }
+                _writer.Write('>');
+            }
+            else
+            {
+                _writer.Write(t.FullName);
+            }
+        }
+
         private string EscapeString(string s)
         {
             return s.Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"");

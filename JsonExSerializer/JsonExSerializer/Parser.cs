@@ -10,6 +10,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
 using JsonExSerializer.CollectionBuilder;
+using System.Reflection;
 
 namespace JsonExSerializer
 {
@@ -20,7 +21,7 @@ namespace JsonExSerializer
         private Type _deserializedType;
         private TokenStream _tokenStream;
         private Stack _values;
-        private SerializerOptions _options;
+        private SerializationContext _options;
 
         #endregion
 
@@ -67,7 +68,7 @@ namespace JsonExSerializer
 
         #endregion
 
-        public Parser(Type t, TokenStream tokenStream, SerializerOptions options)
+        public Parser(Type t, TokenStream tokenStream, SerializationContext options)
         {
             _deserializedType = t;
             _tokenStream = tokenStream;
@@ -302,11 +303,12 @@ namespace JsonExSerializer
             // should we parse these into a type?
             // look for generic type args
 
-            Type builtType = Type.GetType(typeSpec.ToString(), true);
             
-            if (builtType.IsGenericTypeDefinition && PeekToken() == GenericArgsStart)
+
+            List<Type> genericTypes = new List<Type>();
+            if (PeekToken() == GenericArgsStart)
             {
-                List<Type> genericTypes = new List<Type>();
+                
                 tok = ReadToken();                
                 ParseTypeSpecifier();
                 genericTypes.Add((Type)_values.Pop());
@@ -317,8 +319,22 @@ namespace JsonExSerializer
                     genericTypes.Add((Type)_values.Pop());
                 }
                 tok = ReadToken();
-                RequireToken(GenericArgsEnd, tok, "Unterminated generic type arguments");
+                RequireToken(GenericArgsEnd, tok, "Unterminated generic type arguments");                
+            }
+
+            Type builtType = null;
+            if (genericTypes.Count > 0)
+            {
+                typeSpec.Append('`');
+                typeSpec.Append(genericTypes.Count);
+                //builtType = Type.GetType(typeSpec.ToString(), true);
+                builtType = bindType(typeSpec.ToString());
                 builtType = builtType.MakeGenericType(genericTypes.ToArray());
+            }
+            else
+            {
+                //builtType = Type.GetType(typeSpec.ToString(), true);
+                builtType = bindType(typeSpec.ToString());
             }
             // array spec
             if (PeekToken() == LParenToken)
@@ -329,6 +345,22 @@ namespace JsonExSerializer
             }            
 
             _values.Push(builtType);
+        }
+
+        private Type bindType(string typeName)
+        {
+            Assembly current = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
+            foreach (AssemblyName a in current.GetReferencedAssemblies())
+            {
+                if (typeName.StartsWith(a.Name.Replace(".dll", "")))
+                {
+                    Assembly assmbly = Assembly.Load(a);
+                    Type t = assmbly.GetType(typeName);
+                    if (t != null)
+                        return t;
+                }
+            }
+            return Type.GetType(typeName, true);
         }
 
         private void ParsePrimitive(Type desiredType)

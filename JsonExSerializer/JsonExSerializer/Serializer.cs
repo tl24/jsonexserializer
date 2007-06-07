@@ -14,7 +14,7 @@ namespace JsonExSerializer
     public class Serializer
     {
         private Type _serializedType;
-        private SerializerOptions _options;
+        private SerializationContext _options;
 
         /// <summary>
         /// Gets a serializer for the given type
@@ -30,7 +30,7 @@ namespace JsonExSerializer
         private Serializer(Type t)
         {
             _serializedType = t;
-            _options = new SerializerOptions();
+            _options = new SerializationContext();
         }
 
         #region Serialization
@@ -71,7 +71,7 @@ namespace JsonExSerializer
 
         #endregion
 
-        public SerializerOptions Options
+        public SerializationContext Options
         {
             get { return this._options; }
         }

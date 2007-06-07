@@ -110,5 +110,16 @@ namespace JsonExSerializerTests
             Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
             Assert.AreEqual(expectedQueue, actualQueue, "Generic queues not equal");
         }
+
+        [Test]
+        public void GenericCastTest()
+        {
+            Queue<float> expectedQueue = new Queue<float>();
+            expectedQueue.Enqueue(float.MaxValue);
+            Serializer s = Serializer.GetSerializer(typeof(object));
+            string result = s.Serialize(expectedQueue);
+            Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
+            Assert.AreEqual(expectedQueue, actualQueue, "Generic types not equal");
+        }
     }
 }

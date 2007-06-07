@@ -7,13 +7,13 @@ namespace JsonExSerializer
     /// <summary>
     /// Provides options controlling Serializing and Deserializing of objects.
     /// </summary>
-    public class SerializerOptions
+    public class SerializationContext
     {
         public bool _isCompact;
         public bool _outputTypeComment;
         public bool _outputTypeInformation;
 
-        public SerializerOptions()
+        public SerializationContext()
         {
             _isCompact = false;
             _outputTypeComment = true;

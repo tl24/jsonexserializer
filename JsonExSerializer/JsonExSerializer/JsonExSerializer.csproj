@@ -49,6 +49,7 @@
     <Compile Include="SerializationContext.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenStream.cs" />
+    <Compile Include="TwoWayDictionary.cs" />
     <Compile Include="TypeConversion\IJsonTypeConverter.cs" />
     <Compile Include="TypeConversion\TypeConverterAdapter.cs" />
     <Compile Include="TypeConversion\TypeConverterFactory.cs" />

@@ -274,11 +274,12 @@ namespace JsonExSerializer
         /// Parses a type specifier, used by cast and constructor types.  The final
         /// result is "Type" which is then pushed on the values stack. 
         /// Examples:
-        ///   System.Int32    -- int
-        ///   System.Object[]   -- obect array
-        ///   System.Collections.Generic.List&lt;System.String&gt; -- list of strings
-        ///   System.Collections.Generic.List&lt;System.String&gt;[]  -- array of list of strings
-        ///   System.Collections.Generic.List&lt;System.String[]&gt;  -- list of string arrays
+        /// 
+        /// <para>  System.Int32    -- int</para>
+        /// <para>  System.Object[]   -- obect array</para>
+        /// <para>  System.Collections.Generic.List&lt;System.String&gt; -- list of strings</para>
+        /// <para>  System.Collections.Generic.List&lt;System.String&gt;[]  -- array of list of strings</para>
+        /// <para>  System.Collections.Generic.List&lt;System.String[]&gt;  -- list of string arrays</para>
         /// </summary>
         private void ParseTypeSpecifier()
         {
@@ -349,6 +350,11 @@ namespace JsonExSerializer
 
         private Type bindType(string typeName)
         {
+            if (_options.GetTypeBinding(typeName) != null)
+            {
+                return _options.GetTypeBinding(typeName);
+            }
+
             Assembly current = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
             foreach (AssemblyName a in current.GetReferencedAssemblies())
             {

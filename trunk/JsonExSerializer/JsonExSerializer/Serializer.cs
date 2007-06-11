@@ -14,7 +14,7 @@ namespace JsonExSerializer
     public class Serializer
     {
         private Type _serializedType;
-        private SerializationContext _options;
+        private SerializationContext _context;
 
         /// <summary>
         /// Gets a serializer for the given type
@@ -30,14 +30,14 @@ namespace JsonExSerializer
         private Serializer(Type t)
         {
             _serializedType = t;
-            _options = new SerializationContext();
+            _context = new SerializationContext(this);
         }
 
         #region Serialization
 
         public void Serialize(object o, TextWriter writer)
         {
-            SerializerHelper helper = new SerializerHelper(_serializedType, _options, writer);
+            SerializerHelper helper = new SerializerHelper(_serializedType, _context, writer);
             helper.Serialize(o);
 
         }
@@ -57,7 +57,7 @@ namespace JsonExSerializer
 
         public object Deserialize(TextReader reader)
         {
-            Deserializer d = new Deserializer(_serializedType, reader, _options);
+            Deserializer d = new Deserializer(_serializedType, reader, _context);
             return d.Deserialize();
         }
 
@@ -71,9 +71,9 @@ namespace JsonExSerializer
 
         #endregion
 
-        public SerializationContext Options
+        public SerializationContext Context
         {
-            get { return this._options; }
+            get { return this._context; }
         }
 
     }

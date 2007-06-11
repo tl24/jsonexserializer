@@ -9,21 +9,21 @@ namespace JsonExSerializer
     public class SerializerHelper
     {
         private Type _serializedType;
-        private SerializationContext _options;
+        private SerializationContext _context;
         private TextWriter _writer;
         private const string indentLevel = "   ";
 
-        internal SerializerHelper(Type t, SerializationContext options, TextWriter writer)
+        internal SerializerHelper(Type t, SerializationContext context, TextWriter writer)
         {
             _serializedType = t;
-            _options = options;
+            _context = context;
             _writer = writer;
         }
 
         public void Serialize(object o)
         {
             string indent = "";
-            if (o != null && _options.OutputTypeComment)
+            if (o != null && _context.OutputTypeComment)
             {
                 _writer.WriteLine("/*");
                 _writer.WriteLine("  Created by JsonExSerializer");
@@ -31,7 +31,7 @@ namespace JsonExSerializer
                 _writer.WriteLine("  Type: " + o.GetType().FullName);
                 _writer.WriteLine("*/");
             }
-            if (o != null && _options._outputTypeInformation && o.GetType() != _serializedType)
+            if (o != null && _context.OutputTypeInformation && o.GetType() != _serializedType)
             {
                 WriteCast(o.GetType());
             }
@@ -130,7 +130,7 @@ namespace JsonExSerializer
             _writer.Write('{');
             // indent if not in compact mode
             string subindent = "";
-            if (!_options.IsCompact)
+            if (!_context.IsCompact)
             {
                 _writer.Write('\n');
                 subindent = indent + indentLevel;
@@ -140,20 +140,20 @@ namespace JsonExSerializer
                 if (addComma)
                 {
                     _writer.Write(", ");
-                    if (!_options.IsCompact) _writer.Write(Environment.NewLine);
+                    if (!_context.IsCompact) _writer.Write(Environment.NewLine);
                 }
                 _writer.Write(subindent);
                 Serialize(prop.Name, subindent);
                 _writer.Write(":");
                 object value = prop.GetValue(o);
-                if (value != null && _options._outputTypeInformation && value.GetType() != prop.PropertyType)
+                if (value != null && _context.OutputTypeInformation && value.GetType() != prop.PropertyType)
                 {
                     WriteCast(value.GetType());
                 }
                 Serialize(value, subindent);
                 addComma = true;
             }
-            if (!_options.IsCompact)
+            if (!_context.IsCompact)
             {
                 _writer.Write(Environment.NewLine);
                 _writer.Write(indent);
@@ -165,7 +165,7 @@ namespace JsonExSerializer
         {
             TypeHandler handler = TypeHandler.GetHandler(o.GetType());
 
-            bool outputTypeInfo = _options.OutputTypeInformation;
+            bool outputTypeInfo = _context.OutputTypeInformation;
             Type elemType = handler.GetElementType();
             
 
@@ -173,7 +173,7 @@ namespace JsonExSerializer
             _writer.Write('[');
             // indent if not in compact mode
             string subindent = "";
-            if (!_options.IsCompact)
+            if (!_context.IsCompact)
             {
                 _writer.Write('\n');
                 subindent = indent + indentLevel;
@@ -183,7 +183,7 @@ namespace JsonExSerializer
                 if (addComma)
                 {
                     _writer.Write(", ");
-                    if (!_options.IsCompact) _writer.Write(Environment.NewLine);
+                    if (!_context.IsCompact) _writer.Write(Environment.NewLine);
                 }
                 _writer.Write(subindent);
                 if (outputTypeInfo && value.GetType() != elemType)
@@ -193,7 +193,7 @@ namespace JsonExSerializer
                 Serialize(value, subindent);
                 addComma = true;
             }
-            if (!_options.IsCompact)
+            if (!_context.IsCompact)
             {
                 _writer.Write(Environment.NewLine);
                 _writer.Write(indent);
@@ -291,15 +291,24 @@ namespace JsonExSerializer
         /// <param name="t">the type to write</param>
         private void WriteTypeInfo(Type t)
         {
-            if (t.IsArray)
+            string alias = _context.GetTypeAlias(t);
+            if (alias != null) {
+                _writer.Write(alias);
+            }
+            else if (t.IsArray)
             {
                 WriteTypeInfo(t.GetElementType());
                 _writer.Write("[]");
             }
             else if (t.IsGenericType)
             {
-                string genericName = t.GetGenericTypeDefinition().FullName;
-                _writer.Write(genericName.Substring(0, genericName.LastIndexOf('`')));
+                string genericName = _context.GetTypeAlias(t.GetGenericTypeDefinition());
+                if (genericName == null)
+                {
+                    genericName = t.GetGenericTypeDefinition().FullName;
+                    genericName = genericName.Substring(0, genericName.LastIndexOf('`'));
+                }
+                _writer.Write(genericName);
                 _writer.Write('<');
                 bool writeComma = false;
                 foreach (Type genArgType in t.GetGenericArguments())

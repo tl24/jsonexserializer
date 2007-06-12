@@ -418,6 +418,10 @@ namespace JsonExSerializer
                 {
                     result = Enum.Parse(desiredType, tok.value);
                 }
+                else if (_options.HasConverter(desiredType))
+                {
+                    result = _options.GetConverter(desiredType).ConvertTo(tok.value, desiredType);
+                }
                 else
                 {
                     result = Convert.ChangeType(tok.value, desiredType);
@@ -445,6 +449,10 @@ namespace JsonExSerializer
             if (desiredType == typeof(char))
             {
                 _values.Push(Convert.ChangeType(val, typeof(char)));
+            }
+            else if (_options.HasConverter(desiredType))
+            {
+                _values.Push(_options.GetConverter(desiredType).ConvertTo(val, desiredType));
             }
             else
             {

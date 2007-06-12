@@ -1,0 +1,18 @@
+﻿using System;
+using System.Reflection;
+namespace JsonExSerializer.TypeConversion
+{
+    /// <summary>
+    /// A factory for producing type converters.  One of the HasConverter
+    /// methods should be called to see if this factory instance can produce
+    /// a converter of the given type.  If so, then a call to GetConverter
+    /// should succeed.
+    /// </summary>
+    public interface ITypeConverterFactory
+    {
+        IJsonTypeConverter GetConverter(PropertyInfo forProperty);
+        IJsonTypeConverter GetConverter(Type forType);
+        bool HasConverter(Type forType);
+        bool HasConverter(PropertyInfo forProperty);
+    }
+}

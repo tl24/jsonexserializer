@@ -45,7 +45,7 @@ Example:
    al.Add(324);
    al.Add(new Guid("4c14dd8c-2351-4bee-bda9-c33e61d64330"));
    Serializer serializer = Serializer.GetSerializer(typeof(ArrayList));
-   serializer.Context.*OutputTypeInformation* = true;  // on by default
+   serializer.Context.OutputTypeInformation = true;  // on by default
    string result = serializer.Serialize(al);
 }}}
 
@@ -58,5 +58,4 @@ Result:
    (System.Guid) "4c14dd8c-2351-4bee-bda9-c33e61d64330"
 ]
 }}}
-
 

@@ -39,7 +39,6 @@
     <Compile Include="CollectionBuilder\ICollectionBuilder.cs" />
     <Compile Include="JsonConvertAttribute.cs" />
     <Compile Include="JsonExIgnoreAttribute.cs" />
-    <Compile Include="CollectionBuilder\LinkedListCollectionBuilder.cs" />
     <Compile Include="CollectionBuilder\ListCollectionBuilder.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Parser.cs" />
@@ -50,9 +49,12 @@
     <Compile Include="Token.cs" />
     <Compile Include="TokenStream.cs" />
     <Compile Include="TwoWayDictionary.cs" />
+    <Compile Include="TypeConversion\ConverterUtil.cs" />
+    <Compile Include="TypeConversion\DictionaryToListConverter.cs" />
     <Compile Include="TypeConversion\IJsonTypeConverter.cs" />
+    <Compile Include="TypeConversion\ITypeConverterFactory.cs" />
     <Compile Include="TypeConversion\TypeConverterAdapter.cs" />
-    <Compile Include="TypeConversion\TypeConverterFactory.cs" />
+    <Compile Include="TypeConversion\DefaultConverterFactory.cs" />
     <Compile Include="TypeHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

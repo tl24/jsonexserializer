@@ -1,0 +1,53 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections;
+
+namespace JsonExSerializer.TypeConversion
+{
+    /// <summary>
+    /// Converts a dictionary of objects to a list.  On Deserialization, a property
+    /// of the value type is used as the key.
+    /// </summary>
+    public class DictionaryToListConverter : IJsonTypeConverter
+    {
+        private Type _sourceType;
+        private string _context;
+
+        #region IJsonTypeConverter Members
+
+        public object ConvertFrom(object item)
+        {
+            IDictionary dictionary = (IDictionary)item;
+            return dictionary.Values;
+        }
+
+        public object ConvertTo(object item, Type sourceType)
+        {
+            IDictionary dictionary = (IDictionary) Activator.CreateInstance(sourceType);
+            TypeHandlerProperty propHandler = null;
+            ICollection coll = (ICollection)item;
+            foreach (object colItem in coll)
+            {
+                if (propHandler == null)
+                {
+                    propHandler = TypeHandler.GetHandler(_sourceType).FindProperty(_context);
+                    if (propHandler == null)
+                    {
+                        throw new MissingMemberException("Type: " + item.GetType().Name + " does not have an accessible property: " + _context);
+                    }
+                }
+
+                dictionary[propHandler.GetValue(colItem)] = colItem;
+            }
+            return dictionary;
+        }
+
+        public object Context
+        {
+            set { _context = value != null ? value.ToString() : ""; }
+        }
+
+        #endregion
+    }
+}

@@ -40,7 +40,6 @@ namespace JsonExSerializer
         private TypeHandler(Type t)
         {
             _handledType = t;
-            LoadProperties();
         }
 
         private void LoadProperties()

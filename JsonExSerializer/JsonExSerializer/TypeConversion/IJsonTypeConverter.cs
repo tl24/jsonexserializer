@@ -12,17 +12,6 @@ namespace JsonExSerializer.TypeConversion
     public interface IJsonTypeConverter
     {
         /// <summary>
-        /// Specifies the source type that will be converted to the destination type
-        /// </summary>
-        Type SourceType { get; set; }
-
-        /// <summary>
-        /// Returns the destination type that will be returned by ConvertTo.
-        /// </summary>
-        /// <returns></returns>
-        Type GetDestinationType();
-
-        /// <summary>
         /// This method is called before serialization.  The <paramref name="item"/> parameter should be converted
         /// to a type suitable for serialization and returned.
         /// </summary>
@@ -37,7 +26,7 @@ namespace JsonExSerializer.TypeConversion
         /// </summary>
         /// <param name="item"></param>
         /// <returns>the desired object</returns>
-        object ConvertTo(object item);
+        object ConvertTo(object item, Type sourceType);
 
         /// <summary>
         /// Context parameter to control conversion

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.TypeConversion;
+using System.Reflection;
 
 namespace JsonExSerializer
 {
@@ -15,7 +16,8 @@ namespace JsonExSerializer
         private bool _outputTypeInformation;
         private TwoWayDictionary<Type, string> _typeBindings;
         private Serializer _serializerInstance;
-        private TypeConverterFactory _converterFactory;
+        private List<ITypeConverterFactory> _converterFactories;
+        private DefaultConverterFactory _defaultConverterFactory;
 
         public SerializationContext(Serializer serializerInstance)
         {
@@ -40,7 +42,11 @@ namespace JsonExSerializer
             _typeBindings[typeof(decimal)] = "decimal";
             _typeBindings[typeof(float)] = "float";
             _typeBindings[typeof(double)] = "double";
-            _converterFactory = new TypeConverterFactory();
+
+            // type conversion
+            _defaultConverterFactory = new DefaultConverterFactory();
+            _converterFactories = new List<ITypeConverterFactory>();
+            _converterFactories.Add(_defaultConverterFactory);
         }
 
         /// <summary>
@@ -133,14 +139,94 @@ namespace JsonExSerializer
             get { return this._serializerInstance; }
         }
 
+        #region TypeConverter
+
         /// <summary>
-        /// Gets a factory for converting objects between various types
+        /// Register a type converter with the DefaultConverterFactory.
         /// </summary>
-        public TypeConverterFactory ConverterFactory
+        /// <param name="forType">the type to register</param>
+        /// <param name="converter">the converter</param>
+        public void RegisterTypeConverter(Type forType, IJsonTypeConverter converter)
         {
-            get { return this._converterFactory; }
+            _defaultConverterFactory.RegisterConverter(forType, converter);
         }
 
+        /// <summary>
+        /// Register a type converter with the DefaultConverterFactory.
+        /// </summary>
+        /// <param name="forType">the property to register</param>
+        /// <param name="converter">the converter</param>
+        public void RegisterTypeConverter(PropertyInfo forProperty, IJsonTypeConverter converter)
+        {
+            _defaultConverterFactory.RegisterConverter(forProperty, converter);
+        }
 
+        public void AddTypeConverterFactory(ITypeConverterFactory factory)
+        {
+            _converterFactories.Add(factory);
+        }
+
+        /// <summary>
+        /// Constructs and returns a type converter for the property
+        /// </summary>
+        /// <param name="forProperty">property to convert</param>
+        /// <returns>type converter</returns>
+        public IJsonTypeConverter GetConverter(PropertyInfo forProperty)
+        {
+            
+            foreach (ITypeConverterFactory factory in _converterFactories)
+            {
+                if (factory.HasConverter(forProperty))
+                    return factory.GetConverter(forProperty);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Constructs and returns a type converter for the type
+        /// </summary>
+        /// <param name="forProperty">type to convert</param>
+        /// <returns>type converter</returns>
+        public IJsonTypeConverter GetConverter(Type forType)
+        {
+            foreach (ITypeConverterFactory factory in _converterFactories)
+            {
+                if (factory.HasConverter(forType))
+                    return factory.GetConverter(forType);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Checks to see if a type converter can be found for the given type
+        /// </summary>
+        /// <param name="forType">type to check</param>
+        /// <returns>true if the type has a converter</returns>
+        public bool HasConverter(Type forType)
+        {
+            foreach (ITypeConverterFactory factory in _converterFactories)
+            {
+                if (factory.HasConverter(forType))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see if a type converter can be found for the given property
+        /// </summary>
+        /// <param name="forProperty">property to check</param>
+        /// <returns>true if the property has a converter</returns>
+        public bool HasConverter(PropertyInfo forProperty)
+        {
+            foreach (ITypeConverterFactory factory in _converterFactories)
+            {
+                if (factory.HasConverter(forProperty))
+                    return true;
+            }
+            return false;
+        }
+
+        #endregion
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Collections;
+using JsonExSerializer.TypeConversion;
 
 namespace JsonExSerializer
 {
@@ -11,7 +12,7 @@ namespace JsonExSerializer
         private Type _serializedType;
         private SerializationContext _context;
         private TextWriter _writer;
-        private const string indentLevel = "   ";
+        private const int indentStep = 3;
 
         internal SerializerHelper(Type t, SerializationContext context, TextWriter writer)
         {
@@ -22,7 +23,6 @@ namespace JsonExSerializer
 
         public void Serialize(object o)
         {
-            string indent = "";
             if (o != null && _context.OutputTypeComment)
             {
                 _writer.WriteLine("/*");
@@ -35,15 +35,21 @@ namespace JsonExSerializer
             {
                 WriteCast(o.GetType());
             }
-            Serialize(o, indent);
+            Serialize(o, 0);
             
         }
 
-        public void Serialize(object o, string indent)
+        public void Serialize(object o, int indent)
         {
             if (o == null)
             {
                 _writer.Write("null");
+            }
+            else if (_context.HasConverter(o.GetType()))
+            {
+                IJsonTypeConverter converter = _context.GetConverter(o.GetType());
+                o = converter.ConvertFrom(o);
+                Serialize(o, indent);
             }
             else
             {
@@ -117,23 +123,23 @@ namespace JsonExSerializer
             }
         }
 
-        private void SerializeEnum(object o, string indent)
+        private void SerializeEnum(object o, int indent)
         {
             _writer.Write(Enum.Format(o.GetType(), o, "d"));
         }
 
-        private void SerializeObject(object o, string indent)
+        private void SerializeObject(object o, int indent)
         {
             TypeHandler handler = TypeHandler.GetHandler(o.GetType());
             
             bool addComma = false;
             _writer.Write('{');
             // indent if not in compact mode
-            string subindent = "";
+            int subindent = 0;
             if (!_context.IsCompact)
             {
                 _writer.Write('\n');
-                subindent = indent + indentLevel;
+                subindent = indent + indentStep;
             }
             foreach (TypeHandlerProperty prop in handler.Properties)
             {
@@ -142,7 +148,7 @@ namespace JsonExSerializer
                     _writer.Write(", ");
                     if (!_context.IsCompact) _writer.Write(Environment.NewLine);
                 }
-                _writer.Write(subindent);
+                _writer.Write("".PadLeft(subindent));
                 Serialize(prop.Name, subindent);
                 _writer.Write(":");
                 object value = prop.GetValue(o);
@@ -156,12 +162,12 @@ namespace JsonExSerializer
             if (!_context.IsCompact)
             {
                 _writer.Write(Environment.NewLine);
-                _writer.Write(indent);
+                _writer.Write("".PadLeft(indent));
             }
             _writer.Write('}');
         }
 
-        private void SerializeCollection(object o, string indent)
+        private void SerializeCollection(object o, int indent)
         {
             TypeHandler handler = TypeHandler.GetHandler(o.GetType());
 
@@ -172,11 +178,11 @@ namespace JsonExSerializer
             bool addComma = false;
             _writer.Write('[');
             // indent if not in compact mode
-            string subindent = "";
+            int subindent = 0;
             if (!_context.IsCompact)
             {
                 _writer.Write('\n');
-                subindent = indent + indentLevel;
+                subindent = indent + indentStep;
             }
             foreach (object value in (IEnumerable) o)
             {
@@ -185,7 +191,7 @@ namespace JsonExSerializer
                     _writer.Write(", ");
                     if (!_context.IsCompact) _writer.Write(Environment.NewLine);
                 }
-                _writer.Write(subindent);
+                _writer.Write("".PadLeft(subindent));
                 if (outputTypeInfo && value.GetType() != elemType)
                 {
                     WriteCast(value.GetType());
@@ -196,78 +202,78 @@ namespace JsonExSerializer
             if (!_context.IsCompact)
             {
                 _writer.Write(Environment.NewLine);
-                _writer.Write(indent);
+                _writer.Write("".PadLeft(indent));
             }
             _writer.Write(']');
         }
 
-        protected void WriteDateTime(DateTime value, string indent)
+        protected void WriteDateTime(DateTime value, int indent)
         {
             _writer.Write(value.ToString());
         }
-        protected void WriteBoolean(bool value, string indent)
+        protected void WriteBoolean(bool value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteByte(byte value, string indent)
+        protected void WriteByte(byte value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteDBNull(DBNull value, string indent)
+        protected void WriteDBNull(DBNull value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteInt16(short value, string indent)
+        protected void WriteInt16(short value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteInt32(int value, string indent)
+        protected void WriteInt32(int value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteInt64(long value, string indent)
+        protected void WriteInt64(long value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteSByte(sbyte value, string indent)
+        protected void WriteSByte(sbyte value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteUInt16(ushort value, string indent)
+        protected void WriteUInt16(ushort value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteUInt32(uint value, string indent)
+        protected void WriteUInt32(uint value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteUInt64(ulong value, string indent)
+        protected void WriteUInt64(ulong value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteDecimal(decimal value, string indent)
+        protected void WriteDecimal(decimal value, int indent)
         {
             _writer.Write(value);
         }
 
-        protected void WriteDouble(double value, string indent)
+        protected void WriteDouble(double value, int indent)
         {
             _writer.Write(value.ToString("R"));
         }
 
-        protected void WriteFloat(float value, string indent)
+        protected void WriteFloat(float value, int indent)
         {
             _writer.Write(value.ToString("R"));
         }
 
-        protected void WriteChar(char value, string indent)
+        protected void WriteChar(char value, int indent)
         {
             _writer.Write('"');
             _writer.Write(EscapeString(value.ToString()));
             _writer.Write('"');
         }
 
-        protected void WriteString(string value, string indent)
+        protected void WriteString(string value, int indent)
         {
             _writer.Write('"');
             _writer.Write(EscapeString(value));

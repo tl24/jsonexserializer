@@ -14,23 +14,12 @@ namespace JsonExSerializer.TypeConversion
             _converter = converter;
         }
 
-        public Type SourceType
-        {
-            get { return _sourceType; }
-            set { _sourceType = value; }
-        }
-
-        public Type GetDestinationType()
-        {
-            return typeof(string);
-        }
-
         public object ConvertFrom(object item)
         {
             return _converter.ConvertToString(item);
         }
 
-        public object ConvertTo(object item)
+        public object ConvertTo(object item, Type sourceType)
         {
             return _converter.ConvertFromString((string) item);
         }

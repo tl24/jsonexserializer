@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections;
 
 namespace JsonExSerializer.CollectionBuilder
-{
+{    
     /// <summary>
     /// Collection builder for types implementing IList and arrays
     /// </summary>

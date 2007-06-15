@@ -137,5 +137,21 @@ namespace JsonExSerializerTests
             Assert.AreEqual(expectedBits, actualBits, "Bit arrays not equal");
             
         }
+
+        [Test]
+        public void StackTest()
+        {
+            Stack expectedStack = new Stack();
+            expectedStack.Push("5");
+            expectedStack.Push("4");
+            expectedStack.Push("3");
+            expectedStack.Push("2");
+            expectedStack.Push("1");            
+            Serializer s = Serializer.GetSerializer(expectedStack.GetType());
+            string result = s.Serialize(expectedStack);
+
+            Stack actualStack = (Stack)s.Deserialize(result);
+            Assert.AreEqual(expectedStack, actualStack, "Non-generic stack class not equal");
+        }
     }
 }

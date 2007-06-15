@@ -58,6 +58,7 @@ public class MyCollectionBuilder : ICollectionBuilder {
 }
 
 ...
+//Register the collection handler so its available to use by the Serializer
 Serializer s = Serializer.GetSerializer(typeof(MyCollection));
 s.Context.RegisterCollectionHandler(new MyCollectionHandler());
 

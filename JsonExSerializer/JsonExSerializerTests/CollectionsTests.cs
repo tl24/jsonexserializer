@@ -121,5 +121,21 @@ namespace JsonExSerializerTests
             Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
             Assert.AreEqual(expectedQueue, actualQueue, "Generic types not equal");
         }
+
+        [Test]
+        public void BitArrayTest()
+        {
+            BitArray expectedBits = new BitArray(5);
+            expectedBits[0] = true;
+            expectedBits[3] = true;
+            expectedBits[4] = true;
+
+            Serializer s = Serializer.GetSerializer(typeof(BitArray));
+            string result = s.Serialize(expectedBits);
+
+            BitArray actualBits = (BitArray)s.Deserialize(result);
+            Assert.AreEqual(expectedBits, actualBits, "Bit arrays not equal");
+            
+        }
     }
 }

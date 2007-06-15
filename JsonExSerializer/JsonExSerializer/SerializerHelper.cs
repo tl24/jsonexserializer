@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Collections;
 using JsonExSerializer.TypeConversion;
+using JsonExSerializer.Collections;
 
 namespace JsonExSerializer
 {
@@ -68,9 +69,14 @@ namespace JsonExSerializer
                         WriteFloat((float)o, indent);
                         break;
                     case TypeCode.Object:
-                        if (o is ICollection || o.GetType().IsArray)
+                        TypeHandler handler = _context.GetTypeHandler(o.GetType());
+                        if (handler.IsCollection(_context))
                         {
                             SerializeCollection(o, indent);
+                        }
+                        else if (o is ICollection)
+                        {
+                            throw new ApplicationException(o.GetType() + " is a collection but doesn't have a CollectionHandler");
                         }
                         else
                         {
@@ -130,7 +136,7 @@ namespace JsonExSerializer
 
         private void SerializeObject(object o, int indent)
         {
-            TypeHandler handler = TypeHandler.GetHandler(o.GetType());
+            TypeHandler handler = _context.GetTypeHandler(o.GetType());
             
             bool addComma = false;
             _writer.Write('{');
@@ -169,10 +175,11 @@ namespace JsonExSerializer
 
         private void SerializeCollection(object o, int indent)
         {
-            TypeHandler handler = TypeHandler.GetHandler(o.GetType());
+            TypeHandler handler = _context.GetTypeHandler(o.GetType());
 
             bool outputTypeInfo = _context.OutputTypeInformation;
-            Type elemType = handler.GetElementType();
+            ICollectionHandler collectionHandler = handler.GetCollectionHandler(_context);
+            Type elemType = collectionHandler.GetItemType(handler.ForType);
             
 
             bool addComma = false;
@@ -184,7 +191,7 @@ namespace JsonExSerializer
                 _writer.Write('\n');
                 subindent = indent + indentStep;
             }
-            foreach (object value in (IEnumerable) o)
+            foreach (object value in collectionHandler.GetEnumerable(o))
             {
                 if (addComma)
                 {

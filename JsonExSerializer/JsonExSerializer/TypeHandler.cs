@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.Collections;
-using JsonExSerializer.CollectionBuilder;
+using JsonExSerializer.Collections;
 
 namespace JsonExSerializer
 {
@@ -17,27 +17,15 @@ namespace JsonExSerializer
         private static IDictionary<Type, TypeHandler> _cache;
         private Type _handledType;
         private IList<TypeHandlerProperty> _properties;
+        private bool _collectionLookedUp = false;
+        private ICollectionHandler _collectionHandler;        
 
-        static TypeHandler()
+        internal static TypeHandler GetHandler(Type t)
         {
-            _cache = new Dictionary<Type, TypeHandler>();
+            return new TypeHandler(t);
         }
 
-        public static TypeHandler GetHandler(Type t)
-        {
-            TypeHandler handler;
-            if (!_cache.ContainsKey(t))
-            {
-                _cache[t] = handler = new TypeHandler(t);
-            }
-            else
-            {
-                handler = _cache[t];
-            }
-            return handler;
-        }
-
-        private TypeHandler(Type t)
+        internal TypeHandler(Type t)
         {
             _handledType = t;
         }
@@ -87,57 +75,58 @@ namespace JsonExSerializer
             get { return _handledType; }
         }
 
+        public bool IsCollection(SerializationContext context)
+        {
+            if (!_collectionLookedUp)
+            {
+                foreach (ICollectionHandler handler in context.CollectionHandlers)
+                {
+                    if (handler.IsCollection(ForType))
+                    {
+                        _collectionHandler = handler;
+                        break;
+                    }
+                }
+                _collectionLookedUp = true;
+            }
+            return _collectionHandler != null;
+        }
+
+        public ICollectionHandler GetCollectionHandler(SerializationContext context)
+        {
+            if (IsCollection(context)) {
+                return _collectionHandler;
+            } else {
+                throw new ApplicationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
+            }            
+        }
+
         /// <summary>
         /// If the object is a collection or array gets the type 
         /// of its elements.
         /// </summary>
         /// <returns></returns>
-        public Type GetElementType()
+        public Type GetCollectionItemType(SerializationContext context)
         {
-            // This is very crude, but it will work for now
-            if (_handledType.HasElementType)
+            if (IsCollection(context))
             {
-                return _handledType.GetElementType();
-            }
-            else if (_handledType.IsGenericType && typeof(IDictionary).IsAssignableFrom(_handledType))
-            {
-                // get the type of the 
-                return _handledType.GetGenericArguments()[1];
-            }
-            else if (_handledType.IsGenericType && typeof(ICollection).IsAssignableFrom(_handledType))
-            {
-                // get the type of the collection
-                return _handledType.GetGenericArguments()[0];
+                return _collectionHandler.GetItemType(ForType);
             }
             else
             {
-                return typeof(object);
+                throw new ApplicationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }
         }
 
-        public ICollectionBuilder GetCollectionBuilder()
+        public ICollectionBuilder GetCollectionBuilder(SerializationContext context)
         {
-            //TODO: this is ugly code, there has to be a better way
-            if (_handledType.IsArray || typeof(IList).IsAssignableFrom(_handledType))
+            if (IsCollection(context))
             {
-                return new ListCollectionBuilder(_handledType);
-            } else if (typeof(ICollection).IsAssignableFrom(_handledType)) {
-                // make a strongly typed IEnumerable interface to compare against
-                Type ienumGeneric = typeof(IEnumerable<object>).GetGenericTypeDefinition().MakeGenericType(new Type[] { this.GetElementType() });
-                if (_handledType.IsGenericType && ienumGeneric.IsAssignableFrom(_handledType))
-                {
-                    Type cbType = typeof(NonStandardGenericCollectionBuilder<object>).GetGenericTypeDefinition();
-                    cbType = cbType.MakeGenericType(new Type[] { this.GetElementType() });
-                    return (ICollectionBuilder)Activator.CreateInstance(cbType, new object[] { _handledType });
-                }
-                else
-                {
-                    return new NonStandardCollectionBuilder(_handledType);
-                }
+                return _collectionHandler.ConstructBuilder(ForType);
             }
             else
             {
-                throw new Exception("GetCollectionBuilder called on an object that is not a collection");
+                throw new ApplicationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }
         }       
     }

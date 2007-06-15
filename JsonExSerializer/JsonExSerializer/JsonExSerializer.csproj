@@ -33,13 +33,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CollectionBuilder\NonStandardCollectionBuilder.cs" />
-    <Compile Include="CollectionBuilder\NonStandardGenericCollectionBuilder.cs" />
+    <Compile Include="Collections\ArrayBuilder.cs" />
+    <Compile Include="Collections\ArrayHandler.cs" />
+    <Compile Include="Collections\CollectionConstructorHandler.cs" />
+    <Compile Include="Collections\GenericCollectionBuilder.cs" />
+    <Compile Include="Collections\GenericCollectionCtorBuilder.cs" />
+    <Compile Include="Collections\GenericCollectionHandler.cs" />
+    <Compile Include="Collections\ICollectionHandler.cs" />
+    <Compile Include="Collections\ListHandler.cs" />
+    <Compile Include="Collections\NonStandardCollectionBuilder.cs" />
+    <Compile Include="Collections\NonStandardGenericCollectionBuilder.cs" />
     <Compile Include="Deserializer.cs" />
-    <Compile Include="CollectionBuilder\ICollectionBuilder.cs" />
+    <Compile Include="Collections\ICollectionBuilder.cs" />
     <Compile Include="JsonConvertAttribute.cs" />
     <Compile Include="JsonExIgnoreAttribute.cs" />
-    <Compile Include="CollectionBuilder\ListCollectionBuilder.cs" />
+    <Compile Include="Collections\ListCollectionBuilder.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Serializer.cs" />
@@ -49,6 +57,7 @@
     <Compile Include="Token.cs" />
     <Compile Include="TokenStream.cs" />
     <Compile Include="TwoWayDictionary.cs" />
+    <Compile Include="TypeConversion\BitArrayConverter.cs" />
     <Compile Include="TypeConversion\ConverterUtil.cs" />
     <Compile Include="TypeConversion\DictionaryToListConverter.cs" />
     <Compile Include="TypeConversion\IJsonTypeConverter.cs" />

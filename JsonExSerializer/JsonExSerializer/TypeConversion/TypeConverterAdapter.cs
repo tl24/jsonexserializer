@@ -28,5 +28,14 @@ namespace JsonExSerializer.TypeConversion
         {
             set { return; }
         }
+
+        #region IJsonTypeConverter Members
+
+        public Type GetSerializedType(Type sourceType)
+        {
+            return typeof(string);
+        }
+
+        #endregion
     }
 }

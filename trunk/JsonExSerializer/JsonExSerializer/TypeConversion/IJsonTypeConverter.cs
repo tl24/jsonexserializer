@@ -11,6 +11,9 @@ namespace JsonExSerializer.TypeConversion
     /// <typeparam name="SrcT">The type of the object before serialization or after deserialization</typeparam>
     public interface IJsonTypeConverter
     {
+
+        Type GetSerializedType(Type sourceType);
+
         /// <summary>
         /// This method is called before serialization.  The <paramref name="item"/> parameter should be converted
         /// to a type suitable for serialization and returned.

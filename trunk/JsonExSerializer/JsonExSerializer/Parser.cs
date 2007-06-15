@@ -9,7 +9,7 @@ using System.Text;
 using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
-using JsonExSerializer.CollectionBuilder;
+using JsonExSerializer.Collections;
 using System.Reflection;
 
 namespace JsonExSerializer
@@ -21,7 +21,7 @@ namespace JsonExSerializer
         private Type _deserializedType;
         private TokenStream _tokenStream;
         private Stack _values;
-        private SerializationContext _options;
+        private SerializationContext _context;
 
         #endregion
 
@@ -68,12 +68,12 @@ namespace JsonExSerializer
 
         #endregion
 
-        public Parser(Type t, TokenStream tokenStream, SerializationContext options)
+        public Parser(Type t, TokenStream tokenStream, SerializationContext context)
         {
             _deserializedType = t;
             _tokenStream = tokenStream;
             _values = new Stack();
-            _options = options;
+            _context = context;
         }
 
         public object Parse()
@@ -162,10 +162,10 @@ namespace JsonExSerializer
             Debug.Assert(tok == LSquareToken);
 
             Type elemType = typeof(object);
-            TypeHandler handler = TypeHandler.GetHandler(desiredType);
+            TypeHandler handler = _context.GetTypeHandler(desiredType);            
             if (desiredType != typeof(object))
             {                
-                elemType = handler.GetElementType();
+                elemType = handler.GetCollectionItemType(_context);
             }
             if (collBuilder == null)
             {
@@ -175,7 +175,7 @@ namespace JsonExSerializer
                 }
                 else
                 {
-                    collBuilder = handler.GetCollectionBuilder();
+                    collBuilder = handler.GetCollectionBuilder(_context);
                 }
             }
             while (ReadAhead(CommaToken, RSquareToken, new ParserMethod(ParseExpression), elemType))
@@ -221,7 +221,7 @@ namespace JsonExSerializer
             } 
             else 
             {
-                TypeHandler handler = TypeHandler.GetHandler(desiredType);
+                TypeHandler handler = _context.GetTypeHandler(desiredType);
                 TypeHandlerProperty prop = handler.FindProperty(name);
                 if (prop == null)
                     throw new ParseException("Could not find property: " + name + " on type: " + handler.ForType.FullName);
@@ -350,9 +350,9 @@ namespace JsonExSerializer
 
         private Type bindType(string typeName)
         {
-            if (_options.GetTypeBinding(typeName) != null)
+            if (_context.GetTypeBinding(typeName) != null)
             {
-                return _options.GetTypeBinding(typeName);
+                return _context.GetTypeBinding(typeName);
             }
 
             Assembly current = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
@@ -418,9 +418,9 @@ namespace JsonExSerializer
                 {
                     result = Enum.Parse(desiredType, tok.value);
                 }
-                else if (_options.HasConverter(desiredType))
+                else if (_context.HasConverter(desiredType))
                 {
-                    result = _options.GetConverter(desiredType).ConvertTo(tok.value, desiredType);
+                    result = _context.GetConverter(desiredType).ConvertTo(tok.value, desiredType);
                 }
                 else
                 {
@@ -450,9 +450,9 @@ namespace JsonExSerializer
             {
                 _values.Push(Convert.ChangeType(val, typeof(char)));
             }
-            else if (_options.HasConverter(desiredType))
+            else if (_context.HasConverter(desiredType))
             {
-                _values.Push(_options.GetConverter(desiredType).ConvertTo(val, desiredType));
+                _values.Push(_context.GetConverter(desiredType).ConvertTo(val, desiredType));
             }
             else
             {

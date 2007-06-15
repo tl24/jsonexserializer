@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.TypeConversion;
 using System.Reflection;
+using JsonExSerializer.Collections;
 
 namespace JsonExSerializer
 {
@@ -18,6 +19,8 @@ namespace JsonExSerializer
         private Serializer _serializerInstance;
         private List<ITypeConverterFactory> _converterFactories;
         private DefaultConverterFactory _defaultConverterFactory;
+        private List<ICollectionHandler> _collectionHandlers;
+        private IDictionary<Type, TypeHandler> _cache;
 
         public SerializationContext(Serializer serializerInstance)
         {
@@ -47,6 +50,17 @@ namespace JsonExSerializer
             _defaultConverterFactory = new DefaultConverterFactory();
             _converterFactories = new List<ITypeConverterFactory>();
             _converterFactories.Add(_defaultConverterFactory);
+            _defaultConverterFactory.RegisterConverter(typeof(System.Collections.BitArray), new BitArrayConverter());
+
+            // collections
+            _collectionHandlers = new List<ICollectionHandler>();
+            _collectionHandlers.Add(new GenericCollectionHandler());
+            _collectionHandlers.Add(new ArrayHandler());
+            _collectionHandlers.Add(new ListHandler());
+            _collectionHandlers.Add(new CollectionConstructorHandler());
+
+            // type handlers
+            _cache = new Dictionary<Type, TypeHandler>();
         }
 
         /// <summary>
@@ -228,5 +242,34 @@ namespace JsonExSerializer
         }
 
         #endregion
+
+        /// <summary>
+        /// Registers a collection handler which provides support for a certain type
+        /// or multiple types of collections.
+        /// </summary>
+        /// <param name="handler">the collection handler</param>
+        public void RegisterCollectionHandler(ICollectionHandler handler)
+        {
+            _collectionHandlers.Add(handler);
+        }
+
+        internal List<ICollectionHandler> CollectionHandlers
+        {
+            get { return _collectionHandlers; }
+        }
+
+        internal TypeHandler GetTypeHandler(Type objectType)
+        {
+            TypeHandler handler;
+            if (!_cache.ContainsKey(objectType))
+            {
+                _cache[objectType] = handler = new TypeHandler(objectType);
+            }
+            else
+            {
+                handler = _cache[objectType];
+            }
+            return handler;
+        }
     }
 }

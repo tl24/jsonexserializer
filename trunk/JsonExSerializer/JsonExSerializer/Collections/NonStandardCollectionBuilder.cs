@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 
-namespace JsonExSerializer.CollectionBuilder
+namespace JsonExSerializer.Collections
 {
     /// <summary>
     /// A collection builder for non-standard collections which support a constuctor that takes

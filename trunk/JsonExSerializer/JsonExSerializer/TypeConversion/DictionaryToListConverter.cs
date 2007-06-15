@@ -16,6 +16,11 @@ namespace JsonExSerializer.TypeConversion
 
         #region IJsonTypeConverter Members
 
+        public Type GetSerializedType(Type sourceType)
+        {
+            return typeof(Object);
+        }
+
         public object ConvertFrom(object item)
         {
             IDictionary dictionary = (IDictionary)item;

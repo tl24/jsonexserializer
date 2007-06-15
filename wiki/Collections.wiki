@@ -5,6 +5,7 @@ So here's the solution: ICollectionHandler and ICollectionBuilder.
 The ICollectionHandler interface has methods for checking if a given collection type can be handled.  If a type implementing ICollectionHandler can handle your collection type, it can return an ICollectionBuilder object.  The ICollectionBuilder interface has an add method that knows how to put things into the collection and a GetResult method that returns the final collection.
 
 The following collection types are handled automatically:
+  # Arrays of any type
   # System.Collections.IList
   # System.Collections.Generic.ICollection<T>
   # Anything implementing ICollection that also has a constructor that takes a single parameter of type ICollection, ICollection<T>, IEnumerable, or IEnumerable<T>.

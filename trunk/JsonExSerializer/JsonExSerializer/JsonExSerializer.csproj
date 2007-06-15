@@ -43,6 +43,8 @@
     <Compile Include="Collections\ListHandler.cs" />
     <Compile Include="Collections\NonStandardCollectionBuilder.cs" />
     <Compile Include="Collections\NonStandardGenericCollectionBuilder.cs" />
+    <Compile Include="Collections\StackBuilder.cs" />
+    <Compile Include="Collections\StackHandler.cs" />
     <Compile Include="Deserializer.cs" />
     <Compile Include="Collections\ICollectionBuilder.cs" />
     <Compile Include="JsonConvertAttribute.cs" />

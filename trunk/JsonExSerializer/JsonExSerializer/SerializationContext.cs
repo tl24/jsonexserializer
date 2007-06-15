@@ -57,6 +57,7 @@ namespace JsonExSerializer
             _collectionHandlers.Add(new GenericCollectionHandler());
             _collectionHandlers.Add(new ArrayHandler());
             _collectionHandlers.Add(new ListHandler());
+            _collectionHandlers.Add(new StackHandler());
             _collectionHandlers.Add(new CollectionConstructorHandler());
 
             // type handlers

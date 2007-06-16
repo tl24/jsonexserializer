@@ -39,6 +39,8 @@
     <Compile Include="Collections\GenericCollectionBuilder.cs" />
     <Compile Include="Collections\GenericCollectionCtorBuilder.cs" />
     <Compile Include="Collections\GenericCollectionHandler.cs" />
+    <Compile Include="Collections\GenericStackBuilder.cs" />
+    <Compile Include="Collections\GenericStackHandler.cs" />
     <Compile Include="Collections\ICollectionHandler.cs" />
     <Compile Include="Collections\ListHandler.cs" />
     <Compile Include="Collections\NonStandardCollectionBuilder.cs" />
@@ -52,6 +54,7 @@
     <Compile Include="Collections\ListCollectionBuilder.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Parser.cs" />
+    <Compile Include="ReferenceEqualityComparer.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializerHelper.cs" />

@@ -46,12 +46,6 @@ namespace JsonExSerializer
             {
                 _writer.Write("null");
             }
-            else if (_context.HasConverter(o.GetType()))
-            {
-                IJsonTypeConverter converter = _context.GetConverter(o.GetType());
-                o = converter.ConvertFrom(o);
-                Serialize(o, indent);
-            }
             else
             {
                 switch (Type.GetTypeCode(o.GetType()))
@@ -69,12 +63,18 @@ namespace JsonExSerializer
                         WriteFloat((float)o, indent);
                         break;
                     case TypeCode.Object:
+                        if (_context.HasConverter(o.GetType()))
+                        {
+                            IJsonTypeConverter converter = _context.GetConverter(o.GetType());
+                            o = converter.ConvertFrom(o);
+                            Serialize(o, indent);
+                        }
                         TypeHandler handler = _context.GetTypeHandler(o.GetType());
                         if (handler.IsCollection(_context))
                         {
                             SerializeCollection(o, indent);
                         }
-                        else if (o is ICollection)
+                        else if (o is ICollection && !(o is IDictionary))
                         {
                             throw new ApplicationException(o.GetType() + " is a collection but doesn't have a CollectionHandler");
                         }
@@ -136,6 +136,12 @@ namespace JsonExSerializer
 
         private void SerializeObject(object o, int indent)
         {
+            if (o is IDictionary)
+            {
+                SerializeDictionary(o, indent);
+                return;
+            }
+
             TypeHandler handler = _context.GetTypeHandler(o.GetType());
             
             bool addComma = false;
@@ -172,6 +178,55 @@ namespace JsonExSerializer
             }
             _writer.Write('}');
         }
+
+        private void SerializeDictionary(object o, int indent)
+        {            
+            bool addComma = false;
+            _writer.Write('{');
+            // indent if not in compact mode
+            int subindent = 0;
+            if (!_context.IsCompact)
+            {
+                _writer.Write('\n');
+                subindent = indent + indentStep;
+            }
+
+            Type itemType = typeof(object);
+            Type genericDictionary = null;
+
+            if ((genericDictionary = o.GetType().GetInterface(typeof(IDictionary<,>).Name)) != null)
+            {
+                itemType = genericDictionary.GetGenericArguments()[1];
+            }
+
+            
+            foreach (DictionaryEntry pair in ((IDictionary)o))
+            {
+                if (addComma)
+                {
+                    _writer.Write(", ");
+                    if (!_context.IsCompact) _writer.Write(Environment.NewLine);
+                }
+                _writer.Write("".PadLeft(subindent));
+
+                Serialize(pair.Key, subindent);
+                _writer.Write(":");
+                object value = pair.Value;
+                if (value != null && _context.OutputTypeInformation && value.GetType() != itemType)
+                {
+                    WriteCast(value.GetType());
+                }
+                Serialize(value, subindent);
+                addComma = true;
+            }
+            if (!_context.IsCompact)
+            {
+                _writer.Write(Environment.NewLine);
+                _writer.Write("".PadLeft(indent));
+            }
+            _writer.Write('}');
+        }
+
 
         private void SerializeCollection(object o, int indent)
         {

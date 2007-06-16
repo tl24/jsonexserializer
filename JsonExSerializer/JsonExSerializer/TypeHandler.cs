@@ -35,14 +35,16 @@ namespace JsonExSerializer
             if (_properties == null)
             {
                 _properties = new List<TypeHandlerProperty>();
-                PropertyInfo[] pInfos = _handledType.GetProperties();
+                PropertyInfo[] pInfos = _handledType.GetProperties(BindingFlags.Public|BindingFlags.Instance);
                 foreach (PropertyInfo pInfo in pInfos)
                 {
                     // must be able to read and write the prop, otherwise its not 2-way 
                     if (pInfo.CanRead && pInfo.CanWrite)
                     {
+                        
                         // ignore attribute
-                        if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false))
+                        if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
+                            && pInfo.GetGetMethod().GetParameters().Length == 0)
                         {
                             _properties.Add(new TypeHandlerProperty(pInfo));
                         }

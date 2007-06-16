@@ -12,20 +12,20 @@ namespace JsonExSerializer.Collections
     /// </summary>
     public class StackBuilder : ICollectionBuilder
     {
-        private Stack _stack;
+        protected object _stack;
 
         public StackBuilder(Type stackType)
         {
-            _stack = (Stack)Activator.CreateInstance(stackType);
+            _stack = Activator.CreateInstance(stackType);
         }
         #region ICollectionBuilder Members
 
-        public void Add(object item)
+        public virtual void Add(object item)
         {
-            _stack.Push(item);
+            ((Stack)_stack).Push(item);
         }
 
-        public object GetResult()
+        public virtual object GetResult()
         {
             return _stack;
         }

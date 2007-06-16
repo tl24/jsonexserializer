@@ -153,5 +153,21 @@ namespace JsonExSerializerTests
             Stack actualStack = (Stack)s.Deserialize(result);
             Assert.AreEqual(expectedStack, actualStack, "Non-generic stack class not equal");
         }
+
+        [Test]
+        public void GenericStackTest()
+        {
+            Stack<int> expectedStack = new Stack<int>();
+            expectedStack.Push(5);
+            expectedStack.Push(4);
+            expectedStack.Push(3);
+            expectedStack.Push(2);
+            expectedStack.Push(1);
+            Serializer s = Serializer.GetSerializer(expectedStack.GetType());
+            string result = s.Serialize(expectedStack);
+
+            Stack<int> actualStack = (Stack<int>)s.Deserialize(result);
+            Assert.AreEqual(expectedStack, actualStack, "generic stack class not equal");
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace JsonExSerializer
         private TokenStream _tokenStream;
         private Stack _values;
         private SerializationContext _context;
-
+        private Stack<string> _pathStack;
         #endregion
 
         #region Token Constants
@@ -75,6 +75,7 @@ namespace JsonExSerializer
             _tokenStream = tokenStream;
             _values = new Stack();
             _context = context;
+            _pathStack = new Stack<string>();
         }
 
         public object Parse()

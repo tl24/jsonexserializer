@@ -14,12 +14,14 @@ namespace JsonExSerializer
         private SerializationContext _context;
         private TextWriter _writer;
         private const int indentStep = 3;
+        private IDictionary<object, string> _refs;
 
         internal SerializerHelper(Type t, SerializationContext context, TextWriter writer)
         {
             _serializedType = t;
             _context = context;
             _writer = writer;
+            _refs = new Dictionary<object, string>(new ReferenceEqualityComparer<object>());
         }
 
         public void Serialize(object o)
@@ -36,11 +38,11 @@ namespace JsonExSerializer
             {
                 WriteCast(o.GetType());
             }
-            Serialize(o, 0);
+            Serialize(o, 0, "this");
             
         }
 
-        public void Serialize(object o, int indent)
+        public void Serialize(object o, int indent, string currentPath)
         {
             if (o == null)
             {
@@ -63,16 +65,41 @@ namespace JsonExSerializer
                         WriteFloat((float)o, indent);
                         break;
                     case TypeCode.Object:
+                        if (_refs.ContainsKey(o))
+                        {
+                            string refPath = _refs[o];
+                            switch (_context.ReferenceWritingType)
+                            {
+                                //case SerializationContext.ReferenceOption.WriteIdentifier:
+                                //    _writer.Write(refPath);
+                                //    return;
+                                case SerializationContext.ReferenceOption.IgnoreCircularReferences:
+                                    if (currentPath.StartsWith(refPath))
+                                    {
+                                        _writer.Write("null");
+                                        return;
+                                    }
+                                    break;
+                                case SerializationContext.ReferenceOption.ErrorCircularReferences:
+                                    if (currentPath.StartsWith(refPath))
+                                    {
+                                        throw new ApplicationException("Circular reference detected.  Current path: " + currentPath + ", reference to: " + refPath);
+                                    }
+                                    break;
+                            }
+                        } else {
+                            _refs[o] = currentPath;
+                        }
                         if (_context.HasConverter(o.GetType()))
                         {
                             IJsonTypeConverter converter = _context.GetConverter(o.GetType());
                             o = converter.ConvertFrom(o);
-                            Serialize(o, indent);
+                            Serialize(o, indent, currentPath);
                         }
                         TypeHandler handler = _context.GetTypeHandler(o.GetType());
                         if (handler.IsCollection(_context))
                         {
-                            SerializeCollection(o, indent);
+                            SerializeCollection(o, indent, currentPath);
                         }
                         else if (o is ICollection && !(o is IDictionary))
                         {
@@ -80,7 +107,7 @@ namespace JsonExSerializer
                         }
                         else
                         {
-                            SerializeObject(o, indent);
+                            SerializeObject(o, indent, currentPath);
                         }
                         break;
                     case TypeCode.DateTime:
@@ -134,11 +161,11 @@ namespace JsonExSerializer
             _writer.Write(Enum.Format(o.GetType(), o, "d"));
         }
 
-        private void SerializeObject(object o, int indent)
+        private void SerializeObject(object o, int indent, string currentPath)
         {
             if (o is IDictionary)
             {
-                SerializeDictionary(o, indent);
+                SerializeDictionary(o, indent, currentPath);
                 return;
             }
 
@@ -161,14 +188,14 @@ namespace JsonExSerializer
                     if (!_context.IsCompact) _writer.Write(Environment.NewLine);
                 }
                 _writer.Write("".PadLeft(subindent));
-                Serialize(prop.Name, subindent);
+                Serialize(prop.Name, subindent, "");
                 _writer.Write(":");
                 object value = prop.GetValue(o);
                 if (value != null && _context.OutputTypeInformation && value.GetType() != prop.PropertyType)
                 {
                     WriteCast(value.GetType());
                 }
-                Serialize(value, subindent);
+                Serialize(value, subindent, currentPath + "." + prop.Name);
                 addComma = true;
             }
             if (!_context.IsCompact)
@@ -179,7 +206,7 @@ namespace JsonExSerializer
             _writer.Write('}');
         }
 
-        private void SerializeDictionary(object o, int indent)
+        private void SerializeDictionary(object o, int indent, string currentPath)
         {            
             bool addComma = false;
             _writer.Write('{');
@@ -209,14 +236,14 @@ namespace JsonExSerializer
                 }
                 _writer.Write("".PadLeft(subindent));
 
-                Serialize(pair.Key, subindent);
+                Serialize(pair.Key, subindent, "");
                 _writer.Write(":");
                 object value = pair.Value;
                 if (value != null && _context.OutputTypeInformation && value.GetType() != itemType)
                 {
                     WriteCast(value.GetType());
                 }
-                Serialize(value, subindent);
+                Serialize(value, subindent, currentPath + "." + pair.Key.ToString());
                 addComma = true;
             }
             if (!_context.IsCompact)
@@ -228,7 +255,7 @@ namespace JsonExSerializer
         }
 
 
-        private void SerializeCollection(object o, int indent)
+        private void SerializeCollection(object o, int indent, string currentPath)
         {
             TypeHandler handler = _context.GetTypeHandler(o.GetType());
 
@@ -246,6 +273,7 @@ namespace JsonExSerializer
                 _writer.Write('\n');
                 subindent = indent + indentStep;
             }
+            int index = 0;
             foreach (object value in collectionHandler.GetEnumerable(o))
             {
                 if (addComma)
@@ -258,8 +286,9 @@ namespace JsonExSerializer
                 {
                     WriteCast(value.GetType());
                 }
-                Serialize(value, subindent);
+                Serialize(value, subindent, currentPath + "." + index);
                 addComma = true;
+                index++;
             }
             if (!_context.IsCompact)
             {

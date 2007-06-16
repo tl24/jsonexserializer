@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Globalization;
 using JsonExSerializer.Collections;
 using System.Reflection;
+using JsonExSerializer.TypeConversion;
 
 namespace JsonExSerializer
 {
@@ -128,7 +129,7 @@ namespace JsonExSerializer
                 }
                 else if (tok == LSquareToken)
                 {
-                    ParseCollection(null, desiredType);
+                    ParseCollection(desiredType);
                 }
                 else if (tok == LBraceToken)
                 {
@@ -156,11 +157,19 @@ namespace JsonExSerializer
             ParseExpression(t);
         }
 
-        private void ParseCollection(ICollectionBuilder collBuilder, Type desiredType)
+        private void ParseCollection(Type desiredType)
         {
+            ICollectionBuilder collBuilder = null;
             Token tok = ReadToken();
             Debug.Assert(tok == LSquareToken);
 
+            IJsonTypeConverter converter = null;
+            Type originalType = desiredType;
+            if (_context.HasConverter(desiredType))
+            {
+                converter = _context.GetConverter(desiredType);
+                desiredType = converter.GetSerializedType(desiredType);
+            }
             Type elemType = typeof(object);
             TypeHandler handler = _context.GetTypeHandler(desiredType);            
             if (desiredType != typeof(object))
@@ -183,11 +192,24 @@ namespace JsonExSerializer
                 collBuilder.Add(_values.Pop());
             }
 
-            _values.Push(collBuilder.GetResult());
+            object value = collBuilder.GetResult();
+            if (converter != null)
+            {
+                value = converter.ConvertTo(value, originalType);
+            }
+            _values.Push(value);
         }
 
         private void ParseObject(Type desiredType)
         {
+            IJsonTypeConverter converter = null;
+            Type originalType = desiredType;
+            if (_context.HasConverter(desiredType))
+            {
+                converter = _context.GetConverter(desiredType);
+                desiredType = converter.GetSerializedType(desiredType);
+            }
+
             if (desiredType.IsArray)
             {
                 throw new ParseException("Invalid collection type for object " + desiredType);
@@ -204,6 +226,11 @@ namespace JsonExSerializer
             }
             while (ReadAhead(CommaToken, RBraceToken, new ParserMethod(ParseKeyValue), desiredType))
             {
+            }
+            if (converter != null)
+            {
+                object value = _values.Pop();
+                _values.Push(converter.ConvertTo(value, originalType));
             }
         }
 

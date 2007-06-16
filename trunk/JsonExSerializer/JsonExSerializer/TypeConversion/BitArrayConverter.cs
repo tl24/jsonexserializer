@@ -46,20 +46,22 @@ namespace JsonExSerializer.TypeConversion
                 }
             }
 
-            return len + "," + sb.ToString();
+            Hashtable result = new Hashtable();
+            result["Count"] = len;
+            result["Bits"] = sb.ToString();
+            return result;
         }
 
         public object ConvertTo(object item, Type sourceType)
         {
-            string str = (string)item;
-            string[] split = str.Split(',');
-            int count = int.Parse(split[0]);
+            string bits = (string)((Hashtable)item)["Bits"];
+            int count = (int)((Hashtable)item)["Count"];
             // >> 5 == Fast integer division by 32
             int intLength = ((count - 1) >> 5) + 1;
             BitArray result = new BitArray(count);
-            for (int i = 0, j = intLength - 1; i + 3 < split[1].Length && j >= 0; i += 4, j--)
+            for (int i = 0, j = intLength - 1; i + 3 < bits.Length && j >= 0; i += 4, j--)
             {
-                string temp = split[1].Substring(i, 4);
+                string temp = bits.Substring(i, 4);
                 int value = int.Parse(temp, System.Globalization.NumberStyles.AllowHexSpecifier);
                 int end = Math.Min(32, count - (j << 5));
                 for (int k = 0; k < end; k++)
@@ -81,7 +83,7 @@ namespace JsonExSerializer.TypeConversion
 
         public Type GetSerializedType(Type sourceType)
         {
-            return typeof(string);
+            return typeof(Hashtable);
         }
 
         #endregion

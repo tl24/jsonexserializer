@@ -15,6 +15,15 @@ namespace JsonExSerializer
         private bool _isCompact;
         private bool _outputTypeComment;
         private bool _outputTypeInformation;
+        public enum ReferenceOption
+        {
+            //WriteIdentifier,
+            IgnoreCircularReferences,
+            ErrorCircularReferences
+        }
+
+        private ReferenceOption _referenceWritingType;
+
         private TwoWayDictionary<Type, string> _typeBindings;
         private Serializer _serializerInstance;
         private List<ITypeConverterFactory> _converterFactories;
@@ -28,6 +37,8 @@ namespace JsonExSerializer
             _isCompact = false;
             _outputTypeComment = true;
             _outputTypeInformation = true;
+            _referenceWritingType = ReferenceOption.ErrorCircularReferences;
+
             _typeBindings = new TwoWayDictionary<Type, string>();
             // add bindings for primitive types
             _typeBindings[typeof(byte)] = "byte";
@@ -65,6 +76,7 @@ namespace JsonExSerializer
             _cache = new Dictionary<Type, TypeHandler>();
         }
 
+        #region Options
         /// <summary>
         /// If true, string output will be as compact as possible with minimal spacing.  Thus, cutting
         /// down on space.  This option has no effect on Deserialization.
@@ -92,6 +104,7 @@ namespace JsonExSerializer
         {
             _outputTypeComment = false;
             _outputTypeInformation = false;
+            _referenceWritingType = ReferenceOption.ErrorCircularReferences;
         }
 
         /// <summary>
@@ -104,6 +117,24 @@ namespace JsonExSerializer
             get { return this._outputTypeInformation; }
             set { this._outputTypeInformation = value; }
         }
+
+        /// <summary>
+        /// Controls how references to previously serialized objects are written out.
+        /// If the option is set to WriteIdentifier a reference identifier is written.
+        /// The reference identifier is the path from the root to the first reference to the object.
+        /// Example: this.SomeProp.1.MyClassVar;
+        /// Otherwise a copy of the object is written unless a circular reference is detected, then
+        /// this option controls how the circular reference is handled.  If IgnoreCircularReferences
+        /// is set, then null is written when a circular reference is detected.  If ErrorCircularReferences
+        /// is set, then an error will be thrown.
+        /// </summary>
+        public ReferenceOption ReferenceWritingType
+        {
+            get { return this._referenceWritingType; }
+            set { this._referenceWritingType = value; }
+        }
+
+        #endregion
 
         /// <summary>
         /// Adds a different binding for a type
@@ -273,6 +304,5 @@ namespace JsonExSerializer
             }
             return handler;
         }
-
     }
 }

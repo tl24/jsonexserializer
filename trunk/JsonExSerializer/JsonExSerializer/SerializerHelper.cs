@@ -93,8 +93,9 @@ namespace JsonExSerializer
                         if (_context.HasConverter(o.GetType()))
                         {
                             IJsonTypeConverter converter = _context.GetConverter(o.GetType());
-                            o = converter.ConvertFrom(o);
+                            o = converter.ConvertFrom(o, _context);
                             Serialize(o, indent, currentPath);
+                            return;
                         }
                         TypeHandler handler = _context.GetTypeHandler(o.GetType());
                         if (handler.IsCollection(_context))
@@ -180,23 +181,41 @@ namespace JsonExSerializer
                 _writer.Write('\n');
                 subindent = indent + indentStep;
             }
-            foreach (TypeHandlerProperty prop in handler.Properties)
+
+            if (o is ISerializationCallback)
             {
-                if (addComma)
+                ((ISerializationCallback)o).OnBeforeSerialization();
+            }
+
+            try
+            {
+                foreach (TypeHandlerProperty prop in handler.Properties)
                 {
-                    _writer.Write(", ");
-                    if (!_context.IsCompact) _writer.Write(Environment.NewLine);
+                    if (addComma)
+                    {
+                        _writer.Write(", ");
+                        if (!_context.IsCompact) _writer.Write(Environment.NewLine);
+                    }
+                    _writer.Write("".PadLeft(subindent));
+                    Serialize(prop.Name, subindent, "");
+                    _writer.Write(":");
+                    object value = prop.GetValue(o);
+                    if (value != null && _context.OutputTypeInformation && value.GetType() != prop.PropertyType)
+                    {
+                        WriteCast(value.GetType());
+                    }
+                    Serialize(value, subindent, currentPath + "." + prop.Name);
+                    addComma = true;
                 }
-                _writer.Write("".PadLeft(subindent));
-                Serialize(prop.Name, subindent, "");
-                _writer.Write(":");
-                object value = prop.GetValue(o);
-                if (value != null && _context.OutputTypeInformation && value.GetType() != prop.PropertyType)
+            }
+            finally
+            {
+                // make sure this is in a finally block in case the ISerializationCallback interface
+                // is used to control thread locks
+                if (o is ISerializationCallback)
                 {
-                    WriteCast(value.GetType());
+                    ((ISerializationCallback)o).OnAfterSerialization();
                 }
-                Serialize(value, subindent, currentPath + "." + prop.Name);
-                addComma = true;
             }
             if (!_context.IsCompact)
             {
@@ -226,26 +245,42 @@ namespace JsonExSerializer
                 itemType = genericDictionary.GetGenericArguments()[1];
             }
 
-            
-            foreach (DictionaryEntry pair in ((IDictionary)o))
+            if (o is ISerializationCallback)
             {
-                if (addComma)
-                {
-                    _writer.Write(", ");
-                    if (!_context.IsCompact) _writer.Write(Environment.NewLine);
-                }
-                _writer.Write("".PadLeft(subindent));
-
-                Serialize(pair.Key, subindent, "");
-                _writer.Write(":");
-                object value = pair.Value;
-                if (value != null && _context.OutputTypeInformation && value.GetType() != itemType)
-                {
-                    WriteCast(value.GetType());
-                }
-                Serialize(value, subindent, currentPath + "." + pair.Key.ToString());
-                addComma = true;
+                ((ISerializationCallback)o).OnBeforeSerialization();
             }
+            try
+            {
+                foreach (DictionaryEntry pair in ((IDictionary)o))
+                {
+                    if (addComma)
+                    {
+                        _writer.Write(", ");
+                        if (!_context.IsCompact) _writer.Write(Environment.NewLine);
+                    }
+                    _writer.Write("".PadLeft(subindent));
+
+                    Serialize(pair.Key, subindent, "");
+                    _writer.Write(":");
+                    object value = pair.Value;
+                    if (value != null && _context.OutputTypeInformation && value.GetType() != itemType)
+                    {
+                        WriteCast(value.GetType());
+                    }
+                    Serialize(value, subindent, currentPath + "." + pair.Key.ToString());
+                    addComma = true;
+                }
+            }
+            finally
+            {
+                // make sure this is in a finally block in case the ISerializationCallback interface
+                // is used to control thread locks
+                if (o is ISerializationCallback)
+                {
+                    ((ISerializationCallback)o).OnAfterSerialization();
+                }
+            }
+
             if (!_context.IsCompact)
             {
                 _writer.Write(Environment.NewLine);
@@ -274,22 +309,40 @@ namespace JsonExSerializer
                 subindent = indent + indentStep;
             }
             int index = 0;
-            foreach (object value in collectionHandler.GetEnumerable(o))
+
+            if (o is ISerializationCallback)
             {
-                if (addComma)
-                {
-                    _writer.Write(", ");
-                    if (!_context.IsCompact) _writer.Write(Environment.NewLine);
-                }
-                _writer.Write("".PadLeft(subindent));
-                if (outputTypeInfo && value.GetType() != elemType)
-                {
-                    WriteCast(value.GetType());
-                }
-                Serialize(value, subindent, currentPath + "." + index);
-                addComma = true;
-                index++;
+                ((ISerializationCallback)o).OnBeforeSerialization();
             }
+            try
+            {
+                foreach (object value in collectionHandler.GetEnumerable(o))
+                {
+                    if (addComma)
+                    {
+                        _writer.Write(", ");
+                        if (!_context.IsCompact) _writer.Write(Environment.NewLine);
+                    }
+                    _writer.Write("".PadLeft(subindent));
+                    if (outputTypeInfo && value.GetType() != elemType)
+                    {
+                        WriteCast(value.GetType());
+                    }
+                    Serialize(value, subindent, currentPath + "." + index);
+                    addComma = true;
+                    index++;
+                }
+            }
+            finally
+            {
+                // make sure this is in a finally block in case the ISerializationCallback interface
+                // is used to control thread locks
+                if (o is ISerializationCallback)
+                {
+                    ((ISerializationCallback)o).OnAfterSerialization();
+                }
+            }
+
             if (!_context.IsCompact)
             {
                 _writer.Write(Environment.NewLine);

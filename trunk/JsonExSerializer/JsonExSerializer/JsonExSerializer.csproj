@@ -49,6 +49,8 @@
     <Compile Include="Collections\StackHandler.cs" />
     <Compile Include="Deserializer.cs" />
     <Compile Include="Collections\ICollectionBuilder.cs" />
+    <Compile Include="IDeserializationCallback.cs" />
+    <Compile Include="ISerializationCallback.cs" />
     <Compile Include="JsonConvertAttribute.cs" />
     <Compile Include="JsonExIgnoreAttribute.cs" />
     <Compile Include="Collections\ListCollectionBuilder.cs" />

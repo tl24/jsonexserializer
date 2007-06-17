@@ -21,7 +21,7 @@ namespace JsonExSerializer.TypeConversion
         /// </summary>
         /// <param name="item">the item to be converted</param>
         /// <returns>the converted item to be serialized</returns>
-        object ConvertFrom(object item);
+        object ConvertFrom(object item, SerializationContext serializationContext);
 
         /// <summary>
         /// This method will be called upon deserialization.  The item returned from ConvertFrom on serialization
@@ -30,13 +30,12 @@ namespace JsonExSerializer.TypeConversion
         /// </summary>
         /// <param name="item"></param>
         /// <returns>the desired object</returns>
-        object ConvertTo(object item, Type sourceType);
+        object ConvertTo(object item, Type sourceType, SerializationContext serializationContext);
 
         /// <summary>
         /// Context parameter to control conversion
         /// </summary>
         object Context { set; }
 
-        SerializationContext SerializationContext { set; }
     }
 }

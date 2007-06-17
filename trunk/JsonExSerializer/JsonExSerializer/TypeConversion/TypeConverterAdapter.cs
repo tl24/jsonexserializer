@@ -9,18 +9,17 @@ namespace JsonExSerializer.TypeConversion
     {
         private Type _sourceType;
         private TypeConverter _converter;
-        private SerializationContext _serializationContext;
 
         public TypeConverterAdapter(TypeConverter converter) {
             _converter = converter;
         }
 
-        public object ConvertFrom(object item)
+        public object ConvertFrom(object item, SerializationContext serializationContext)
         {
             return _converter.ConvertToString(item);
         }
 
-        public object ConvertTo(object item, Type sourceType)
+        public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             return _converter.ConvertFromString((string) item);
         }
@@ -38,11 +37,5 @@ namespace JsonExSerializer.TypeConversion
         }
 
         #endregion
-
-        public SerializationContext SerializationContext
-        {
-            get { return this._serializationContext; }
-            set { this._serializationContext = value; }
-        }
     }
 }

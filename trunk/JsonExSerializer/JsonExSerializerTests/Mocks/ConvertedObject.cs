@@ -94,5 +94,15 @@ namespace JsonExSerializerTests.Mocks
         }
 
         #endregion
+
+        #region IJsonTypeConverter Members
+
+
+        public SerializationContext SerializationContext
+        {
+            set { return; }
+        }
+
+        #endregion
     }
 }

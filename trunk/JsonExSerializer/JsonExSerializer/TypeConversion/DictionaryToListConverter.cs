@@ -13,6 +13,7 @@ namespace JsonExSerializer.TypeConversion
     {
         private Type _sourceType;
         private string _context;
+        private SerializationContext _serializationContext;
 
         #region IJsonTypeConverter Members
 
@@ -36,7 +37,7 @@ namespace JsonExSerializer.TypeConversion
             {
                 if (propHandler == null)
                 {
-                    propHandler = TypeHandler.GetHandler(_sourceType).FindProperty(_context);
+                    propHandler = _serializationContext.GetTypeHandler(_sourceType).FindProperty(_context);
                     if (propHandler == null)
                     {
                         throw new MissingMemberException("Type: " + item.GetType().Name + " does not have an accessible property: " + _context);
@@ -54,5 +55,11 @@ namespace JsonExSerializer.TypeConversion
         }
 
         #endregion
+
+        public SerializationContext SerializationContext
+        {
+            get { return this._serializationContext; }
+            set { this._serializationContext = value; }
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace JsonExSerializer.TypeConversion
     public interface IJsonTypeConverter
     {
 
+
         Type GetSerializedType(Type sourceType);
 
         /// <summary>
@@ -35,5 +36,7 @@ namespace JsonExSerializer.TypeConversion
         /// Context parameter to control conversion
         /// </summary>
         object Context { set; }
+
+        SerializationContext SerializationContext { set; }
     }
 }

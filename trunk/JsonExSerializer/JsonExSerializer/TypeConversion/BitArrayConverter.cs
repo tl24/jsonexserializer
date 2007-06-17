@@ -7,6 +7,7 @@ namespace JsonExSerializer.TypeConversion
 {
     public class BitArrayConverter : IJsonTypeConverter
     {
+
         #region IJsonTypeConverter Members
         
         /// converts a bit array into a string of the format:  "63,FFEF10002EFA"
@@ -84,6 +85,16 @@ namespace JsonExSerializer.TypeConversion
         public Type GetSerializedType(Type sourceType)
         {
             return typeof(Hashtable);
+        }
+
+        #endregion
+
+        #region IJsonTypeConverter Members
+
+
+        public SerializationContext SerializationContext
+        {
+            set { return; }
         }
 
         #endregion

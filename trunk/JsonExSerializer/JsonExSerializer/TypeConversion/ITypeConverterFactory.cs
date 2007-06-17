@@ -14,5 +14,6 @@ namespace JsonExSerializer.TypeConversion
         IJsonTypeConverter GetConverter(Type forType);
         bool HasConverter(Type forType);
         bool HasConverter(PropertyInfo forProperty);
+        SerializationContext SerializationContext { set; }
     }
 }

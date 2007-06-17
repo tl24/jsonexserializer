@@ -59,6 +59,8 @@ namespace JsonExSerializer
 
             // type conversion
             _defaultConverterFactory = new DefaultConverterFactory();
+            _defaultConverterFactory.SerializationContext = this;
+
             _converterFactories = new List<ITypeConverterFactory>();
             _converterFactories.Add(_defaultConverterFactory);
             _defaultConverterFactory.RegisterConverter(typeof(System.Collections.BitArray), new BitArrayConverter());

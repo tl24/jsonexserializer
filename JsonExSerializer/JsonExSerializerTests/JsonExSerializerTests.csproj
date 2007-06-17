@@ -45,6 +45,7 @@
     <Compile Include="Mocks\MockCallbackObject.cs" />
     <Compile Include="Mocks\MockFlagsEnum.cs" />
     <Compile Include="Mocks\MockReferenceObject.cs" />
+    <Compile Include="Mocks\SelfConverter.cs" />
     <Compile Include="Mocks\SemiComplexObject.cs" />
     <Compile Include="Mocks\SpecializedMock.cs" />
     <Compile Include="Mocks\SubClassMock.cs" />

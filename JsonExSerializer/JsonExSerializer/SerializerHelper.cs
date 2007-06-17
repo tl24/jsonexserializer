@@ -97,6 +97,12 @@ namespace JsonExSerializer
                             Serialize(o, indent, currentPath);
                             return;
                         }
+                        else if (o is IJsonTypeConverter)
+                        {
+                            o = ((IJsonTypeConverter)o).ConvertFrom(o, _context);
+                            Serialize(o, indent, currentPath);
+                            return;
+                        }
                         TypeHandler handler = _context.GetTypeHandler(o.GetType());
                         if (handler.IsCollection(_context))
                         {

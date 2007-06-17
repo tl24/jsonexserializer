@@ -58,13 +58,13 @@ namespace JsonExSerializerTests.Mocks
     {
         #region IJsonTypeConverter Members
 
-        public object ConvertFrom(object item)
+        public object ConvertFrom(object item, SerializationContext serializationContext)
         {
             MyImmutablePoint pt = (MyImmutablePoint) item;
             return pt.X + "," + pt.Y;
         }
 
-        public object ConvertTo(object item, Type sourceType)
+        public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             string data = (string)item;
             int x = 0, y = 0;

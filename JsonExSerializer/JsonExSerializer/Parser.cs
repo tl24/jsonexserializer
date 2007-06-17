@@ -103,9 +103,10 @@ namespace JsonExSerializer
 
         private object ParseExpression(Type desiredType, object parent)
         {
+            object value = null;
             if (_tokenStream.IsEmpty())
             {
-                return null;
+                value = null;
             }
             else
             {
@@ -113,33 +114,38 @@ namespace JsonExSerializer
                 if (tok.type == TokenType.Number
                     || (IsIdentifier(tok) && !IsKeyword(tok)))
                 {
-                    return ParsePrimitive(desiredType);
+                    value = ParsePrimitive(desiredType);
                 }
                 else if (IsQuotedString(tok))
                 {
-                    return ParseString(desiredType);
+                    value = ParseString(desiredType);
                 }
                 else if (tok == LSquareToken)
                 {
-                    return ParseCollection(desiredType);
+                    value = ParseCollection(desiredType);
                 }
                 else if (tok == LBraceToken)
                 {
-                    return ParseObject(desiredType);
+                    value = ParseObject(desiredType);
                 }
                 else if (tok == LParenToken)
                 {
-                    return ParseCast(desiredType);
+                    value = ParseCast(desiredType);
                 }
                 else if (tok == NewToken)
                 {
-                    return ParseConstructorSpec(desiredType);
+                    value = ParseConstructorSpec(desiredType);
                 }
                 else
                 {
                     throw new ParseException("Unexpected token: " + tok);
                 }
             }
+            if (value is IDeserializationCallback)
+            {
+                ((IDeserializationCallback)value).OnAfterDeserialization();
+            }
+            return value;
         }
 
         private object ParseCast(Type desiredType)
@@ -191,7 +197,7 @@ namespace JsonExSerializer
             object value = collBuilder.GetResult();
             if (converter != null)
             {
-                value = converter.ConvertTo(value, originalType);
+                value = converter.ConvertTo(value, originalType, _context);
             }
             return value;
         }
@@ -227,7 +233,7 @@ namespace JsonExSerializer
             }
             if (converter != null)
             {
-                value = converter.ConvertTo(value, originalType);
+                value = converter.ConvertTo(value, originalType, _context);
             }
             return value;
         }
@@ -444,7 +450,7 @@ namespace JsonExSerializer
                 }
                 else if (_context.HasConverter(desiredType))
                 {
-                    return _context.GetConverter(desiredType).ConvertTo(tok.value, desiredType);
+                    return _context.GetConverter(desiredType).ConvertTo(tok.value, desiredType, _context);
                 }
                 else
                 {
@@ -475,7 +481,7 @@ namespace JsonExSerializer
             }
             else if (_context.HasConverter(desiredType))
             {
-                return _context.GetConverter(desiredType).ConvertTo(val, desiredType);
+                return _context.GetConverter(desiredType).ConvertTo(val, desiredType, _context);
             }
             else
             {

@@ -41,21 +41,11 @@ namespace JsonExSerializerTests
         [Test]
         public void ConvertGuidTest()
         {
-            DefaultConverterFactory factory = new DefaultConverterFactory();
-            if (factory.HasConverter(typeof(Guid)))
-            {
-                IJsonTypeConverter converter = factory.GetConverter(typeof(Guid));
-                Guid g = Guid.NewGuid();
-                object o = converter.ConvertFrom(g);
-                Assert.IsTrue(o is string, "Converter should convert guid to string");
-                Guid result = (Guid) converter.ConvertTo(o, typeof(Guid));
-
-                Assert.AreEqual(g, result, "Guid did not convert correctly");
-            }
-            else
-            {
-                Assert.Fail("Guid should have a typeconverter");
-            }
+            Serializer s = Serializer.GetSerializer(typeof(Guid));
+            Guid g = Guid.NewGuid();
+            string result = s.Serialize(g);
+            Guid actual = (Guid)s.Deserialize(result);
+            Assert.AreEqual(g, actual, "Guid test failed");
         }
 
         [Test]
@@ -66,6 +56,21 @@ namespace JsonExSerializerTests
             string result = serializer.Serialize(expectedPt);
             MyImmutablePoint actualPt = (MyImmutablePoint) serializer.Deserialize(result);
             Assert.AreEqual(expectedPt, actualPt, "MyImmutablePoint class not serialized correctly");
+        }
+
+        [Test]
+        public void CallbackTest()
+        {
+            MockCallbackObject expected = new MockCallbackObject();
+            expected.Name = "callback";
+
+            Serializer s = Serializer.GetSerializer(expected.GetType());
+            string result = s.Serialize(expected);
+            Assert.AreEqual(1, expected.BeforeSerializeCount, "BeforeSerialize incorrect count");
+            Assert.AreEqual(1, expected.AfterSerializeCount, "AfterSerialize incorrect count");
+
+            MockCallbackObject actual = (MockCallbackObject)s.Deserialize(result);
+            Assert.AreEqual(1, actual.AfterDeserializeCount, "AfterDeserialize incorrect count");
         }
     }
 }

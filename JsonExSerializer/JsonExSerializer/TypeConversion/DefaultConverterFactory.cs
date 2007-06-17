@@ -119,7 +119,6 @@ namespace JsonExSerializer.TypeConversion
             {
                 // System.ComponentModel.TypeConverter
                 converter = new TypeConverterAdapter(TypeDescriptor.GetConverter(forType));
-                converter.SerializationContext = this.SerializationContext;
                 _registeredTypes[forType] = converter;
                 return converter;
             }
@@ -141,7 +140,6 @@ namespace JsonExSerializer.TypeConversion
                 // just one for now, but later support chaining of converters
                 JsonConvertAttribute convAttr = (JsonConvertAttribute) forMember.GetCustomAttributes(typeof(JsonConvertAttribute), false)[0];
                 IJsonTypeConverter converter = (IJsonTypeConverter) Activator.CreateInstance(convAttr.Converter);
-                converter.SerializationContext = this.SerializationContext;
                 _registeredTypes[forMember] = converter;
                 // should we register it?
                 return converter;

@@ -79,17 +79,8 @@ namespace JsonExSerializer
         }
 
         public object Parse()
-        {
-            ParseExpression(_deserializedType);
-            object result = null;
-            if (_values.Count > 1)
-            {
-                throw new ParseException("Invalid parse exception, too many resulting values");
-            }
-            if (_values.Count == 1)
-                result = _values.Pop();
-
-            return result;
+        {         
+            return ParseExpression(_deserializedType, null);
         }
 
         /// <summary>
@@ -110,11 +101,11 @@ namespace JsonExSerializer
             return _tokenStream.ReadToken();
         }
 
-        private void ParseExpression(Type desiredType)
+        private object ParseExpression(Type desiredType, object parent)
         {
             if (_tokenStream.IsEmpty())
             {
-                return;
+                return null;
             }
             else
             {
@@ -122,43 +113,46 @@ namespace JsonExSerializer
                 if (tok.type == TokenType.Number
                     || (IsIdentifier(tok) && !IsKeyword(tok)))
                 {
-                    ParsePrimitive(desiredType);
+                    return ParsePrimitive(desiredType);
                 }
                 else if (IsQuotedString(tok))
                 {
-                    ParseString(desiredType);
+                    return ParseString(desiredType);
                 }
                 else if (tok == LSquareToken)
                 {
-                    ParseCollection(desiredType);
+                    return ParseCollection(desiredType);
                 }
                 else if (tok == LBraceToken)
                 {
-                    ParseObject(desiredType);
+                    return ParseObject(desiredType);
                 }
                 else if (tok == LParenToken)
                 {
-                    ParseCast(desiredType);
+                    return ParseCast(desiredType);
                 }
                 else if (tok == NewToken)
                 {
-                    ParseConstructorSpec(desiredType);
+                    return ParseConstructorSpec(desiredType);
+                }
+                else
+                {
+                    throw new ParseException("Unexpected token: " + tok);
                 }
             }
         }
 
-        private void ParseCast(Type desiredType)
+        private object ParseCast(Type desiredType)
         {
             Token tok = ReadToken();
             Debug.Assert(tok == LParenToken, "Invalid starting token for ParseCast: " + tok);
-            ParseTypeSpecifier();
+            desiredType = ParseTypeSpecifier();
             tok = ReadToken();
             RequireToken(RParenToken, tok, "Invalid Type Cast Syntax");
-            Type t = (Type) _values.Pop();
-            ParseExpression(t);
+            return ParseExpression(desiredType, null);
         }
 
-        private void ParseCollection(Type desiredType)
+        private object ParseCollection(Type desiredType)
         {
             ICollectionBuilder collBuilder = null;
             Token tok = ReadToken();
@@ -188,9 +182,10 @@ namespace JsonExSerializer
                     collBuilder = handler.GetCollectionBuilder(_context);
                 }
             }
-            while (ReadAhead(CommaToken, RSquareToken, new ParserMethod(ParseExpression), elemType))
+            object item;
+            while (ReadAhead(CommaToken, RSquareToken, new ParserMethod(ParseExpression), elemType, collBuilder, out item))
             {
-                collBuilder.Add(_values.Pop());
+                collBuilder.Add(item);
             }
 
             object value = collBuilder.GetResult();
@@ -198,10 +193,10 @@ namespace JsonExSerializer
             {
                 value = converter.ConvertTo(value, originalType);
             }
-            _values.Push(value);
+            return value;
         }
 
-        private void ParseObject(Type desiredType)
+        private object ParseObject(Type desiredType)
         {
             IJsonTypeConverter converter = null;
             Type originalType = desiredType;
@@ -217,35 +212,37 @@ namespace JsonExSerializer
             }
             Token tok = ReadToken();
             Debug.Assert(tok == LBraceToken);
+            object value = null;
             if (desiredType == typeof(object))
             {
-                _values.Push(new Hashtable());
+                value = new Hashtable();
             }
             else
             {
-                _values.Push(Activator.CreateInstance(desiredType));
+                value = Activator.CreateInstance(desiredType);
             }
-            while (ReadAhead(CommaToken, RBraceToken, new ParserMethod(ParseKeyValue), desiredType))
+            object item;
+            while (ReadAhead(CommaToken, RBraceToken, new ParserMethod(ParseKeyValue), desiredType, value, out item))
             {
             }
             if (converter != null)
             {
-                object value = _values.Pop();
-                _values.Push(converter.ConvertTo(value, originalType));
+                value = converter.ConvertTo(value, originalType);
             }
+            return value;
         }
 
-        private void ParseKeyValue(Type desiredType)
+        private object ParseKeyValue(Type desiredType, object instance)
         {
-            object instance = _values.Peek();
             Token tok = ReadToken();
             string name = tok.value;
             tok = ReadToken();
-            RequireToken(ColonToken, tok, "Syntax error, key should be followed by :.");            
+            RequireToken(ColonToken, tok, "Syntax error, key should be followed by :.");
+            object value;
             if (instance is IDictionary)
             {
-                ParseExpression(typeof(object));
-                ((IDictionary)instance)[name] = _values.Pop();                
+                value = ParseExpression(typeof(object), null);
+                ((IDictionary)instance)[name] = value;
             } 
             else 
             {
@@ -253,14 +250,14 @@ namespace JsonExSerializer
                 TypeHandlerProperty prop = handler.FindProperty(name);
                 if (prop == null)
                     throw new ParseException("Could not find property: " + name + " on type: " + handler.ForType.FullName);
-                ParseExpression(prop.PropertyType);
-                prop.SetValue(instance, _values.Pop());
+                value = ParseExpression(prop.PropertyType, null);
+                prop.SetValue(instance, value);
             }
-            
+            return value;
             
         }
 
-        private delegate void ParserMethod(Type desiredType);
+        private delegate object ParserMethod(Type desiredType, object parent);
 
         /// <summary>
         /// Handler for 1 or more construct
@@ -270,9 +267,10 @@ namespace JsonExSerializer
         /// <param name="meth">the method to call to parse an item</param>
         /// <param name="desiredType">the desired type for the called method</param>
         /// <returns>true if match parsed, false otherwise</returns>
-        private bool ReadAhead(Token separator, Token terminal, ParserMethod meth, Type desiredType)
+        private bool ReadAhead(Token separator, Token terminal, ParserMethod meth, Type desiredType, object parent, out object result)
         {
             Token tok = PeekToken();
+            result = null;
             if (tok == terminal)
             {
                 ReadToken();
@@ -282,20 +280,21 @@ namespace JsonExSerializer
             {
                 ReadToken();
             }
-            meth(desiredType);
+            result = meth(desiredType, parent);
             return true;
         }
 
-        private void ParseConstructorSpec(Type desiredType)
+        private object ParseConstructorSpec(Type desiredType)
         {
+            throw new ParseException("Constructors not supported");
             Token tok = ReadToken();    // should be the new keyword
             Debug.Assert(tok == NewToken);
-            ParseTypeSpecifier();
+            Type t = ParseTypeSpecifier();
 
             Type type = (Type)_values.Pop();
             tok = ReadToken();
             RequireToken(LParenToken, tok, "Missing constructor arguments");
-
+            return null;
         }
 
         /// <summary>
@@ -309,7 +308,7 @@ namespace JsonExSerializer
         /// <para>  System.Collections.Generic.List&lt;System.String&gt;[]  -- array of list of strings</para>
         /// <para>  System.Collections.Generic.List&lt;System.String[]&gt;  -- list of string arrays</para>
         /// </summary>
-        private void ParseTypeSpecifier()
+        private Type ParseTypeSpecifier()
         {
             StringBuilder typeSpec = new StringBuilder();
             Token tok = ReadToken();
@@ -339,13 +338,11 @@ namespace JsonExSerializer
             {
                 
                 tok = ReadToken();                
-                ParseTypeSpecifier();
-                genericTypes.Add((Type)_values.Pop());
+                genericTypes.Add(ParseTypeSpecifier());
                 
                 while (PeekToken() == CommaToken)
                 {                    
-                    ParseTypeSpecifier();
-                    genericTypes.Add((Type)_values.Pop());
+                    genericTypes.Add(ParseTypeSpecifier());
                 }
                 tok = ReadToken();
                 RequireToken(GenericArgsEnd, tok, "Unterminated generic type arguments");                
@@ -373,7 +370,7 @@ namespace JsonExSerializer
                 builtType = builtType.MakeArrayType();
             }            
 
-            _values.Push(builtType);
+            return builtType;
         }
 
         private Type bindType(string typeName)
@@ -397,10 +394,9 @@ namespace JsonExSerializer
             return Type.GetType(typeName, true);
         }
 
-        private void ParsePrimitive(Type desiredType)
+        private object ParsePrimitive(Type desiredType)
         {
             Token tok = ReadToken();
-            object result = null;
             if (desiredType == typeof(object))
             {
                 // no type info, try to figure out the closest type
@@ -409,30 +405,30 @@ namespace JsonExSerializer
                     case TokenType.Number:
                         if (tok.value.IndexOf('.') != -1)
                         {
-                            result = Convert.ToDouble(tok.value);
+                            return Convert.ToDouble(tok.value);
                         }
                         else
                         {
-                            result = Convert.ToInt32(tok.value);
+                            return Convert.ToInt32(tok.value);
                         }
                         break;
                     case TokenType.Identifier:
                         if (tok.value.Equals("true", StringComparison.CurrentCultureIgnoreCase)
                         || tok.value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
                         {
-                            result = Convert.ToBoolean(tok.value);
+                            return Convert.ToBoolean(tok.value);
                         }
                         else if (tok.value.Equals("null"))
                         {
-                            result = null;
+                            return null;
                         }
                         else
                         {
-                            result = tok.value;
+                            return tok.value;
                         }
                         break;
                     default:
-                        result = tok.value;
+                        return tok.value;
                         break;
                 }
             }
@@ -440,25 +436,24 @@ namespace JsonExSerializer
             {
                 if (tok == NullToken)
                 {
-                    result = null;
+                    return null;
                 }
                 else if (desiredType.IsEnum)
                 {
-                    result = Enum.Parse(desiredType, tok.value);
+                    return Enum.Parse(desiredType, tok.value);
                 }
                 else if (_context.HasConverter(desiredType))
                 {
-                    result = _context.GetConverter(desiredType).ConvertTo(tok.value, desiredType);
+                    return _context.GetConverter(desiredType).ConvertTo(tok.value, desiredType);
                 }
                 else
                 {
-                    result = Convert.ChangeType(tok.value, desiredType);
+                    return Convert.ChangeType(tok.value, desiredType);
                 }
             }
-            _values.Push(result);
         }
 
-        private void ParseString(Type desiredType)
+        private object ParseString(Type desiredType)
         {
             Token tok = ReadToken();
             string val = null;
@@ -476,15 +471,15 @@ namespace JsonExSerializer
             }
             if (desiredType == typeof(char))
             {
-                _values.Push(Convert.ChangeType(val, typeof(char)));
+                return Convert.ChangeType(val, typeof(char));
             }
             else if (_context.HasConverter(desiredType))
             {
-                _values.Push(_context.GetConverter(desiredType).ConvertTo(val, desiredType));
+                return _context.GetConverter(desiredType).ConvertTo(val, desiredType);
             }
             else
             {
-                _values.Push(val);
+                return val;
             }
         }
 

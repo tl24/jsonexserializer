@@ -9,6 +9,7 @@ namespace JsonExSerializer.TypeConversion
     {
         private Type _sourceType;
         private TypeConverter _converter;
+        private SerializationContext _serializationContext;
 
         public TypeConverterAdapter(TypeConverter converter) {
             _converter = converter;
@@ -37,5 +38,11 @@ namespace JsonExSerializer.TypeConversion
         }
 
         #endregion
+
+        public SerializationContext SerializationContext
+        {
+            get { return this._serializationContext; }
+            set { this._serializationContext = value; }
+        }
     }
 }

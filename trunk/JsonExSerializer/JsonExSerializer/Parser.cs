@@ -110,35 +110,56 @@ namespace JsonExSerializer
             }
             else
             {
-                Token tok = PeekToken();
-                if (tok.type == TokenType.Number
-                    || (IsIdentifier(tok) && !IsKeyword(tok)))
+                if (_context.HasConverter(desiredType))
                 {
-                    value = ParsePrimitive(desiredType);
+                    Type originalType = desiredType;
+                    IJsonTypeConverter converter = _context.GetConverter(desiredType);
+                    desiredType = converter.GetSerializedType(desiredType);
+                    value = ParseExpression(desiredType, parent);
+                    value = converter.ConvertTo(value, originalType, _context);
                 }
-                else if (IsQuotedString(tok))
+                else if (typeof(IJsonTypeConverter).IsAssignableFrom(desiredType))
                 {
-                    value = ParseString(desiredType);
-                }
-                else if (tok == LSquareToken)
-                {
-                    value = ParseCollection(desiredType);
-                }
-                else if (tok == LBraceToken)
-                {
-                    value = ParseObject(desiredType);
-                }
-                else if (tok == LParenToken)
-                {
-                    value = ParseCast(desiredType);
-                }
-                else if (tok == NewToken)
-                {
-                    value = ParseConstructorSpec(desiredType);
+                    // object converts itself, create an instance of the object
+                    IJsonTypeConverter converter = (IJsonTypeConverter)Activator.CreateInstance(desiredType);
+                    Type originalType = desiredType;
+                    desiredType = converter.GetSerializedType(desiredType);
+                    value = ParseExpression(desiredType, parent);
+                    converter.ConvertTo(value, originalType, _context);
+                    value = converter;
                 }
                 else
                 {
-                    throw new ParseException("Unexpected token: " + tok);
+                    Token tok = PeekToken();
+                    if (tok.type == TokenType.Number
+                        || (IsIdentifier(tok) && !IsKeyword(tok)))
+                    {
+                        value = ParsePrimitive(desiredType);
+                    }
+                    else if (IsQuotedString(tok))
+                    {
+                        value = ParseString(desiredType);
+                    }
+                    else if (tok == LSquareToken)
+                    {
+                        value = ParseCollection(desiredType);
+                    }
+                    else if (tok == LBraceToken)
+                    {
+                        value = ParseObject(desiredType);
+                    }
+                    else if (tok == LParenToken)
+                    {
+                        value = ParseCast(desiredType);
+                    }
+                    else if (tok == NewToken)
+                    {
+                        value = ParseConstructorSpec(desiredType);
+                    }
+                    else
+                    {
+                        throw new ParseException("Unexpected token: " + tok);
+                    }
                 }
             }
             if (value is IDeserializationCallback)
@@ -164,13 +185,6 @@ namespace JsonExSerializer
             Token tok = ReadToken();
             Debug.Assert(tok == LSquareToken);
 
-            IJsonTypeConverter converter = null;
-            Type originalType = desiredType;
-            if (_context.HasConverter(desiredType))
-            {
-                converter = _context.GetConverter(desiredType);
-                desiredType = converter.GetSerializedType(desiredType);
-            }
             Type elemType = typeof(object);
             TypeHandler handler = _context.GetTypeHandler(desiredType);            
             if (desiredType != typeof(object))
@@ -195,22 +209,11 @@ namespace JsonExSerializer
             }
 
             object value = collBuilder.GetResult();
-            if (converter != null)
-            {
-                value = converter.ConvertTo(value, originalType, _context);
-            }
             return value;
         }
 
         private object ParseObject(Type desiredType)
         {
-            IJsonTypeConverter converter = null;
-            Type originalType = desiredType;
-            if (_context.HasConverter(desiredType))
-            {
-                converter = _context.GetConverter(desiredType);
-                desiredType = converter.GetSerializedType(desiredType);
-            }
 
             if (desiredType.IsArray)
             {
@@ -230,10 +233,6 @@ namespace JsonExSerializer
             object item;
             while (ReadAhead(CommaToken, RBraceToken, new ParserMethod(ParseKeyValue), desiredType, value, out item))
             {
-            }
-            if (converter != null)
-            {
-                value = converter.ConvertTo(value, originalType, _context);
             }
             return value;
         }
@@ -448,10 +447,6 @@ namespace JsonExSerializer
                 {
                     return Enum.Parse(desiredType, tok.value);
                 }
-                else if (_context.HasConverter(desiredType))
-                {
-                    return _context.GetConverter(desiredType).ConvertTo(tok.value, desiredType, _context);
-                }
                 else
                 {
                     return Convert.ChangeType(tok.value, desiredType);
@@ -478,10 +473,6 @@ namespace JsonExSerializer
             if (desiredType == typeof(char))
             {
                 return Convert.ChangeType(val, typeof(char));
-            }
-            else if (_context.HasConverter(desiredType))
-            {
-                return _context.GetConverter(desiredType).ConvertTo(val, desiredType, _context);
             }
             else
             {

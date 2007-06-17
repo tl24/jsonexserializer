@@ -72,5 +72,16 @@ namespace JsonExSerializerTests
             MockCallbackObject actual = (MockCallbackObject)s.Deserialize(result);
             Assert.AreEqual(1, actual.AfterDeserializeCount, "AfterDeserialize incorrect count");
         }
+
+        [Test]
+        public void SelfConversionTest()
+        {
+            SelfConverter expected = new SelfConverter();
+            Serializer s = Serializer.GetSerializer(typeof(SelfConverter));
+            string result = s.Serialize(expected);
+            SelfConverter actual = (SelfConverter)s.Deserialize(result);
+            Assert.AreEqual(expected, actual, "Selfconversion failed");
+
+        }
     }
 }

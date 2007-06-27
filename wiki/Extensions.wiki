@@ -35,7 +35,7 @@ Result:
 }}}
 
 == Type Casts ==
-  If it is determined that the type of an object can not be sufficiently determined on deserialization based on the metadata of the object being serialized, then a cast will be written to the serialized stream to indicate the type upon deserialization.  This can occur when using interfaces, non-generic collections such as ArrayList or HashTable, or typing a property with a base class type, but the value of the property is a subclass of the base class.  The OutputTypeInformation option controls the writing of type information.
+  If it is determined that the type of an object can not be sufficiently determined on deserialization based on the metadata of the object being serialized, then a cast will be written to the serialized stream to indicate the type upon deserialization.  This can occur when using interfaces, non-generic collections such as ArrayList or HashTable, or typing a property with a base class type, but the value of the property is a subclass of the base class.  The type information will either be a simple type reference like you would see in normal C# code, or quoted with an assembly reference.  The OutputTypeInformation option controls the writing of type information.
 
 Example:
 {{{
@@ -55,7 +55,6 @@ Result:
    (string) "this string",
    (bool) true,
    (int) 324,
-   (System.Guid) "4c14dd8c-2351-4bee-bda9-c33e61d64330"
+   ("System.Guid, System") "4c14dd8c-2351-4bee-bda9-c33e61d64330"
 ]
 }}}
-

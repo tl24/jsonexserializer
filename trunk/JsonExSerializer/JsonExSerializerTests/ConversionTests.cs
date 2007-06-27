@@ -81,7 +81,6 @@ namespace JsonExSerializerTests
             string result = s.Serialize(expected);
             SelfConverter actual = (SelfConverter)s.Deserialize(result);
             Assert.AreEqual(expected, actual, "Selfconversion failed");
-
         }
     }
 }

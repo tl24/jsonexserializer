@@ -14,14 +14,14 @@ namespace JsonExSerializer
         private SerializationContext _context;
         private TextWriter _writer;
         private const int indentStep = 3;
-        private IDictionary<object, string> _refs;
+        private IDictionary<object, ReferenceInfo> _refs;
 
         internal SerializerHelper(Type t, SerializationContext context, TextWriter writer)
         {
             _serializedType = t;
             _context = context;
             _writer = writer;
-            _refs = new Dictionary<object, string>(new ReferenceEqualityComparer<object>());
+            _refs = new Dictionary<object, ReferenceInfo>(new ReferenceEqualityComparer<object>());
         }
 
         public void Serialize(object o)
@@ -65,14 +65,20 @@ namespace JsonExSerializer
                         WriteFloat((float)o, indent);
                         break;
                     case TypeCode.Object:
+                        ReferenceInfo refInfo = null;
+
                         if (_refs.ContainsKey(o))
                         {
-                            string refPath = _refs[o];
+                            refInfo = _refs[o];
+                            string refPath = refInfo.Path;
                             switch (_context.ReferenceWritingType)
                             {
-                                //case SerializationContext.ReferenceOption.WriteIdentifier:
-                                //    _writer.Write(refPath);
-                                //    return;
+                                case SerializationContext.ReferenceOption.WriteIdentifier:
+                                    if (!refInfo.CanReference)
+                                        throw new ApplicationException("Can't reference object: " + refPath + " from " + currentPath + ", either it is a collection, or it has not been converted yet");
+
+                                    _writer.Write(refPath);
+                                    return;
                                 case SerializationContext.ReferenceOption.IgnoreCircularReferences:
                                     if (currentPath.StartsWith(refPath))
                                     {
@@ -88,19 +94,22 @@ namespace JsonExSerializer
                                     break;
                             }
                         } else {
-                            _refs[o] = currentPath;
+                            refInfo = new ReferenceInfo(currentPath);
+                            _refs[o] = refInfo;
                         }
                         if (_context.HasConverter(o.GetType()))
                         {
                             IJsonTypeConverter converter = _context.GetConverter(o.GetType());
                             o = converter.ConvertFrom(o, _context);
                             Serialize(o, indent, currentPath);
+                            refInfo.CanReference = true;    // can't reference inside the object
                             return;
                         }
                         else if (o is IJsonTypeConverter)
                         {
                             o = ((IJsonTypeConverter)o).ConvertFrom(o, _context);
                             Serialize(o, indent, currentPath);
+                            refInfo.CanReference = true;    // can't reference inside the object
                             return;
                         }
                         TypeHandler handler = _context.GetTypeHandler(o.GetType());
@@ -114,6 +123,7 @@ namespace JsonExSerializer
                         }
                         else
                         {
+                            refInfo.CanReference = true;    // regular object, can reference at any time
                             SerializeObject(o, indent, currentPath);
                         }
                         break;
@@ -487,5 +497,18 @@ namespace JsonExSerializer
             return s.Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"");
         }
 
+        /// <summary>
+        /// Helper class to store information about a reference
+        /// </summary>
+        private class ReferenceInfo
+        {
+            public string Path;
+            public bool CanReference = false;
+
+            public ReferenceInfo(string Path)
+            {
+                this.Path = Path;
+            }
+        }
     }
 }

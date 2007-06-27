@@ -411,7 +411,8 @@ namespace JsonExSerializer
                 genericTypes.Add(ParseTypeSpecifier());
                 
                 while (PeekToken() == CommaToken)
-                {                    
+                {
+                    ReadToken();    // eat the comma
                     genericTypes.Add(ParseTypeSpecifier());
                 }
                 tok = ReadToken();

@@ -303,23 +303,34 @@ namespace JsonExSerializer
 
         private object ParseKeyValue(Type desiredType, object instance)
         {
-            Token tok = ReadToken();
-            string name = tok.value;
-            tok = ReadToken();
-            RequireToken(ColonToken, tok, "Syntax error, key should be followed by :.");
-            object value;
-            _pathStack.Push(name);
+            Type keyType = typeof(string);
+            Type valueType = typeof(object);
             if (instance is IDictionary)
             {
-                value = ParseExpression(typeof(object), null, false);
-                ((IDictionary)instance)[name] = value;
+                if (desiredType.GetInterface(typeof(IDictionary<,>).Name) != null)
+                {
+                    Type genDict = desiredType.GetInterface(typeof(IDictionary<,>).Name);
+                    Type[] genArgs = genDict.GetGenericArguments();
+                    keyType = genArgs[0];
+                    valueType = genArgs[1];
+                }
+            }
+            object key = ParseExpression(keyType, instance, false);
+            Token tok = ReadToken();
+            RequireToken(ColonToken, tok, "Syntax error, key should be followed by :.");
+            object value;
+            _pathStack.Push(key.ToString());
+            if (instance is IDictionary)
+            {
+                value = ParseExpression(valueType, null, false);
+                ((IDictionary)instance)[key] = value;
             } 
             else 
             {
                 TypeHandler handler = _context.GetTypeHandler(desiredType);
-                TypeHandlerProperty prop = handler.FindProperty(name);
+                TypeHandlerProperty prop = handler.FindProperty(key.ToString());
                 if (prop == null)
-                    throw new ParseException("Could not find property: " + name + " on type: " + handler.ForType.FullName);
+                    throw new ParseException("Could not find property: " + key + " on type: " + handler.ForType.FullName);
                 value = ParseExpression(prop.PropertyType, null, false);
                 prop.SetValue(instance, value);
             }
@@ -382,7 +393,7 @@ namespace JsonExSerializer
         {
             StringBuilder typeSpec = new StringBuilder();
             Token tok = ReadToken();
-            if (tok.type != TokenType.Identifier)
+            if (tok.type != TokenType.Identifier && !IsQuotedString(tok))
             {
                 throw new ParseException("Type expected");
             }
@@ -422,8 +433,12 @@ namespace JsonExSerializer
             Type builtType = null;
             if (genericTypes.Count > 0)
             {
-                typeSpec.Append('`');
-                typeSpec.Append(genericTypes.Count);
+                // if its specified as a string it might already have this
+                if (typeSpec.ToString().IndexOf('`') < 0)
+                {
+                    typeSpec.Append('`');
+                    typeSpec.Append(genericTypes.Count);
+                }
                 //builtType = Type.GetType(typeSpec.ToString(), true);
                 builtType = bindType(typeSpec.ToString());
                 builtType = builtType.MakeGenericType(genericTypes.ToArray());
@@ -451,7 +466,13 @@ namespace JsonExSerializer
                 return _context.GetTypeBinding(typeName);
             }
 
+            /*
             Assembly current = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
+            // check the calling assembly to see if the type exists in the calling assembly
+            Type ct = current.GetType(typeName);
+            if (ct != null)
+                return ct;
+            
             foreach (AssemblyName a in current.GetReferencedAssemblies())
             {
                 if (typeName.StartsWith(a.Name.Replace(".dll", "")))
@@ -462,6 +483,7 @@ namespace JsonExSerializer
                         return t;
                 }
             }
+            */
             return Type.GetType(typeName, true);
         }
 

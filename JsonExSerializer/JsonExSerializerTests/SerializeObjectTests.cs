@@ -119,6 +119,22 @@ namespace JsonExSerializerTests
             Assert.AreEqual(actual, dict, "Generic dictionaries not equal");
         }
 
+        /// <summary>
+        /// Tests an enum as a dictionary key
+        /// </summary>
+        [Test]
+        public void EnumDictionaryKeyTest()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(IDictionary<string, int>));
+            IDictionary<SimpleEnum, string> dict = new Dictionary<SimpleEnum, string>();
+            dict.Add(SimpleEnum.EnumValue1, "value1");
+            dict.Add(SimpleEnum.EnumValue2, "value2");
+            string result = s.Serialize(dict);
+            // make sure concrete type is correct
+            Dictionary<SimpleEnum, string> actual = (Dictionary<SimpleEnum, string>)s.Deserialize(result);
+            Assert.AreEqual(actual, dict, "Enum keyed dictionaries not equal");
+        }
+
         public void ValidateSimpleObjects(SimpleObject src, SimpleObject dst)
         {
             Assert.AreEqual(src.BoolValue, dst.BoolValue, "SimpleObject.BoolValue not equal");

@@ -5,6 +5,7 @@ using System.IO;
 using System.Collections;
 using JsonExSerializer.TypeConversion;
 using JsonExSerializer.Collections;
+using System.Reflection;
 
 namespace JsonExSerializer
 {
@@ -460,21 +461,20 @@ namespace JsonExSerializer
             string alias = _context.GetTypeAlias(t);
             if (alias != null) {
                 _writer.Write(alias);
+                return;
             }
             else if (t.IsArray)
             {
                 WriteTypeInfo(t.GetElementType());
                 _writer.Write("[]");
+                return;
             }
-            else if (t.IsGenericType)
+
+            Assembly core = typeof(object).Assembly;
+
+            if (t.IsGenericType && !t.IsGenericTypeDefinition)
             {
-                string genericName = _context.GetTypeAlias(t.GetGenericTypeDefinition());
-                if (genericName == null)
-                {
-                    genericName = t.GetGenericTypeDefinition().FullName;
-                    genericName = genericName.Substring(0, genericName.LastIndexOf('`'));
-                }
-                _writer.Write(genericName);
+                WriteTypeInfo(t.GetGenericTypeDefinition()); 
                 _writer.Write('<');
                 bool writeComma = false;
                 foreach (Type genArgType in t.GetGenericArguments())
@@ -487,8 +487,29 @@ namespace JsonExSerializer
                 _writer.Write('>');
             }
             else
-            {
-                _writer.Write(t.FullName);
+            {                
+                if (t.Assembly == core)
+                {
+                    string typeName = t.FullName;
+                    if (t.IsGenericTypeDefinition)
+                    {
+                        typeName = typeName.Substring(0, typeName.LastIndexOf('`'));
+                    }
+                    _writer.Write(typeName);
+                }
+                else
+                {
+                    AssemblyName asmblyName = t.Assembly.GetName();
+                    _writer.Write('"');
+                    _writer.Write(t.FullName);
+                    _writer.Write(",");
+                    if (t.Assembly.GlobalAssemblyCache)
+                        _writer.Write(asmblyName.FullName);
+                    else
+                        _writer.Write(asmblyName.Name);
+
+                    _writer.Write('"');
+                }
             }
         }
 

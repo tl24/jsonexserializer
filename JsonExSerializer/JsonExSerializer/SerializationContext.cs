@@ -17,7 +17,7 @@ namespace JsonExSerializer
         private bool _outputTypeInformation;
         public enum ReferenceOption
         {
-            //WriteIdentifier,
+            WriteIdentifier,
             IgnoreCircularReferences,
             ErrorCircularReferences
         }

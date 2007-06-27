@@ -10,20 +10,51 @@ namespace JsonExSerializerTests
     [TestFixture]
     public class ReferenceTests
     {
+        private MockReferenceObject simple = null;
+        private MockReferenceObject deep = null;
+
+        [SetUp]
+        public void TestSetup()
+        {
+            CreateSimpleReference();
+            CreateDeepReference();
+        }
+
+        private void CreateSimpleReference()
+        {
+            simple = new MockReferenceObject();
+            MockReferenceObject m2 = new MockReferenceObject();
+            simple.Name = "m1";
+            m2.Name = "m2";
+            simple.Reference = m2;
+            m2.Reference = simple;
+        }
+
+        private void CreateDeepReference()
+        {
+            deep = new MockReferenceObject();
+            MockReferenceObject m2 = new MockReferenceObject();
+            MockReferenceObject m3 = new MockReferenceObject();
+            MockReferenceObject m4 = new MockReferenceObject();
+
+            deep.Name = "m1";
+            m2.Name = "m2";
+            m3.Name = "m3";
+            m4.Name = "m4";
+            deep.Reference = m2;
+            m2.Reference = m3;
+            m3.Reference = m4;
+            m4.Reference = m2;
+
+        }
+
         [Test]
         [ExpectedException(typeof(ApplicationException))]
         public void CircularReferenceError()
         {
-            MockReferenceObject m1 = new MockReferenceObject();
-            MockReferenceObject m2 = new MockReferenceObject();
-            m1.Name = "m1";
-            m2.Name = "m2";
-            m1.Reference = m2;
-            m2.Reference = m1;
-
             Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.ErrorCircularReferences;
-            string result = s.Serialize(m1);
+            string result = s.Serialize(simple);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
         }
 
@@ -32,39 +63,18 @@ namespace JsonExSerializerTests
         [ExpectedException(typeof(ApplicationException))]
         public void DeepCircularReferenceError()
         {
-            MockReferenceObject m1 = new MockReferenceObject();
-            MockReferenceObject m2 = new MockReferenceObject();
-            MockReferenceObject m3 = new MockReferenceObject();
-            MockReferenceObject m4 = new MockReferenceObject();
-
-            m1.Name = "m1";
-            m2.Name = "m2";
-            m3.Name = "m3";
-            m4.Name = "m4";
-            m1.Reference = m2;
-            m2.Reference = m3;
-            m3.Reference = m4;
-            m4.Reference = m2;
-
             Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.ErrorCircularReferences;
-            string result = s.Serialize(m1);
+            string result = s.Serialize(deep);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
         }
 
         [Test]
         public void CircularReferenceIgnore()
         {
-            MockReferenceObject m1 = new MockReferenceObject();
-            MockReferenceObject m2 = new MockReferenceObject();
-            m1.Name = "m1";
-            m2.Name = "m2";
-            m1.Reference = m2;
-            m2.Reference = m1;
-
             Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.IgnoreCircularReferences;
-            string result = s.Serialize(m1);
+            string result = s.Serialize(simple);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
             Assert.IsNull(actual.Reference.Reference);
         }
@@ -72,27 +82,32 @@ namespace JsonExSerializerTests
         [Test]
         public void DeepCircularReferenceIgnore()
         {
-            MockReferenceObject m1 = new MockReferenceObject();
-            MockReferenceObject m2 = new MockReferenceObject();
-            MockReferenceObject m3 = new MockReferenceObject();
-            MockReferenceObject m4 = new MockReferenceObject();
-
-            m1.Name = "m1";
-            m2.Name = "m2";
-            m3.Name = "m3";
-            m4.Name = "m4";
-            m1.Reference = m2;
-            m2.Reference = m3;
-            m3.Reference = m4;
-            m4.Reference = m2;
-
             Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.IgnoreCircularReferences;
-            string result = s.Serialize(m1);
+            string result = s.Serialize(deep);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
             Assert.IsNull(actual.Reference.Reference.Reference.Reference);
 
         }
 
+        [Test]
+        public void CircularReferenceWrite()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            string result = s.Serialize(simple);
+            MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
+            Assert.AreSame(simple, simple.Reference.Reference, "References not equal");
+        }
+
+        [Test]
+        public void DeepCircularReferenceWrite()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            string result = s.Serialize(deep);
+            MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
+            Assert.AreSame(deep.Reference, deep.Reference.Reference.Reference.Reference, "References not equal");
+        }
     }
 }

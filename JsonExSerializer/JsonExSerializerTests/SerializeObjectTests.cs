@@ -102,6 +102,23 @@ namespace JsonExSerializerTests
             Assert.AreEqual(co.SubClassProp, actual.SubClassProp, "Sub Class properties don't match");
         }
 
+        /// <summary>
+        /// Tests a cast containing generic parameters
+        /// </summary>
+        [Test]
+        public void CastWithGenericsTest()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(IDictionary<string, int>));
+            IDictionary<string, int> dict = new Dictionary<string, int>();
+            dict.Add("one", 1);
+            dict.Add("two", 2);
+            dict.Add("ten", 10);
+            string result = s.Serialize(dict);
+            // make sure concrete type is correct
+            Dictionary<string, int> actual = (Dictionary<string, int>)s.Deserialize(result);
+            Assert.AreEqual(actual, dict, "Generic dictionaries not equal");
+        }
+
         public void ValidateSimpleObjects(SimpleObject src, SimpleObject dst)
         {
             Assert.AreEqual(src.BoolValue, dst.BoolValue, "SimpleObject.BoolValue not equal");

@@ -75,4 +75,22 @@ Here's an example, similar to one of the unit tests.  MyPoint is an immutable cl
 }}}
 
 == Registering your Converter ==
- There are multiple ways of registering your converted to go with your class.  You've already seen one way, the JsonConvert attribute.
+There are multiple ways of registering your converter to go with your class.  You've already seen one way, the JsonConvert attribute.  This attribute can also be applied to a property.  When applied to a property, the converter will override and converters defined for the property type.
+
+Another option is to implement the IJsonTypeConverter directly in the class that needs to be converted.  In this case it will just use the instance of your class to do the conversion.  From the example above, just move all the methods of MyPointConverter into the MyPoint class.  The ConvertTo method will just write to the private member variables directly rather than create a new instance of MyPoint.
+
+In cases where you can't modify the serialized class or don't want to, you can register a converter through the Serialization Context.
+{{{
+    Serializer s = Serializer.GetSerializer(...);
+    s.Context.RegisterTypeConverter(typeof(MyPoint), new MyPointConverter());
+}}}
+This also works for properties as well, you just need to register the converter with the PropertyInfo object from the System.Reflection namespace for the property to serialize.
+
+For special cases you can create a TypeConverterFactory.  Perhaps in the case where you want to convert objects that implement a certain interface and aren't tied to a specific class.  The type converter factory can be registered through the serialization context as well.
+{{{
+    Serializer s = Serializer.GetSerializer(...);
+    s.Context.AddTypeConverterFactory(new MyInterfaceConverterFactory());
+}}}
+
+And finally, JsonEx will also use the .NET framework System.ComponentModel.TypeConverter if there is one available and it allows conversion to and from a string.
+ 

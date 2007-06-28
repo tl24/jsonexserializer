@@ -3,7 +3,7 @@
 
 During Serialization it may be necessary to convert one type to another that is more suitable for serialization.  The !TypeConversion namespace contains classes for doing this.
 
- = IJsonTypeConverter Interface =
+= IJsonTypeConverter Interface =
 
 The main interface for handling conversion is the *IJsonTypeConverter* interface.
 The ConvertFrom and the ConvertTo methods are the two main methods in this interface.  The ConvertFrom method is called during serialization and should return the converted object that you want serialized.  The ConvertTo method is called upon deserialization and should transform the object back into its original form.
@@ -74,5 +74,5 @@ Here's an example, similar to one of the unit tests.  MyPoint is an immutable cl
 
 }}}
 
- = Registering your Converter =
+= Registering your Converter =
  There are multiple ways of registering your converted to go with your class.  You've already seen one way, the JsonConvert attribute.

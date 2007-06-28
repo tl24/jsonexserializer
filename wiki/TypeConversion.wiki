@@ -3,16 +3,14 @@
 
 During Serialization it may be necessary to convert one type to another that is more suitable for serialization.  The !TypeConversion namespace contains classes for doing this.
 
-= Details =
-
-  # IJsonTypeConverter
+ = IJsonTypeConverter Interface =
 
 The main interface for handling conversion is the *IJsonTypeConverter* interface.
 The ConvertFrom and the ConvertTo methods are the two main methods in this interface.  The ConvertFrom method is called during serialization and should return the converted object that you want serialized.  The ConvertTo method is called upon deserialization and should transform the object back into its original form.
 
 This can be used in situations where custom serialization is needed.  Just convert the object into another format that can be easily serialized.  A good example of this is just converting an object to a hashtable or other implementation of IDictionary.  The fields that you want to serialize with the object are just put as keys in the hashtable.
 
-Here's an example, similar to one of the unit tests.  MyPoint is an immutable class with 2 fields x, y that can only be set via the constructor.  So normal serialization would not work in this case.  So the MyPoint class is converted to an int array of length 2 for serialization.  On Deserialization, the 2 ints in the array are passed to the constructor to recreate the object. (_Note: a future release will probably allow for deserializing without requiring no-arg constructors_).
+Here's an example, similar to one of the unit tests.  MyPoint is an immutable class with 2 fields x, y that can only be set via the constructor.  So normal serialization would not work in this case.  So the MyPoint class is converted to an int array of length 2 for serialization.  On Deserialization, the 2 ints in the array are passed to the constructor to recreate the object. Notice the JsonConvert attribute on the MyPoint class, this is one way of registering your type converter with the class.  (_Note: a future release will probably allow for deserializing without requiring no-arg constructors_).
 
 {{{
     /// <summary>
@@ -75,3 +73,6 @@ Here's an example, similar to one of the unit tests.  MyPoint is an immutable cl
     }
 
 }}}
+
+ = Registering your Converter =
+ There are multiple ways of registering your converted to go with your class.  You've already seen one way, the JsonConvert attribute.

@@ -76,15 +76,7 @@ Here's an example, similar to one of the unit tests.  MyPoint is an immutable cl
 
 == Registering your Converter ==
 === JsonConvert Attribute ===
-There are multiple ways of registering your converter to go with your class.  You've already seen one way, the JsonConvert attribute.  This attribute can also be applied to a property.  When applied to a property, the converter will override any converters defined for the property type.  In addition if you specify the attribute multiple times for a class or property, a converter chain will be created, passing the object to the converter referenced in the first attribute, then the result of that to the next converter and so on.  In this example, type A would be converted to type C:
-{{{
-
-[JsonConvert(typeof(AtoBConverter))]
-[JsonConvert(typeof(BtoCConverter))]
-class A {
-  /// ...
-}
-}}}
+There are multiple ways of registering your converter to go with your class.  You've already seen one way, the JsonConvert attribute.  This attribute can also be applied to a property.  When applied to a property, the converter will override any converters defined for the property type.  
 
 === Implement IJsonTypeConverter interface ===
 Another option is to implement the IJsonTypeConverter directly in the class that needs to be converted.  In this case it will just use the instance of your class to do the conversion.  From the example above, just move all the methods of MyPointConverter into the MyPoint class.  The ConvertTo method will just write to the private member variables directly rather than create a new instance of MyPoint.

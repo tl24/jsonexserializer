@@ -4,8 +4,8 @@ using System.Text;
 
 namespace JsonExSerializer
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Enum | AttributeTargets.Struct,AllowMultiple=true,Inherited=false)]
-    public class JsonConvertAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Enum | AttributeTargets.Struct,AllowMultiple=false,Inherited=false)]
+    public sealed class JsonConvertAttribute : System.Attribute
     {
         private Type _converter;
         private object _context;

@@ -24,7 +24,7 @@ namespace JsonExSerializer
     ///     string data = serializerObject.Serialize(myClass);
     /// </c>
     /// </example>
-    public class Serializer
+    public sealed class Serializer
     {
         private Type _serializedType;
         private SerializationContext _context;

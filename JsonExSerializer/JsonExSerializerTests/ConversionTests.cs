@@ -115,6 +115,10 @@ namespace JsonExSerializerTests
             ChainedConversionMock mock = new ChainedConversionMock();
             mock.StringProp = new StringHolder("True");
             Serializer s = Serializer.GetSerializer(typeof(ChainedConversionMock));
+            ChainedConverter converter = new ChainedConverter();
+            converter.Converters.Add(new StringToBoolConverter());
+            converter.Converters.Add(new BoolToIntConverter());
+            s.Context.RegisterTypeConverter(mock.GetType().GetProperty("StringProp"), converter);
             string result = s.Serialize(mock);
             ChainedConversionMock actual = (ChainedConversionMock)s.Deserialize(result);
             Assert.AreEqual(mock.StringProp.StringProp, actual.StringProp.StringProp, "Chained conversion failed");
@@ -138,7 +142,22 @@ namespace JsonExSerializerTests
             // converters should not be called on ignored properties
             Assert.AreEqual(0, MyLinePointConverter.ConvertFromCount, "Property ConvertFrom not called correct amount of times");
             Assert.AreEqual(0, MyLinePointConverter.ConvertToCount, "Property ConvertTo not called correct amount of times");
+        }
 
+        [Test]
+        [ExpectedException(typeof(JsonExSerializationException))]
+        public void TestRegisterPrimitiveTypeConverter()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(object));
+            s.Context.RegisterTypeConverter(typeof(int), new MyImmutablePointConverter());
+        }
+
+        [Test]
+        [ExpectedException(typeof(JsonExSerializationException))]
+        public void TestRegisterPrimitivePropertyConverter()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(object));
+            s.Context.RegisterTypeConverter(typeof(SimpleObject).GetProperty("StringValue"), new MyImmutablePointConverter());
         }
     }
 }

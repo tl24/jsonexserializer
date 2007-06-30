@@ -16,7 +16,7 @@ using System.IO;
 
 namespace JsonExSerializer
 {
-    class Parser
+    sealed class Parser
     {
         #region Member Variables
 

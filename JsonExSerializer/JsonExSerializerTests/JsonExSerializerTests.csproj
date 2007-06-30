@@ -41,10 +41,12 @@
     <Compile Include="CollectionsTests.cs" />
     <Compile Include="ConversionTests.cs" />
     <Compile Include="DeserializePrimitiveTests.cs" />
+    <Compile Include="Mocks\ChainedConversion.cs" />
     <Compile Include="Mocks\ConvertedObject.cs" />
     <Compile Include="Mocks\MockCallbackObject.cs" />
     <Compile Include="Mocks\MockFlagsEnum.cs" />
     <Compile Include="Mocks\MockReferenceObject.cs" />
+    <Compile Include="Mocks\MyLine.cs" />
     <Compile Include="Mocks\SelfConverter.cs" />
     <Compile Include="Mocks\SemiComplexObject.cs" />
     <Compile Include="Mocks\SpecializedMock.cs" />

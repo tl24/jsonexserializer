@@ -46,7 +46,7 @@ namespace JsonExSerializer
             {
                 WriteCast(o.GetType());
             }
-            Serialize(o, 0, "this");
+            Serialize(o, 0, "this", null);
             
         }
 
@@ -57,7 +57,7 @@ namespace JsonExSerializer
         /// <param name="o">the object to serialize</param>
         /// <param name="indent">indent level for formating</param>
         /// <param name="currentPath">the current path for reference writing</param>
-        private void Serialize(object o, int indent, string currentPath)
+        private void Serialize(object o, int indent, string currentPath, IJsonTypeConverter converter)
         {
             if (o == null)
             {
@@ -120,12 +120,12 @@ namespace JsonExSerializer
                             _refs[o] = refInfo;
                         }
                         // Check for a converter and convert
-                        if (_context.HasConverter(o.GetType()))
+                        if (converter != null || _context.HasConverter(o.GetType()))
                         {
-                            IJsonTypeConverter converter = _context.GetConverter(o.GetType());
+                            converter = (converter != null) ? converter : _context.GetConverter(o.GetType());
                             o = converter.ConvertFrom(o, _context);
                             // call serialize again in case the new type has a converter
-                            Serialize(o, indent, currentPath);
+                            Serialize(o, indent, currentPath, null);
                             refInfo.CanReference = true;    // can't reference inside the object
                             return;
                         }
@@ -133,7 +133,7 @@ namespace JsonExSerializer
                         {
                             o = ((IJsonTypeConverter)o).ConvertFrom(o, _context);
                             // call serialize again in case the new type has a converter
-                            Serialize(o, indent, currentPath);
+                            Serialize(o, indent, currentPath, null);
                             refInfo.CanReference = true;    // can't reference inside the object
                             return;
                         }
@@ -245,7 +245,7 @@ namespace JsonExSerializer
 
             try
             {
-                foreach (TypeHandlerProperty prop in handler.Properties)
+                foreach (PropertyHandler prop in handler.Properties)
                 {
                     if (addComma)
                     {
@@ -253,14 +253,21 @@ namespace JsonExSerializer
                         if (!_context.IsCompact) _writer.Write(Environment.NewLine);
                     }
                     _writer.Write("".PadLeft(subindent));
-                    Serialize(prop.Name, subindent, "");
+                    Serialize(prop.Name, subindent, "", null);
                     _writer.Write(":");
                     object value = prop.GetValue(obj);
                     if (value != null && _context.OutputTypeInformation && value.GetType() != prop.PropertyType)
                     {
                         WriteCast(value.GetType());
                     }
-                    Serialize(value, subindent, currentPath + "." + prop.Name);
+                    if (_context.HasConverter(prop.Property))
+                    {
+                        Serialize(value, subindent, currentPath + "." + prop.Name, _context.GetConverter(prop.Property));
+                    }
+                    else
+                    {
+                        Serialize(value, subindent, currentPath + "." + prop.Name, null);
+                    }
                     addComma = true;
                 }
             }
@@ -323,14 +330,14 @@ namespace JsonExSerializer
                     }
                     _writer.Write("".PadLeft(subindent));
 
-                    Serialize(pair.Key, subindent, "");
+                    Serialize(pair.Key, subindent, "", null);
                     _writer.Write(":");
                     object value = pair.Value;
                     if (value != null && _context.OutputTypeInformation && value.GetType() != itemType)
                     {
                         WriteCast(value.GetType());
                     }
-                    Serialize(value, subindent, currentPath + "." + pair.Key.ToString());
+                    Serialize(value, subindent, currentPath + "." + pair.Key.ToString(), null);
                     addComma = true;
                 }
             }
@@ -397,7 +404,7 @@ namespace JsonExSerializer
                     {
                         WriteCast(value.GetType());
                     }
-                    Serialize(value, subindent, currentPath + "." + index);
+                    Serialize(value, subindent, currentPath + "." + index, null);
                     addComma = true;
                     index++;
                 }

@@ -137,9 +137,23 @@ namespace JsonExSerializer.TypeConversion
             }
             else if (forMember.IsDefined(typeof(JsonConvertAttribute), true))
             {
-                // just one for now, but later support chaining of converters
-                JsonConvertAttribute convAttr = (JsonConvertAttribute) forMember.GetCustomAttributes(typeof(JsonConvertAttribute), false)[0];
-                IJsonTypeConverter converter = (IJsonTypeConverter) Activator.CreateInstance(convAttr.Converter);
+                JsonConvertAttribute[] convAttr = (JsonConvertAttribute[]) forMember.GetCustomAttributes(typeof(JsonConvertAttribute), false);
+                IJsonTypeConverter converter = null;
+                if (convAttr.Length > 1)
+                {
+                    // multiple attributes, create a chain
+                    ChainedConverter chain = new ChainedConverter();
+                    foreach (JsonConvertAttribute attribute in convAttr)
+                    {
+                        chain.Converters.Add(GetConverter(attribute));
+                    }
+                    converter = chain;
+                }
+                else
+                {
+                    // single attribute just create the converter from it
+                    converter = GetConverter(convAttr[0]);
+                }
                 _registeredTypes[forMember] = converter;
                 // should we register it?
                 return converter;
@@ -148,6 +162,21 @@ namespace JsonExSerializer.TypeConversion
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Constructs a converter from the convert attribute
+        /// </summary>
+        /// <param name="attribute">the JsonConvertAttribute decorating a property or class</param>
+        /// <returns>converter</returns>
+        private IJsonTypeConverter GetConverter(JsonConvertAttribute attribute)
+        {
+            IJsonTypeConverter converter = (IJsonTypeConverter)Activator.CreateInstance(attribute.Converter);
+            if (attribute.Context != null)
+            {
+                converter.Context = attribute.Context;
+            }
+            return converter;
         }
 
         public SerializationContext SerializationContext

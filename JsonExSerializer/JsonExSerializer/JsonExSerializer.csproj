@@ -64,6 +64,7 @@
     <Compile Include="TokenStream.cs" />
     <Compile Include="TwoWayDictionary.cs" />
     <Compile Include="TypeConversion\BitArrayConverter.cs" />
+    <Compile Include="TypeConversion\ChainedConverter.cs" />
     <Compile Include="TypeConversion\ConverterUtil.cs" />
     <Compile Include="TypeConversion\DictionaryToListConverter.cs" />
     <Compile Include="TypeConversion\IJsonTypeConverter.cs" />
@@ -71,7 +72,7 @@
     <Compile Include="TypeConversion\TypeConverterAdapter.cs" />
     <Compile Include="TypeConversion\DefaultConverterFactory.cs" />
     <Compile Include="TypeHandler.cs" />
-    <Compile Include="TypeHandlerProperty.cs" />
+    <Compile Include="PropertyHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

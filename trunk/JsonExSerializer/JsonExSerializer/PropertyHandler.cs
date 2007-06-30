@@ -8,11 +8,11 @@ namespace JsonExSerializer
     /// <summary>
     /// Helper for a type's properties
     /// </summary>
-    class TypeHandlerProperty
+    class PropertyHandler
     {
         private PropertyInfo _property;
 
-        internal TypeHandlerProperty(PropertyInfo property)
+        internal PropertyHandler(PropertyInfo property)
         {
             _property = property;
         }
@@ -52,5 +52,15 @@ namespace JsonExSerializer
         {
             _property.SetValue(instance, value, null);
         }
+
+        /// <summary>
+        /// The System.Reflection.PropertyInfo instance represented by this PropertyHandler
+        /// </summary>
+        public PropertyInfo Property
+        {
+            get { return this._property; }
+        }
+
+
     }
 }

@@ -13,6 +13,12 @@ namespace JsonExSerializerTests
     public class ConversionTests
     {
 
+        [TearDown]
+        public void teardown()
+        {
+            MyLinePointConverter.clear();
+        }
+
         [Test]
         public void TestHasConverter()
         {
@@ -81,6 +87,37 @@ namespace JsonExSerializerTests
             string result = s.Serialize(expected);
             SelfConverter actual = (SelfConverter)s.Deserialize(result);
             Assert.AreEqual(expected, actual, "Selfconversion failed");
+        }
+
+        [Test]
+        public void PropertyConversionTest()
+        {
+            MyLine line = new MyLine();
+            line.Start = new MyImmutablePoint(1, 5);
+            line.End = new MyImmutablePoint(2, 12);
+
+            Serializer s = Serializer.GetSerializer(typeof(MyLine));
+            string result = s.Serialize(line);
+            MyLine actual = (MyLine)s.Deserialize(result);
+            Assert.AreEqual(line.Start, actual.Start, "Line start not equal");
+            Assert.AreEqual(line.End, actual.End, "Line end not equal");
+            // make sure the property converter overrode the converter declared on the type
+            Assert.AreEqual(1, MyLinePointConverter.ConvertFromCount, "Property ConvertFrom not called correct amount of times");
+            Assert.AreEqual(1, MyLinePointConverter.ConvertToCount, "Property ConvertTo not called correct amount of times");
+        }
+
+        /// <summary>
+        /// Test property that has multiple convert attributes on it
+        /// </summary>
+        [Test]
+        public void ChainedConversionTest()
+        {
+            ChainedConversionMock mock = new ChainedConversionMock();
+            mock.StringProp = new StringHolder("True");
+            Serializer s = Serializer.GetSerializer(typeof(ChainedConversionMock));
+            string result = s.Serialize(mock);
+            ChainedConversionMock actual = (ChainedConversionMock)s.Deserialize(result);
+            Assert.AreEqual(mock.StringProp.StringProp, actual.StringProp.StringProp, "Chained conversion failed");
         }
     }
 }

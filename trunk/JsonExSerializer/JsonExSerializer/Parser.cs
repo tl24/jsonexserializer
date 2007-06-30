@@ -94,7 +94,7 @@ namespace JsonExSerializer
         public object Parse()
         {
             _pathStack.Push("this");
-            return ParseExpression(_deserializedType, null, false);
+            return ParseExpression(_deserializedType, null, false, true);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace JsonExSerializer
             return _tokenStream.ReadToken();
         }
 
-        private object ParseExpression(Type desiredType, object parent, bool isConverted)
+        private object ParseExpression(Type desiredType, object parent, bool isConverted, bool useConverter)
         {
             object value = null;
             if (_tokenStream.IsEmpty())
@@ -124,22 +124,22 @@ namespace JsonExSerializer
             }
             else
             {
-                if (_context.HasConverter(desiredType))
+                if (useConverter && _context.HasConverter(desiredType))
                 {
                     Type originalType = desiredType;
                     IJsonTypeConverter converter = _context.GetConverter(desiredType);
                     desiredType = converter.GetSerializedType(desiredType);
-                    value = ParseExpression(desiredType, parent, true);
+                    value = ParseExpression(desiredType, parent, true, true);
                     value = converter.ConvertTo(value, originalType, _context);
                     _values[GetCurrentPath()] = value;
                 }
-                else if (typeof(IJsonTypeConverter).IsAssignableFrom(desiredType))
+                else if (useConverter && typeof(IJsonTypeConverter).IsAssignableFrom(desiredType))
                 {
                     // object converts itself, create an instance of the object
                     IJsonTypeConverter converter = (IJsonTypeConverter)Activator.CreateInstance(desiredType);
                     Type originalType = desiredType;
                     desiredType = converter.GetSerializedType(desiredType);
-                    value = ParseExpression(desiredType, parent, true);
+                    value = ParseExpression(desiredType, parent, true, true);
                     converter.ConvertTo(value, originalType, _context);
                     value = converter;
                     _values[GetCurrentPath()] = value;
@@ -237,7 +237,7 @@ namespace JsonExSerializer
             desiredType = ParseTypeSpecifier();
             tok = ReadToken();
             RequireToken(RParenToken, tok, "Invalid Type Cast Syntax");
-            return ParseExpression(desiredType, null, isConverted);
+            return ParseExpression(desiredType, null, isConverted, true);
         }
 
         private object ParseCollection(Type desiredType, bool isConverted)
@@ -266,7 +266,7 @@ namespace JsonExSerializer
             object item;
             int i = 0;
             _pathStack.Push(i.ToString());
-            while (ReadAhead(CommaToken, RSquareToken, delegate (Type t, object o) { return ParseExpression(t, o, false); }, elemType, collBuilder, out item))
+            while (ReadAhead(CommaToken, RSquareToken, delegate (Type t, object o) { return ParseExpression(t, o, false, true); }, elemType, collBuilder, out item))
             {
                 collBuilder.Add(item);
                 _pathStack.Pop();
@@ -322,23 +322,34 @@ namespace JsonExSerializer
                     valueType = genArgs[1];
                 }
             }
-            object key = ParseExpression(keyType, instance, false);
+            object key = ParseExpression(keyType, instance, false, true);
             Token tok = ReadToken();
             RequireToken(ColonToken, tok, "Syntax error, key should be followed by :.");
             object value;
             _pathStack.Push(key.ToString());
             if (instance is IDictionary)
             {
-                value = ParseExpression(valueType, null, false);
+                value = ParseExpression(valueType, null, false, true);
                 ((IDictionary)instance)[key] = value;
             } 
             else 
             {
                 TypeHandler handler = _context.GetTypeHandler(desiredType);
-                TypeHandlerProperty prop = handler.FindProperty(key.ToString());
+                PropertyHandler prop = handler.FindProperty(key.ToString());
                 if (prop == null)
                     throw new ParseException("Could not find property: " + key + " on type: " + handler.ForType.FullName);
-                value = ParseExpression(prop.PropertyType, null, false);
+                if (_context.HasConverter(prop.Property))
+                {
+                    IJsonTypeConverter converter = _context.GetConverter(prop.Property);
+                    Type propDesiredType = converter.GetSerializedType(prop.PropertyType);
+                    value = ParseExpression(propDesiredType, null, true, false);
+                    value = converter.ConvertTo(value, prop.PropertyType, _context);
+                }
+                else
+                {
+
+                    value = ParseExpression(prop.PropertyType, null, false, true);
+                }
                 prop.SetValue(instance, value);
             }
             _pathStack.Pop();

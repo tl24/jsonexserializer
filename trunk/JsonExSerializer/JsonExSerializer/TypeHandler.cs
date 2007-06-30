@@ -19,7 +19,7 @@ namespace JsonExSerializer
     {
         private static IDictionary<Type, TypeHandler> _cache;
         private Type _handledType;
-        private IList<TypeHandlerProperty> _properties;
+        private IList<PropertyHandler> _properties;
         private bool _collectionLookedUp = false;
         private ICollectionHandler _collectionHandler;
         private SerializationContext _context;
@@ -50,7 +50,7 @@ namespace JsonExSerializer
         {
             if (_properties == null)
             {
-                _properties = new List<TypeHandlerProperty>();
+                _properties = new List<PropertyHandler>();
                 PropertyInfo[] pInfos = _handledType.GetProperties(BindingFlags.Public|BindingFlags.Instance);
                 foreach (PropertyInfo pInfo in pInfos)
                 {
@@ -62,7 +62,7 @@ namespace JsonExSerializer
                         if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
                             && pInfo.GetGetMethod().GetParameters().Length == 0)
                         {
-                            _properties.Add(new TypeHandlerProperty(pInfo));
+                            _properties.Add(new PropertyHandler(pInfo));
                         }
                     }
                 }
@@ -72,7 +72,7 @@ namespace JsonExSerializer
         /// <summary>
         /// Get the list of properties for this type
         /// </summary>
-        public IList<TypeHandlerProperty> Properties
+        public IList<PropertyHandler> Properties
         {
             get {
                 LoadProperties();
@@ -87,10 +87,10 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="Name">the name of the property</param>
         /// <returns>TypeHandlerProperty instance for the property or null if not found</returns>
-        public TypeHandlerProperty FindProperty(string Name)
+        public PropertyHandler FindProperty(string Name)
         {
             LoadProperties();
-            foreach (TypeHandlerProperty prop in _properties)
+            foreach (PropertyHandler prop in _properties)
             {
                 if (prop.Name == Name)
                     return prop;

@@ -105,4 +105,6 @@ namespace JsonExSerializerTests.Mocks
 
         #endregion
     }
+
+
 }

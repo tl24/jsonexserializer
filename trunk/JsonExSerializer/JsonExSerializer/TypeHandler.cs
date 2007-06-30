@@ -12,24 +12,40 @@ using JsonExSerializer.Collections;
 
 namespace JsonExSerializer
 {
-    public class TypeHandler
+    /// <summary>
+    /// Helper class for dealing with types during serialization
+    /// </summary>
+    class TypeHandler
     {
         private static IDictionary<Type, TypeHandler> _cache;
         private Type _handledType;
         private IList<TypeHandlerProperty> _properties;
         private bool _collectionLookedUp = false;
-        private ICollectionHandler _collectionHandler;        
-
-        internal static TypeHandler GetHandler(Type t)
+        private ICollectionHandler _collectionHandler;
+        private SerializationContext _context;
+        /// <summary>
+        /// Get an instance of a type handler for a given type
+        /// </summary>
+        /// <param name="t">the type</param>
+        /// <returns>a type handler for the given type</returns>
+        internal static TypeHandler GetHandler(Type t, SerializationContext context)
         {
-            return new TypeHandler(t);
+            return new TypeHandler(t, context);
         }
 
-        internal TypeHandler(Type t)
+        /// <summary>
+        /// internal constructor
+        /// </summary>
+        /// <param name="t"></param>
+        internal TypeHandler(Type t, SerializationContext context)
         {
             _handledType = t;
+            _context = context;
         }
 
+        /// <summary>
+        /// Loads the properties for the type if they haven't already been loaded
+        /// </summary>
         private void LoadProperties()
         {
             if (_properties == null)
@@ -53,6 +69,9 @@ namespace JsonExSerializer
             }
         }
 
+        /// <summary>
+        /// Get the list of properties for this type
+        /// </summary>
         public IList<TypeHandlerProperty> Properties
         {
             get {
@@ -61,6 +80,13 @@ namespace JsonExSerializer
             }
         }
 
+        /// <summary>
+        /// Finds a property by its name.  The property must follow the same rules as
+        /// those returned from the Properties list, i.e. must be readable and writable and
+        /// not have an ignore attribute.
+        /// </summary>
+        /// <param name="Name">the name of the property</param>
+        /// <returns>TypeHandlerProperty instance for the property or null if not found</returns>
         public TypeHandlerProperty FindProperty(string Name)
         {
             LoadProperties();
@@ -72,16 +98,24 @@ namespace JsonExSerializer
             return null;
         }
 
+        /// <summary>
+        /// The type of object that this typehandler represents
+        /// </summary>
         public Type ForType
         {
             get { return _handledType; }
         }
 
-        public bool IsCollection(SerializationContext context)
+        /// <summary>
+        /// Returns true if this type is a collection type
+        /// </summary>
+        /// <param name="context">the serialization context</param>
+        /// <returns>true if a collection</returns>
+        public bool IsCollection()
         {
             if (!_collectionLookedUp)
             {
-                foreach (ICollectionHandler handler in context.CollectionHandlers)
+                foreach (ICollectionHandler handler in _context.CollectionHandlers)
                 {
                     if (handler.IsCollection(ForType))
                     {
@@ -94,12 +128,17 @@ namespace JsonExSerializer
             return _collectionHandler != null;
         }
 
-        public ICollectionHandler GetCollectionHandler(SerializationContext context)
+        /// <summary>
+        /// Returns a collection handler if this object is a collection
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public ICollectionHandler GetCollectionHandler()
         {
-            if (IsCollection(context)) {
+            if (IsCollection()) {
                 return _collectionHandler;
             } else {
-                throw new ApplicationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
+                throw new CollectionException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }            
         }
 
@@ -108,58 +147,34 @@ namespace JsonExSerializer
         /// of its elements.
         /// </summary>
         /// <returns></returns>
-        public Type GetCollectionItemType(SerializationContext context)
+        public Type GetCollectionItemType()
         {
-            if (IsCollection(context))
+            if (IsCollection())
             {
                 return _collectionHandler.GetItemType(ForType);
             }
             else
             {
-                throw new ApplicationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
+                throw new CollectionException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }
         }
 
-        public ICollectionBuilder GetCollectionBuilder(SerializationContext context)
+        /// <summary>
+        /// Returns a collection builder object for this type if it is a collection.
+        /// </summary>
+        /// <param name="context">the serialization context</param>
+        /// <returns>collection builder</returns>
+        public ICollectionBuilder GetCollectionBuilder()
         {
-            if (IsCollection(context))
+            if (IsCollection())
             {
                 return _collectionHandler.ConstructBuilder(ForType);
             }
             else
             {
-                throw new ApplicationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
+                throw new CollectionException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }
         }       
     }
 
-    public class TypeHandlerProperty
-    {
-        private PropertyInfo _property;
-
-        public TypeHandlerProperty(PropertyInfo property)
-        {
-            _property = property;
-        }
-
-        public Type PropertyType
-        {
-            get { return _property.PropertyType; }            
-        }
-
-        public string Name
-        {
-            get { return _property.Name; }
-        }
-
-        public object GetValue(object instance)
-        {
-            return _property.GetValue(instance, null);
-        }
-
-        public void SetValue(object instance, object value)
-        {
-            _property.SetValue(instance, value, null);
-        }
-    }
 }

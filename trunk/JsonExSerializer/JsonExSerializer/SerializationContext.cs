@@ -31,7 +31,7 @@ namespace JsonExSerializer
         private List<ICollectionHandler> _collectionHandlers;
         private IDictionary<Type, TypeHandler> _cache;
 
-        public SerializationContext(Serializer serializerInstance)
+        internal SerializationContext(Serializer serializerInstance)
         {
             this._serializerInstance = serializerInstance;
             _isCompact = false;
@@ -139,7 +139,8 @@ namespace JsonExSerializer
         #endregion
 
         /// <summary>
-        /// Adds a different binding for a type
+        /// Adds a different binding for a type.  When the type is encountered during serialization, the alias
+        /// will be written out instead of the normal type info if a cast or type information is needed.
         /// </summary>
         /// <param name="t">the type object</param>
         /// <param name="typeAlias">the type's alias</param>
@@ -298,7 +299,7 @@ namespace JsonExSerializer
             TypeHandler handler;
             if (!_cache.ContainsKey(objectType))
             {
-                _cache[objectType] = handler = new TypeHandler(objectType);
+                _cache[objectType] = handler = new TypeHandler(objectType, this);
             }
             else
             {

@@ -21,7 +21,7 @@ namespace JsonExSerializerTests
         }
 
         private void CreateSimpleReference()
-        {
+        {            
             simple = new MockReferenceObject();
             MockReferenceObject m2 = new MockReferenceObject();
             simple.Name = "m1";
@@ -49,7 +49,7 @@ namespace JsonExSerializerTests
         }
 
         [Test]
-        [ExpectedException(typeof(ApplicationException))]
+        [ExpectedException(typeof(JsonExSerializationException))]
         public void CircularReferenceError()
         {
             Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
@@ -60,7 +60,7 @@ namespace JsonExSerializerTests
 
 
         [Test]
-        [ExpectedException(typeof(ApplicationException))]
+        [ExpectedException(typeof(JsonExSerializationException))]
         public void DeepCircularReferenceError()
         {
             Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));

@@ -10,28 +10,36 @@ using System.IO;
 
 namespace JsonExSerializer
 {
-    public class TokenStream
+    /// <summary>
+    /// Tokenizes input from the specified reader and returns tokens for the parser to parse.
+    /// </summary>
+    class TokenStream
     {
-
         #region Member Variables
 
         private TextReader _reader;
         private Stack<Token> _tokens;
         private char[] _symbols;
-        private SerializationContext _options;
 
         #endregion
 
-        public TokenStream(TextReader reader, SerializationContext options)
+        /// <summary>
+        /// Create an instance of the token stream to read from the given reader.
+        /// </summary>
+        /// <param name="reader"></param>
+        public TokenStream(TextReader reader)
         {
             _reader = reader;
             _tokens = new Stack<Token>();
             _symbols = "[]<>():,{}.".ToCharArray();
             Array.Sort<char>(_symbols);
-            _options = options;
         }
 
-
+        /// <summary>
+        /// Peek at the next available token without consuming it.
+        /// </summary>
+        /// <returns>the next available token, or the empty token if all tokens have been read</returns>
+        /// <see cref="Token.Empty"/>
         public Token PeekToken()
         {
             if (_tokens.Count == 0)
@@ -42,6 +50,11 @@ namespace JsonExSerializer
             return _tokens.Peek();
         }
 
+        /// <summary>
+        /// Reads the next available token and consumes it.
+        /// </summary>
+        /// <returns>the next available token, or the empty token if all tokens have been read</returns>
+        /// <see cref="Token.Empty"/>
         public Token ReadToken()
         {
             if (_tokens.Count > 0)
@@ -54,11 +67,19 @@ namespace JsonExSerializer
             }
         }
 
+        /// <summary>
+        /// Checks to see if there are any more tokens to be read
+        /// </summary>
+        /// <returns>true if no more tokens</returns>
         public bool IsEmpty()
         {
             return PeekToken() == Token.Empty;
         }
 
+        /// <summary>
+        /// Reads a token from the text reader and returns it
+        /// </summary>
+        /// <returns></returns>
         private Token ReadTokenFromReader()
         {
             StringBuilder buffer = new StringBuilder();
@@ -91,6 +112,15 @@ namespace JsonExSerializer
 
         #region Read Methods
 
+        /// <summary>
+        /// Reads a C# multiline comment
+        /// <example>
+        /// /*
+        ///   This is a multiline comment
+        /// */
+        /// </example>
+        /// </summary>
+        /// <param name="ch">the starting character</param>
         private void ReadMultilineComment(char ch)
         {
             // read until we see */
@@ -108,6 +138,10 @@ namespace JsonExSerializer
             throw new ParseException("Unterminated multiline comment");
         }
 
+        /// <summary>
+        /// Reads a single line comment // comment
+        /// </summary>
+        /// <param name="ch">the starting character</param>
         private void ReadLineComment(char ch)
         {
             _reader.Read(); // eat the 2nd "/" char
@@ -125,7 +159,12 @@ namespace JsonExSerializer
             }
         }
 
-     
+        /// <summary>
+        /// Parses a symbol from the reader such as "," "." etc
+        /// </summary>
+        /// <param name="ch">the starting character</param>
+        /// <param name="buffer">a buffer to store input</param>
+        /// <returns>symbol token</returns>
         private Token GetSymbol(char ch, StringBuilder buffer)
         {
             // we don't have any symbols at the moment that are more than one character
@@ -133,6 +172,13 @@ namespace JsonExSerializer
             return new Token(TokenType.Symbol, ch.ToString());
         }
 
+        /// <summary>
+        /// Gets an identifier from the reader such as a variable reference, null, true, or false.
+        /// Follows C# rules, non-qouted string starting with a letter or "_" followed by letters digits or "_"
+        /// </summary>
+        /// <param name="start">the starting character</param>
+        /// <param name="buffer">a buffer to hold input</param>
+        /// <returns>identifier token</returns>
         private Token GetIdentifier(char start, StringBuilder buffer)
         {
 
@@ -155,6 +201,13 @@ namespace JsonExSerializer
             return new Token(TokenType.Identifier, buffer.ToString());
         }
 
+        /// <summary>
+        /// Gets a number from the reader, which can be integer, floating point or scientific notation
+        /// Examples: 123343, -123232, 12.345, -45.3434, 3.45E+10
+        /// </summary>
+        /// <param name="start">the starting character</param>
+        /// <param name="buffer">buffer to hold input</param>
+        /// <returns>number token</returns>
         private Token GetNumber(char start, StringBuilder buffer)
         {
             int c;
@@ -171,12 +224,12 @@ namespace JsonExSerializer
                         ch = (char)_reader.Peek();
                         if (ch == '.')
                         {
-                            i=1;
+                            i=1;  // try to read fractional now
                             buffer.Append((char)_reader.Read());
                         }
                         else if (ch == 'e' || ch == 'E')
                         {
-                            i = 2;
+                            i = 2; // try to read exponent now
                             buffer.Append((char)_reader.Read());
                         }
                         else
@@ -194,12 +247,12 @@ namespace JsonExSerializer
                         }
                         else if (ch == 'e' || ch == 'E')
                         {
-                            i = 2;
+                            i = 2; // read exponent
                             buffer.Append((char)_reader.Read());
                         }
                         else
                         {
-                            i = 3;
+                            i = 3; // break out
                         }
                         break;
                     case 2: // scientific notation
@@ -217,7 +270,7 @@ namespace JsonExSerializer
                         }
                         else
                         {
-                            i = 3;
+                            i = 3; // break out
                         }
                         break;
                 }
@@ -225,6 +278,10 @@ namespace JsonExSerializer
             return new Token(TokenType.Number, buffer.ToString());
         }
 
+        /// <summary>
+        /// Gets an integer portion of a number, stopping at a "." or the start of an exponent "e" or "E"
+        /// </summary>
+        /// <param name="buffer">buffer to store input</param>
         private void GetIntegerPart(StringBuilder buffer)
         {
             int c;
@@ -248,6 +305,12 @@ namespace JsonExSerializer
             }
         }
 
+        /// <summary>
+        /// Gets a single or double qouted string from the reader, handling and escape characters
+        /// </summary>
+        /// <param name="start">the starting character</param>
+        /// <param name="buffer">buffer for input</param>
+        /// <returns>string token</returns>
         private Token GetQuotedString(char start, StringBuilder buffer)
         {
             char quoteChar = start;
@@ -305,11 +368,21 @@ namespace JsonExSerializer
 
         #region Token Predicates
 
+        /// <summary>
+        /// Is the character a starting quote character
+        /// </summary>
+        /// <param name="ch">character to test</param>
+        /// <returns>true if quote start</returns>
         private bool IsQuoteStart(char ch)
         {
             return ch == '\'' || ch == '"';
         }
 
+        /// <summary>
+        /// Is the character the start of a number
+        /// </summary>
+        /// <param name="ch">character to test</param>
+        /// <returns>true if number start</returns>
         private bool IsNumberStart(char ch)
         {
             if (ch == '.' && char.IsDigit((char)_reader.Peek()))
@@ -318,21 +391,41 @@ namespace JsonExSerializer
                 return ch == '+' || ch == '-' || char.IsDigit(ch);
         }
 
+        /// <summary>
+        /// Is the character the start of an identifier
+        /// </summary>
+        /// <param name="ch">character to test</param>
+        /// <returns>true if identifier start</returns>
         private bool IsIdentifierStart(char ch)
         {
             return char.IsLetter(ch) || ch == '_';
         }
 
+        /// <summary>
+        /// Is the character the start of a symbol
+        /// </summary>
+        /// <param name="ch">character to test</param>
+        /// <returns>true if symbol start</returns>
         private bool IsSymbolStart(char ch)
         {
             return Array.BinarySearch<char>(_symbols, ch) != -1;
         }
 
+        /// <summary>
+        /// Is the character the start of a single line comment
+        /// </summary>
+        /// <param name="ch">character to start</param>
+        /// <returns>true if single line comment start</returns>
         private bool IsLineCommentStart(char ch)
         {
             return (ch == '/' && _reader.Peek() == '/');
         }
 
+        /// <summary>
+        /// Is the character the start of a multiline comment
+        /// </summary>
+        /// <param name="ch">character to test</param>
+        /// <returns>true if multiline start</returns>
         private bool IsMultilineCommentStart(char ch)
         {
             return (ch == '/' && _reader.Peek() == '*');

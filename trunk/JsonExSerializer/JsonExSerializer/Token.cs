@@ -12,7 +12,7 @@ namespace JsonExSerializer
     /// <summary>
     /// The type for a given token
     /// </summary>
-    public enum TokenType
+    enum TokenType
     {
         Number,
         Identifier,
@@ -24,7 +24,7 @@ namespace JsonExSerializer
     /// <summary>
     /// Structure to represent a token from the input stream
     /// </summary>
-    public struct Token
+    struct Token
     {
         public static Token Empty = new Token();
 
@@ -59,6 +59,11 @@ namespace JsonExSerializer
         public override string ToString()
         {
             return string.Format("{0}: {1} {2}", GetType().Name, type, value);
+        }
+
+        public override int GetHashCode()
+        {
+            return ((string)(type.ToString() + ":" + value.ToString())).GetHashCode();
         }
     }
 }

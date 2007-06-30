@@ -12,10 +12,11 @@ using System.Globalization;
 using JsonExSerializer.Collections;
 using System.Reflection;
 using JsonExSerializer.TypeConversion;
+using System.IO;
 
 namespace JsonExSerializer
 {
-    public class Parser
+    class Parser
     {
         #region Member Variables
 
@@ -70,6 +71,12 @@ namespace JsonExSerializer
         /// <summary> this </summary>
         private readonly Token ReferenceStartToken = new Token(TokenType.Identifier, "this");
         #endregion
+
+        public Parser(Type t, TextReader reader, SerializationContext context)
+            : this(t, new TokenStream(reader), context)
+        {
+        }
+
 
         public Parser(Type t, TokenStream tokenStream, SerializationContext context)
         {
@@ -243,7 +250,7 @@ namespace JsonExSerializer
             TypeHandler handler = _context.GetTypeHandler(desiredType);            
             if (desiredType != typeof(object))
             {                
-                elemType = handler.GetCollectionItemType(_context);
+                elemType = handler.GetCollectionItemType();
             }
             if (collBuilder == null)
             {
@@ -253,7 +260,7 @@ namespace JsonExSerializer
                 }
                 else
                 {
-                    collBuilder = handler.GetCollectionBuilder(_context);
+                    collBuilder = handler.GetCollectionBuilder();
                 }
             }
             object item;

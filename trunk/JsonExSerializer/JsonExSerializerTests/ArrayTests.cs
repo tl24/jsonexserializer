@@ -35,7 +35,7 @@ namespace JsonExSerializerTests
 
         [Test]
         public void ObjectArrayTest()
-        {
+        {            
             int ivalue = 32;
             short svalue = 12;
             string strvalue = "test";

@@ -9,7 +9,10 @@ using System.Reflection;
 
 namespace JsonExSerializer
 {
-    public class SerializerHelper
+    /// <summary>
+    /// Class to do the work of serializing an object
+    /// </summary>
+    class SerializerHelper
     {
         private Type _serializedType;
         private SerializationContext _context;
@@ -25,6 +28,10 @@ namespace JsonExSerializer
             _refs = new Dictionary<object, ReferenceInfo>(new ReferenceEqualityComparer<object>());
         }
 
+        /// <summary>
+        /// Serialize the given object
+        /// </summary>
+        /// <param name="o">object to serialize</param>
         public void Serialize(object o)
         {
             if (o != null && _context.OutputTypeComment)
@@ -43,7 +50,14 @@ namespace JsonExSerializer
             
         }
 
-        public void Serialize(object o, int indent, string currentPath)
+        /// <summary>
+        /// Serialize the given object at the current indent level.  The path to the object is represented by
+        /// currentPath such as "this.name", etc.  This is an internal method that can be called recursively.
+        /// </summary>
+        /// <param name="o">the object to serialize</param>
+        /// <param name="indent">indent level for formating</param>
+        /// <param name="currentPath">the current path for reference writing</param>
+        private void Serialize(object o, int indent, string currentPath)
         {
             if (o == null)
             {
@@ -51,6 +65,7 @@ namespace JsonExSerializer
             }
             else
             {
+                // Get the typecode and call the approriate method
                 switch (Type.GetTypeCode(o.GetType()))
                 {
                     case TypeCode.Char:
@@ -70,13 +85,19 @@ namespace JsonExSerializer
 
                         if (_refs.ContainsKey(o))
                         {
+                            /*
+                             * This object has already been seen by the serializer so
+                             * determine what to do with it.  If its part of the current path
+                             * then its a circular reference and an error needs to be thrown or it should
+                             * be ignored depending on the option. Otherwise write a reference to it
+                             */ 
                             refInfo = _refs[o];
                             string refPath = refInfo.Path;
                             switch (_context.ReferenceWritingType)
                             {
                                 case SerializationContext.ReferenceOption.WriteIdentifier:
                                     if (!refInfo.CanReference)
-                                        throw new ApplicationException("Can't reference object: " + refPath + " from " + currentPath + ", either it is a collection, or it has not been converted yet");
+                                        throw new JsonExSerializationException("Can't reference object: " + refPath + " from " + currentPath + ", either it is a collection, or it has not been converted yet");
 
                                     _writer.Write(refPath);
                                     return;
@@ -90,7 +111,7 @@ namespace JsonExSerializer
                                 case SerializationContext.ReferenceOption.ErrorCircularReferences:
                                     if (currentPath.StartsWith(refPath))
                                     {
-                                        throw new ApplicationException("Circular reference detected.  Current path: " + currentPath + ", reference to: " + refPath);
+                                        throw new JsonExSerializationException("Circular reference detected.  Current path: " + currentPath + ", reference to: " + refPath);
                                     }
                                     break;
                             }
@@ -98,10 +119,12 @@ namespace JsonExSerializer
                             refInfo = new ReferenceInfo(currentPath);
                             _refs[o] = refInfo;
                         }
+                        // Check for a converter and convert
                         if (_context.HasConverter(o.GetType()))
                         {
                             IJsonTypeConverter converter = _context.GetConverter(o.GetType());
                             o = converter.ConvertFrom(o, _context);
+                            // call serialize again in case the new type has a converter
                             Serialize(o, indent, currentPath);
                             refInfo.CanReference = true;    // can't reference inside the object
                             return;
@@ -109,18 +132,19 @@ namespace JsonExSerializer
                         else if (o is IJsonTypeConverter)
                         {
                             o = ((IJsonTypeConverter)o).ConvertFrom(o, _context);
+                            // call serialize again in case the new type has a converter
                             Serialize(o, indent, currentPath);
                             refInfo.CanReference = true;    // can't reference inside the object
                             return;
                         }
                         TypeHandler handler = _context.GetTypeHandler(o.GetType());
-                        if (handler.IsCollection(_context))
+                        if (handler.IsCollection())
                         {
                             SerializeCollection(o, indent, currentPath);
                         }
                         else if (o is ICollection && !(o is IDictionary))
                         {
-                            throw new ApplicationException(o.GetType() + " is a collection but doesn't have a CollectionHandler");
+                            throw new CollectionException(o.GetType() + " is a collection but doesn't have a CollectionHandler");
                         }
                         else
                         {
@@ -174,20 +198,35 @@ namespace JsonExSerializer
             }
         }
 
-        private void SerializeEnum(object o, int indent)
+        /// <summary>
+        /// serialize an enum type
+        /// </summary>
+        /// <param name="o">the enum to serialize</param>
+        /// <param name="indent">indent level</param>
+        private void SerializeEnum(Enum enm, int indent)
         {
-            _writer.Write(Enum.Format(o.GetType(), o, "d"));
+            _writer.Write(Enum.Format(enm.GetType(), enm, "d"));
         }
 
-        private void SerializeObject(object o, int indent, string currentPath)
+        /// <summary>
+        /// Serialize a non-primitive non-scalar object.  Will use the
+        /// following notation:
+        /// <c>
+        ///  { prop1: "value1", prop2: "value2" }
+        /// </c>
+        /// </summary>
+        /// <param name="o">the object to serialize</param>
+        /// <param name="indent">indentation level</param>
+        /// <param name="currentPath">object's path</param>
+        private void SerializeObject(object obj, int indent, string currentPath)
         {
-            if (o is IDictionary)
+            if (obj is IDictionary)
             {
-                SerializeDictionary(o, indent, currentPath);
+                SerializeDictionary((IDictionary) obj, indent, currentPath);
                 return;
             }
 
-            TypeHandler handler = _context.GetTypeHandler(o.GetType());
+            TypeHandler handler = _context.GetTypeHandler(obj.GetType());
             
             bool addComma = false;
             _writer.Write('{');
@@ -199,9 +238,9 @@ namespace JsonExSerializer
                 subindent = indent + indentStep;
             }
 
-            if (o is ISerializationCallback)
+            if (obj is ISerializationCallback)
             {
-                ((ISerializationCallback)o).OnBeforeSerialization();
+                ((ISerializationCallback)obj).OnBeforeSerialization();
             }
 
             try
@@ -216,7 +255,7 @@ namespace JsonExSerializer
                     _writer.Write("".PadLeft(subindent));
                     Serialize(prop.Name, subindent, "");
                     _writer.Write(":");
-                    object value = prop.GetValue(o);
+                    object value = prop.GetValue(obj);
                     if (value != null && _context.OutputTypeInformation && value.GetType() != prop.PropertyType)
                     {
                         WriteCast(value.GetType());
@@ -229,9 +268,9 @@ namespace JsonExSerializer
             {
                 // make sure this is in a finally block in case the ISerializationCallback interface
                 // is used to control thread locks
-                if (o is ISerializationCallback)
+                if (obj is ISerializationCallback)
                 {
-                    ((ISerializationCallback)o).OnAfterSerialization();
+                    ((ISerializationCallback)obj).OnAfterSerialization();
                 }
             }
             if (!_context.IsCompact)
@@ -242,7 +281,14 @@ namespace JsonExSerializer
             _writer.Write('}');
         }
 
-        private void SerializeDictionary(object o, int indent, string currentPath)
+        /// <summary>
+        /// Serialize an object implementing IDictionary.  The serialized data is similar to a regular
+        /// object, except that the keys of the dictionary are used instead of properties.
+        /// </summary>
+        /// <param name="dictionary">the dictionary object</param>
+        /// <param name="indent">indentation level</param>
+        /// <param name="currentPath">object's path</param>
+        private void SerializeDictionary(IDictionary dictionary, int indent, string currentPath)
         {            
             bool addComma = false;
             _writer.Write('{');
@@ -257,18 +303,18 @@ namespace JsonExSerializer
             Type itemType = typeof(object);
             Type genericDictionary = null;
 
-            if ((genericDictionary = o.GetType().GetInterface(typeof(IDictionary<,>).Name)) != null)
+            if ((genericDictionary = dictionary.GetType().GetInterface(typeof(IDictionary<,>).Name)) != null)
             {
                 itemType = genericDictionary.GetGenericArguments()[1];
             }
 
-            if (o is ISerializationCallback)
+            if (dictionary is ISerializationCallback)
             {
-                ((ISerializationCallback)o).OnBeforeSerialization();
+                ((ISerializationCallback)dictionary).OnBeforeSerialization();
             }
             try
             {
-                foreach (DictionaryEntry pair in ((IDictionary)o))
+                foreach (DictionaryEntry pair in dictionary)
                 {
                     if (addComma)
                     {
@@ -292,9 +338,9 @@ namespace JsonExSerializer
             {
                 // make sure this is in a finally block in case the ISerializationCallback interface
                 // is used to control thread locks
-                if (o is ISerializationCallback)
+                if (dictionary is ISerializationCallback)
                 {
-                    ((ISerializationCallback)o).OnAfterSerialization();
+                    ((ISerializationCallback)dictionary).OnAfterSerialization();
                 }
             }
 
@@ -306,13 +352,19 @@ namespace JsonExSerializer
             _writer.Write('}');
         }
 
-
-        private void SerializeCollection(object o, int indent, string currentPath)
+        /// <summary>
+        /// Serialize an object that acts like a collection.
+        /// The syntax will be: [item1, item2, item3]
+        /// </summary>
+        /// <param name="collection">collection</param>
+        /// <param name="indent">indentation level for formatting</param>
+        /// <param name="currentPath">the object's path</param>
+        private void SerializeCollection(object collection, int indent, string currentPath)
         {
-            TypeHandler handler = _context.GetTypeHandler(o.GetType());
+            TypeHandler handler = _context.GetTypeHandler(collection.GetType());
 
             bool outputTypeInfo = _context.OutputTypeInformation;
-            ICollectionHandler collectionHandler = handler.GetCollectionHandler(_context);
+            ICollectionHandler collectionHandler = handler.GetCollectionHandler();
             Type elemType = collectionHandler.GetItemType(handler.ForType);
             
 
@@ -327,13 +379,13 @@ namespace JsonExSerializer
             }
             int index = 0;
 
-            if (o is ISerializationCallback)
+            if (collection is ISerializationCallback)
             {
-                ((ISerializationCallback)o).OnBeforeSerialization();
+                ((ISerializationCallback)collection).OnBeforeSerialization();
             }
             try
             {
-                foreach (object value in collectionHandler.GetEnumerable(o))
+                foreach (object value in collectionHandler.GetEnumerable(collection))
                 {
                     if (addComma)
                     {
@@ -354,9 +406,9 @@ namespace JsonExSerializer
             {
                 // make sure this is in a finally block in case the ISerializationCallback interface
                 // is used to control thread locks
-                if (o is ISerializationCallback)
+                if (collection is ISerializationCallback)
                 {
-                    ((ISerializationCallback)o).OnAfterSerialization();
+                    ((ISerializationCallback)collection).OnAfterSerialization();
                 }
             }
 
@@ -372,10 +424,12 @@ namespace JsonExSerializer
         {
             _writer.Write(value.ToString());
         }
+
         protected void WriteBoolean(bool value, int indent)
         {
             _writer.Write(value);
         }
+
         protected void WriteByte(byte value, int indent)
         {
             _writer.Write(value);
@@ -441,6 +495,13 @@ namespace JsonExSerializer
             _writer.Write('"');
         }
 
+        /// <summary>
+        /// Writes a type cast for an object.  The cast will be one of two forms:
+        /// (System.Type)
+        /// or
+        /// ("SomeNamespace.SomeType, SomeAssembly")
+        /// </summary>
+        /// <param name="t">the type to cast</param>
         private void WriteCast(Type t)
         {
             if (t != typeof(string)) {

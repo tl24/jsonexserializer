@@ -12,7 +12,7 @@ namespace JsonExSerializer
     /// <summary>
     /// Indicates an error parsing the input stream for deserialization
     /// </summary>
-    public class ParseException : ApplicationException
+    public class ParseException : JsonExSerializationException
     {
         public ParseException()
             : base()

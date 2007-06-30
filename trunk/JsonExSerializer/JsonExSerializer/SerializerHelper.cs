@@ -12,7 +12,7 @@ namespace JsonExSerializer
     /// <summary>
     /// Class to do the work of serializing an object
     /// </summary>
-    class SerializerHelper
+    sealed class SerializerHelper
     {
         private Type _serializedType;
         private SerializationContext _context;

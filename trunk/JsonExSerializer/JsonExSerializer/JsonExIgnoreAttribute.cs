@@ -5,7 +5,7 @@ using System.Text;
 namespace JsonExSerializer
 {
     [AttributeUsage(AttributeTargets.Property,Inherited=false)]
-    public class JsonExIgnoreAttribute : System.Attribute
+    public sealed class JsonExIgnoreAttribute : System.Attribute
     {
     }
 }

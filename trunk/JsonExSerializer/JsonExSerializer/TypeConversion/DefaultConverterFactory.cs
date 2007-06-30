@@ -30,6 +30,10 @@ namespace JsonExSerializer.TypeConversion
         {
             if (converter != null && typeToConvert != null)
             {
+                if (typeToConvert.IsPrimitive || typeToConvert == typeof(string))
+                {
+                    throw new JsonExSerializationException("Converters can not be registered for primitive types or string. " + typeToConvert);
+                }
                 _registeredTypes[typeToConvert] = converter;
             }
         }
@@ -43,6 +47,10 @@ namespace JsonExSerializer.TypeConversion
         {
             if (converter != null && property != null)
             {
+                if (property.PropertyType.IsPrimitive || property.PropertyType == typeof(string))
+                {
+                    throw new JsonExSerializationException("Converters can not be registered for properties of a primitive type or string. " + property);
+                }
                 _registeredTypes[property] = converter;
             }
         }
@@ -137,23 +145,8 @@ namespace JsonExSerializer.TypeConversion
             }
             else if (forMember.IsDefined(typeof(JsonConvertAttribute), true))
             {
-                JsonConvertAttribute[] convAttr = (JsonConvertAttribute[]) forMember.GetCustomAttributes(typeof(JsonConvertAttribute), false);
-                IJsonTypeConverter converter = null;
-                if (convAttr.Length > 1)
-                {
-                    // multiple attributes, create a chain
-                    ChainedConverter chain = new ChainedConverter();
-                    foreach (JsonConvertAttribute attribute in convAttr)
-                    {
-                        chain.Converters.Add(GetConverter(attribute));
-                    }
-                    converter = chain;
-                }
-                else
-                {
-                    // single attribute just create the converter from it
-                    converter = GetConverter(convAttr[0]);
-                }
+                JsonConvertAttribute convAttr = (JsonConvertAttribute) forMember.GetCustomAttributes(typeof(JsonConvertAttribute), false)[0];
+                IJsonTypeConverter converter = GetConverter(convAttr);
                 _registeredTypes[forMember] = converter;
                 // should we register it?
                 return converter;

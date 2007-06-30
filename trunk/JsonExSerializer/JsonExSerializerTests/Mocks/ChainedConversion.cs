@@ -44,8 +44,6 @@ namespace JsonExSerializerTests.Mocks
     {
         private StringHolder _stringProp;
 
-        [JsonConvert(typeof(StringToBoolConverter))]
-        [JsonConvert(typeof(BoolToIntConverter))]
         public StringHolder StringProp
         {
             get { return this._stringProp; }

@@ -23,6 +23,8 @@ namespace JsonExSerializer
         private bool _collectionLookedUp = false;
         private ICollectionHandler _collectionHandler;
         private SerializationContext _context;
+        private IDictionary<string, bool> _tempIgnore;
+
         /// <summary>
         /// Get an instance of a type handler for a given type
         /// </summary>
@@ -41,6 +43,7 @@ namespace JsonExSerializer
         {
             _handledType = t;
             _context = context;
+            _tempIgnore = new Dictionary<string, bool>();
         }
 
         /// <summary>
@@ -60,12 +63,14 @@ namespace JsonExSerializer
                         
                         // ignore attribute
                         if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
-                            && pInfo.GetGetMethod().GetParameters().Length == 0)
+                            && pInfo.GetGetMethod().GetParameters().Length == 0
+                            && !_tempIgnore.ContainsKey(pInfo.Name))
                         {
                             _properties.Add(new PropertyHandler(pInfo));
                         }
                     }
                 }
+                _tempIgnore.Clear();
             }
         }
 
@@ -96,6 +101,32 @@ namespace JsonExSerializer
                     return prop;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
+        /// </summary>
+        /// <param name="name">the name of the property</param>
+        public void IgnoreProperty(string name)
+        {
+            if (_properties == null)
+            {
+                _tempIgnore[name] = true;
+            }
+            else
+            {
+                PropertyHandler handler = FindProperty(name);
+                _properties.Remove(handler);
+            }
+        }
+
+        /// <summary>
+        /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
+        /// </summary>
+        /// <param name="name">the name of the property</param>
+        public void IgnoreProperty(PropertyInfo property)
+        {
+            IgnoreProperty(property.Name);
         }
 
         /// <summary>

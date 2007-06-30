@@ -119,5 +119,26 @@ namespace JsonExSerializerTests
             ChainedConversionMock actual = (ChainedConversionMock)s.Deserialize(result);
             Assert.AreEqual(mock.StringProp.StringProp, actual.StringProp.StringProp, "Chained conversion failed");
         }
+
+        [Test]
+        public void IgnorePropertyTest()
+        {
+            MyLine line = new MyLine();
+            line.Start = new MyImmutablePoint(1, 5);
+            line.End = new MyImmutablePoint(2, 12);
+
+            Serializer s = Serializer.GetSerializer(typeof(MyLine));
+            // ignore properties (Use both methods)
+            s.Context.IgnoreProperty(typeof(MyLine), "Start");
+            s.Context.IgnoreProperty(typeof(MyLine).GetProperty("End"));
+            string result = s.Serialize(line);
+            MyLine actual = (MyLine)s.Deserialize(result);
+            Assert.IsNull(actual.Start, "Line start should be ignored");
+            Assert.IsNull(actual.End, "Line end should be ignored");
+            // converters should not be called on ignored properties
+            Assert.AreEqual(0, MyLinePointConverter.ConvertFromCount, "Property ConvertFrom not called correct amount of times");
+            Assert.AreEqual(0, MyLinePointConverter.ConvertToCount, "Property ConvertTo not called correct amount of times");
+
+        }
     }
 }

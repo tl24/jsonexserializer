@@ -307,5 +307,26 @@ namespace JsonExSerializer
             }
             return handler;
         }
+
+        /// <summary>
+        /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
+        /// </summary>
+        /// <param name="objectType">the type that contains the property</param>
+        /// <param name="propertyName">the name of the property</param>
+        public void IgnoreProperty(Type objectType, string propertyName)
+        {
+            TypeHandler handler = GetTypeHandler(objectType);
+            handler.IgnoreProperty(propertyName);
+        }
+
+        /// <summary>
+        /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
+        /// </summary>
+        /// <param name="property">the property</param>
+        public void IgnoreProperty(PropertyInfo property)
+        {
+            TypeHandler handler = GetTypeHandler(property.DeclaringType);
+            handler.IgnoreProperty(property);
+        }
     }
 }

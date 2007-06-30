@@ -4,6 +4,12 @@ using System.Text;
 
 namespace JsonExSerializer
 {
+    /// <summary>
+    /// A Bidirectional dictionary used by the context to store types.  items can be looked based on
+    /// key or value.  A lookup on the value will return the key.
+    /// </summary>
+    /// <typeparam name="K">the type of the key</typeparam>
+    /// <typeparam name="V">the type of the value</typeparam>
     class TwoWayDictionary<K, V> : IDictionary<K, V> 
     {
         private IDictionary<K, V> _impl;

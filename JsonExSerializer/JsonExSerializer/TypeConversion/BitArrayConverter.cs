@@ -5,6 +5,9 @@ using System.Collections;
 
 namespace JsonExSerializer.TypeConversion
 {
+    /// <summary>
+    /// Converter for the System.Collections.BitArray type
+    /// </summary>
     public class BitArrayConverter : IJsonTypeConverter
     {
 

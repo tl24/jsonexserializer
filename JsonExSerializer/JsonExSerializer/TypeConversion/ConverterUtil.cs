@@ -12,9 +12,9 @@ namespace JsonExSerializer.TypeConversion
     public sealed class ConverterUtil
     {
         private TypeHandler _handler;
-        public ConverterUtil(Type forType)
+        public ConverterUtil(Type forType, SerializationContext context)
         {
-            _handler = TypeHandler.GetHandler(forType);
+            _handler = context.GetTypeHandler(forType);
         }
 
         /// <summary>

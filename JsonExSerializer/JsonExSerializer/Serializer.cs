@@ -11,6 +11,19 @@ using System.Globalization;
 
 namespace JsonExSerializer
 {
+    /// <summary>
+    /// The Serializer class is the main entry point into the Serialization framework.  To
+    /// get an instance of the Serializer, call the GetSerializer factory method with the type of
+    /// the object that you want to Serialize or Deserialize.  
+    /// </summary>
+    /// <example>
+    /// <c>
+    ///     Serializer serializerObject = Serializer.GetSerializer(typeof(MyClass));
+    ///     MyClass myClass = new MyClass();
+    ///     /* set properties on myClass */
+    ///     string data = serializerObject.Serialize(myClass);
+    /// </c>
+    /// </example>
     public class Serializer
     {
         private Type _serializedType;
@@ -35,6 +48,12 @@ namespace JsonExSerializer
 
         #region Serialization
 
+        /// <summary>
+        /// Serialize the object and write the data to the writer parameter.
+        /// The caller is expected to close the writer when done.
+        /// </summary>
+        /// <param name="o">the object to serialize</param>
+        /// <param name="writer">writer for the serialized data</param>
         public void Serialize(object o, TextWriter writer)
         {
             SerializerHelper helper = new SerializerHelper(_serializedType, _context, writer);
@@ -42,6 +61,11 @@ namespace JsonExSerializer
 
         }
 
+        /// <summary>
+        /// Serialize the object and return the serialized data as a string.
+        /// </summary>
+        /// <param name="o">the object to serialize</param>
+        /// <returns>serialized data string</returns>
         public string Serialize(object o)
         {
             TextWriter writer = new StringWriter();
@@ -55,12 +79,24 @@ namespace JsonExSerializer
 
         #region Deserialization
 
+        /// <summary>
+        /// Read the serialized data from the reader and return the
+        /// deserialized object.
+        /// </summary>
+        /// <param name="reader">TextReader to read the data from</param>
+        /// <returns>the deserialized object</returns>
         public object Deserialize(TextReader reader)
-        {
-            Deserializer d = new Deserializer(_serializedType, reader, _context);
-            return d.Deserialize();
+        {            
+            Parser p = new Parser(_serializedType, reader, _context);
+            return p.Parse();
         }
 
+        /// <summary>
+        /// Read the serialized data from the input string and return the
+        /// deserialized object.
+        /// </summary>
+        /// <param name="input">the string containing the serialized data</param>
+        /// <returns>the deserialized object</returns>
         public object Deserialize(string input)
         {
             StringReader rdr = new StringReader(input);
@@ -71,6 +107,11 @@ namespace JsonExSerializer
 
         #endregion
 
+        /// <summary>
+        /// The Serialization context for this serializer.  The SerializationContext contains
+        /// options for serializing as well as serializer helper classes such as TypeConverters
+        /// and CollectionHandlers.
+        /// </summary>
         public SerializationContext Context
         {
             get { return this._context; }

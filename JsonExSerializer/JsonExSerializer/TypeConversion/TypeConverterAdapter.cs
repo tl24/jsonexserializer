@@ -5,6 +5,11 @@ using System.ComponentModel;
 
 namespace JsonExSerializer.TypeConversion
 {
+
+    /// <summary>
+    /// TypeConverter that utilizes the System.ComponentModel.TypeConverter for
+    /// a given type.
+    /// </summary>
     public class TypeConverterAdapter : IJsonTypeConverter
     {
         private Type _sourceType;

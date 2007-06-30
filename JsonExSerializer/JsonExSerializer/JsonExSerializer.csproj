@@ -33,6 +33,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CollectionException.cs" />
     <Compile Include="Collections\ArrayBuilder.cs" />
     <Compile Include="Collections\ArrayHandler.cs" />
     <Compile Include="Collections\CollectionConstructorHandler.cs" />
@@ -43,17 +44,15 @@
     <Compile Include="Collections\GenericStackHandler.cs" />
     <Compile Include="Collections\ICollectionHandler.cs" />
     <Compile Include="Collections\ListHandler.cs" />
-    <Compile Include="Collections\NonStandardCollectionBuilder.cs" />
-    <Compile Include="Collections\NonStandardGenericCollectionBuilder.cs" />
     <Compile Include="Collections\StackBuilder.cs" />
     <Compile Include="Collections\StackHandler.cs" />
-    <Compile Include="Deserializer.cs" />
     <Compile Include="Collections\ICollectionBuilder.cs" />
     <Compile Include="IDeserializationCallback.cs" />
     <Compile Include="ISerializationCallback.cs" />
     <Compile Include="JsonConvertAttribute.cs" />
     <Compile Include="JsonExIgnoreAttribute.cs" />
     <Compile Include="Collections\ListCollectionBuilder.cs" />
+    <Compile Include="JsonExSerializationException.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="ReferenceEqualityComparer.cs" />
@@ -72,6 +71,7 @@
     <Compile Include="TypeConversion\TypeConverterAdapter.cs" />
     <Compile Include="TypeConversion\DefaultConverterFactory.cs" />
     <Compile Include="TypeHandler.cs" />
+    <Compile Include="TypeHandlerProperty.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

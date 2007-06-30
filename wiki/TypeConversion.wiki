@@ -1,7 +1,7 @@
 #summary How to convert to other types during serialization
 = Introduction =
 
-During Serialization it may be necessary to convert one type to another that is more suitable for serialization.  The !TypeConversion namespace contains classes for doing this.
+During Serialization it may be necessary to convert one type to another that is more suitable for serialization.  The !TypeConversion namespace contains classes for doing this. _Note: Only object types can use type conversion.  Type conversion for primitive types and strings is ignored._
 
 == IJsonTypeConverter Interface ==
 

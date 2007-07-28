@@ -246,5 +246,13 @@ namespace JsonExSerializerTests
             int actual = (int)s.Deserialize(result);
             Assert.AreEqual(expected, actual);
         }
+
+        [Test]
+        public void DeserializeEmptyString()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(object));
+            object value = s.Deserialize("");
+            Assert.IsNull(value, "Deserialize empty string should be null");
+        }
     }
 }

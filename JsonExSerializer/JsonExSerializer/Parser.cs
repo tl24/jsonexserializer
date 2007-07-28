@@ -467,10 +467,10 @@ namespace JsonExSerializer
                 builtType = bindType(typeSpec.ToString());
             }
             // array spec
-            if (PeekToken() == LParenToken)
+            if (PeekToken() == LSquareToken)
             {                
                 tok = ReadToken();
-                RequireToken(RParenToken, ReadToken(), "Expected array type specifier");
+                RequireToken(RSquareToken, ReadToken(), "Expected array type specifier");
                 builtType = builtType.MakeArrayType();
             }            
 

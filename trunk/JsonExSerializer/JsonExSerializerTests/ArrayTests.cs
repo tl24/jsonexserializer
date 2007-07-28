@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using JsonExSerializer;
+using NUnit.Framework.Constraints;
+using NUnit.Framework.SyntaxHelpers;
+using System.Collections;
 
 namespace JsonExSerializerTests
 {
@@ -68,6 +71,16 @@ namespace JsonExSerializerTests
             {
                 Assert.AreEqual(a1[i], a2[i], "Array elements at index: " + i + " are not equal.");
             }
+        }
+
+        [Test]
+        public void TestArrayCast()
+        {
+            object[] data = { 1, "string", new ArrayList() };
+            Serializer s = Serializer.GetSerializer(typeof(object));
+            string result = s.Serialize(data);
+            object[] actual = (object[]) s.Deserialize(result);
+            Assert.AreEqual(data, actual, "Cast to array not correct");
         }
     }
 }

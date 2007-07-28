@@ -404,7 +404,7 @@ namespace JsonExSerializer
                     {
                         WriteCast(value.GetType());
                     }
-                    Serialize(value, subindent, currentPath + "." + index, null);
+                    Serialize(value, subindent, currentPath + ".[" + index + "]", null);
                     addComma = true;
                     index++;
                 }

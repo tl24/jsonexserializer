@@ -208,11 +208,20 @@ namespace JsonExSerializer
                 tok = ReadToken(); // separator "."
                 refSpec.Append(tok.value);
                 tok = ReadToken(); // type part
-                if (tok.type != TokenType.Identifier)
+                if (tok == LSquareToken)
                 {
-                    throw new ParseException("Invalid Reference, must be an identifier: " + tok);
+                    refSpec.Append(tok.value);  // [
+                    refSpec.Append(ReadToken().value); // index
+                    refSpec.Append(ReadToken().value); // ]
                 }
-                refSpec.Append(tok.value);
+                else if (tok.type == TokenType.Identifier)
+                {
+                    refSpec.Append(tok.value);
+                }
+                else
+                {
+                    throw new ParseException("Invalid Reference, must be an identifier or array value: " + tok);
+                }                
             }
             return _values[refSpec.ToString()];
         }
@@ -265,7 +274,7 @@ namespace JsonExSerializer
             }
             object item;
             int i = 0;
-            _pathStack.Push(i.ToString());
+            _pathStack.Push(string.Format("[{0}]", i));
             while (ReadAhead(CommaToken, RSquareToken, delegate (Type t, object o) { return ParseExpression(t, o, false, true); }, elemType, collBuilder, out item))
             {
                 collBuilder.Add(item);

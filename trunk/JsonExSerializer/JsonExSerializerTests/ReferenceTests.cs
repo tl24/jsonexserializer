@@ -109,5 +109,17 @@ namespace JsonExSerializerTests
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
             Assert.AreSame(deep.Reference, deep.Reference.Reference.Reference.Reference, "References not equal");
         }
+
+        [Test]
+        public void TestCollectionIndexReference()
+        {
+            MockReferenceObject[] mockArray = new MockReferenceObject[] { simple };
+            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            string result = s.Serialize(mockArray);
+            MockReferenceObject[] actual = (MockReferenceObject[]) s.Deserialize(result);
+            Assert.AreSame(actual[0], actual[0].Reference.Reference, "reference inside collection not equal");
+
+        }
     }
 }

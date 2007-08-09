@@ -25,15 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ZipFiles Include="build\**" />
-	<ZipFilesNoSource Include="build\**" Exclude="build\src\**" />
+    <SourceFiles Include="**\JsonExSerializer\**\*.*" Exclude="@(DefaultExclude)" />
+    <SourceFiles Include="**\JsonExSerializerTests\**\*.*" Exclude="@(DefaultExclude)" />
   </ItemGroup>
 
-  <ItemGroup>
-    <SourceFiles Include="JsonExSerializer\**\*.*" Exclude="@(DefaultExclude)" />
-	<SourceFiles Include="JsonExSerializerTests\**\*.*" Exclude="@(DefaultExclude)" />
-  </ItemGroup>
-  
   <Target Name="Version">
     <SvnVersion LocalPath="$(MSBuildProjectDirectory)">
       <Output TaskParameter="Revision" PropertyName="Revision" />
@@ -48,7 +43,7 @@
       AssemblyCopyright="Copyright © 2007"     
       ComVisible="false"
       Guid="12d697c6-ebf8-479f-b78a-86fdf09307d0"
-	  AssemblyInformationalVersion="$(Major).$(Minor)"
+	    AssemblyInformationalVersion="$(Major).$(Minor)"
       AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)"
       AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)"
       Condition="$(Revision) != '0' "/>
@@ -62,39 +57,51 @@
       AssemblyCopyright="Copyright © 2007"     
       ComVisible="false"
       Guid="041b67d7-8bf6-4867-ba57-bc8dc556cbc6"
-	  AssemblyInformationalVersion="$(Major).$(Minor)"
+	    AssemblyInformationalVersion="$(Major).$(Minor)"
       AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)"
       AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)"
       Condition="$(Revision) != '0' "/>
-</Target>
-  
-  <Target Name="Clean">
-	<RemoveDir Directories="build" />
-  </Target>
-  
-  <Target Name="Compile" DependsOnTargets="Version; Clean">
-    <MSBuild Projects="JsonExSerializer.sln"
-             Properties="Configuration=Release" />
-	<Copy SourceFiles="JsonExSerializer/bin/Release/JsonExSerializer.dll; JsonExSerializer/bin/Release/JsonExSerializer.pdb; JsonExSerializerTests/bin/Release/JsonExSerializerTests.dll; JsonExSerializerTests/bin/Release/JsonExSerializerTests.pdb"
-	      DestinationFolder="build" />
+
+    <CreateItem Include="build/JsonExSerializer-$(Major).$(Minor).$(Build)">
+      <Output TaskParameter="Include" PropertyName="DistRoot" />
+    </CreateItem>
   </Target>
 
-  
+  <Target Name="Clean">
+    <RemoveDir Directories="build" />
+  </Target>
+
+  <Target Name="Compile" DependsOnTargets="Clean; Version">
+    <MSBuild Projects="JsonExSerializer.sln"
+             Properties="Configuration=Release" />
+    <Copy SourceFiles="JsonExSerializer/bin/Release/JsonExSerializer.dll; JsonExSerializer/bin/Release/JsonExSerializer.pdb; JsonExSerializerTests/bin/Release/JsonExSerializerTests.dll; JsonExSerializerTests/bin/Release/JsonExSerializerTests.pdb"
+          DestinationFolder="$(DistRoot)" />
+  </Target>
+
+
   <Target Name="Documentation" DependsOnTargets="Compile">
     <Exec command="doxygen" />
+    <CreateItem Include="build/docs/**">
+      <Output TaskParameter="Include"
+              ItemName="CopyDocFiles" />
+    </CreateItem>    
+    <Copy SourceFiles="@(CopyDocFiles)" DestinationFolder="$(DistRoot)/docs" />
+    <RemoveDir Directories="build/docs" />
   </Target>
 
   <Target Name="Zip" DependsOnTargets="Documentation">
+    <Delete Files="JsonExSerializer.v$(Major).$(Minor).$(Build).$(Revision).zip" />
     <Copy SourceFiles="@(SourceFiles)" 
-	      DestinationFiles="@(SourceFiles->'build/src/%(RecursiveDir)%(Filename)%(Extension)')" />
-	<Copy SourceFiles="JsonExSerializer.sln" DestinationFolder="build/src" />
-	<Copy SourceFiles="license.txt" DestinationFolder="build" />
+	      DestinationFiles="@(SourceFiles->'$(DistRoot)/src/%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="JsonExSerializer.sln" DestinationFolder="$(DistRoot)/src" />
+    <Copy SourceFiles="license.txt" DestinationFolder="$(DistRoot)" />
+    <CreateItem Include="build/**">
+      <Output TaskParameter="Include"
+              ItemName="ZipFiles" />
+    </CreateItem>
     <Zip Files="@(ZipFiles)"
-          ZipFileName="JsonExSerializer-Full.v$(Major).$(Minor).$(Build).$(Revision).zip"
-		  WorkingDirectory="build" />
-    <Zip Files="@(ZipFilesNoSource)"
-          ZipFileName="JsonExSerializer.v$(Major).$(Minor).$(Build).$(Revision).zip"
-          WorkingDirectory="build" />
+         ZipFileName="JsonExSerializer.v$(Major).$(Minor).$(Build).$(Revision).zip"
+         WorkingDirectory="build" />
   </Target>
 
   <Target Name="Build" DependsOnTargets="Zip">

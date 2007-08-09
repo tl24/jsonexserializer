@@ -611,7 +611,7 @@ namespace JsonExSerializer
         /// <param name="expected">the expected token</param>
         /// <param name="actual">the actual token</param>
         /// <param name="message">message to use in the exception if expected != actual</param>
-        private void RequireToken(Token expected, Token actual, string message)
+        private static void RequireToken(Token expected, Token actual, string message)
         {
             if (actual != expected)
             {
@@ -624,7 +624,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="tok">the token to test</param>
         /// <returns>true if its a quoted string</returns>
-        private bool IsQuotedString(Token tok)
+        private static bool IsQuotedString(Token tok)
         {
             return tok.type == TokenType.DoubleQuotedString || tok.type == TokenType.SingleQuotedString;
         }
@@ -634,7 +634,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="tok">the token to test</param>
         /// <returns>true if its an identifier</returns>
-        private bool IsIdentifier(Token tok)
+        private static bool IsIdentifier(Token tok)
         {
             return tok.type == TokenType.Identifier;
         }
@@ -644,7 +644,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="tok">the token to test</param>
         /// <returns>true if its a keyword</returns>
-        private bool IsKeyword(Token tok)
+        private static bool IsKeyword(Token tok)
         {
             // include null?
             return tok.type == TokenType.Identifier && tok.value == "new";

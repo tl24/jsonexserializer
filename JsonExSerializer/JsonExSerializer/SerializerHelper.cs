@@ -165,7 +165,7 @@ namespace JsonExSerializer
                         WriteDBNull((DBNull)o, indent);
                         break;
                     case TypeCode.Empty:
-                        throw new Exception("Unsupported value (Empty): " + o);
+                        throw new ApplicationException("Unsupported value (Empty): " + o);
                     case TypeCode.Int16:
                         WriteInt16((short)o, indent);
                         break;
@@ -427,75 +427,75 @@ namespace JsonExSerializer
             _writer.Write(']');
         }
 
-        protected void WriteDateTime(DateTime value, int indent)
+        private void WriteDateTime(DateTime value, int indent)
         {
             _writer.Write(value.ToString());
         }
 
-        protected void WriteBoolean(bool value, int indent)
+        private void WriteBoolean(bool value, int indent)
         {
             _writer.Write(value);
         }
 
-        protected void WriteByte(byte value, int indent)
+        private void WriteByte(byte value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteDBNull(DBNull value, int indent)
+        private void WriteDBNull(DBNull value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteInt16(short value, int indent)
+        private void WriteInt16(short value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteInt32(int value, int indent)
+        private void WriteInt32(int value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteInt64(long value, int indent)
+        private void WriteInt64(long value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteSByte(sbyte value, int indent)
+        private void WriteSByte(sbyte value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteUInt16(ushort value, int indent)
+        private void WriteUInt16(ushort value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteUInt32(uint value, int indent)
+        private void WriteUInt32(uint value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteUInt64(ulong value, int indent)
+        private void WriteUInt64(ulong value, int indent)
         {
             _writer.Write(value);
         }
-        protected void WriteDecimal(decimal value, int indent)
+        private void WriteDecimal(decimal value, int indent)
         {
             _writer.Write(value);
         }
 
-        protected void WriteDouble(double value, int indent)
+        private void WriteDouble(double value, int indent)
         {
             _writer.Write(value.ToString("R"));
         }
 
-        protected void WriteFloat(float value, int indent)
+        private void WriteFloat(float value, int indent)
         {
             _writer.Write(value.ToString("R"));
         }
 
-        protected void WriteChar(char value, int indent)
+        private void WriteChar(char value, int indent)
         {
             _writer.Write('"');
             _writer.Write(EscapeString(value.ToString()));
             _writer.Write('"');
         }
 
-        protected void WriteString(string value, int indent)
+        private void WriteString(string value, int indent)
         {
             _writer.Write('"');
             _writer.Write(EscapeString(value));
@@ -581,7 +581,7 @@ namespace JsonExSerializer
             }
         }
 
-        private string EscapeString(string s)
+        private static string EscapeString(string s)
         {
             return s.Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"");
         }

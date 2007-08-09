@@ -17,7 +17,6 @@ namespace JsonExSerializer
     /// </summary>
     class TypeHandler
     {
-        private static IDictionary<Type, TypeHandler> _cache;
         private Type _handledType;
         private IList<PropertyHandler> _properties;
         private bool _collectionLookedUp = false;

@@ -12,7 +12,6 @@ namespace JsonExSerializer.TypeConversion
     /// </summary>
     public class TypeConverterAdapter : IJsonTypeConverter
     {
-        private Type _sourceType;
         private TypeConverter _converter;
 
         public TypeConverterAdapter(TypeConverter converter) {

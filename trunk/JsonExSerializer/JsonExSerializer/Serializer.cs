@@ -68,11 +68,13 @@ namespace JsonExSerializer
         /// <returns>serialized data string</returns>
         public string Serialize(object o)
         {
-            TextWriter writer = new StringWriter();
-            Serialize(o, writer);
-            string s = writer.ToString();
-            writer.Close();
-            return s;
+            using (TextWriter writer = new StringWriter())
+            {
+                Serialize(o, writer);
+                string s = writer.ToString();
+                writer.Close();
+                return s;
+            }
         }
 
         #endregion

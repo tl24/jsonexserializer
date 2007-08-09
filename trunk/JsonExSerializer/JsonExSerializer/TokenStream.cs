@@ -210,7 +210,6 @@ namespace JsonExSerializer
         /// <returns>number token</returns>
         private Token GetNumber(char start, StringBuilder buffer)
         {
-            int c;
             char ch = start;
             buffer.Append(ch);
             int i = (start == '.') ? 1 : 0;

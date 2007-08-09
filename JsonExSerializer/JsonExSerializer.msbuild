@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+
+  <PropertyGroup>
+    <Major>1</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
+    <Revision>0</Revision>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <DefaultExclude Include="**\.svn\**" />
+    <DefaultExclude Include="**\bin\**" />
+    <DefaultExclude Include="**\obj\**" />
+    <DefaultExclude Include="**\Release\**" />
+    <DefaultExclude Include="**\Debug\**" />
+    <DefaultExclude Include="**\Test\**" />
+    <DefaultExclude Include="**\TestResults\**" />
+    <DefaultExclude Include="**\doc\**" />
+    <DefaultExclude Include="**\www\**" />
+    <DefaultExclude Include="**\*.user" />
+    <DefaultExclude Include="**\*.suo" />
+    <DefaultExclude Include="**\*.zip" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ZipFiles Include="build\**" />
+	<ZipFilesNoSource Include="build\**" Exclude="build\src\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SourceFiles Include="JsonExSerializer\**\*.*" Exclude="@(DefaultExclude)" />
+	<SourceFiles Include="JsonExSerializerTests\**\*.*" Exclude="@(DefaultExclude)" />
+  </ItemGroup>
+  
+  <Target Name="Version">
+    <SvnVersion LocalPath="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="Revision" PropertyName="Revision" />
+    </SvnVersion>
+    <Message Text="Version: $(Major).$(Minor).$(Build).$(Revision)"/>
+    <AssemblyInfo CodeLanguage="CS" 
+      OutputFile="JsonExSerializer\Properties\AssemblyInfo.cs"
+      AssemblyTitle="JsonExSerializer"
+      AssemblyDescription=".NET Serialization Framework using JSON"
+      AssemblyCompany=""
+      AssemblyProduct="JsonExSerializer"
+      AssemblyCopyright="Copyright © 2007"     
+      ComVisible="false"
+      Guid="12d697c6-ebf8-479f-b78a-86fdf09307d0"
+	  AssemblyInformationalVersion="$(Major).$(Minor)"
+      AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)"
+      AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)"
+      Condition="$(Revision) != '0' "/>
+
+    <AssemblyInfo CodeLanguage="CS" 
+      OutputFile="JsonExSerializerTests\Properties\AssemblyInfo.cs"
+      AssemblyTitle="JsonExSerializerTests"
+      AssemblyDescription=".NET Serialization Framework Tests using JSON"
+      AssemblyCompany=""
+      AssemblyProduct="JsonExSerializer"
+      AssemblyCopyright="Copyright © 2007"     
+      ComVisible="false"
+      Guid="041b67d7-8bf6-4867-ba57-bc8dc556cbc6"
+	  AssemblyInformationalVersion="$(Major).$(Minor)"
+      AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)"
+      AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)"
+      Condition="$(Revision) != '0' "/>
+</Target>
+  
+  <Target Name="Clean">
+	<RemoveDir Directories="build" />
+  </Target>
+  
+  <Target Name="Compile" DependsOnTargets="Version; Clean">
+    <MSBuild Projects="JsonExSerializer.sln"
+             Properties="Configuration=Release" />
+	<Copy SourceFiles="JsonExSerializer/bin/Release/JsonExSerializer.dll; JsonExSerializer/bin/Release/JsonExSerializer.pdb; JsonExSerializerTests/bin/Release/JsonExSerializerTests.dll; JsonExSerializerTests/bin/Release/JsonExSerializerTests.pdb"
+	      DestinationFolder="build" />
+  </Target>
+
+  
+  <Target Name="Documentation" DependsOnTargets="Compile">
+    <Exec command="doxygen" />
+  </Target>
+
+  <Target Name="Zip" DependsOnTargets="Documentation">
+    <Copy SourceFiles="@(SourceFiles)" 
+	      DestinationFiles="@(SourceFiles->'build/src/%(RecursiveDir)%(Filename)%(Extension)')" />
+	<Copy SourceFiles="JsonExSerializer.sln" DestinationFolder="build/src" />
+	<Copy SourceFiles="license.txt" DestinationFolder="build" />
+    <Zip Files="@(ZipFiles)"
+          ZipFileName="JsonExSerializer-Full.v$(Major).$(Minor).$(Build).$(Revision).zip"
+		  WorkingDirectory="build" />
+    <Zip Files="@(ZipFilesNoSource)"
+          ZipFileName="JsonExSerializer.v$(Major).$(Minor).$(Build).$(Revision).zip"
+          WorkingDirectory="build" />
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="Zip">
+    <Message Text="Build Complete"/>
+  </Target>
+</Project>

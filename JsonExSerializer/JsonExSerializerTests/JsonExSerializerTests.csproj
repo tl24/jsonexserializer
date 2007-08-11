@@ -41,6 +41,7 @@
     <Compile Include="CollectionsTests.cs" />
     <Compile Include="ConversionTests.cs" />
     <Compile Include="DeserializePrimitiveTests.cs" />
+    <Compile Include="Expression\ReferenceTests.cs" />
     <Compile Include="Mocks\ChainedConversion.cs" />
     <Compile Include="Mocks\ConvertedObject.cs" />
     <Compile Include="Mocks\MockCallbackObject.cs" />

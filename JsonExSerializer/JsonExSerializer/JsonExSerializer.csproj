@@ -47,6 +47,24 @@
     <Compile Include="Collections\StackBuilder.cs" />
     <Compile Include="Collections\StackHandler.cs" />
     <Compile Include="Collections\ICollectionBuilder.cs" />
+    <Compile Include="Expression\CollectionBuilderEvaluator.cs" />
+    <Compile Include="Expression\ComplexEvaluatorBase.cs" />
+    <Compile Include="Expression\ComplexExpressionBase.cs" />
+    <Compile Include="Expression\ConverterEvaluator.cs" />
+    <Compile Include="Expression\EvaluatorBase.cs" />
+    <Compile Include="Expression\EvaluatorFactory.cs" />
+    <Compile Include="Expression\ExpressionBase.cs" />
+    <Compile Include="Expression\IEvaluator.cs" />
+    <Compile Include="Expression\KeyValueExpression.cs" />
+    <Compile Include="Expression\ListEvaluator.cs" />
+    <Compile Include="Expression\ListExpression.cs" />
+    <Compile Include="Expression\NullExpression.cs" />
+    <Compile Include="Expression\ObjectEvaluator.cs" />
+    <Compile Include="Expression\ObjectExpression.cs" />
+    <Compile Include="Expression\ReferenceExpression.cs" />
+    <Compile Include="Expression\ReferenceIdentifier.cs" />
+    <Compile Include="Expression\ValueEvaluator.cs" />
+    <Compile Include="Expression\ValueExpression.cs" />
     <Compile Include="IDeserializationCallback.cs" />
     <Compile Include="ISerializationCallback.cs" />
     <Compile Include="JsonConvertAttribute.cs" />
@@ -75,12 +93,9 @@
     <Compile Include="PropertyHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
-
+  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
   <Target Name="ZipFiles">
-	<Zip Files="@(Compile)"  
-         ZipFileName="$(OutputPath)\src.zip" />
-  
+    <Zip Files="@(Compile)" ZipFileName="$(OutputPath)\src.zip" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

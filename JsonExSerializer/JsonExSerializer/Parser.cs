@@ -13,6 +13,7 @@ using JsonExSerializer.Collections;
 using System.Reflection;
 using JsonExSerializer.TypeConversion;
 using System.IO;
+using JsonExSerializer.Expression;
 
 namespace JsonExSerializer
 {
@@ -23,8 +24,6 @@ namespace JsonExSerializer
         private Type _deserializedType;
         private TokenStream _tokenStream;
         private SerializationContext _context;
-        private Stack<string> _pathStack;
-        private IDictionary<string, object> _values;
         #endregion
 
         #region Token Constants
@@ -83,8 +82,6 @@ namespace JsonExSerializer
             _deserializedType = t;
             _tokenStream = tokenStream;
             _context = context;
-            _pathStack = new Stack<string>();
-            _values = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -93,8 +90,9 @@ namespace JsonExSerializer
         /// <returns>the object constructed from the stream</returns>
         public object Parse()
         {
-            _pathStack.Push("this");
-            return ParseExpression(_deserializedType, null, false, true);
+            ExpressionBase expr = ParseExpression();
+            expr.SetResultTypeIfNotSet(_deserializedType);
+            return expr.Evaluate(this._context);
         }
 
         /// <summary>
@@ -115,79 +113,47 @@ namespace JsonExSerializer
             return _tokenStream.ReadToken();
         }
 
-        private object ParseExpression(Type desiredType, object parent, bool isConverted, bool useConverter)
+        private ExpressionBase ParseExpression()
         {
-            object value = null;
+            ExpressionBase value;
             if (_tokenStream.IsEmpty())
             {
-                value = null;
+                value = new NullExpression();
             }
             else
             {
-                if (useConverter && _context.HasConverter(desiredType))
+                Token tok = PeekToken();
+                if (tok == ReferenceStartToken)
+                    value = ParseReference();
+                else if (tok.type == TokenType.Number
+                    || (IsIdentifier(tok) && !IsKeyword(tok)))
                 {
-                    Type originalType = desiredType;
-                    IJsonTypeConverter converter = _context.GetConverter(desiredType);
-                    desiredType = converter.GetSerializedType(desiredType);
-                    value = ParseExpression(desiredType, parent, true, true);
-                    value = converter.ConvertTo(value, originalType, _context);
-                    _values[GetCurrentPath()] = value;
+                    value = ParsePrimitive();
                 }
-                else if (useConverter && typeof(IJsonTypeConverter).IsAssignableFrom(desiredType))
+                else if (IsQuotedString(tok))
                 {
-                    // object converts itself, create an instance of the object
-                    IJsonTypeConverter converter = (IJsonTypeConverter)Activator.CreateInstance(desiredType);
-                    Type originalType = desiredType;
-                    desiredType = converter.GetSerializedType(desiredType);
-                    value = ParseExpression(desiredType, parent, true, true);
-                    converter.ConvertTo(value, originalType, _context);
-                    value = converter;
-                    _values[GetCurrentPath()] = value;
+                    value = ParseString();
+                }
+                else if (tok == LSquareToken)
+                {
+                    value = ParseCollection();
+                }
+                else if (tok == LBraceToken)
+                {
+                    value = ParseObject();
+                }
+                else if (tok == LParenToken)
+                {
+                    value = ParseCast();
+                }
+                else if (tok == NewToken)
+                {
+                    value = ParseConstructedObject();
                 }
                 else
                 {
-                    Token tok = PeekToken();
-                    if (tok == ReferenceStartToken)
-                    {
-                        value = ParseReference();
-                        // return the value early to skip the IDeserializationCallback
-                        // since this is a reference its already been called
-                        return value;
-                    }
-                    else if (tok.type == TokenType.Number
-                        || (IsIdentifier(tok) && !IsKeyword(tok)))
-                    {
-                        value = ParsePrimitive(desiredType);
-                    }
-                    else if (IsQuotedString(tok))
-                    {
-                        value = ParseString(desiredType);
-                    }
-                    else if (tok == LSquareToken)
-                    {
-                        value = ParseCollection(desiredType, isConverted);
-                    }
-                    else if (tok == LBraceToken)
-                    {
-                        value = ParseObject(desiredType, isConverted);
-                    }
-                    else if (tok == LParenToken)
-                    {
-                        value = ParseCast(desiredType, isConverted);
-                    }
-                    else if (tok == NewToken)
-                    {
-                        value = ParseConstructorSpec(desiredType, isConverted);
-                    }
-                    else
-                    {
-                        throw new ParseException("Unexpected token: " + tok);
-                    }
+                    throw new ParseException("Unexpected token: " + tok);
                 }
-            }
-            if (value is IDeserializationCallback)
-            {
-                ((IDeserializationCallback)value).OnAfterDeserialization();
             }
             return value;
         }
@@ -196,177 +162,105 @@ namespace JsonExSerializer
         /// Parses a reference to an object
         /// </summary>
         /// <returns></returns>
-        private object ParseReference()
+        private ExpressionBase ParseReference()
         {
-            StringBuilder refSpec = new StringBuilder();
+            ReferenceIdentifier refID = new ReferenceIdentifier();
             Token tok = ReadToken();
             RequireToken(ReferenceStartToken, tok, "Invalid starting token for ParseReference");
 
-            refSpec.Append(tok.value);
+            refID.AddPart(tok.value);
             while ((tok = PeekToken()) == PeriodToken)
             {
                 tok = ReadToken(); // separator "."
-                refSpec.Append(tok.value);
                 tok = ReadToken(); // type part
                 if (tok == LSquareToken)
                 {
-                    refSpec.Append(tok.value);  // [
-                    refSpec.Append(ReadToken().value); // index
-                    refSpec.Append(ReadToken().value); // ]
+                    refID.AddPart(ReadToken().value); // index
+                    ReadToken(); // ]
                 }
                 else if (tok.type == TokenType.Identifier)
                 {
-                    refSpec.Append(tok.value);
+                    refID.AddPart(tok.value);
                 }
                 else
                 {
                     throw new ParseException("Invalid Reference, must be an identifier or array value: " + tok);
                 }                
             }
-            return _values[refSpec.ToString()];
+            return new ReferenceExpression(refID);
         }
 
         /// <summary>
-        /// Turns the current path stack into a dot-seperated list
+        /// Parses a type cast.  Will also parse the expression that the cast applies to.
+        /// The result will be the expression following the cast with the ResultType set to
+        /// the type of the cast.
         /// </summary>
-        /// <example>this.prop1.1.value</example>
-        /// <returns>dot-seperated string</returns>
-        private string GetCurrentPath()
-        {
-            string[] pathParts = _pathStack.ToArray();
-            // reverse the string so its in the right order, fifo
-            Array.Reverse(pathParts);
-            return string.Join(".", pathParts);
-        }
-
-        private object ParseCast(Type desiredType, bool isConverted)
+        /// <returns>casted expression</returns>
+        private ExpressionBase ParseCast()
         {
             Token tok = ReadToken();
             Debug.Assert(tok == LParenToken, "Invalid starting token for ParseCast: " + tok);
-            desiredType = ParseTypeSpecifier();
+            Type desiredType = ParseTypeSpecifier();
             tok = ReadToken();
             RequireToken(RParenToken, tok, "Invalid Type Cast Syntax");
-            return ParseExpression(desiredType, null, isConverted, true);
+            ExpressionBase result = ParseExpression();
+            result.ResultType = desiredType;
+            return result;
         }
 
-        private object ParseCollection(Type desiredType, bool isConverted)
+        /// <summary>
+        /// Parses a javascript array
+        /// </summary>
+        /// <returns></returns>
+        private ListExpression ParseCollection()
         {
-            ICollectionBuilder collBuilder = null;
             Token tok = ReadToken();
             Debug.Assert(tok == LSquareToken);
-
-            Type elemType = typeof(object);
-            TypeHandler handler = _context.GetTypeHandler(desiredType);            
-            if (desiredType != typeof(object))
-            {                
-                elemType = handler.GetCollectionItemType();
-            }
-            if (collBuilder == null)
+            ListExpression value = new ListExpression();
+            ExpressionBase item;
+            while (ReadAhead(CommaToken, RSquareToken, new ExpressionMethod(ParseExpression), out item))
             {
-                if (desiredType == typeof(object))
-                {
-                    collBuilder = new ListCollectionBuilder(typeof(ArrayList));
-                }
-                else
-                {
-                    collBuilder = handler.GetCollectionBuilder();
-                }
+                value.Add(item);
             }
-            object item;
-            int i = 0;
-            _pathStack.Push(string.Format("[{0}]", i));
-            while (ReadAhead(CommaToken, RSquareToken, delegate (Type t, object o) { return ParseExpression(t, o, false, true); }, elemType, collBuilder, out item))
-            {
-                collBuilder.Add(item);
-                _pathStack.Pop();
-                i++;
-                _pathStack.Push(i.ToString());
-            }
-            _pathStack.Pop();
-            object value = collBuilder.GetResult();
-            if (!isConverted)
-                _values[GetCurrentPath()] = value;
             return value;
         }
 
-        private object ParseObject(Type desiredType, bool isConverted)
+        /// <summary>
+        /// Parses a javascript object
+        /// </summary>
+        /// <returns></returns>
+        private ObjectExpression ParseObject()
         {
-
-            if (desiredType.IsArray)
-            {
-                throw new ParseException("Invalid collection type for object " + desiredType);
-            }
             Token tok = ReadToken();
             Debug.Assert(tok == LBraceToken);
-            object value = null;
-            if (desiredType == typeof(object))
+            ObjectExpression value = new ObjectExpression();
+            ExpressionBase item;
+            while (ReadAhead(CommaToken, RBraceToken, new ExpressionMethod(ParseKeyValue), out item))
             {
-                value = new Hashtable();
-            }
-            else
-            {
-                value = Activator.CreateInstance(desiredType);
-            }
-            if (!isConverted)
-                _values[GetCurrentPath()] = value;
-
-            object item;
-            while (ReadAhead(CommaToken, RBraceToken, new ParserMethod(ParseKeyValue), desiredType, value, out item))
-            {
+                value.Add((KeyValueExpression)item);
             }
             return value;
         }
 
-        private object ParseKeyValue(Type desiredType, object instance)
+        /// <summary>
+        /// Parses a key value pair of an javascript object
+        /// </summary>
+        /// <returns></returns>
+        private KeyValueExpression ParseKeyValue()
         {
-            Type keyType = typeof(string);
-            Type valueType = typeof(object);
-            if (instance is IDictionary)
-            {
-                if (desiredType.GetInterface(typeof(IDictionary<,>).Name) != null)
-                {
-                    Type genDict = desiredType.GetInterface(typeof(IDictionary<,>).Name);
-                    Type[] genArgs = genDict.GetGenericArguments();
-                    keyType = genArgs[0];
-                    valueType = genArgs[1];
-                }
-            }
-            object key = ParseExpression(keyType, instance, false, true);
+            ExpressionBase key = ParseExpression(); // should be a value
             Token tok = ReadToken();
             RequireToken(ColonToken, tok, "Syntax error, key should be followed by :.");
-            object value;
-            _pathStack.Push(key.ToString());
-            if (instance is IDictionary)
-            {
-                value = ParseExpression(valueType, null, false, true);
-                ((IDictionary)instance)[key] = value;
-            } 
-            else 
-            {
-                TypeHandler handler = _context.GetTypeHandler(desiredType);
-                PropertyHandler prop = handler.FindProperty(key.ToString());
-                if (prop == null)
-                    throw new ParseException("Could not find property: " + key + " on type: " + handler.ForType.FullName);
-                if (_context.HasConverter(prop.Property))
-                {
-                    IJsonTypeConverter converter = _context.GetConverter(prop.Property);
-                    Type propDesiredType = converter.GetSerializedType(prop.PropertyType);
-                    value = ParseExpression(propDesiredType, null, true, false);
-                    value = converter.ConvertTo(value, prop.PropertyType, _context);
-                }
-                else
-                {
-
-                    value = ParseExpression(prop.PropertyType, null, false, true);
-                }
-                prop.SetValue(instance, value);
-            }
-            _pathStack.Pop();
-            return value;
-            
+            ExpressionBase value = ParseExpression();
+            return new KeyValueExpression(key, value);
         }
 
-        private delegate object ParserMethod(Type desiredType, object parent);
+        /// <summary>
+        /// Delegate method to call for the ReadAhead method.  The method will be called for
+        /// each item found by the ReadAhead method.
+        /// </summary>
+        /// <returns></returns>
+        private delegate ExpressionBase ExpressionMethod();
 
         /// <summary>
         /// Handler for 1 or more construct
@@ -374,9 +268,9 @@ namespace JsonExSerializer
         /// <param name="separator">the separator token between items</param>
         /// <param name="terminal">the ending token</param>
         /// <param name="meth">the method to call to parse an item</param>
-        /// <param name="desiredType">the desired type for the called method</param>
+        /// <param name="result">the parsed expression</param>
         /// <returns>true if match parsed, false otherwise</returns>
-        private bool ReadAhead(Token separator, Token terminal, ParserMethod meth, Type desiredType, object parent, out object result)
+        private bool ReadAhead(Token separator, Token terminal, ExpressionMethod meth, out ExpressionBase result)
         {
             Token tok = PeekToken();
             result = null;
@@ -389,20 +283,40 @@ namespace JsonExSerializer
             {
                 ReadToken();
             }
-            result = meth(desiredType, parent);
+            result = meth();
             return true;
         }
 
-        private object ParseConstructorSpec(Type desiredType, bool isConverted)
+        /// <summary>
+        /// Parses a constructor expression
+        /// </summary>
+        /// <returns>complex expression</returns>
+        /// <example>
+        ///    new MyType("arg1", "arg2")
+        ///    new MyType("argA", "argB") { "argC": "C", "argD": "D" }
+        /// </example>
+        private ComplexExpressionBase ParseConstructedObject()
         {
-            throw new ParseException("Constructors not supported");
             Token tok = ReadToken();    // should be the new keyword
             Debug.Assert(tok == NewToken);
             Type t = ParseTypeSpecifier();
 
             tok = ReadToken();
             RequireToken(LParenToken, tok, "Missing constructor arguments");
-            return null;
+            ExpressionBase arg;
+            List<ExpressionBase> ConstructorArgs = new List<ExpressionBase>();
+            while (ReadAhead(CommaToken, RParenToken, new ExpressionMethod(ParseExpression), out arg)) {
+                ConstructorArgs.Add(arg);
+            }
+            ComplexExpressionBase value = null;
+            if (PeekToken() == LSquareToken || PeekToken() == LBraceToken) {
+                value = (ComplexExpressionBase) ParseExpression();
+            } else {
+                value = new ObjectExpression();
+            }
+            value.ResultType = t;
+            value.ConstructorArguments = ConstructorArgs;
+            return value;
         }
 
         /// <summary>
@@ -514,63 +428,32 @@ namespace JsonExSerializer
             return Type.GetType(typeName, true);
         }
 
-        /// <summary>
-        /// Parses a primitive value, numeric or string
-        /// </summary>
-        /// <param name="desiredType">the desired type of the returned value</param>
-        /// <returns>parsed value</returns>
-        private object ParsePrimitive(Type desiredType)
-        {
+        private ExpressionBase ParsePrimitive() {
             Token tok = ReadToken();
-            if (desiredType == typeof(object))
-            {
                 // no type info, try to figure out the closest type
-                switch (tok.type)
-                {
-                    case TokenType.Number:
-                        if (tok.value.IndexOf('.') != -1)
-                        {
-                            return Convert.ToDouble(tok.value);
-                        }
-                        else
-                        {
-                            return Convert.ToInt32(tok.value);
-                        }
-                        break;
-                    case TokenType.Identifier:
-                        if (tok.value.Equals("true", StringComparison.CurrentCultureIgnoreCase)
-                        || tok.value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            return Convert.ToBoolean(tok.value);
-                        }
-                        else if (tok.value.Equals("null"))
-                        {
-                            return null;
-                        }
-                        else
-                        {
-                            return tok.value;
-                        }
-                        break;
-                    default:
-                        return tok.value;
-                        break;
-                }
-            }
-            else
+            switch (tok.type)
             {
-                if (tok == NullToken)
-                {
-                    return null;
-                }
-                else if (desiredType.IsEnum)
-                {
-                    return Enum.Parse(desiredType, tok.value);
-                }
-                else
-                {
-                    return Convert.ChangeType(tok.value, desiredType);
-                }
+                case TokenType.Number:
+                    return new NumericExpression(tok.value);
+                    break;
+                case TokenType.Identifier:
+                    if (tok.value.Equals("true", StringComparison.CurrentCultureIgnoreCase)
+                    || tok.value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        return new BooleanExpression(tok.value);
+                    }
+                    else if (tok.value.Equals("null"))
+                    {
+                        return new NullExpression();
+                    }
+                    else
+                    {
+                        return new ValueExpression(tok.value);
+                    }
+                    break;
+                default:
+                    return new ValueExpression(tok.value);
+                    break;
             }
         }
 
@@ -579,7 +462,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="desiredType">the desired return type, should be string or char</param>
         /// <returns>the parsed string or char</returns>
-        private object ParseString(Type desiredType)
+        private ExpressionBase ParseString()
         {
             Token tok = ReadToken();
             string val = null;
@@ -595,14 +478,7 @@ namespace JsonExSerializer
                 val = tok.value.Replace("\\t", "\t");
                 val = tok.value.Replace("\\n", "\n");
             }
-            if (desiredType == typeof(char))
-            {
-                return Convert.ChangeType(val, typeof(char));
-            }
-            else
-            {
-                return val;
-            }
+            return new ValueExpression(val);
         }
 
         /// <summary>

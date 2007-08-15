@@ -66,11 +66,13 @@
     <Compile Include="Expression\ValueEvaluator.cs" />
     <Compile Include="Expression\ValueExpression.cs" />
     <Compile Include="IDeserializationCallback.cs" />
+    <Compile Include="IJsonWriter.cs" />
     <Compile Include="ISerializationCallback.cs" />
     <Compile Include="JsonConvertAttribute.cs" />
     <Compile Include="JsonExIgnoreAttribute.cs" />
     <Compile Include="Collections\ListCollectionBuilder.cs" />
     <Compile Include="JsonExSerializationException.cs" />
+    <Compile Include="JsonWriter.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="ReferenceEqualityComparer.cs" />

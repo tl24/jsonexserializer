@@ -9,23 +9,6 @@ namespace JsonExSerializer
     public abstract class JsonWriter : IJsonWriter
     {
         protected TextWriter _writer;
-        protected enum ModeType
-        {
-            InitialMode,
-            ObjectMode,
-            KeyMode,
-            ArrayMode,
-            ConstructorMode,
-            DoneMode,
-            /// <summary>
-            /// Not really a valid mode, just signals a stack pop
-            /// </summary>
-            PreviousMode,
-            /// <summary>
-            /// Signals to stay in the current mode
-            /// </summary>
-            CurrentMode
-        }
 
         protected enum OpType
         {
@@ -40,111 +23,20 @@ namespace JsonExSerializer
             OpCast
         }
 
-        protected ModeType currentMode = ModeType.InitialMode;
-        protected bool needComma = false;
         protected short indentLevel = 0;
         protected short indentSize = 4;
-
-        protected Stack<ModeType> _modeStack;
-        /// <summary>
-        /// Stores a combination of modes and operations.  If an
-        /// operation is valid for a given mode that will be a key in
-        /// the dictionary, the value will be the new mode for the operation.
-        /// </summary>
-        protected static IDictionary<ModeOp, ModeType> _validOps;
+        private IState _currentState;
 
         public JsonWriter(TextWriter writer, bool indent) {
             this._writer = writer;
-            _modeStack = new Stack<ModeType>();
+            _currentState = new InitialState(this);
             if (!indent)
                 indentSize = 0;
         }
 
-        static JsonWriter()
-        {
-            _validOps = new Dictionary<ModeOp, ModeType>();
-            // initial mode
-            _validOps[new ModeOp(ModeType.InitialMode, OpType.ArrStart)] = ModeType.ArrayMode;
-            _validOps[new ModeOp(ModeType.InitialMode, OpType.CtorStart)] = ModeType.ConstructorMode;
-            _validOps[new ModeOp(ModeType.InitialMode, OpType.ObjStart)] = ModeType.ObjectMode;
-            _validOps[new ModeOp(ModeType.InitialMode, OpType.OpCast)] = ModeType.CurrentMode;
-            _validOps[new ModeOp(ModeType.InitialMode, OpType.OpValue)] = ModeType.DoneMode;
-
-            _validOps[new ModeOp(ModeType.ArrayMode, OpType.ArrStart)] = ModeType.ArrayMode;
-            _validOps[new ModeOp(ModeType.ArrayMode, OpType.CtorStart)] = ModeType.ConstructorMode;
-            _validOps[new ModeOp(ModeType.ArrayMode, OpType.ObjStart)] = ModeType.ObjectMode;
-            _validOps[new ModeOp(ModeType.ArrayMode, OpType.OpCast)] = ModeType.CurrentMode;
-            _validOps[new ModeOp(ModeType.ArrayMode, OpType.ArrEnd)] = ModeType.PreviousMode;
-            _validOps[new ModeOp(ModeType.ArrayMode, OpType.OpValue)] = ModeType.CurrentMode;
-
-            _validOps[new ModeOp(ModeType.ObjectMode, OpType.ObjEnd)] = ModeType.PreviousMode;
-            _validOps[new ModeOp(ModeType.ObjectMode, OpType.OpKey)] = ModeType.KeyMode;
-
-            _validOps[new ModeOp(ModeType.KeyMode, OpType.OpValue)] = ModeType.PreviousMode;
-            _validOps[new ModeOp(ModeType.KeyMode, OpType.ArrStart)] = ModeType.ArrayMode;
-            _validOps[new ModeOp(ModeType.KeyMode, OpType.CtorStart)] = ModeType.ConstructorMode;
-            _validOps[new ModeOp(ModeType.KeyMode, OpType.ObjStart)] = ModeType.ObjectMode;
-            _validOps[new ModeOp(ModeType.KeyMode, OpType.OpCast)] = ModeType.CurrentMode;
-
-
-        }
         private void PreWrite(OpType operation) {
-            try
-            {
-                ModeType newMode = _validOps[new ModeOp(currentMode, operation)];
-                switch (newMode)
-                {
-                    case  ModeType.PreviousMode:
-                        indentLevel--;
-                        if (currentMode != ModeType.KeyMode && operation != OpType.OpValue)
-                        {
-                            WriteLineBreak();
-                            WriteIndent();
-                        }
-                        currentMode = _modeStack.Pop();
-                        // keys need an extra pop when coming back from array or object modes
-                        if (currentMode == ModeType.KeyMode)
-                            currentMode = _modeStack.Pop();
-
-                        // never return to initial mode, after the first expression we're done
-                        if (currentMode == ModeType.InitialMode)
-                            currentMode = ModeType.DoneMode;
-
-                        needComma = true;
-                        break;
-                    case ModeType.CurrentMode:
-                        if (needComma == true)
-                        {
-                            _writer.Write(", ");
-                        }
-                        WriteLineBreak();
-                        WriteIndent();
-                        needComma = true;
-                        break;
-                    default:
-                        if (needComma == true)
-                        {
-                            _writer.Write(", ");                            
-                        }
-                        if (currentMode != ModeType.InitialMode && currentMode != ModeType.KeyMode)
-                        {
-                            WriteLineBreak();
-                            WriteIndent();
-                        }
-                        if (currentMode != ModeType.KeyMode)
-                            indentLevel++;
-
-                        needComma = false;
-                        _modeStack.Push(currentMode);
-                        
-                        currentMode = newMode;
-                        break;
-                }
-                
-            }
-            catch (KeyNotFoundException e) {
-                throw new InvalidOperationException(string.Format("Invalid operation {0} for current state {1}", operation, currentMode));
-            }
+            _currentState.PreWrite(operation);
+            return;
         }
 
         protected void WriteIndent()
@@ -161,13 +53,17 @@ namespace JsonExSerializer
         public IJsonWriter ConstructorStart(Type constructorType)
         {
             PreWrite(OpType.CtorStart);
-            throw new Exception("The method or operation is not implemented.");
+            _writer.Write("new ");
+            WriteTypeInfo(constructorType);
+            _writer.Write("(");
+            return this;
         }
 
         public IJsonWriter ConstructorEnd()
         {
             PreWrite(OpType.CtorEnd);
-            throw new Exception("The method or operation is not implemented.");
+            _writer.Write(")");
+            return this;
         }
 
         public IJsonWriter ObjectStart()
@@ -182,7 +78,6 @@ namespace JsonExSerializer
             PreWrite(OpType.OpKey);
             WriteQuotedString(key);
             _writer.Write(':');
-            needComma = false;
             return this;
         }
 
@@ -266,8 +161,6 @@ namespace JsonExSerializer
             {
                 PreWrite(OpType.OpCast);
                 _writer.Write('(');
-                //TODO: Write simple type name for primitive types 
-                // such as "int" instead of "System.Int32"
                 WriteTypeInfo(castedType);
                 _writer.Write(')');
             }
@@ -282,34 +175,260 @@ namespace JsonExSerializer
             _writer.Dispose();
         }
 
-        /// <summary>
-        /// struct to hold mode operation pair to store in the
-        /// dictionary for valid operations for a given state
-        /// </summary>
-        protected struct ModeOp
+        private interface IState
         {
-            public ModeType Mode;
-            public OpType Operation;
-            public ModeOp(ModeType Mode, OpType Operation)
-            {
-                this.Mode = Mode;
-                this.Operation = Operation;
+            JsonWriter Outer { get; set; }
+
+            /// <summary>
+            /// Reference to the previous state, this should be
+            /// set when a new state is created
+            /// </summary>
+            IState PreviousState { get; set; }
+
+            /// <summary>
+            /// Called before a write operation occurs
+            /// </summary>
+            /// <param name="operation"></param>
+            void PreWrite(OpType operation);
+
+            /// <summary>
+            /// Called when control is returned back to a prior state. 
+            /// The current state implementing the transition should pass itself
+            /// as the "other" state.
+            /// </summary>
+            /// <param name="otherState">the state that is returning control back to the previous state</param>
+            /// <param name="operation">the current operation that is causing control to return</param>
+            void ReturnFrom(IState otherState, OpType operation);
+        }
+
+        /// <summary>
+        /// Base class for states, implements helper functions for transitions
+        /// </summary>
+        private class StateBase : IState
+        {
+            protected IState _previousState;
+            protected JsonWriter _outer;
+            protected bool needComma;
+
+            public StateBase(JsonWriter outer) {
+                this._outer = outer;
+                needComma = false;
             }
 
-            public override bool Equals(object obj)
+            public StateBase() : this(null) {
+            }
+
+            public virtual JsonWriter Outer {
+                get { return _outer; }
+                set { _outer = value; }
+            }
+
+            public virtual IState PreviousState
             {
-                if (obj is ModeOp)
+                get { return _previousState; }
+                set { _previousState = value; }
+            }
+
+            public virtual void PreWrite(OpType operation)
+            {
+                switch (operation)
                 {
-                    ModeOp other = (ModeOp)obj;
-                    return other.Operation == this.Operation
-                        && other.Mode == this.Mode;
+                    case OpType.ArrStart:
+                        NewState(new ArrayState());
+                        break;
+                    case OpType.CtorStart:
+                        NewState(new CtorState());
+                        break;
+                    case OpType.ObjStart:
+                        NewState(new ObjectState());
+                        break;
+                    case OpType.OpCast:
+                        Current(operation);
+                        needComma = false;
+                        break;
+                    default:
+                        InvalidState(operation);
+                        break;
                 }
-                return false;
             }
 
-            public override int GetHashCode()
+            public virtual void ReturnFrom(IState otherState, OpType operation)
             {
-                return (((int)Mode) << 5) | ((int)Operation);
+
+            }
+
+            protected void InvalidState(OpType operation)
+            {
+                throw new InvalidOperationException(string.Format("Invalid operation {0} for current state {1}", operation, this.GetType().Name));
+            }
+
+            protected virtual void ReturnToPrevious(OpType operation) {
+                Outer.indentLevel--;
+                if (!(this is KeyState) && operation != OpType.OpValue)
+                {
+                    Outer.WriteLineBreak();
+                    Outer.WriteIndent();
+                }
+
+                Outer._currentState = PreviousState;
+                if (PreviousState == null)
+                    throw new InvalidOperationException("Attempt to return to previous state when there is no previous state");
+
+                PreviousState.ReturnFrom(this, operation);
+            }
+
+            protected virtual void NewState(IState newState) {
+                if (needComma == true)
+                {
+                    Outer._writer.Write(", ");
+                }
+                if (!(this is InitialState) && !(this is KeyState))
+                {
+                    Outer.WriteLineBreak();
+                    Outer.WriteIndent();
+                }
+                if (!(this is KeyState))
+                    Outer.indentLevel++;
+
+                newState.PreviousState = this;
+                newState.Outer = Outer;
+                Outer._currentState = newState;
+            }
+
+            protected virtual void Current(OpType operation)
+            {
+                if (needComma == true)
+                {
+                    Outer._writer.Write(", ");
+                }
+                Outer.WriteLineBreak();
+                Outer.WriteIndent();
+                needComma = true;
+            }
+        }
+
+        private class InitialState : StateBase
+        {
+            public InitialState(JsonWriter outer) : base(outer) {
+            }
+
+
+            public override void PreWrite(OpType operation)
+            {
+                switch (operation)
+                {
+                    case OpType.ArrStart:
+                        NewState(new ArrayState());
+                        break;
+                    case OpType.CtorStart:
+                        NewState(new CtorState());
+                        break;
+                    case OpType.ObjStart:
+                        NewState(new ObjectState());
+                        break;
+                    case OpType.OpCast:
+                        // do nothing
+                        break;
+                    case OpType.OpValue:
+                        NewState(new DoneState());
+                        break;
+                    default:
+                        InvalidState(operation);
+                        break;
+                }
+            }
+
+            public override void ReturnFrom(IState otherState, OpType operation)
+            {
+                // only one expression can be written then we're done
+                // so never return to initial state
+                Outer._currentState = new DoneState();
+                Outer._currentState.Outer = Outer;
+            }
+        }
+
+        private class ArrayState : StateBase {
+
+            public override void PreWrite(OpType operation)
+            {
+                switch (operation)
+                {
+                    case OpType.ArrStart:
+                    case OpType.CtorStart:
+                    case OpType.ObjStart:
+                    case OpType.OpCast:
+                        base.PreWrite(operation);
+                        break;
+                    case OpType.OpValue:
+                        Current(operation);
+                        break;
+                    case OpType.ArrEnd:
+                        ReturnToPrevious(operation);
+                        break;
+                    default:
+                        InvalidState(operation);
+                        break;
+                }
+            }
+        }
+
+        private class CtorState : StateBase {
+            public override void PreWrite(OpType operation)
+            {
+                switch (operation)
+                {
+                    case OpType.CtorEnd:
+                        ReturnToPrevious(operation);
+                        break;
+                    default:
+                        InvalidState(operation);
+                        break;
+                }
+            }
+        }
+
+        private class ObjectState : StateBase {
+            public override void PreWrite(OpType operation)
+            {
+                switch (operation)
+                {
+                    case OpType.ObjEnd:
+                        ReturnToPrevious(operation);
+                        break;
+                    case OpType.OpKey:
+                        NewState(new KeyState());
+                        needComma = true;
+                        break;
+                    default:
+                        InvalidState(operation);
+                        break;
+                }
+            }
+        }
+
+        private class DoneState : StateBase {
+            public override void PreWrite(OpType operation)
+            {
+                InvalidState(operation);
+            }
+        }
+
+        private class KeyState : StateBase {
+            public override void PreWrite(OpType operation)
+            {
+                switch (operation)
+                {
+                    case OpType.OpValue:
+                        ReturnToPrevious(operation);
+                        break;
+                    default:
+                        base.PreWrite(operation);
+                        break;
+                }
+            }
+            public override void ReturnFrom(IState otherState, OpType operation)
+            {
+                Outer._currentState = PreviousState;
             }
         }
     }

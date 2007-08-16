@@ -11,46 +11,8 @@ using System.Diagnostics;
 namespace JsonExSerializerTests
 {
     [TestFixture]
-    public class JsonWriterTests
+    public class JsonWriterTests : JsonWriterTestBase
     {
-        /// <summary>
-        /// Results will be written here for each test
-        /// </summary>
-        protected StringWriter stringWriter;
-
-        /// <summary>
-        /// This will be the instance used to test
-        /// </summary>
-        protected JsonWriter jsonWriter;
-
-        [SetUp]
-        public void Setup()
-        {
-            stringWriter = new StringWriter();
-            jsonWriter = new JsonWriterMock(stringWriter, true);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            stringWriter.Dispose();
-            jsonWriter.Dispose();
-            stringWriter = null;
-            jsonWriter = null;
-        }
-
-        /// <summary>
-        /// Asserts that the string matches what was written to the stringWriter without
-        /// regard to whitespace.
-        /// </summary>
-        /// <param name="textToMatch">the text to match against</param>
-        /// <param name="description">error description</param>
-        public void AssertMatch(string textToMatch, string description)
-        {
-            // remove whitespace
-            string result = Regex.Replace(stringWriter.ToString(), @"\s*", "");
-            Assert.AreEqual(result, textToMatch, description);
-        }
 
         [RowTest]
         [Row(true, "True")]

@@ -47,7 +47,9 @@
     <Compile Include="DeserializePrimitiveTests.cs" />
     <Compile Include="Expression\ReferenceTests.cs" />
     <Compile Include="JsonWriterComplexTests.cs" />
+    <Compile Include="JsonWriterTestBase.cs" />
     <Compile Include="JsonWriterTests.cs" />
+    <Compile Include="JsonWriterTypeTests.cs" />
     <Compile Include="Mocks\ChainedConversion.cs" />
     <Compile Include="Mocks\ConvertedObject.cs" />
     <Compile Include="Mocks\JsonWriterMock.cs" />

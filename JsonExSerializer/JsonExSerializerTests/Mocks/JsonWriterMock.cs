@@ -15,7 +15,7 @@ namespace JsonExSerializerTests.Mocks
 
         protected override void WriteTypeInfo(Type t)
         {
-            throw new Exception("The method or operation is not implemented.");
+            _writer.Write(t.FullName);
         }
 
         public override IJsonWriter WriteObject(object value)

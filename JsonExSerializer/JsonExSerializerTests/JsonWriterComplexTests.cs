@@ -11,33 +11,8 @@ using System.Diagnostics;
 namespace JsonExSerializerTests
 {
     [TestFixture]
-    public class JsonWriterComplexTests
+    public class JsonWriterComplexTests : JsonWriterTestBase
     {
-        /// <summary>
-        /// Results will be written here for each test
-        /// </summary>
-        protected StringWriter stringWriter;
-
-        /// <summary>
-        /// This will be the instance used to test
-        /// </summary>
-        protected JsonWriter jsonWriter;
-
-        [SetUp]
-        public void Setup()
-        {
-            stringWriter = new StringWriter();
-            jsonWriter = new JsonWriterMock(stringWriter, true);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            stringWriter.Dispose();
-            jsonWriter.Dispose();
-            stringWriter = null;
-            jsonWriter = null;
-        }
 
         /// <summary>
         /// Asserts that the string matches what was written to the stringWriter without
@@ -50,8 +25,7 @@ namespace JsonExSerializerTests
             Debug.WriteLine(description);
             Debug.WriteLine(stringWriter.ToString());
             // remove whitespace
-            string result = Regex.Replace(stringWriter.ToString(), @"\s*", "");
-            Assert.AreEqual(result, textToMatch, description);
+            base.AssertMatch(textToMatch, description);
         }
 
         [Test]

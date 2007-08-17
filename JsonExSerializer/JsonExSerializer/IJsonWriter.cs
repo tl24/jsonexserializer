@@ -6,11 +6,15 @@ namespace JsonExSerializer
 {
     public interface IJsonWriter : IDisposable
     {
+        /*
         IJsonWriter ConstructorStart(Type constructorType);
 
         // arguments??
 
         IJsonWriter ConstructorEnd();
+         */
+ 
+
         /// <summary>
         /// Starts an object
         /// </summary>
@@ -71,6 +75,21 @@ namespace JsonExSerializer
         /// <param name="value"></param>
         /// <returns></returns>
         IJsonWriter QuotedValue(string value);
+
+        /// <summary>
+        /// Writes a special string value that is not
+        /// quoted such as null, or some other keyword.
+        /// </summary>
+        /// <param name="value">the value to write</param>
+        /// <returns></returns>
+        IJsonWriter SpecialValue(string value);
+
+        /// <summary>
+        /// Writes a comment.  The comment characters /* */ or // should be included in the comment string
+        /// </summary>
+        /// <param name="comment">the comment string</param>
+        /// <returns></returns>
+        IJsonWriter Comment(string comment);
 
         /// <summary>
         /// Writes an object cast

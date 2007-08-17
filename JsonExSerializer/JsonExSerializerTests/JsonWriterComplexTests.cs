@@ -20,7 +20,7 @@ namespace JsonExSerializerTests
         /// </summary>
         /// <param name="textToMatch">the text to match against</param>
         /// <param name="description">error description</param>
-        public void AssertMatch(string textToMatch, string description)
+        public override void AssertMatch(string textToMatch, string description)
         {
             Debug.WriteLine(description);
             Debug.WriteLine(stringWriter.ToString());

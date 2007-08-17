@@ -26,6 +26,10 @@ namespace JsonExSerializerTests
             base.AssertMatch(textToMatch, description);
         }
 
+        public virtual void AssertCtorMatch(string textToMatch, string description)
+        {
+
+        }
         [Test]
         public void SingleItemCast()
         {
@@ -95,6 +99,7 @@ namespace JsonExSerializerTests
             AssertMatch("(JsonExSerializerTests.Mocks.SimpleObject){\"ByteValue\":(System.Byte)255}", "Object Cast");
         }
 
+        /*
         [Test]
         [Ignore]
         public void EmptyConstructor()
@@ -103,5 +108,6 @@ namespace JsonExSerializerTests
                 .ConstructorEnd();
             AssertMatch("new System.String()", "Empty Constructor");
         }
+         */
     }
 }

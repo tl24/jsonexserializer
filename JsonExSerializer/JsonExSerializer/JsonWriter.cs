@@ -50,6 +50,8 @@ namespace JsonExSerializer
             if (indentSize > 0)
                 _writer.Write("\r\n");
         }
+
+        /*
         public IJsonWriter ConstructorStart(Type constructorType)
         {
             PreWrite(OpType.CtorStart);
@@ -65,6 +67,8 @@ namespace JsonExSerializer
             _writer.Write(")");
             return this;
         }
+        */
+
 
         public IJsonWriter ObjectStart()
         {
@@ -134,6 +138,21 @@ namespace JsonExSerializer
         {
             PreWrite(OpType.OpValue);
             WriteQuotedString(value);
+            return this;
+        }
+
+        public IJsonWriter SpecialValue(string value)
+        {
+            PreWrite(OpType.OpValue);
+            _writer.Write(value);
+            return this;
+        }
+
+        public IJsonWriter Comment(string comment)
+        {
+            // no prewrite, a comment is valid anywhere at any time
+            // and does not alter the state
+            _writer.Write(comment);
             return this;
         }
 
@@ -229,6 +248,11 @@ namespace JsonExSerializer
                 set { _previousState = value; }
             }
 
+            /// <summary>
+            /// Called before write operations to check for
+            /// valid states and to transition to new states
+            /// </summary>
+            /// <param name="operation"></param>
             public virtual void PreWrite(OpType operation)
             {
                 switch (operation)
@@ -252,16 +276,25 @@ namespace JsonExSerializer
                 }
             }
 
+
             public virtual void ReturnFrom(IState otherState, OpType operation)
             {
 
             }
 
+            /// <summary>
+            /// The current operation is invalid for the given state, throw an exception
+            /// </summary>
+            /// <param name="operation">the operation</param>
             protected void InvalidState(OpType operation)
             {
                 throw new InvalidOperationException(string.Format("Invalid operation {0} for current state {1}", operation, this.GetType().Name));
             }
 
+            /// <summary>
+            /// Return control to the previous state
+            /// </summary>
+            /// <param name="operation">the current operation</param>
             protected virtual void ReturnToPrevious(OpType operation) {
                 Outer.indentLevel--;
                 if (!(this is KeyState) && operation != OpType.OpValue)
@@ -277,6 +310,11 @@ namespace JsonExSerializer
                 PreviousState.ReturnFrom(this, operation);
             }
 
+            /// <summary>
+            /// Transition to a new state, the current state will be set as
+            /// the PreviousState property of the newState.
+            /// </summary>
+            /// <param name="newState">the new state to transition to</param>
             protected virtual void NewState(IState newState) {
                 if (needComma == true)
                 {
@@ -295,6 +333,10 @@ namespace JsonExSerializer
                 Outer._currentState = newState;
             }
 
+            /// <summary>
+            /// Stay on the current state
+            /// </summary>
+            /// <param name="operation">the current operation</param>
             protected virtual void Current(OpType operation)
             {
                 if (needComma == true)
@@ -307,6 +349,9 @@ namespace JsonExSerializer
             }
         }
 
+        /// <summary>
+        /// The initial state of the writer
+        /// </summary>
         private class InitialState : StateBase
         {
             public InitialState(JsonWriter outer) : base(outer) {
@@ -347,6 +392,9 @@ namespace JsonExSerializer
             }
         }
 
+        /// <summary>
+        /// State when an array is in progress
+        /// </summary>
         private class ArrayState : StateBase {
 
             public override void PreWrite(OpType operation)
@@ -372,6 +420,9 @@ namespace JsonExSerializer
             }
         }
 
+        /// <summary>
+        /// State when a constructor is in progress
+        /// </summary>
         private class CtorState : StateBase {
             public override void PreWrite(OpType operation)
             {
@@ -387,21 +438,55 @@ namespace JsonExSerializer
             }
         }
 
+        /// <summary>
+        /// State when a javascript object is in progress
+        /// </summary>
         private class ObjectState : StateBase {
+
+            private bool key;
+            public ObjectState()
+                : base()
+            {
+                key = true; // look for key
+            }
             public override void PreWrite(OpType operation)
             {
-                switch (operation)
+                if (key)
                 {
-                    case OpType.ObjEnd:
-                        ReturnToPrevious(operation);
-                        break;
-                    case OpType.OpKey:
-                        NewState(new KeyState());
-                        needComma = true;
-                        break;
-                    default:
-                        InvalidState(operation);
-                        break;
+                    switch (operation)
+                    {
+                        case OpType.OpKey:
+                            key = false;
+                            Current(operation);
+                            needComma = false;
+                            break;
+                        case OpType.ObjEnd:
+                            ReturnToPrevious(operation);
+                            break;
+                        default:
+                            InvalidState(operation);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (operation)
+                    {
+
+                        case OpType.OpValue:
+                            key = true;
+                            needComma = true;
+                            break;
+                        case OpType.OpCast:
+                            // nothing to do
+                            break;
+                        default:
+                            base.PreWrite(operation);
+                            // wrote a value, look for a key again
+                            key = true;
+                            needComma = true;
+                            break;
+                    }
                 }
             }
         }

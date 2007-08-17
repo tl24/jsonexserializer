@@ -406,31 +406,12 @@ namespace JsonExSerializer
             {
                 return _context.GetTypeBinding(typeName);
             }
-
-            /*
-            Assembly current = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
-            // check the calling assembly to see if the type exists in the calling assembly
-            Type ct = current.GetType(typeName);
-            if (ct != null)
-                return ct;
-            
-            foreach (AssemblyName a in current.GetReferencedAssemblies())
-            {
-                if (typeName.StartsWith(a.Name.Replace(".dll", "")))
-                {
-                    Assembly assmbly = Assembly.Load(a);
-                    Type t = assmbly.GetType(typeName);
-                    if (t != null)
-                        return t;
-                }
-            }
-            */
             return Type.GetType(typeName, true);
         }
 
         private ExpressionBase ParsePrimitive() {
             Token tok = ReadToken();
-                // no type info, try to figure out the closest type
+            // no type info, try to figure out the closest type
             switch (tok.type)
             {
                 case TokenType.Number:

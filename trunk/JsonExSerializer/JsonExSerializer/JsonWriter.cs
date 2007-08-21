@@ -13,6 +13,8 @@ namespace JsonExSerializer
         protected enum OpType
         {
             CtorStart,
+            CtorArgStart,
+            CtorArgEnd,
             CtorEnd,
             ObjStart,
             ObjEnd,
@@ -51,24 +53,52 @@ namespace JsonExSerializer
                 _writer.Write("\r\n");
         }
 
-        /*
+        public IJsonWriter ConstructorStart(string NamespaceAndClass)
+        {
+            PreWrite(OpType.CtorStart);
+            _writer.Write("new ");
+            WriteTypeInfo(NamespaceAndClass);
+
+            return this;
+        }
+
+        public IJsonWriter ConstructorStart(string NamespaceAndClass, string Assembly)
+        {
+            PreWrite(OpType.CtorStart);
+            _writer.Write("new ");
+            WriteTypeInfo(NamespaceAndClass, Assembly);
+
+            return this;
+        }
+
         public IJsonWriter ConstructorStart(Type constructorType)
         {
             PreWrite(OpType.CtorStart);
             _writer.Write("new ");
             WriteTypeInfo(constructorType);
+
+            return this;
+        }
+
+        public IJsonWriter ConstructorArgsStart()
+        {
+            PreWrite(OpType.CtorArgStart);
             _writer.Write("(");
+            return this;
+        }
+
+        public IJsonWriter ConstructorArgsEnd()
+        {
+            PreWrite(OpType.CtorArgEnd);
+            _writer.Write(")");
             return this;
         }
 
         public IJsonWriter ConstructorEnd()
         {
             PreWrite(OpType.CtorEnd);
-            _writer.Write(")");
             return this;
         }
-        */
-
 
         public IJsonWriter ObjectStart()
         {
@@ -174,6 +204,26 @@ namespace JsonExSerializer
         /// <param name="t">the type to write</param>
         protected abstract void WriteTypeInfo(Type t);
 
+        /// <summary>
+        /// Writes out the type info specified by the NamespaceAndClass string.
+        /// </summary>
+        /// <param name="NamespaceAndClass">the fully-qualified type with namespace and class, but not assembly</param>
+        protected virtual void WriteTypeInfo(string NamespaceAndClass)
+        {
+            _writer.Write(NamespaceAndClass);
+        }
+
+        /// <summary>
+        /// Writes out the type info specified by the NamespaceAndClass string and assembly.
+        /// </summary>
+        /// <param name="NamespaceAndClass">the fully-qualified type with namespace and class, but not assembly</param>
+        /// <param name="assembly">The assembly for the type</param>
+        protected virtual void WriteTypeInfo(string NamespaceAndClass, string assembly)
+        {
+            string fullTypeName = NamespaceAndClass + ", " + assembly;
+            WriteQuotedString(fullTypeName);
+        }
+
         public IJsonWriter Cast(Type castedType)
         {
             if (castedType != typeof(string))
@@ -183,6 +233,25 @@ namespace JsonExSerializer
                 WriteTypeInfo(castedType);
                 _writer.Write(')');
             }
+            return this;
+        }
+
+        public IJsonWriter Cast(string NamespaceAndClass)
+        {
+            PreWrite(OpType.OpCast);
+            _writer.Write('(');
+            _writer.Write(NamespaceAndClass);
+            _writer.Write(')');
+            return this;
+        }
+
+        public IJsonWriter Cast(string NamespaceAndClass, string Assembly)
+        {
+            string fullTypeName = NamespaceAndClass + ", " + Assembly;
+            PreWrite(OpType.OpCast);
+            _writer.Write('(');
+            WriteQuotedString(fullTypeName);
+            _writer.Write(')');
             return this;
         }
 
@@ -282,6 +351,8 @@ namespace JsonExSerializer
 
             }
 
+
+
             /// <summary>
             /// The current operation is invalid for the given state, throw an exception
             /// </summary>
@@ -292,17 +363,29 @@ namespace JsonExSerializer
             }
 
             /// <summary>
+            /// Return control to the previous state with formatting performed
+            /// </summary>
+            /// <param name="operation">the current operation</param>
+            protected virtual void ReturnToPrevious(OpType operation)
+            {
+                ReturnToPrevious(operation, true);
+            }
+
+            /// <summary>
             /// Return control to the previous state
             /// </summary>
             /// <param name="operation">the current operation</param>
-            protected virtual void ReturnToPrevious(OpType operation) {
-                Outer.indentLevel--;
-                if (!(this is KeyState) && operation != OpType.OpValue)
+            /// <param name="doFormatting">flag to indicate whether formatting options such as indenting should be performed</param>
+            protected virtual void ReturnToPrevious(OpType operation, bool doFormatting) {
+                if (doFormatting)
                 {
-                    Outer.WriteLineBreak();
-                    Outer.WriteIndent();
+                    Outer.indentLevel--;
+                    if (!(this is KeyState) && operation != OpType.OpValue)
+                    {
+                        Outer.WriteLineBreak();
+                        Outer.WriteIndent();
+                    }
                 }
-
                 Outer._currentState = PreviousState;
                 if (PreviousState == null)
                     throw new InvalidOperationException("Attempt to return to previous state when there is no previous state");
@@ -312,25 +395,41 @@ namespace JsonExSerializer
 
             /// <summary>
             /// Transition to a new state, the current state will be set as
+            /// the PreviousState property of the newState.  Formatting will be performed
+            /// </summary>
+            /// <param name="newState">the new state to transition to</param>
+            protected virtual void NewState(IState newState)
+            {
+                NewState(newState, true);
+            }
+
+            /// <summary>
+            /// Transition to a new state, the current state will be set as
             /// the PreviousState property of the newState.
             /// </summary>
             /// <param name="newState">the new state to transition to</param>
-            protected virtual void NewState(IState newState) {
+            /// <param name="doFormatting">flag to indicate whether formatting options such as indenting should be performed</param>
+            protected virtual void NewState(IState newState, bool doFormatting)
+            {
+                // this is necessary to function correctly so don't put inside doFormatting check
                 if (needComma == true)
                 {
                     Outer._writer.Write(", ");
-                }
-                if (!(this is InitialState) && !(this is KeyState))
+                } 
+                if (doFormatting)
                 {
-                    Outer.WriteLineBreak();
-                    Outer.WriteIndent();
+                    if (!(this is InitialState) && !(this is KeyState))
+                    {
+                        Outer.WriteLineBreak();
+                        Outer.WriteIndent();
+                    }
+                    if (!(this is KeyState))
+                        Outer.indentLevel++;
                 }
-                if (!(this is KeyState))
-                    Outer.indentLevel++;
-
                 newState.PreviousState = this;
                 newState.Outer = Outer;
                 Outer._currentState = newState;
+                needComma = true;
             }
 
             /// <summary>
@@ -339,12 +438,25 @@ namespace JsonExSerializer
             /// <param name="operation">the current operation</param>
             protected virtual void Current(OpType operation)
             {
+                Current(operation, true);
+            }
+
+            /// <summary>
+            /// Stay on the current state
+            /// </summary>
+            /// <param name="operation">the current operation</param>
+            /// <param name="doFormatting">flag to indicate whether formatting options such as indenting should be performed</param>
+            protected virtual void Current(OpType operation, bool doFormatting)
+            {
                 if (needComma == true)
                 {
                     Outer._writer.Write(", ");
                 }
-                Outer.WriteLineBreak();
-                Outer.WriteIndent();
+                if (doFormatting)
+                {
+                    Outer.WriteLineBreak();
+                    Outer.WriteIndent();
+                }
                 needComma = true;
             }
         }
@@ -424,12 +536,95 @@ namespace JsonExSerializer
         /// State when a constructor is in progress
         /// </summary>
         private class CtorState : StateBase {
+            private enum CtorStateType
+            {
+                Initial,
+                Initializer,
+                Done
+            }
+
+            private CtorStateType stateType = CtorStateType.Initial;
+
+            public override void PreWrite(OpType operation)            
+            {
+                switch (stateType)
+                {
+                    case CtorStateType.Initial:
+                        switch (operation)
+                        {
+                            case OpType.CtorArgStart:
+                                NewState(new CtorArgsState(), false);
+                                stateType = CtorStateType.Initializer;
+                                needComma = false;
+                                break;
+                            default:
+                                InvalidState(operation);
+                                break;
+                        }
+                        break;
+                    case CtorStateType.Initializer:
+                        switch (operation)
+                        {
+                            case OpType.CtorEnd:
+                                ReturnToPrevious(operation, false);
+                                break;
+                            case OpType.ObjStart:
+                                base.PreWrite(operation);
+                                stateType = CtorStateType.Done;
+                                break;
+                            case OpType.OpCast:
+                                base.PreWrite(operation);
+                                break;
+                            default:
+                                InvalidState(operation);
+                                break;
+
+                        }
+                        break;
+                    case CtorStateType.Done:
+                        switch (operation)
+                        {
+                            case OpType.CtorEnd:
+                                ReturnToPrevious(operation, false);
+                                break;
+                            default:
+                                InvalidState(operation);
+                                break;
+                        }
+                        break;
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// State when an constructor args are in progress
+        /// </summary>
+        private class CtorArgsState : StateBase
+        {
+
             public override void PreWrite(OpType operation)
             {
                 switch (operation)
                 {
-                    case OpType.CtorEnd:
-                        ReturnToPrevious(operation);
+                    case OpType.ArrStart:
+                        NewState(new ArrayState(), false);
+                        break;
+                    case OpType.CtorStart:
+                        NewState(new CtorState(), false);
+                        break;
+                    case OpType.ObjStart:
+                        NewState(new ObjectState(), false);
+                        break;
+                    case OpType.OpCast:
+                        Current(operation, false);
+                        needComma = false;
+                        break;
+                    case OpType.OpValue:
+                        Current(operation, false);
+                        break;
+                    case OpType.CtorArgEnd:
+                        ReturnToPrevious(operation, false);
                         break;
                     default:
                         InvalidState(operation);

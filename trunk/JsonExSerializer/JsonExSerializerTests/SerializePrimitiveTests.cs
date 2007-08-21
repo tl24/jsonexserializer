@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
 using JsonExSerializer;
 using JsonExSerializerTests.Mocks;
+using MbUnit.Framework;
+using System.Diagnostics;
 
 namespace JsonExSerializerTests
 {
@@ -11,200 +12,126 @@ namespace JsonExSerializerTests
     public class SerializePrimitiveTests
     {
 
-        [Test]
-        public void SerializeLongTest()
+        [Row(32L)]
+        [Row(0L)]
+        [Row(-23L)]
+        [Row(long.MaxValue)]
+        [Row(long.MinValue)]
+        [RowTest]
+        public void SerializeLongTest(long expected)
         {
             Serializer s = Serializer.GetSerializer(typeof(long));
             s.Context.SetJsonStrictOptions();
-            long expected = 32;
             string result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "long Positive did not serialize correctly");
+            Assert.AreEqual(expected.ToString(), result.Trim(), "long did not serialize correctly");
             long actual = (long)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "long Positive did not deserialize correctly");
-
-            expected = 0;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "long Zero did not serialize correctly");
-            actual = (long)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "long zero did not deserialize correctly");
-
-            expected = -23;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "long Negative did not serialize correctly");
-            actual = (long)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "long Negative did not deserialize correctly");
-
+            Assert.AreEqual(expected, actual, "long did not deserialize correctly");
         }
 
 
-        [Test]
-        public void SerializeIntTest()
+        [Row(32)]
+        [Row(0)]
+        [Row(-23)]
+        [Row(int.MaxValue)]
+        [Row(int.MinValue)]
+        [RowTest]
+        public void SerializeIntTest(int expected)
         {
             Serializer s = Serializer.GetSerializer(typeof(int));
             s.Context.SetJsonStrictOptions();
-            int expected = 32;
             string result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "Int Positive did not serialize correctly");
-
-            expected = 0;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "Int Zero did not serialize correctly");
-
-            expected = -23;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "Int Negative did not serialize correctly");
-
+            Assert.AreEqual(expected.ToString(), result.Trim(), "Int did not serialize correctly");
         }
 
-        [Test]
-        public void SerializeUIntTest()
+        [Row(32u)]
+        [Row(0u)]
+        [Row(uint.MaxValue)]
+        [Row(uint.MinValue)]
+        [RowTest]
+        public void SerializeUIntTest(uint expected)
         {
             Serializer s = Serializer.GetSerializer(typeof(uint));
             s.Context.SetJsonStrictOptions();
-            uint expected = 32;
             string result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "UInt Positive did not serialize correctly");
-
-            expected = 0;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "UInt Zero did not serialize correctly");
-
-            expected = uint.MaxValue;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "UInt Max did not serialize correctly");
-
-            expected = uint.MinValue;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "UInt Min did not serialize correctly");
+            Assert.AreEqual(expected.ToString(), result.Trim(), "UInt did not serialize correctly");
         }
 
-        [Test]
-        public void SerializeShortTest()
+        [Row(32)]
+        [Row(0)]
+        [Row(-23)]
+        [Row(short.MaxValue)]
+        [Row(short.MinValue)]
+        [RowTest]
+        public void SerializeShortTest(short expected)
         {
             Serializer s = Serializer.GetSerializer(typeof(short));
             s.Context.SetJsonStrictOptions();
-            short expected = 32;
             string result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "Short Positive did not serialize correctly");
-
-            expected = 0;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "Short Zero did not serialize correctly");
-
-            expected = -23;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "Short Negative did not serialize correctly");
-
+            Assert.AreEqual(expected.ToString(), result.Trim(), "Short did not serialize correctly");
         }
 
-        [Test]
-        public void SerializeBoolTest()
+        [Row(true)]
+        [Row(false)]
+        [RowTest]
+        public void SerializeBoolTest(bool expected)
         {
             Serializer s = Serializer.GetSerializer(typeof(bool));
             s.Context.SetJsonStrictOptions();
-            bool expected = true;
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(), result.Trim(), "Bool true did not serialize correctly");
-
-            expected = false;
-
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "Bool false did not serialize correctly");
         }
 
-        [Test]
-        public void SerializeFloatTest()
+        [Row(32.34f)]
+        [Row(0.0f)]
+        [Row(-23.234f)]
+        [Row(float.MaxValue)]
+        [Row(float.MinValue)]
+        [Row(float.NaN)]
+        [Row(float.PositiveInfinity)]
+        /*[Row(float.NegativeInfinity)]*/
+        [RowTest]
+        public void SerializeFloatTest(float expected)
         {
             Serializer s = Serializer.GetSerializer(typeof(float));
             s.Context.SetJsonStrictOptions();
-            float expected = 32.34f;
             float actual;
             string result = s.Serialize(expected);
-            Assert.AreEqual(expected, float.Parse(result), "float Positive did not serialize correctly");
+            Assert.AreEqual(expected, float.Parse(result), "float did not serialize correctly");
             actual = (float)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "float positive did not deserialize correctly");
-
-            expected = 0.0f;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, float.Parse(result), "float Zero did not serialize correctly");
-            actual = (float)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "float Zero did not deserialize correctly");
-
-            expected = -23.234f;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, float.Parse(result), "float Negative did not serialize correctly");
-            actual = (float)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "float Negative did not deserialize correctly");
-
-            expected = float.MaxValue;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, float.Parse(result), "float MaxValue did not serialize correctly");
-            actual = (float)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "float MaxValue did not deserialize correctly");
-
-            expected = float.MinValue;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, float.Parse(result), "float MinValue did not serialize correctly");
-            actual = (float)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "float MinValue did not deserialize correctly");
-
-            expected = float.NaN;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, float.Parse(result), "float NaN did not serialize correctly");
-            actual = (float)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "float NaN did not deserialize correctly");
-
-            expected = float.PositiveInfinity;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, float.Parse(result), "float PositiveInfinity did not serialize correctly");
-            actual = (float)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "float PositiveInfinity did not deserialize correctly");
-
-            //TODO: Implement serialization support for NegativeInfinity...not too common I would think
-            /*            
-            expected = float.NegativeInfinity;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, float.Parse(result), "float NegativeInfinity did not serialize correctly");
-            actual = (float)s.Deserialize(result);
-            Assert.AreEqual(expected, actual, "float NegativeInfinity did not deserialize correctly");
-             */
+            Assert.AreEqual(expected, actual, "float did not deserialize correctly");
         }
 
-        [Test]
-        public void SerializeDoubleTest()
+        [Row(32.34)]
+        [Row(0.0)]
+        [Row(-23.234)]
+        [Row(double.MaxValue)]
+        [Row(double.MinValue)]
+        [Row(double.NaN)]
+        [Row(double.PositiveInfinity)]
+        /*[Row(double.NegativeInfinity)]*/
+        [RowTest]
+        public void SerializeDoubleTest(double expected)
         {
             Serializer s = Serializer.GetSerializer(typeof(double));
             s.Context.SetJsonStrictOptions();
-            double expected = 32.34;
             string result = s.Serialize(expected);
-            Assert.AreEqual(expected, double.Parse(result), "double Positive did not serialize correctly");
-
-            expected = 0.0;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, double.Parse(result), "double Zero did not serialize correctly");
-
-            expected = -23.234;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, double.Parse(result), "double Negative did not serialize correctly");
+            Assert.AreEqual(expected, double.Parse(result), "double did not serialize correctly");
+            double actual = (double)s.Deserialize(result);
+            Assert.AreEqual(expected, actual, "double did not deserialize correctly");
         }
 
-        [Test]
-        public void SerializeByteTest()
+        [Row(0xff)]
+        [Row(0x0)]
+        [Row(0x1)]
+        [RowTest]
+        public void SerializeByteTest(byte expected)
         {
             Serializer s = Serializer.GetSerializer(typeof(byte));
             s.Context.SetJsonStrictOptions();
-            byte expected = 0xff;
             string result = s.Serialize(expected);
-            Assert.AreEqual(expected, byte.Parse(result), "byte Positive did not serialize correctly");
-
-            expected = 0x0;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, byte.Parse(result), "byte Zero did not serialize correctly");
-
-
-            expected = 0x1;
-            result = s.Serialize(expected);
-            Assert.AreEqual(expected, byte.Parse(result), "byte 1 did not serialize correctly");
+            Assert.AreEqual(expected, byte.Parse(result), "byte did not serialize correctly");
+            byte actual = (byte)s.Deserialize(result);
+            Assert.AreEqual(expected, actual, "byte did not deserialize correctly");
         }
 
         [Test]
@@ -254,5 +181,41 @@ namespace JsonExSerializerTests
             object value = s.Deserialize("");
             Assert.IsNull(value, "Deserialize empty string should be null");
         }
+
+        [Test]
+        public void SerializeDateTest()
+        {
+            TestDate(new DateTime(1970, 1, 1));
+            TestDate(new DateTime(2000,1,1,0,0,0));
+            TestDate(new DateTime(2010, 2, 28, 23, 23, 23));
+            TestDate(new DateTime(2004, 2, 29, 15, 59, 59));
+        }
+
+        public void TestDate(DateTime expected)
+        {
+            Serializer s = Serializer.GetSerializer(typeof(DateTime));
+            s.Context.SetJsonStrictOptions();
+            string result = s.Serialize(expected);
+            DateTime actual = (DateTime)s.Deserialize(result);
+            Assert.AreEqual(expected, actual, "DateTime did not deserialize correctly");
+        }
+
+        [Row("1.10")]
+        [Row("0.1")]
+        [Row("79228162514264337593543950335")] // Max value
+        [Row("-79228162514264337593543950335")] // Min value
+        [Row("0")]
+        [RowTest]
+        public void SerializeDecimalTest(string decimalString) {
+            Debug.WriteLine(decimal.MinValue.ToString());
+            decimal expected = decimal.Parse(decimalString);
+            Serializer s = Serializer.GetSerializer(typeof(decimal));
+            s.Context.SetJsonStrictOptions();
+            string result = s.Serialize(expected);
+            Assert.AreEqual(expected, decimal.Parse(result), "decimal did not serialize correctly");
+            decimal actual = (decimal)s.Deserialize(result);
+            Assert.AreEqual(expected, actual, "decimal did not deserialize correctly");
+        }
+
     }
 }

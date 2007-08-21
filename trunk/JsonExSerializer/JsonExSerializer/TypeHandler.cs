@@ -19,6 +19,8 @@ namespace JsonExSerializer
     {
         private Type _handledType;
         private IList<PropertyHandler> _properties;
+        private IList<PropertyHandler> _constructorArgs;
+
         private bool _collectionLookedUp = false;
         private ICollectionHandler _collectionHandler;
         private SerializationContext _context;
@@ -49,27 +51,55 @@ namespace JsonExSerializer
         /// Loads the properties for the type if they haven't already been loaded
         /// </summary>
         private void LoadProperties()
-        {
+        {   
             if (_properties == null)
             {
                 _properties = new List<PropertyHandler>();
+                _constructorArgs = new List<PropertyHandler>();
+
                 PropertyInfo[] pInfos = _handledType.GetProperties(BindingFlags.Public|BindingFlags.Instance);
                 foreach (PropertyInfo pInfo in pInfos)
                 {
                     // must be able to read and write the prop, otherwise its not 2-way 
-                    if (pInfo.CanRead && pInfo.CanWrite)
+                    if (pInfo.CanRead)
                     {
-                        
-                        // ignore attribute
-                        if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
+                        if (pInfo.IsDefined(typeof(ConstructorParameterAttribute), false))
+                        {
+                            ConstructorParameterAttribute ctorAttr = (ConstructorParameterAttribute) pInfo.GetCustomAttributes(typeof(ConstructorParameterAttribute), false)[0];
+
+                            _constructorArgs.Add(new PropertyHandler(pInfo, ctorAttr.Position));
+                        } 
+                        else if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
                             && pInfo.GetGetMethod().GetParameters().Length == 0
-                            && !_tempIgnore.ContainsKey(pInfo.Name))
+                            && !_tempIgnore.ContainsKey(pInfo.Name)
+                            && pInfo.CanWrite)
                         {
                             _properties.Add(new PropertyHandler(pInfo));
                         }
                     }
                 }
+                if (_constructorArgs.Count > 0)
+                {
+                    ((List<PropertyHandler>)_constructorArgs).Sort(
+                        new Comparison<PropertyHandler>(PropertyHandlerComparison));
+                }
                 _tempIgnore.Clear();
+            }
+        }
+
+        private int PropertyHandlerComparison(PropertyHandler a, PropertyHandler b) {
+            return a.Position - b.Position;
+        }
+
+        /// <summary>
+        /// Get the list of properties for this type
+        /// </summary>
+        public IList<PropertyHandler> ConstructorParamaters
+        {
+            get
+            {
+                LoadProperties();
+                return _constructorArgs;
             }
         }
 

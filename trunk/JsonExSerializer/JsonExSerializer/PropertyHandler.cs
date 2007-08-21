@@ -11,10 +11,17 @@ namespace JsonExSerializer
     class PropertyHandler
     {
         private PropertyInfo _property;
+        private int _position = -1;
 
         internal PropertyHandler(PropertyInfo property)
         {
             _property = property;
+        }
+
+        internal PropertyHandler(PropertyInfo property, int position)
+        {
+            _property = property;
+            _position = position;
         }
 
         /// <summary>
@@ -61,6 +68,9 @@ namespace JsonExSerializer
             get { return this._property; }
         }
 
-
+        public int Position
+        {
+            get { return this._position; }
+        }
     }
 }

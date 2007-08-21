@@ -47,18 +47,18 @@ namespace JsonExSerializerTests
         {
             jsonWriter
                 .ArrayStart()
-                    .Value(1)
                     .ArrayStart()
                         .QuotedValue("one")
                     .ArrayEnd()
-                    .Value(2)
+                    .Value(1)
                     .ArrayStart()
                         .QuotedValue("two")
                         .Value(3)
                     .ArrayEnd()
+                    .Value(2)
                 .ArrayEnd();
 
-            AssertMatch("[1,[\"one\"],2,[\"two\",3]]", "Array of arrays test");
+            AssertMatch("[[\"one\"],1,[\"two\",3],2]", "Array of arrays test");
         }
 
         [Test]

@@ -233,30 +233,67 @@ namespace JsonExSerializer
 
             TypeHandler handler = _context.GetTypeHandler(obj.GetType());
             
-            this.ObjectStart();
             if (obj is ISerializationCallback)
             {
                 ((ISerializationCallback)obj).OnBeforeSerialization();
             }
 
+            bool hasConstructor = false;
+            bool hasInitializer = false;
+
             try
             {
-                foreach (PropertyHandler prop in handler.Properties)
+                if (handler.ConstructorParamaters.Count > 0)
                 {
-                    this.Key(prop.Name);
-                    object value = prop.GetValue(obj);
-                    if (value != null && _context.OutputTypeInformation && value.GetType() != prop.PropertyType)
+                    hasConstructor = true;
+                    this.ConstructorStart(obj.GetType());
+                    this.ConstructorArgsStart();
+                    foreach (PropertyHandler ctorParm in handler.ConstructorParamaters)
                     {
-                        this.Cast(value.GetType());
+                        object value = ctorParm.GetValue(obj);
+                        if (value != null && _context.OutputTypeInformation && value.GetType() != ctorParm.PropertyType)
+                        {
+                            this.Cast(value.GetType());
+                        }
+                        if (_context.HasConverter(ctorParm.Property))
+                        {
+                            Serialize(value, "", _context.GetConverter(ctorParm.Property));
+                        }
+                        else
+                        {
+                            Serialize(value, "", null);
+                        }
                     }
-                    if (_context.HasConverter(prop.Property))
+                    this.ConstructorArgsEnd();
+                }
+
+                if (!hasConstructor || handler.Properties.Count > 0)
+                {
+                    hasInitializer = true;
+                    this.ObjectStart();
+
+                    foreach (PropertyHandler prop in handler.Properties)
                     {
-                        Serialize(value, currentPath + "." + prop.Name, _context.GetConverter(prop.Property));
+                        this.Key(prop.Name);
+                        object value = prop.GetValue(obj);
+                        if (value != null && _context.OutputTypeInformation && value.GetType() != prop.PropertyType)
+                        {
+                            this.Cast(value.GetType());
+                        }
+                        if (_context.HasConverter(prop.Property))
+                        {
+                            Serialize(value, currentPath + "." + prop.Name, _context.GetConverter(prop.Property));
+                        }
+                        else
+                        {
+                            Serialize(value, currentPath + "." + prop.Name, null);
+                        }
                     }
-                    else
-                    {
-                        Serialize(value, currentPath + "." + prop.Name, null);
-                    }
+                    this.ObjectEnd();
+                }
+                if (hasConstructor)
+                {
+                    this.ConstructorEnd();
                 }
             }
             finally
@@ -268,7 +305,7 @@ namespace JsonExSerializer
                     ((ISerializationCallback)obj).OnAfterSerialization();
                 }
             }
-            this.ObjectEnd();
+            
         }
 
         /// <summary>
@@ -368,12 +405,8 @@ namespace JsonExSerializer
 
         private void WriteDateTime(DateTime value)
         {
-            this.SpecialValue(value.ToString());
-        }
-
-        private void WriteBoolean(bool value)
-        {
-            this.Value(value);
+            // quote it to protect it from number parsing
+            this.QuotedValue(value.ToString());
         }
 
         private void WriteByte(byte value)
@@ -491,12 +524,6 @@ namespace JsonExSerializer
                 }
             }
         }
-        /*
-        private static string EscapeString(string s)
-        {
-            return s.Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"");
-        }
-        */
 
         /// <summary>
         /// Helper class to store information about a reference

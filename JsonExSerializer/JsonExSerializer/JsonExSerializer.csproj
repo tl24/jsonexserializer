@@ -47,6 +47,7 @@
     <Compile Include="Collections\StackBuilder.cs" />
     <Compile Include="Collections\StackHandler.cs" />
     <Compile Include="Collections\ICollectionBuilder.cs" />
+    <Compile Include="ConstructorArgumentAttribute.cs" />
     <Compile Include="Expression\CollectionBuilderEvaluator.cs" />
     <Compile Include="Expression\ComplexEvaluatorBase.cs" />
     <Compile Include="Expression\ComplexExpressionBase.cs" />

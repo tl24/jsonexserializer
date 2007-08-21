@@ -20,7 +20,22 @@ namespace JsonExSerializer.Expression
         {
             // set the default type if none set
             Expression.SetResultTypeIfNotSet(typeof(Hashtable));
-
+            if (Expression.ConstructorArguments.Count > 0)
+            {
+                TypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
+                if (handler.ConstructorParamaters.Count == Expression.ConstructorArguments.Count)
+                {
+                    for (int i = 0; i < handler.ConstructorParamaters.Count; i++)
+                    {
+                        Expression.ConstructorArguments[i].SetResultTypeIfNotSet(handler.ConstructorParamaters[i].PropertyType);
+                    }
+                }
+                else
+                {
+                    throw new ParseException("Wrong number of constructor arguments for type: " + Expression.ResultType
+                        + ", expected: " + handler.ConstructorParamaters.Count + ", actual: " + Expression.ConstructorArguments.Count);
+                }
+            }
             return base.Construct();
         }
         /// <summary>

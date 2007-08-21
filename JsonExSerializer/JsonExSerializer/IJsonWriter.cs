@@ -6,13 +6,47 @@ namespace JsonExSerializer
 {
     public interface IJsonWriter : IDisposable
     {
-        /*
+        /// <summary>
+        /// Starts a constructed object
+        /// </summary>
+        /// <param name="constructorType"></param>
+        /// <returns></returns>
         IJsonWriter ConstructorStart(Type constructorType);
 
-        // arguments??
+        /// <summary>
+        /// Starts a constructed object with the given type information
+        /// </summary>
+        /// <param name="NamespaceAndClass">The fully-qualified class name without assembly reference</param>
+        /// <returns></returns>
+        IJsonWriter ConstructorStart(string NamespaceAndClass);
 
+        /// <summary>
+        /// Starts a constructed object
+        /// </summary>
+        /// <param name="NamespaceAndClass">The fully-qualified class name without assembly reference</param>
+        /// <param name="Assembly">The assembly name</param>
+        /// <returns></returns>
+        IJsonWriter ConstructorStart(string NamespaceAndClass, string Assembly);
+
+        /// <summary>
+        /// Starts the arguments for a constructed object
+        /// </summary>
+        /// <returns></returns>
+        IJsonWriter ConstructorArgsStart();
+
+        /// <summary>
+        /// Ends the arguments for a constructed object
+        /// </summary>
+        /// <returns></returns>
+        IJsonWriter ConstructorArgsEnd();
+        
+
+        /// <summary>
+        /// Ends the constructed object
+        /// </summary>
+        /// <returns></returns>
         IJsonWriter ConstructorEnd();
-         */
+        
  
 
         /// <summary>
@@ -98,6 +132,24 @@ namespace JsonExSerializer
         /// <param name="castedType">The type for the cast</param>
         /// <returns></returns>
         IJsonWriter Cast(Type castedType);
+
+        /// <summary>
+        /// Writes an object cast with the type name specified as a string.  The NamespaceAndClass
+        /// contains the class name and possibly the Namespace but no assembly.
+        /// (MyNamespace.MyClass) ...
+        /// </summary>
+        /// <param name="NamespaceAndClass">The fully-qualified class name without assembly reference</param>
+        /// <returns></returns>
+        IJsonWriter Cast(string NamespaceAndClass);
+
+        /// <summary>
+        /// Writes an object cast with the fully qualified type name and assemble reference
+        /// ("MyNamespace.MyClass, MyAssembly") ...
+        /// </summary>
+        /// <param name="NamespaceAndClass">The fully-qualified class name without assembly reference</param>
+        /// <param name="Assembly">The assembly name</param>
+        /// <returns></returns>
+        IJsonWriter Cast(string NamespaceAndClass, string Assembly);
 
         /// <summary>
         /// Serializes any type of object completely

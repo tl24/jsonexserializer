@@ -57,11 +57,14 @@
     <Compile Include="Mocks\MockFlagsEnum.cs" />
     <Compile Include="Mocks\MockReferenceObject.cs" />
     <Compile Include="Mocks\MyLine.cs" />
+    <Compile Include="Mocks\MyPointConstructor.cs" />
     <Compile Include="Mocks\SelfConverter.cs" />
     <Compile Include="Mocks\SemiComplexObject.cs" />
     <Compile Include="Mocks\SpecializedMock.cs" />
     <Compile Include="Mocks\SubClassMock.cs" />
+    <Compile Include="PerfTests.cs" />
     <Compile Include="ReferenceTests.cs" />
+    <Compile Include="SerializeCtorTests.cs" />
     <Compile Include="SerializeObjectTests.cs" />
     <Compile Include="SerializePrimitiveTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -47,7 +47,9 @@ namespace JsonExSerializerTests
         public virtual void AssertMatch(string textToMatch, string description)
         {
             // remove whitespace
-            string result = Regex.Replace(stringWriter.ToString(), @"\s*", "");
+            //string result = Regex.Replace(stringWriter.ToString(), @"\s*", "");
+            string result = Regex.Replace(stringWriter.ToString(), @"(?<!new)\s*", "");
+            
             Assert.AreEqual(result, textToMatch, description);
         }
     }

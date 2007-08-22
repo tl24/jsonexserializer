@@ -20,7 +20,7 @@ namespace JsonExSerializer.Collections
         /// </summary>
         /// <param name="collectionType">the type to construct a builder for</param>
         /// <returns>a collection builder</returns>
-        ICollectionBuilder ConstructBuilder(Type collectionType);
+        ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount);
 
         /// <summary>
         /// Gets the type of items that this collection type holds

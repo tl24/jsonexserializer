@@ -18,9 +18,9 @@ namespace JsonExSerializer.Collections
             return collectionType.IsArray;
         }
 
-        public ICollectionBuilder ConstructBuilder(Type collectionType)
+        public ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount)
         {
-            return new ArrayBuilder(collectionType);
+            return new ArrayBuilder(collectionType, itemCount);
         }
 
         public Type GetItemType(Type CollectionType)

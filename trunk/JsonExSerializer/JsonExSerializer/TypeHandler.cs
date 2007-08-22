@@ -224,11 +224,11 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="context">the serialization context</param>
         /// <returns>collection builder</returns>
-        public ICollectionBuilder GetCollectionBuilder()
+        public ICollectionBuilder GetCollectionBuilder(int itemCount)
         {
             if (IsCollection())
             {
-                return _collectionHandler.ConstructBuilder(ForType);
+                return _collectionHandler.ConstructBuilder(ForType, itemCount);
             }
             else
             {

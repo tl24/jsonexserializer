@@ -12,15 +12,14 @@ namespace JsonExSerializer.Collections
     public class ArrayBuilder : ICollectionBuilder
     {
         private Type _arrayType;
-        private IList _collector;
-        public ArrayBuilder(Type arrayType)
+        private Array result;
+        private int index = 0;
+        public ArrayBuilder(Type arrayType, int itemCount)
         {
             _arrayType = arrayType;
             if (_arrayType.IsArray)
             {
-                // construct a strongly-typed List with the array element type
-                Type tempType = typeof(List<>).MakeGenericType(new Type[] { _arrayType.GetElementType() });
-                _collector = (IList)Activator.CreateInstance(tempType);
+                result = Array.CreateInstance(_arrayType.GetElementType(), itemCount);
             }
             else
             {
@@ -31,17 +30,17 @@ namespace JsonExSerializer.Collections
 
         public void Add(object item)
         {
-            _collector.Add(item);
+            result.SetValue(item, index++);
         }
 
         public object GetResult()
         {
-            Array result = Array.CreateInstance(_arrayType.GetElementType(), _collector.Count);
-            if (_collector.Count > 0)
-            {
-                _collector.CopyTo(result, 0);
-            }
             return result;            
+        }
+
+        public object GetReference()
+        {
+            return result;
         }
 
         #endregion

@@ -31,6 +31,10 @@ namespace JsonExSerializer.Collections
             return _collector;
         }
 
+        public virtual object GetReference()
+        {
+            return _collector;
+        }
         #endregion
     }
 }

@@ -31,7 +31,7 @@ namespace JsonExSerializer.Collections
             }
         }
 
-        public ICollectionBuilder ConstructBuilder(Type collectionType)
+        public ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount)
         {
             Type itemType = GetItemType(collectionType);
             // will make a generic builder either way, but itemType might be object

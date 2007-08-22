@@ -5,41 +5,48 @@ using JsonExSerializer.Collections;
 
 namespace JsonExSerializer.Expression
 {
-    public class CollectionBuilderEvaluator : IEvaluator {
-        protected ExpressionBase _expression;
-        protected SerializationContext _context;
+    public class CollectionBuilderEvaluator : IEvaluator
+    {
+        private ExpressionBase _expression;
+        private SerializationContext _context;
         private IEvaluator _defaultEvaluator;
         private ICollectionBuilder _converter;
         private bool _isEvaluating = false;
-        // the result (cached for repeated calls)
-        protected object _result;  
+        private ICollectionBuilder _builder;
+        private Type _itemType;
+        private object _result;
 
-
-        public CollectionBuilderEvaluator(ExpressionBase expression)
+        public CollectionBuilderEvaluator(ExpressionBase expression) 
         {
             _expression = expression;
         }
 
 
+        private void ConstructBuilder()
+        {
+            ListExpression list = (ListExpression)Expression;
+            TypeHandler handler = Context.GetTypeHandler(list.ResultType);
+            _itemType = handler.GetCollectionItemType();
+            _builder = handler.GetCollectionBuilder(list.Items.Count);
+        }
 
-        #region IEvaluator Members
 
         public object Evaluate()
         {
             if (_result == null)
             {
-                ListExpression _list = (ListExpression)_expression;
-                TypeHandler handler = Context.GetTypeHandler(_list.ResultType);
-                Type itemType = handler.GetCollectionItemType();
-                ICollectionBuilder builder = handler.GetCollectionBuilder();
-                foreach (ExpressionBase item in _list.Items)
-                {
-                    item.SetResultTypeIfNotSet(itemType);
-                    object itemResult = item.Evaluate(Context);
-                    builder.Add(itemResult);
-                }
-                _result = builder.GetResult();
+                if (_builder == null)
+                    ConstructBuilder();
 
+                ListExpression list = (ListExpression)Expression;
+                foreach (ExpressionBase item in list.Items)
+                {
+                    item.SetResultTypeIfNotSet(_itemType);
+                    object itemResult = item.Evaluate(Context);
+                    _builder.Add(itemResult);
+                }
+                _result = _builder.GetResult();
+                _builder = null;
                 if (_result is IDeserializationCallback)
                 {
                     ((IDeserializationCallback)_result).OnAfterDeserialization();
@@ -52,7 +59,9 @@ namespace JsonExSerializer.Expression
         {
             if (_result == null)
             {
-                throw new InvalidOperationException("Collections built using CollectionBuilders can't be referenced during their creation.");
+                if (_builder == null)
+                    ConstructBuilder();
+                return _builder.GetReference();
             }
             else
             {
@@ -60,18 +69,19 @@ namespace JsonExSerializer.Expression
             }
         }
 
+        /// <summary>
+        /// The expression being evaluated
+        /// </summary>
         public ExpressionBase Expression
         {
-            get { return _expression; }
-            set { _expression = value; }
+            get { return this._expression; }
+            set { this._expression = value; }
         }
 
         public SerializationContext Context
         {
-            get { return _context; }
-            set { _context = value; }
+            get { return this._context; }
+            set { this._context = value; }
         }
-
-        #endregion
     }
 }

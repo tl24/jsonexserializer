@@ -12,5 +12,6 @@ namespace JsonExSerializer.Collections
     {
         void Add(object item);
         object GetResult();
+        object GetReference();
     }
 }

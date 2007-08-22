@@ -4,6 +4,10 @@ using System.Text;
 
 namespace JsonExSerializer
 {
+    /// <summary>
+    /// This attribute is used to decorate a property that will be used as an argument to the
+    /// constructor rather than written out as a normal property.
+    /// </summary>
     [global::System.AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     public sealed class ConstructorParameterAttribute : Attribute
     {

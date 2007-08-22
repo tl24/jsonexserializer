@@ -24,6 +24,11 @@ namespace JsonExSerializer.Collections
             return _stack;
         }
 
+        public object GetReference()
+        {
+            return _stack;
+        }
+
         #endregion
     }
 }

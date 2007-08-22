@@ -19,7 +19,7 @@ namespace JsonExSerializer.Collections
             return collectionType.IsGenericType && typeof(Stack<>).IsAssignableFrom(collectionType.GetGenericTypeDefinition());
         }
 
-        public ICollectionBuilder ConstructBuilder(Type collectionType)
+        public ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount)
         {
             Type itemType = GetItemType(collectionType);
             return (ICollectionBuilder) Activator.CreateInstance(typeof(GenericStackBuilder<>).MakeGenericType(itemType));

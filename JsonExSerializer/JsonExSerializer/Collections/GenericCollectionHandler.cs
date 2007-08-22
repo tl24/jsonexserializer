@@ -25,7 +25,7 @@ namespace JsonExSerializer.Collections
                     && !_IDictionaryType.IsAssignableFrom(collectionType));
         }
 
-        public ICollectionBuilder ConstructBuilder(Type collectionType)
+        public ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount)
         {
             Type itemType = GetItemType(collectionType);
             return (ICollectionBuilder) Activator.CreateInstance(typeof(GenericCollectionBuilder<>).MakeGenericType(itemType), collectionType);

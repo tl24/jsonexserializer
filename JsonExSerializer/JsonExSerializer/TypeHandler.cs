@@ -94,7 +94,7 @@ namespace JsonExSerializer
         /// <summary>
         /// Get the list of properties for this type
         /// </summary>
-        public IList<PropertyHandler> ConstructorParamaters
+        public IList<PropertyHandler> ConstructorParameters
         {
             get
             {

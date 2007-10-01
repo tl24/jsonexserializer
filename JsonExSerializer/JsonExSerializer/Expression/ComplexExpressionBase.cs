@@ -22,7 +22,16 @@ namespace JsonExSerializer.Expression
         public IList<ExpressionBase> ConstructorArguments
         {
             get { return this._constructorArguments; }
-            set { this._constructorArguments = value; }
+            set { 
+                this._constructorArguments = value;
+                if (value != null)
+                {
+                    foreach (ExpressionBase exp in value)
+                    {
+                        exp.Parent = this;
+                    }
+                }
+            }
         }
 
         public override ExpressionBase ResolveReference(ReferenceIdentifier refID)

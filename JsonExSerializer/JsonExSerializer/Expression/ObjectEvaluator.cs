@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using System.Reflection;
 
 namespace JsonExSerializer.Expression
 {
@@ -23,17 +24,17 @@ namespace JsonExSerializer.Expression
             if (Expression.ConstructorArguments.Count > 0)
             {
                 TypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
-                if (handler.ConstructorParamaters.Count == Expression.ConstructorArguments.Count)
+                if (handler.ConstructorParameters.Count == Expression.ConstructorArguments.Count)
                 {
-                    for (int i = 0; i < handler.ConstructorParamaters.Count; i++)
+                    for (int i = 0; i < handler.ConstructorParameters.Count; i++)
                     {
-                        Expression.ConstructorArguments[i].SetResultTypeIfNotSet(handler.ConstructorParamaters[i].PropertyType);
+                        Expression.ConstructorArguments[i].SetResultTypeIfNotSet(handler.ConstructorParameters[i].PropertyType);
                     }
                 }
                 else
                 {
-                    throw new ParseException("Wrong number of constructor arguments for type: " + Expression.ResultType
-                        + ", expected: " + handler.ConstructorParamaters.Count + ", actual: " + Expression.ConstructorArguments.Count);
+                    // no constructor parameters defined or not enough defined, try to find one that matches
+                    DetermineConstructorArgTypes(handler.ConstructorParameters);
                 }
             }
             return base.Construct();
@@ -54,6 +55,81 @@ namespace JsonExSerializer.Expression
         {
             get { return (ObjectExpression)_expression; }
             set { _expression = value; }
+        }
+
+        /// <summary>
+        /// Determines the constructor argument types when there are no mappings for them.
+        /// it does this by searching the constructors on the created type for a compatible match.
+        /// </summary>
+        private void DetermineConstructorArgTypes(IList<PropertyHandler> definedArguments)
+        {
+
+            int argCount = Expression.ConstructorArguments.Count;
+
+            if (definedArguments.Count > 0)
+            {
+                // if we have some definitions, try to use them to determine type info
+                for (int i = 0; i < Math.Min(definedArguments.Count, argCount); i++)
+                {
+                    Expression.ConstructorArguments[i].SetResultTypeIfNotSet(definedArguments[i].PropertyType);
+                }
+            }
+            List<ConstructorInfo> ctors = new List<ConstructorInfo>();
+            foreach (ConstructorInfo ctorInfo in Expression.ResultType.GetConstructors())
+            {
+                if (ctorInfo.GetParameters().Length == argCount)
+                    ctors.Add(ctorInfo);
+            }
+
+            if (ctors.Count > 1)
+            {
+                // try to narrow it down
+                int i = ctors.Count - 1;
+                while (i >= 0 && ctors.Count > 1)
+                {
+                    ConstructorInfo ctor = ctors[i];
+                    if (!IsConstructorCompatible(ctor))
+                    {
+                        ctors.RemoveAt(i);
+                    }
+                    i--;
+                }
+            }
+
+            if (ctors.Count == 1)
+            {
+                ParameterInfo[] parms = ctors[0].GetParameters();
+
+                for (int j = 0; j < parms.Length; j++)
+                {
+                    Expression.ConstructorArguments[j].SetResultTypeIfNotSet(parms[j].ParameterType);
+                }
+            }
+            else
+            {
+                throw new ParseException(string.Format("Unable to find a suitable constructor for type: {0} with {1} arguments.",
+                    Expression.ResultType, Expression.ConstructorArguments.Count));
+            }
+        }
+
+        private bool IsConstructorCompatible(ConstructorInfo constructor)
+        {
+            ParameterInfo[] parms = constructor.GetParameters();
+            // should have already been checked, but just double-check
+            if (parms.Length != Expression.ConstructorArguments.Count)
+                return false;
+
+            // check to make sure each arg type is compatible, if its set
+            for (int i = 0; i < parms.Length; i++)
+            {
+                Type exprType = null;
+                if (Expression.ConstructorArguments[i].ResultType != null)
+                    exprType = Expression.ConstructorArguments[i].ResultType;
+
+                if (exprType != null && !parms[i].ParameterType.IsAssignableFrom(exprType))
+                    return false;
+            }
+            return true;
         }
     }
 }

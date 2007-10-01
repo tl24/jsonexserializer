@@ -69,12 +69,17 @@
     <Compile Include="SerializePrimitiveTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mocks\SimpleObject.cs" />
+    <Compile Include="SimpleConfigSettingsTests.cs" />
+    <Compile Include="TypeBindingConfigTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JsonExSerializer\JsonExSerializer.csproj">
       <Project>{D0C83979-A672-4C06-99BC-B82D81749405}</Project>
       <Name>JsonExSerializer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lib\" />

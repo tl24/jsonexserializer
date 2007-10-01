@@ -12,6 +12,9 @@ namespace JsonExSerializer
     /// </summary>
     public class SerializationContext
     {
+
+        #region Member variables
+
         private bool _isCompact;
         private bool _outputTypeComment;
         private bool _outputTypeInformation;
@@ -30,6 +33,10 @@ namespace JsonExSerializer
         private DefaultConverterFactory _defaultConverterFactory;
         private List<ICollectionHandler> _collectionHandlers;
         private IDictionary<Type, TypeHandler> _cache;
+
+        #endregion
+
+        #region Constructor
 
         internal SerializationContext(Serializer serializerInstance)
         {
@@ -77,6 +84,8 @@ namespace JsonExSerializer
             // type handlers
             _cache = new Dictionary<Type, TypeHandler>();
         }
+
+        #endregion
 
         #region Options
         /// <summary>
@@ -138,6 +147,7 @@ namespace JsonExSerializer
 
         #endregion
 
+        #region Type Binding
         /// <summary>
         /// Adds a different binding for a type.  When the type is encountered during serialization, the alias
         /// will be written out instead of the normal type info if a cast or type information is needed.
@@ -147,6 +157,35 @@ namespace JsonExSerializer
         public void AddTypeBinding(Type t, string typeAlias)
         {
             _typeBindings[t] = typeAlias;
+        }
+
+        /// <summary>
+        /// Clears all type bindings
+        /// </summary>
+        public void ClearTypeBindings()
+        {
+            _typeBindings.Clear();
+        }
+
+        /// <summary>
+        /// Removes a type binding
+        /// </summary>
+        /// <param name="t">the bound type to remove</param>
+        public void RemoveTypeBinding(Type t)
+        {
+            _typeBindings.Remove(t);
+        }
+
+        /// <summary>
+        /// Removes a type binding
+        /// </summary>
+        /// <param name="alias">the type alias to remove</param>
+        public void RemoveTypeBinding(string alias)
+        {
+            Type key;
+            if (_typeBindings.TryGetKey(alias, out key))
+                _typeBindings.Remove(key);
+
         }
 
         /// <summary>
@@ -179,6 +218,9 @@ namespace JsonExSerializer
             }
             return t;
         }
+
+        #endregion
+
 
         /// <summary>
         /// The current serializer instance that created and is using this
@@ -279,6 +321,8 @@ namespace JsonExSerializer
 
         #endregion
 
+        #region Handlers
+
         /// <summary>
         /// Registers a collection handler which provides support for a certain type
         /// or multiple types of collections.
@@ -308,6 +352,9 @@ namespace JsonExSerializer
             return handler;
         }
 
+        #endregion
+
+        #region Ignore Properties
         /// <summary>
         /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
         /// </summary>
@@ -328,5 +375,8 @@ namespace JsonExSerializer
             TypeHandler handler = GetTypeHandler(property.DeclaringType);
             handler.IgnoreProperty(property);
         }
+
+        #endregion
+
     }
 }

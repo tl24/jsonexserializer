@@ -194,7 +194,7 @@ namespace JsonExSerializer
         }
 
         private static string EscapeString(string s)
-        {
+        {            
             return s.Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"");
         }
 

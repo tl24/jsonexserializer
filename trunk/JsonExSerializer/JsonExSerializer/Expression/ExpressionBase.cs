@@ -53,7 +53,7 @@ namespace JsonExSerializer.Expression
 
         public abstract ExpressionBase ResolveReference(ReferenceIdentifier refID);
 
-        public JsonExSerializer.Expression.ExpressionBase Parent
+        public virtual ExpressionBase Parent
         {
             get { return this._parent; }
             set { this._parent = value; }

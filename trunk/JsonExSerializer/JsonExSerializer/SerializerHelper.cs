@@ -243,12 +243,12 @@ namespace JsonExSerializer
 
             try
             {
-                if (handler.ConstructorParamaters.Count > 0)
+                if (handler.ConstructorParameters.Count > 0)
                 {
                     hasConstructor = true;
                     this.ConstructorStart(obj.GetType());
                     this.ConstructorArgsStart();
-                    foreach (PropertyHandler ctorParm in handler.ConstructorParamaters)
+                    foreach (PropertyHandler ctorParm in handler.ConstructorParameters)
                     {
                         object value = ctorParm.GetValue(obj);
                         if (value != null && _context.OutputTypeInformation && value.GetType() != ctorParm.PropertyType)

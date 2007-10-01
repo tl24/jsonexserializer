@@ -36,14 +36,25 @@ namespace JsonExSerializer
         /// <returns>a serializer</returns>
         public static Serializer GetSerializer(Type t)
         {
-            return new Serializer(t);
+            return GetSerializer(t, "JsonExSerializer");
+        }
+
+        /// <summary>
+        /// Gets a serializer for the given type
+        /// </summary>
+        /// <param name="t">type</param>
+        /// <returns>a serializer</returns>
+        public static Serializer GetSerializer(Type t, string configSection)
+        {
+            return new Serializer(t, configSection);
         }
 
 
-        private Serializer(Type t)
+        private Serializer(Type t, string configSection)
         {
             _serializedType = t;
             _context = new SerializationContext(this);
+            XmlConfigurator.Configure(_context, configSection);
         }
 
         #region Serialization

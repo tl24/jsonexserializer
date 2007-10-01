@@ -87,6 +87,10 @@ namespace JsonExSerializer.Expression
         {
             // lookup info for the type
             PropertyHandler hndlr = context.GetTypeHandler(parentObject.GetType()).FindProperty(Key);
+            if (hndlr == null)
+            {
+                throw new Exception(string.Format("Could not find property {0} for type {1}", Key, parentObject.GetType()));
+            }
             ValueExpression.SetResultTypeIfNotSet(hndlr.PropertyType);
             if (context.HasConverter(hndlr.Property))
             {

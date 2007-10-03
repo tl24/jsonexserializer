@@ -153,11 +153,24 @@ namespace JsonExSerializerTests
         }
 
         [Test]
-        [ExpectedException(typeof(JsonExSerializationException))]
-        public void TestRegisterPrimitivePropertyConverter()
+        public void TestConverterFactory()
         {
-            Serializer s = Serializer.GetSerializer(typeof(object));
-            s.Context.RegisterTypeConverter(typeof(SimpleObject).GetProperty("StringValue"), new MyImmutablePointConverter());
+            Serializer s = Serializer.GetSerializer(typeof(KeyOnlyObjectImpl));
+            KeyOnlyObjectImpl ko = new KeyOnlyObjectImpl();
+            ko.ID = "TestID";
+            ko.Name = "TestName";
+
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            MockConverterFactory factory = new MockConverterFactory();
+            s.Context.AddTypeConverterFactory(factory);
+            string result = s.Serialize(ko);
+
+            // assert string is ID only
+            Assert.AreEqual("\"" + ko.ID + "\"", result, "Factory converter should serialize to ID only");
+
+            KeyOnlyObjectImpl des = (KeyOnlyObjectImpl) s.Deserialize(result);
+            Assert.AreSame(ko, des);
         }
     }
 }

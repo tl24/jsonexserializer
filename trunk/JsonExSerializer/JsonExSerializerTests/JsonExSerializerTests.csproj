@@ -54,6 +54,7 @@
     <Compile Include="Mocks\ConvertedObject.cs" />
     <Compile Include="Mocks\JsonWriterMock.cs" />
     <Compile Include="Mocks\MockCallbackObject.cs" />
+    <Compile Include="Mocks\MockConverterFactory.cs" />
     <Compile Include="Mocks\MockFlagsEnum.cs" />
     <Compile Include="Mocks\MockReferenceObject.cs" />
     <Compile Include="Mocks\MyLine.cs" />

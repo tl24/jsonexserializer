@@ -31,6 +31,7 @@ namespace JsonExSerializer
             handlers["ReferenceWritingType"] = new MapHandler(HandleReferenceWritingType);
             handlers["TypeBindings"] = new MapHandler(HandleTypeBindings);
             handlers["TypeConverters"] = new MapHandler(HandleTypeConverters);
+            handlers["TypeConverterFactories"] = new MapHandler(HandleTypeConverterFactories);
         }
 
         public static void Configure(SerializationContext context, string configSection)
@@ -67,7 +68,7 @@ namespace JsonExSerializer
             }
             catch (Exception e)
             {
-                throw new Exception("Error configuring serializer from config section " + sectionName, e);
+                throw new Exception("Error configuring serializer from config section " + sectionName + ". " + e.Message, e);
             }
         }
 
@@ -141,6 +142,35 @@ namespace JsonExSerializer
                         break;
                     default:
                         throw new Exception("Unrecognized element " + record.opName + " within TypeConverters tag");
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the configuration of Type Converters factories for the TypeConverterFactories node
+        /// </summary>
+        private void HandleTypeConverterFactories()
+        {
+            // only supports add for now
+            AddRemoveClearHandler handler = new AddRemoveClearHandler(reader, "type", null, null, "TypeConverterFactories");
+            foreach (ARCRec record in handler.GetTags())
+            {
+                switch (record.opName)
+                {
+                    case "add":
+                        if (string.IsNullOrEmpty(record.values["type"]))
+                            throw new Exception("Must specify 'type' for TypeConverterFactories add");
+
+                        // load the specified types
+                        Type factoryType = Type.GetType(record.values["type"]);
+
+                        ITypeConverterFactory converterFactory = (ITypeConverterFactory)Activator.CreateInstance(factoryType);
+                        context.AddTypeConverterFactory(converterFactory);
+
+                        break;
+                    default:
+                        throw new Exception("Unrecognized element " + record.opName + " within TypeConverterFactories tag");
                         break;
                 }
             }

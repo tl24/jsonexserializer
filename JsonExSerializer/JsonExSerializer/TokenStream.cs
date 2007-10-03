@@ -336,6 +336,14 @@ namespace JsonExSerializer
                     else if (ch == '\\')
                     {
                         buffer.Append('\\');
+                    }                       
+                    else if (ch == 'u') // unicode escape sequence \unnnn
+                    {
+                        char[] ucodeChar = new char[4];
+                        int nRead = _reader.Read(ucodeChar, 0, 4);
+                        if (nRead != 4)
+                            throw new ParseException("Invalid unicode escape sequence, expecting \"\\unnnn\", but got " + (new string(ucodeChar, 0, nRead)));
+                        buffer.Append((char)uint.Parse(new string(ucodeChar), System.Globalization.NumberStyles.HexNumber));
                     }
                     else
                     {

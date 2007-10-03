@@ -47,10 +47,6 @@ namespace JsonExSerializer.TypeConversion
         {
             if (converter != null && property != null)
             {
-                if (property.PropertyType.IsPrimitive || property.PropertyType == typeof(string))
-                {
-                    throw new JsonExSerializationException("Converters can not be registered for properties of a primitive type or string. " + property);
-                }
                 _registeredTypes[property] = converter;
             }
         }

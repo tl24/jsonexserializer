@@ -134,5 +134,17 @@ namespace JsonExSerializerTests
             result = (string)s.Deserialize("\"" + value.Replace("\"", "\\\"") + "\"");
             Assert.AreEqual(value, result, "Embedded quotes double quote string did not deserialize correctly");
         }
+
+        [Test]
+        public void UnicodeEscapeTest()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(string));
+            string expected = "\u0164\u0112\u0161\u0164";
+            string toDeserialize = @"""\u0164\u0112\u0161\u0164""";
+            string result = (string)s.Deserialize(toDeserialize);
+            Assert.AreEqual(expected, result, "Unicode escaped string did not deserialize correctly");
+
+
+        }
     }
 }

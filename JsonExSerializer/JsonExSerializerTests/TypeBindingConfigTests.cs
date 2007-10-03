@@ -50,5 +50,17 @@ namespace JsonExSerializerTests
             Assert.IsNotNull(typeConverter, "No converter for simple object registered");
             Assert.IsNotNull(propConverter, "No converter for simple object, BoolValue property registered");
         }
+
+        [Test]
+        public void TestRegisterTypeConverterFactory()
+        {
+            /*
+            Serializer s = Serializer.GetSerializer(typeof(object), "TestRegisterTypeConverter");
+            IJsonTypeConverter typeConverter = s.Context.GetConverter(typeof(SimpleObject));
+            IJsonTypeConverter propConverter = s.Context.GetConverter(typeof(SimpleObject).GetProperty("BoolValue"));
+            Assert.IsNotNull(typeConverter, "No converter for simple object registered");
+            Assert.IsNotNull(propConverter, "No converter for simple object, BoolValue property registered");
+             */
+        }
     }
 }

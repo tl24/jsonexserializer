@@ -135,6 +135,17 @@ namespace JsonExSerializerTests
             Assert.AreEqual(actual, dict, "Enum keyed dictionaries not equal");
         }
 
+        [Test]
+        public void StructTypeTest()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(MockValueType));
+            MockValueType value = new MockValueType(5, 10);
+            string result = s.Serialize(value);
+
+            MockValueType actual = (MockValueType)s.Deserialize(result);
+            Assert.AreEqual(value, actual, "Structs not equal");
+        }
+
         public void ValidateSimpleObjects(SimpleObject src, SimpleObject dst)
         {
             Assert.AreEqual(src.BoolValue, dst.BoolValue, "SimpleObject.BoolValue not equal");

@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections.Specialized;
 using System.Reflection;
 using JsonExSerializer.TypeConversion;
+using JsonExSerializer.Collections;
 
 namespace JsonExSerializer
 {
@@ -32,6 +33,8 @@ namespace JsonExSerializer
             handlers["TypeBindings"] = new MapHandler(HandleTypeBindings);
             handlers["TypeConverters"] = new MapHandler(HandleTypeConverters);
             handlers["TypeConverterFactories"] = new MapHandler(HandleTypeConverterFactories);
+            handlers["CollectionHandlers"] = new MapHandler(HandleCollectionHandlers);
+            handlers["IgnoreProperties"] = new MapHandler(HandleIgnoreProperties);
         }
 
         public static void Configure(SerializationContext context, string configSection)
@@ -73,78 +76,108 @@ namespace JsonExSerializer
         }
 
         /// <summary>
+        /// Handler for TypeBinding/add tag
+        /// </summary>
+        /// <param name="tag">tag name</param>
+        /// <param name="values">attribute values</param>
+        private void AddTypeBinding(string tag, string[] values)
+        {
+            string alias = values[0];
+            string type = values[1];
+
+            if (string.IsNullOrEmpty(alias))
+                throw new Exception("Must specify 'alias' for TypeBinding add");
+            if (string.IsNullOrEmpty(type))
+                throw new Exception("Must specify 'type' for TypeBinding add");
+
+            context.AddTypeBinding(Type.GetType(type, true), alias);
+        }
+
+        /// <summary>
+        /// Handler for TypeBinding/remove tag
+        /// </summary>
+        /// <param name="tag">tag name</param>
+        /// <param name="values">attribute values</param>
+        private void RemoveTypeBinding(string tag, string[] values)
+        {
+            string alias = values[0];
+            string type = values[1];
+            if (!string.IsNullOrEmpty(type))
+                context.RemoveTypeBinding(Type.GetType(type, true));
+            else if (!string.IsNullOrEmpty(alias))
+                context.RemoveTypeBinding(alias);
+            else
+                throw new Exception("Must specify either alias or type argument to remove TypeBinding");
+        }
+
+        /// <summary>
         /// Handles the "TypeBindings" tag of the config
         /// </summary>
         private void HandleTypeBindings()
         {
-            AddRemoveClearHandler handler = new AddRemoveClearHandler(reader, "alias type", "alias type", "", "TypeBindings");
-            foreach(ARCRec record in handler.GetTags()) {
-                switch (record.opName) {
-                    case "add":
-                        if (string.IsNullOrEmpty(record.values["alias"]))
-                            throw new Exception("Must specify 'alias' for TypeBinding add");
-                        if (string.IsNullOrEmpty(record.values["type"]))
-                            throw new Exception("Must specify 'type' for TypeBinding add");
-
-                        context.AddTypeBinding(Type.GetType(record.values["type"]), record.values["alias"]);
-                        break;
-                    case "remove":
-                        if (!string.IsNullOrEmpty(record.values["type"]))
-                            context.RemoveTypeBinding(Type.GetType(record.values["type"]));
-                        else if (!string.IsNullOrEmpty(record.values["alias"]))
-                            context.RemoveTypeBinding(record.values["alias"]);
-                        else
-                            throw new Exception("Must specify either alias or type argument to remove TypeBinding");
-                        break;
-                    case "clear":
-                        context.ClearTypeBindings();
-                        break;
-                    default:
-                        throw new Exception("Unrecognized element " + record.opName + " within TypeBinding tag");
-                        break;
-                }
-            }
+            SectionHandler handler = new SectionHandler(reader, "TypeBindings");
+            handler.AddMethod(new MethodMap("add", "alias type", new MethodDelegate(AddTypeBinding)));
+            handler.AddMethod(new MethodMap("remove", "alias type", new MethodDelegate(RemoveTypeBinding)));
+            handler.AddMethod(new MethodMap("clear", "", delegate(string t, string[] v) { context.ClearTypeBindings(); }));
+            handler.Process();            
         }
 
+        /// <summary>
+        /// Handles the TypeConverters/add tag of the config file
+        /// </summary>
+        /// <param name="tagName">name of the tag, should be "add"</param>
+        /// <param name="values">attribute values in the order: type, property, converter</param>
+        private void AddTypeConverter(string tagName, string[] values)
+        {
+            string type = values[0];
+            string property = values[1];
+            string converter = values[2];
+
+            if (string.IsNullOrEmpty(type))
+                throw new Exception("Must specify 'type' for TypeConverters add");
+            if (string.IsNullOrEmpty(converter))
+                throw new Exception("Must specify 'converter' for TypeConverters add");
+
+            // load the specified types
+            Type objectType = Type.GetType(type, true);
+            Type converterType = Type.GetType(converter, true);
+
+            PropertyInfo propertyObj = null;
+            // check for the property element, if it exists, the converter is for a property on the type
+            if (!string.IsNullOrEmpty(property))
+            {
+                propertyObj = objectType.GetProperty(property);
+            }
+            IJsonTypeConverter converterObj = (IJsonTypeConverter)Activator.CreateInstance(converterType);
+            if (propertyObj != null)
+                context.RegisterTypeConverter(propertyObj, converterObj);
+            else
+                context.RegisterTypeConverter(objectType, converterObj);
+
+        }
         /// <summary>
         /// Handles the configuration of Type Converters for the TypeConverters node
         /// </summary>
         private void HandleTypeConverters()
         {
-            // only supports add for now
-            AddRemoveClearHandler handler = new AddRemoveClearHandler(reader, "type property converter", null, null, "TypeConverters");
-            foreach (ARCRec record in handler.GetTags())
-            {
-                switch (record.opName)
-                {
-                    case "add":
-                        if (string.IsNullOrEmpty(record.values["type"]))
-                            throw new Exception("Must specify 'type' for TypeConverters add");
-                        if (string.IsNullOrEmpty(record.values["converter"]))
-                            throw new Exception("Must specify 'converter' for TypeConverters add");
+            SectionHandler handler = new SectionHandler(reader, "TypeConverters");
+            handler.AddMethod(new MethodMap("add", "type property converter", new MethodDelegate(AddTypeConverter)));
+            handler.Process();
+        }
 
-                        // load the specified types
-                        Type objectType = Type.GetType(record.values["type"]);
-                        Type converterType = Type.GetType(record.values["converter"]);
+        private void AddTypeConverterFactory(string tagName, string[] values)
+        {
+            string type = values[0];
 
-                        PropertyInfo property = null;
-                        // check for the property element, if it exists, the converter is for a property on the type
-                        if (!string.IsNullOrEmpty(record.values["property"]))
-                        {
-                            property = objectType.GetProperty(record.values["property"]);
-                        }
-                        IJsonTypeConverter converter = (IJsonTypeConverter) Activator.CreateInstance(converterType);
-                        if (property != null)
-                            context.RegisterTypeConverter(property, converter);
-                        else
-                            context.RegisterTypeConverter(objectType, converter);
+            if (string.IsNullOrEmpty(type))
+                throw new Exception("Must specify 'type' for TypeConverterFactories add");
 
-                        break;
-                    default:
-                        throw new Exception("Unrecognized element " + record.opName + " within TypeConverters tag");
-                        break;
-                }
-            }
+            // load the specified types
+            Type factoryType = Type.GetType(type, true);
+
+            ITypeConverterFactory converterFactory = (ITypeConverterFactory)Activator.CreateInstance(factoryType);
+            context.AddTypeConverterFactory(converterFactory);
+
         }
 
         /// <summary>
@@ -152,28 +185,55 @@ namespace JsonExSerializer
         /// </summary>
         private void HandleTypeConverterFactories()
         {
-            // only supports add for now
-            AddRemoveClearHandler handler = new AddRemoveClearHandler(reader, "type", null, null, "TypeConverterFactories");
-            foreach (ARCRec record in handler.GetTags())
-            {
-                switch (record.opName)
-                {
-                    case "add":
-                        if (string.IsNullOrEmpty(record.values["type"]))
-                            throw new Exception("Must specify 'type' for TypeConverterFactories add");
+            SectionHandler handler = new SectionHandler(reader, "TypeConverterFactories");
+            handler.AddMethod(new MethodMap("add", "type", new MethodDelegate(AddTypeConverterFactory)));
+            handler.Process();
+        }
 
-                        // load the specified types
-                        Type factoryType = Type.GetType(record.values["type"]);
+        private void AddCollectionHandler(string tagName, string[] values)
+        {
+            string type = values[0];
 
-                        ITypeConverterFactory converterFactory = (ITypeConverterFactory)Activator.CreateInstance(factoryType);
-                        context.AddTypeConverterFactory(converterFactory);
+            if (string.IsNullOrEmpty(type))
+                throw new Exception("Must specify 'type' for CollectionHandlers add");
 
-                        break;
-                    default:
-                        throw new Exception("Unrecognized element " + record.opName + " within TypeConverterFactories tag");
-                        break;
-                }
-            }
+            // load the specified types
+            Type handlerType = Type.GetType(type, true);
+
+            ICollectionHandler collHandler = (ICollectionHandler)Activator.CreateInstance(handlerType);
+            context.RegisterCollectionHandler(collHandler);
+        }
+
+        /// <summary>
+        /// Handles the configuration of Type Converters factories for the TypeConverterFactories node
+        /// </summary>
+        private void HandleCollectionHandlers()
+        {
+            SectionHandler handler = new SectionHandler(reader, "CollectionHandlers");
+            handler.AddMethod(new MethodMap("add", "type", new MethodDelegate(AddCollectionHandler)));
+            handler.Process();
+        }
+
+        private void AddIgnoreProperty(string tagName, string[] values)
+        {
+            string type = values[0];
+            string property = values[1];
+
+            if (string.IsNullOrEmpty(type))
+                throw new Exception("Must specify 'type' for IgnoreProperties add");
+            if (string.IsNullOrEmpty(property))
+                throw new Exception("Must specify 'property' for IgnoreProperties add");
+
+
+            Type classType = Type.GetType(type, true);
+            context.IgnoreProperty(classType, property);
+        }
+
+        private void HandleIgnoreProperties()
+        {
+            SectionHandler handler = new SectionHandler(reader, "IgnoreProperties");
+            handler.AddMethod(new MethodMap("add", "type property", new MethodDelegate(AddIgnoreProperty)));
+            handler.Process();
         }
 
         private void HandleReferenceWritingType()
@@ -182,81 +242,110 @@ namespace JsonExSerializer
             context.ReferenceWritingType = (SerializationContext.ReferenceOption) Enum.Parse(context.ReferenceWritingType.GetType(), value);
         }
 
-        #region Add, Remove, Clear Handler
-        private struct ARCRec
-        {
-            public string opName;   // add, remove, or clear
-            public NameValueCollection values;
+        private delegate void MethodDelegate(string tagName, params string[] values);
 
-            public ARCRec(string opName, NameValueCollection values)
+        /// <summary>
+        /// encapsulates a method delegate for processing a tag.  The
+        /// parameters list is a list of valid attributes for the tag.  They will be
+        /// passed in the order listed to the delegate.
+        /// </summary>
+        private class MethodMap
+        {
+            private string _name;
+            private NameValueCollection _parameters;
+            private MethodDelegate _method;
+
+            /// <summary>
+            /// Creates a method map for the tag
+            /// </summary>
+            /// <param name="name">the name of the method</param>
+            /// <param name="parameters">space separated list of attributes for the tag</param>
+            /// <param name="method">the delegate</param>
+            public MethodMap(string name, string parameters, MethodDelegate method) {
+                this._name = name;
+                _parameters = new NameValueCollection();
+                int i = 0;
+                foreach (string s in parameters.Split(' ')) {
+                    _parameters.Add(s, i.ToString());
+                    i++;
+                }
+
+                this._method = method;
+            }
+
+            /// <summary>
+            /// The name of the tag
+            /// </summary>
+            public string Name
             {
-                this.opName = opName;
-                this.values = values;
+                get { return this._name; }
+            }
+
+            /// <summary>
+            /// The valid attributes for the tag
+            /// </summary>
+            public NameValueCollection Parameters
+            {
+                get { return this._parameters; }
+            }
+
+            /// <summary>
+            /// The delegate to call when the tag is encountered
+            /// </summary>
+            public MethodDelegate Method
+            {
+                get { return this._method; }
             }
         }
 
-        private class AddRemoveClearHandler
+        /// <summary>
+        /// Handles a given section of the xml file
+        /// </summary>
+        private class SectionHandler
         {
             private XmlReader reader;
-            private Dictionary<string, NameValueCollection> tagMap = new Dictionary<string, NameValueCollection>();
+            private Dictionary<string, MethodMap> tagMap = new Dictionary<string, MethodMap>();
             private string outerTag;
 
-            public AddRemoveClearHandler(XmlReader reader, string addAttributes, string removeAttributes, string clearAttributes, string outerTag)
+            public SectionHandler(XmlReader reader, string outerTag)
             {
-                if (addAttributes != null)
-                {
-                    this.tagMap.Add("add", new NameValueCollection());
-                    foreach (string s in addAttributes.Split(' '))
-                        this.tagMap["add"].Add(s, s);
-                }
-
-                if (removeAttributes != null)
-                {
-                    this.tagMap.Add("remove", new NameValueCollection());
-                    foreach (string s in removeAttributes.Split(' '))
-                        this.tagMap["remove"].Add(s, s);
-                }
-
-                if (clearAttributes != null)
-                {
-                    this.tagMap.Add("clear", new NameValueCollection());
-                    foreach (string s in clearAttributes.Split(' '))
-                        this.tagMap["clear"].Add(s, s);
-                }
-
                 this.outerTag = outerTag;
                 this.reader = reader;
             }
 
-            public IEnumerable<ARCRec> GetTags()
+            public void AddMethod(MethodMap method) {
+                tagMap.Add(method.Name, method);
+            }
+
+            public void Process()
             {
                 while (reader.Read())
                 {
-                    if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "outerTag")
-                        yield break;
+                    if (reader.NodeType == XmlNodeType.EndElement && reader.Name == outerTag)
+                        break;
+
                     if (reader.IsStartElement())
                     {
                         if (!tagMap.ContainsKey(reader.Name))
                             throw new Exception("Unrecognized element " + reader.Name + " within " + outerTag + " tag");
 
                         string tag = reader.Name;
-                        NameValueCollection values = new NameValueCollection();
-                        NameValueCollection validAttributes = tagMap[reader.Name];
+
+                        MethodMap method = tagMap[tag];
+                        string[] values = new string[method.Parameters.Count];
 
                         while (reader.MoveToNextAttribute())
                         {
-                            if (validAttributes.Get(reader.Name) == null)
+                            if (method.Parameters.Get(reader.Name) == null)
                                 throw new Exception("Unrecognized attribute " + reader.Name + " to " + tag + " tag within " + outerTag + " tag");
 
-                            values[reader.Name] = reader.ReadContentAsString();
+                            values[int.Parse(method.Parameters.Get(reader.Name))] = reader.ReadContentAsString();
                         }
-                        yield return new ARCRec(tag, values);
+                        method.Method(tag, values);
                     }
                 }
             }
-        }
-        #endregion
-
+        }       
     }
 
     public class XmlConfigSection : ConfigurationSection

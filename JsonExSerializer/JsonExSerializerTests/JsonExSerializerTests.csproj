@@ -54,9 +54,11 @@
     <Compile Include="Mocks\ConvertedObject.cs" />
     <Compile Include="Mocks\JsonWriterMock.cs" />
     <Compile Include="Mocks\MockCallbackObject.cs" />
+    <Compile Include="Mocks\MockCollectionConverter.cs" />
     <Compile Include="Mocks\MockConverterFactory.cs" />
     <Compile Include="Mocks\MockFlagsEnum.cs" />
     <Compile Include="Mocks\MockReferenceObject.cs" />
+    <Compile Include="Mocks\MockValueType.cs" />
     <Compile Include="Mocks\MyLine.cs" />
     <Compile Include="Mocks\MyPointConstructor.cs" />
     <Compile Include="Mocks\SelfConverter.cs" />
@@ -71,7 +73,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mocks\SimpleObject.cs" />
     <Compile Include="SimpleConfigSettingsTests.cs" />
-    <Compile Include="TypeBindingConfigTests.cs" />
+    <Compile Include="AdvancedConfigSettingTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JsonExSerializer\JsonExSerializer.csproj">

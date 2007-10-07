@@ -217,5 +217,13 @@ namespace JsonExSerializerTests
             Assert.AreEqual(expected, actual, "decimal did not deserialize correctly");
         }
 
+        public void SerializeStringEscapesTest()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(string));
+            string data = "\u0000\u0001\u0002\r\n\t\f\b\"/\\";
+            string result = s.Serialize(data);
+            string actual = (string)s.Deserialize(result);
+            Assert.AreEqual(data, actual, "Escaped strings don't match");
+        }
     }
 }

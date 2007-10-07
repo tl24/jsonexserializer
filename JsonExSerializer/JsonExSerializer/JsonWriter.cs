@@ -8,6 +8,7 @@ namespace JsonExSerializer
 {
     public abstract class JsonWriter : IJsonWriter
     {
+
         protected TextWriter _writer;
 
         protected enum OpType
@@ -189,13 +190,54 @@ namespace JsonExSerializer
         protected void WriteQuotedString(string value)
         {
             _writer.Write('"');
-            _writer.Write(EscapeString(value));
+            WriteEscapedString(value);
             _writer.Write('"');
         }
 
-        private static string EscapeString(string s)
-        {            
-            return s.Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"");
+        protected void WriteEscapedString(string s)
+        {
+            for (int i = 0; i < s.Length; i++)
+            {
+                char c = s[i];
+                switch (c)
+                {
+                    case '"':
+                    case '/':
+                    case '\\':
+                        _writer.Write('\\');
+                        _writer.Write(c);
+                        break;
+                    case '\b':
+                        _writer.Write('\\');
+                        _writer.Write('b');
+                        break;
+                    case '\f':
+                        _writer.Write('\\');
+                        _writer.Write('f');
+                        break;
+                    case '\n':
+                        _writer.Write('\\');
+                        _writer.Write('n');
+                        break;
+                    case '\r':
+                        _writer.Write('\\');
+                        _writer.Write('r');
+                        break;
+                    case '\t':
+                        _writer.Write('\\');
+                        _writer.Write('t');
+                        break;
+                    default:
+                        if ((uint)c < 32)
+                        {
+                            // escape known non-printable characters
+                            _writer.Write(string.Format("\\u{0:x4}", (uint) c));
+                        }
+                        else
+                            _writer.Write(c);
+                        break;
+                }
+            }
         }
 
         /// <summary>

@@ -322,21 +322,21 @@ namespace JsonExSerializer
                 if (escape)
                 {
                     if (ch == quoteChar)
-                    {
                         buffer.Append(ch);
-                    }
-                    else if (ch == 't')
-                    {
+                    else if (ch == 't') // horizantal tab
                         buffer.Append('\t');
-                    }
-                    else if (ch == 'n')
-                    {
+                    else if (ch == 'n') // newline
                         buffer.Append('\n');
-                    }
-                    else if (ch == '\\')
-                    {
+                    else if (ch == '\\') // reverse solidus
                         buffer.Append('\\');
-                    }                       
+                    else if (ch == '/')  // solidus
+                        buffer.Append('/');
+                    else if (ch == 'b')  // backspace
+                        buffer.Append('\b');
+                    else if (ch == 'f')  // formfeed
+                        buffer.Append('\f');
+                    else if (ch == 'r') // carriage return
+                        buffer.Append('\r');
                     else if (ch == 'u') // unicode escape sequence \unnnn
                     {
                         char[] ucodeChar = new char[4];
@@ -346,9 +346,7 @@ namespace JsonExSerializer
                         buffer.Append((char)uint.Parse(new string(ucodeChar), System.Globalization.NumberStyles.HexNumber));
                     }
                     else
-                    {
-                        buffer.Append('\\').Append(ch);
-                    }
+                        buffer.Append(ch);
                     escape = false;
                 }
                 else

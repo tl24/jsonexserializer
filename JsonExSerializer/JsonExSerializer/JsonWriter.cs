@@ -202,7 +202,6 @@ namespace JsonExSerializer
                 switch (c)
                 {
                     case '"':
-                    case '/':
                     case '\\':
                         _writer.Write('\\');
                         _writer.Write(c);

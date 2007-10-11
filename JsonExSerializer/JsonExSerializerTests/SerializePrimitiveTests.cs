@@ -142,7 +142,16 @@ namespace JsonExSerializerTests
             string expected = "simple";
             string result = s.Serialize(expected);
             Assert.AreEqual("\"simple\"", result, "String did not serialize correctly.");
+        }
 
+        [Test]
+        public void SerializeSpecialCharacterStringTest()
+        {
+            Serializer s = Serializer.GetSerializer(typeof(string));
+            string expected = "Are you sure? (y\\n)\r\n";
+            string result = s.Serialize(expected);
+            string actual = (string) s.Deserialize(result);
+            Assert.AreEqual(expected, actual, "String with special characters did not serialize correctly.");
         }
 
         [Test]

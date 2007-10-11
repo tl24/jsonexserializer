@@ -441,25 +441,10 @@ namespace JsonExSerializer
         /// <summary>
         /// Parses a single or double quoted string, or a character
         /// </summary>
-        /// <param name="desiredType">the desired return type, should be string or char</param>
         /// <returns>the parsed string or char</returns>
         private ExpressionBase ParseString()
         {
-            Token tok = ReadToken();
-            string val = null;
-            if (tok.type == TokenType.DoubleQuotedString)
-            {
-                val = tok.value.Replace("\\\"", "\"");
-                val = tok.value.Replace("\\t", "\t");
-                val = tok.value.Replace("\\n", "\n");
-            }
-            else if (tok.type == TokenType.SingleQuotedString)
-            {
-                val = tok.value.Replace("\\'", "'");
-                val = tok.value.Replace("\\t", "\t");
-                val = tok.value.Replace("\\n", "\n");
-            }
-            return new ValueExpression(val);
+            return new ValueExpression(ReadToken().value);
         }
 
         /// <summary>

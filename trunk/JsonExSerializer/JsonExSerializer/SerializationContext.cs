@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.TypeConversion;
 using System.Reflection;
 using JsonExSerializer.Collections;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer
 {
@@ -32,7 +38,8 @@ namespace JsonExSerializer
         private List<ITypeConverterFactory> _converterFactories;
         private DefaultConverterFactory _defaultConverterFactory;
         private List<ICollectionHandler> _collectionHandlers;
-        private IDictionary<Type, TypeHandler> _cache;
+        
+        private ITypeHandlerFactory _typeHandlerFactory;
 
         #endregion
 
@@ -82,7 +89,7 @@ namespace JsonExSerializer
             _collectionHandlers.Add(new CollectionConstructorHandler());
 
             // type handlers
-            _cache = new Dictionary<Type, TypeHandler>();
+            _typeHandlerFactory = new TypeHandlerFactory(this);
         }
 
         #endregion
@@ -338,20 +345,20 @@ namespace JsonExSerializer
             get { return _collectionHandlers; }
         }
 
-        internal TypeHandler GetTypeHandler(Type objectType)
+        public ITypeHandler GetTypeHandler(Type objectType)
         {
-            TypeHandler handler;
-            if (!_cache.ContainsKey(objectType))
-            {
-                _cache[objectType] = handler = new TypeHandler(objectType, this);
-            }
-            else
-            {
-                handler = _cache[objectType];
-            }
-            return handler;
+            return TypeHandlerFactory.CreateTypeHandler(objectType);
         }
 
+        /// <summary>
+        /// Gets or sets the TypeHandlerFactory which is responsible for
+        /// creating ITypeHandlers which manage type metadata
+        /// </summary>
+        public ITypeHandlerFactory TypeHandlerFactory
+        {
+            get { return _typeHandlerFactory; }
+            set { _typeHandlerFactory = value; }
+        }
         #endregion
 
         #region Ignore Properties
@@ -362,7 +369,7 @@ namespace JsonExSerializer
         /// <param name="propertyName">the name of the property</param>
         public void IgnoreProperty(Type objectType, string propertyName)
         {
-            TypeHandler handler = GetTypeHandler(objectType);
+            ITypeHandler handler = GetTypeHandler(objectType);
             handler.IgnoreProperty(propertyName);
         }
 
@@ -372,7 +379,7 @@ namespace JsonExSerializer
         /// <param name="property">the property</param>
         public void IgnoreProperty(PropertyInfo property)
         {
-            TypeHandler handler = GetTypeHandler(property.DeclaringType);
+            ITypeHandler handler = GetTypeHandler(property.DeclaringType);
             handler.IgnoreProperty(property);
         }
 

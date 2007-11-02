@@ -77,6 +77,10 @@
     <Compile Include="Collections\ListCollectionBuilder.cs" />
     <Compile Include="JsonExSerializationException.cs" />
     <Compile Include="JsonWriter.cs" />
+    <Compile Include="MetaData\IPropertyHandler.cs" />
+    <Compile Include="MetaData\ITypeHandler.cs" />
+    <Compile Include="MetaData\ITypeHandlerFactory.cs" />
+    <Compile Include="MetaData\TypeHandlerFactory.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="ReferenceEqualityComparer.cs" />
@@ -95,8 +99,8 @@
     <Compile Include="TypeConversion\ITypeConverterFactory.cs" />
     <Compile Include="TypeConversion\TypeConverterAdapter.cs" />
     <Compile Include="TypeConversion\DefaultConverterFactory.cs" />
-    <Compile Include="TypeHandler.cs" />
-    <Compile Include="PropertyHandler.cs" />
+    <Compile Include="MetaData\TypeHandler.cs" />
+    <Compile Include="MetaData\PropertyHandler.cs" />
     <Compile Include="XmlConfigurator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

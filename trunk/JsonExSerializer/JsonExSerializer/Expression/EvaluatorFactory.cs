@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.TypeConversion;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.Expression
 {
@@ -40,7 +46,7 @@ namespace JsonExSerializer.Expression
                 evaluatorType = attr.EvaluatorType;
                 evaluator = (IEvaluator) Activator.CreateInstance(evaluatorType, expression);                
             } else if (expression is ListExpression) {
-                TypeHandler handler = context.GetTypeHandler(expression.ResultType);
+                ITypeHandler handler = context.GetTypeHandler(expression.ResultType);
                 if (handler.IsCollection())
                 {
                     evaluator = new CollectionBuilderEvaluator(expression);

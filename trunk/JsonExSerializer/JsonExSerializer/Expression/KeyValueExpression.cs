@@ -1,8 +1,14 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using JsonExSerializer.TypeConversion;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.Expression
 {
@@ -86,7 +92,7 @@ namespace JsonExSerializer.Expression
         public object EvaluateObjectProperty(SerializationContext context, object parentObject)
         {
             // lookup info for the type
-            PropertyHandler hndlr = context.GetTypeHandler(parentObject.GetType()).FindProperty(Key);
+            IPropertyHandler hndlr = context.GetTypeHandler(parentObject.GetType()).FindProperty(Key);
             if (hndlr == null)
             {
                 throw new Exception(string.Format("Could not find property {0} for type {1}", Key, parentObject.GetType()));

@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.Expression
 {
@@ -31,7 +37,8 @@ namespace JsonExSerializer.Expression
                 args[i] = carg.Evaluate(Context);
             }
             _isConstructing = false;
-            return Activator.CreateInstance(Expression.ResultType, args);
+            ITypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
+            return handler.CreateInstance(args);
         }
 
 

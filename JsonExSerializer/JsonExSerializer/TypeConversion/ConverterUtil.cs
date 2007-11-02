@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.TypeConversion
 {
@@ -11,7 +17,7 @@ namespace JsonExSerializer.TypeConversion
     /// </summary>
     public sealed class ConverterUtil
     {
-        private TypeHandler _handler;
+        private ITypeHandler _handler;
         public ConverterUtil(Type forType, SerializationContext context)
         {
             _handler = context.GetTypeHandler(forType);
@@ -31,7 +37,7 @@ namespace JsonExSerializer.TypeConversion
                 foreach (object key in values.Keys)
                 {
                     string stringKey = key.ToString();
-                    PropertyHandler prop = _handler.FindProperty(stringKey);
+                    IPropertyHandler prop = _handler.FindProperty(stringKey);
                     if (prop == null && !ignoreMissingProperties)
                     {
                         throw new MissingMemberException("Can't find a property for " + stringKey);

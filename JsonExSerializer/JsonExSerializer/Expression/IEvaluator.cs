@@ -1,4 +1,9 @@
-﻿using System;
+﻿/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
+using System;
 namespace JsonExSerializer.Expression
 {
     public interface IEvaluator

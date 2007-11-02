@@ -10,16 +10,16 @@ using System.Reflection;
 using System.Collections;
 using JsonExSerializer.Collections;
 
-namespace JsonExSerializer
+namespace JsonExSerializer.MetaData
 {
     /// <summary>
     /// Helper class for dealing with types during serialization
     /// </summary>
-    class TypeHandler
+    public class TypeHandler : ITypeHandler
     {
         private Type _handledType;
-        private IList<PropertyHandler> _properties;
-        private IList<PropertyHandler> _constructorArgs;
+        private IList<IPropertyHandler> _properties;
+        private IList<IPropertyHandler> _constructorArgs;
 
         private bool _collectionLookedUp = false;
         private ICollectionHandler _collectionHandler;
@@ -27,20 +27,10 @@ namespace JsonExSerializer
         private IDictionary<string, bool> _tempIgnore;
 
         /// <summary>
-        /// Get an instance of a type handler for a given type
-        /// </summary>
-        /// <param name="t">the type</param>
-        /// <returns>a type handler for the given type</returns>
-        internal static TypeHandler GetHandler(Type t, SerializationContext context)
-        {
-            return new TypeHandler(t, context);
-        }
-
-        /// <summary>
         /// internal constructor
         /// </summary>
         /// <param name="t"></param>
-        internal TypeHandler(Type t, SerializationContext context)
+        public TypeHandler(Type t, SerializationContext context)
         {
             _handledType = t;
             _context = context;
@@ -50,12 +40,12 @@ namespace JsonExSerializer
         /// <summary>
         /// Loads the properties for the type if they haven't already been loaded
         /// </summary>
-        private void LoadProperties()
+        protected virtual void LoadProperties()
         {   
             if (_properties == null)
             {
-                _properties = new List<PropertyHandler>();
-                _constructorArgs = new List<PropertyHandler>();
+                _properties = new List<IPropertyHandler>();
+                _constructorArgs = new List<IPropertyHandler>();
 
                 PropertyInfo[] pInfos = _handledType.GetProperties(BindingFlags.Public|BindingFlags.Instance);
                 foreach (PropertyInfo pInfo in pInfos)
@@ -80,21 +70,26 @@ namespace JsonExSerializer
                 }
                 if (_constructorArgs.Count > 0)
                 {
-                    ((List<PropertyHandler>)_constructorArgs).Sort(
-                        new Comparison<PropertyHandler>(PropertyHandlerComparison));
+                    ((List<IPropertyHandler>)_constructorArgs).Sort(
+                        new Comparison<IPropertyHandler>(PropertyHandlerComparison));
                 }
                 _tempIgnore.Clear();
             }
         }
 
-        private int PropertyHandlerComparison(PropertyHandler a, PropertyHandler b) {
+        protected int PropertyHandlerComparison(IPropertyHandler a, IPropertyHandler b) {
             return a.Position - b.Position;
         }
 
+        public virtual object CreateInstance(object[] args)
+        {
+            return Activator.CreateInstance(this.ForType, args);
+        }
+
         /// <summary>
-        /// Get the list of properties for this type
+        /// Get the list of constructor parameters for this type
         /// </summary>
-        public IList<PropertyHandler> ConstructorParameters
+        public virtual IList<IPropertyHandler> ConstructorParameters
         {
             get
             {
@@ -106,7 +101,7 @@ namespace JsonExSerializer
         /// <summary>
         /// Get the list of properties for this type
         /// </summary>
-        public IList<PropertyHandler> Properties
+        public virtual IList<IPropertyHandler> Properties
         {
             get {
                 LoadProperties();
@@ -121,10 +116,9 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="Name">the name of the property</param>
         /// <returns>TypeHandlerProperty instance for the property or null if not found</returns>
-        public PropertyHandler FindProperty(string Name)
+        public IPropertyHandler FindProperty(string Name)
         {
-            LoadProperties();
-            foreach (PropertyHandler prop in _properties)
+            foreach (IPropertyHandler prop in Properties)
             {
                 if (prop.Name == Name)
                     return prop;
@@ -136,7 +130,7 @@ namespace JsonExSerializer
         /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
         /// </summary>
         /// <param name="name">the name of the property</param>
-        public void IgnoreProperty(string name)
+        public virtual void IgnoreProperty(string name)
         {
             if (_properties == null)
             {
@@ -144,7 +138,7 @@ namespace JsonExSerializer
             }
             else
             {
-                PropertyHandler handler = FindProperty(name);
+                IPropertyHandler handler = FindProperty(name);
                 _properties.Remove(handler);
             }
         }
@@ -153,7 +147,7 @@ namespace JsonExSerializer
         /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
         /// </summary>
         /// <param name="name">the name of the property</param>
-        public void IgnoreProperty(PropertyInfo property)
+        public virtual void IgnoreProperty(PropertyInfo property)
         {
             IgnoreProperty(property.Name);
         }
@@ -161,7 +155,7 @@ namespace JsonExSerializer
         /// <summary>
         /// The type of object that this typehandler represents
         /// </summary>
-        public Type ForType
+        public virtual Type ForType
         {
             get { return _handledType; }
         }
@@ -171,7 +165,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="context">the serialization context</param>
         /// <returns>true if a collection</returns>
-        public bool IsCollection()
+        public virtual bool IsCollection()
         {
             if (!_collectionLookedUp)
             {
@@ -193,7 +187,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public ICollectionHandler GetCollectionHandler()
+        public virtual ICollectionHandler GetCollectionHandler()
         {
             if (IsCollection()) {
                 return _collectionHandler;
@@ -207,7 +201,7 @@ namespace JsonExSerializer
         /// of its elements.
         /// </summary>
         /// <returns></returns>
-        public Type GetCollectionItemType()
+        public virtual Type GetCollectionItemType()
         {
             if (IsCollection())
             {
@@ -224,7 +218,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="context">the serialization context</param>
         /// <returns>collection builder</returns>
-        public ICollectionBuilder GetCollectionBuilder(int itemCount)
+        public virtual ICollectionBuilder GetCollectionBuilder(int itemCount)
         {
             if (IsCollection())
             {

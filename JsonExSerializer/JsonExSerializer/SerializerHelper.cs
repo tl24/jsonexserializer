@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,6 +11,7 @@ using System.Collections;
 using JsonExSerializer.TypeConversion;
 using JsonExSerializer.Collections;
 using System.Reflection;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer
 {
@@ -144,7 +150,7 @@ namespace JsonExSerializer
                             refInfo.CanReference = true;    // can't reference inside the object
                             return;
                         }
-                        TypeHandler handler = _context.GetTypeHandler(o.GetType());
+                        ITypeHandler handler = _context.GetTypeHandler(o.GetType());
                         if (handler.IsCollection())
                         {
                             SerializeCollection(o, currentPath);
@@ -231,7 +237,7 @@ namespace JsonExSerializer
                 return;
             }
 
-            TypeHandler handler = _context.GetTypeHandler(obj.GetType());
+            ITypeHandler handler = _context.GetTypeHandler(obj.GetType());
             
             if (obj is ISerializationCallback)
             {
@@ -365,7 +371,7 @@ namespace JsonExSerializer
         /// <param name="currentPath">the object's path</param>
         private void SerializeCollection(object collection, string currentPath)
         {
-            TypeHandler handler = _context.GetTypeHandler(collection.GetType());
+            ITypeHandler handler = _context.GetTypeHandler(collection.GetType());
 
             bool outputTypeInfo = _context.OutputTypeInformation;
             ICollectionHandler collectionHandler = handler.GetCollectionHandler();

@@ -1,8 +1,14 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using System.Reflection;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.Expression
 {
@@ -23,7 +29,7 @@ namespace JsonExSerializer.Expression
             Expression.SetResultTypeIfNotSet(typeof(Hashtable));
             if (Expression.ConstructorArguments.Count > 0)
             {
-                TypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
+                ITypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
                 if (handler.ConstructorParameters.Count == Expression.ConstructorArguments.Count)
                 {
                     for (int i = 0; i < handler.ConstructorParameters.Count; i++)
@@ -34,6 +40,7 @@ namespace JsonExSerializer.Expression
                 else
                 {
                     // no constructor parameters defined or not enough defined, try to find one that matches
+                    //TODO: Using too much reflection info, needs to be moved to ITypeHandler somehow
                     DetermineConstructorArgTypes(handler.ConstructorParameters);
                 }
             }
@@ -61,7 +68,7 @@ namespace JsonExSerializer.Expression
         /// Determines the constructor argument types when there are no mappings for them.
         /// it does this by searching the constructors on the created type for a compatible match.
         /// </summary>
-        private void DetermineConstructorArgTypes(IList<PropertyHandler> definedArguments)
+        private void DetermineConstructorArgTypes(IList<IPropertyHandler> definedArguments)
         {
 
             int argCount = Expression.ConstructorArguments.Count;

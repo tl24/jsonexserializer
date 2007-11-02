@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.Collections;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.Expression
 {
@@ -25,7 +31,7 @@ namespace JsonExSerializer.Expression
         private void ConstructBuilder()
         {
             ListExpression list = (ListExpression)Expression;
-            TypeHandler handler = Context.GetTypeHandler(list.ResultType);
+            ITypeHandler handler = Context.GetTypeHandler(list.ResultType);
             _itemType = handler.GetCollectionItemType();
             _builder = handler.GetCollectionBuilder(list.Items.Count);
         }

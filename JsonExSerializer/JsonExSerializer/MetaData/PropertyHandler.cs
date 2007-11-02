@@ -1,24 +1,29 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 
-namespace JsonExSerializer
+namespace JsonExSerializer.MetaData
 {
     /// <summary>
     /// Helper for a type's properties
     /// </summary>
-    class PropertyHandler
+    public class PropertyHandler : IPropertyHandler
     {
         private PropertyInfo _property;
         private int _position = -1;
 
-        internal PropertyHandler(PropertyInfo property)
+        public PropertyHandler(PropertyInfo property)
         {
             _property = property;
         }
 
-        internal PropertyHandler(PropertyInfo property, int position)
+        public PropertyHandler(PropertyInfo property, int position)
         {
             _property = property;
             _position = position;
@@ -45,7 +50,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="instance">the object to retrieve this property value from</param>
         /// <returns>property value</returns>
-        public object GetValue(object instance)
+        public virtual object GetValue(object instance)
         {
             return _property.GetValue(instance, null);
         }
@@ -55,7 +60,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="instance">the object instance to set the property value on</param>
         /// <param name="value">the new value to set</param>
-        public void SetValue(object instance, object value)
+        public virtual void SetValue(object instance, object value)
         {
             _property.SetValue(instance, value, null);
         }

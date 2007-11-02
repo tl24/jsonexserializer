@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2007, Ted Elliott
+ * Code licensed under the New BSD License:
+ * http://code.google.com/p/jsonexserializer/wiki/License
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.TypeConversion
 {
@@ -30,7 +36,7 @@ namespace JsonExSerializer.TypeConversion
         public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             IDictionary dictionary = (IDictionary) Activator.CreateInstance(sourceType);
-            PropertyHandler propHandler = null;
+            IPropertyHandler propHandler = null;
             ICollection coll = (ICollection)item;
             foreach (object colItem in coll)
             {

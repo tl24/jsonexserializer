@@ -21,6 +21,6 @@ using System.Runtime.InteropServices;
 [assembly: GuidAttribute("12d697c6-ebf8-479f-b78a-86fdf09307d0")]
 [assembly: CLSCompliantAttribute(true)]
 [assembly: AssemblyInformationalVersionAttribute("1.4")]
-[assembly: AssemblyVersionAttribute("1.4.0.80")]
-[assembly: AssemblyFileVersionAttribute("1.4.0.80")]
+[assembly: AssemblyVersionAttribute("1.4.0.84")]
+[assembly: AssemblyFileVersionAttribute("1.4.0.84")]
 

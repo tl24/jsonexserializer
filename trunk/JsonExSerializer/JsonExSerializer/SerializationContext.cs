@@ -10,6 +10,7 @@ using JsonExSerializer.TypeConversion;
 using System.Reflection;
 using JsonExSerializer.Collections;
 using JsonExSerializer.MetaData;
+using System.Collections;
 
 namespace JsonExSerializer
 {
@@ -35,19 +36,16 @@ namespace JsonExSerializer
 
         private TwoWayDictionary<Type, string> _typeBindings;
         private Serializer _serializerInstance;
-        private List<ITypeConverterFactory> _converterFactories;
-        private DefaultConverterFactory _defaultConverterFactory;
         private List<ICollectionHandler> _collectionHandlers;
         
         private ITypeHandlerFactory _typeHandlerFactory;
-
+        private IDictionary _parameters;
         #endregion
 
         #region Constructor
 
-        internal SerializationContext(Serializer serializerInstance)
+        public SerializationContext()
         {
-            this._serializerInstance = serializerInstance;
             _isCompact = false;
             _outputTypeComment = true;
             _outputTypeInformation = true;
@@ -71,14 +69,6 @@ namespace JsonExSerializer
             _typeBindings[typeof(float)] = "float";
             _typeBindings[typeof(double)] = "double";
 
-            // type conversion
-            _defaultConverterFactory = new DefaultConverterFactory();
-            _defaultConverterFactory.SerializationContext = this;
-
-            _converterFactories = new List<ITypeConverterFactory>();
-            _converterFactories.Add(_defaultConverterFactory);
-            _defaultConverterFactory.RegisterConverter(typeof(System.Collections.BitArray), new BitArrayConverter());
-
             // collections
             _collectionHandlers = new List<ICollectionHandler>();
             _collectionHandlers.Add(new GenericCollectionHandler());
@@ -90,6 +80,10 @@ namespace JsonExSerializer
 
             // type handlers
             _typeHandlerFactory = new TypeHandlerFactory(this);
+            _parameters = new Hashtable();
+
+            // type conversion
+            _typeHandlerFactory.RegisterTypeConverter(typeof(System.Collections.BitArray), new BitArrayConverter());
         }
 
         #endregion
@@ -236,8 +230,23 @@ namespace JsonExSerializer
         public Serializer SerializerInstance
         {
             get { return this._serializerInstance; }
+            internal set
+            {
+                if (this._serializerInstance != null)
+                {
+                    throw new InvalidOperationException("SerializationContext can not be used in more than one Serializer instance");
+                }
+                this._serializerInstance = value;
+            }
         }
 
+        /// <summary>
+        /// User defined parameters
+        /// </summary>
+        public IDictionary Parameters
+        {
+            get { return _parameters; }
+        }
         #region TypeConverter
 
         /// <summary>
@@ -247,7 +256,7 @@ namespace JsonExSerializer
         /// <param name="converter">the converter</param>
         public void RegisterTypeConverter(Type forType, IJsonTypeConverter converter)
         {
-            _defaultConverterFactory.RegisterConverter(forType, converter);
+            TypeHandlerFactory.RegisterTypeConverter(forType, converter);
         }
 
         /// <summary>
@@ -257,73 +266,7 @@ namespace JsonExSerializer
         /// <param name="converter">the converter</param>
         public void RegisterTypeConverter(PropertyInfo forProperty, IJsonTypeConverter converter)
         {
-            _defaultConverterFactory.RegisterConverter(forProperty, converter);
-        }
-
-        public void AddTypeConverterFactory(ITypeConverterFactory factory)
-        {
-            _converterFactories.Add(factory);
-        }
-
-        /// <summary>
-        /// Constructs and returns a type converter for the property
-        /// </summary>
-        /// <param name="forProperty">property to convert</param>
-        /// <returns>type converter</returns>
-        public IJsonTypeConverter GetConverter(PropertyInfo forProperty)
-        {
-            
-            foreach (ITypeConverterFactory factory in _converterFactories)
-            {
-                if (factory.HasConverter(forProperty))
-                    return factory.GetConverter(forProperty);
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Constructs and returns a type converter for the type
-        /// </summary>
-        /// <param name="forProperty">type to convert</param>
-        /// <returns>type converter</returns>
-        public IJsonTypeConverter GetConverter(Type forType)
-        {
-            foreach (ITypeConverterFactory factory in _converterFactories)
-            {
-                if (factory.HasConverter(forType))
-                    return factory.GetConverter(forType);
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Checks to see if a type converter can be found for the given type
-        /// </summary>
-        /// <param name="forType">type to check</param>
-        /// <returns>true if the type has a converter</returns>
-        public bool HasConverter(Type forType)
-        {
-            foreach (ITypeConverterFactory factory in _converterFactories)
-            {
-                if (factory.HasConverter(forType))
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Checks to see if a type converter can be found for the given property
-        /// </summary>
-        /// <param name="forProperty">property to check</param>
-        /// <returns>true if the property has a converter</returns>
-        public bool HasConverter(PropertyInfo forProperty)
-        {
-            foreach (ITypeConverterFactory factory in _converterFactories)
-            {
-                if (factory.HasConverter(forProperty))
-                    return true;
-            }
-            return false;
+            TypeHandlerFactory.RegisterTypeConverter(forProperty.DeclaringType, forProperty.Name, converter);
         }
 
         #endregion
@@ -347,7 +290,7 @@ namespace JsonExSerializer
 
         public ITypeHandler GetTypeHandler(Type objectType)
         {
-            return TypeHandlerFactory.CreateTypeHandler(objectType);
+            return TypeHandlerFactory[objectType];
         }
 
         /// <summary>

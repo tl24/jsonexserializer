@@ -40,13 +40,13 @@ namespace JsonExSerializer.Expression
             Type evaluatorType = null;
             Type expType = expression.GetType();
             IEvaluator evaluator = null;
+            ITypeHandler handler = context.GetTypeHandler(expression.ResultType);
             if (expType.IsDefined(typeof(DefaultEvaluatorAttribute), false))
             {
                 DefaultEvaluatorAttribute attr = (DefaultEvaluatorAttribute)expType.GetCustomAttributes(typeof(DefaultEvaluatorAttribute), false)[0];
                 evaluatorType = attr.EvaluatorType;
                 evaluator = (IEvaluator) Activator.CreateInstance(evaluatorType, expression);                
-            } else if (expression is ListExpression) {
-                ITypeHandler handler = context.GetTypeHandler(expression.ResultType);
+            } else if (expression is ListExpression) {                
                 if (handler.IsCollection())
                 {
                     evaluator = new CollectionBuilderEvaluator(expression);
@@ -61,11 +61,10 @@ namespace JsonExSerializer.Expression
                     evaluator = new ConverterEvaluator(expression, defaultEvaluator, null);
                     evaluator.Context = context;
                 }
-                else if (context.HasConverter(expression.ResultType))
+                else if (handler.HasConverter)
                 {
                     IEvaluator defaultEvaluator = evaluator;
-                    IJsonTypeConverter converter = context.GetConverter(expression.ResultType);
-                    evaluator = new ConverterEvaluator(expression, defaultEvaluator, converter);
+                    evaluator = new ConverterEvaluator(expression, defaultEvaluator, handler.TypeConverter);
                     evaluator.Context = context;
                 }
                 return evaluator;

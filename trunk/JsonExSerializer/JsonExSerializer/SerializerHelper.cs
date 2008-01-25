@@ -132,10 +132,12 @@ namespace JsonExSerializer
                             refInfo = new ReferenceInfo(currentPath);
                             _refs[o] = refInfo;
                         }
+                        ITypeHandler handler = _context.GetTypeHandler(o.GetType());
+
                         // Check for a converter and convert
-                        if (converter != null || _context.HasConverter(o.GetType()))
+                        if (converter != null || handler.HasConverter)
                         {
-                            converter = (converter != null) ? converter : _context.GetConverter(o.GetType());
+                            converter = (converter != null) ? converter : handler.TypeConverter;
                             o = converter.ConvertFrom(o, _context);
                             // call serialize again in case the new type has a converter
                             Serialize(o, currentPath, null);
@@ -150,7 +152,7 @@ namespace JsonExSerializer
                             refInfo.CanReference = true;    // can't reference inside the object
                             return;
                         }
-                        ITypeHandler handler = _context.GetTypeHandler(o.GetType());
+                        
                         if (handler.IsCollection())
                         {
                             SerializeCollection(o, currentPath);
@@ -254,16 +256,16 @@ namespace JsonExSerializer
                     hasConstructor = true;
                     this.ConstructorStart(obj.GetType());
                     this.ConstructorArgsStart();
-                    foreach (PropertyHandler ctorParm in handler.ConstructorParameters)
+                    foreach (IPropertyHandler ctorParm in handler.ConstructorParameters)
                     {
                         object value = ctorParm.GetValue(obj);
                         if (value != null && _context.OutputTypeInformation && value.GetType() != ctorParm.PropertyType)
                         {
                             this.Cast(value.GetType());
                         }
-                        if (_context.HasConverter(ctorParm.Property))
+                        if (ctorParm.HasConverter)
                         {
-                            Serialize(value, "", _context.GetConverter(ctorParm.Property));
+                            Serialize(value, "", ctorParm.TypeConverter);
                         }
                         else
                         {
@@ -278,7 +280,7 @@ namespace JsonExSerializer
                     hasInitializer = true;
                     this.ObjectStart();
 
-                    foreach (PropertyHandler prop in handler.Properties)
+                    foreach (IPropertyHandler prop in handler.Properties)
                     {
                         this.Key(prop.Name);
                         object value = prop.GetValue(obj);
@@ -286,9 +288,9 @@ namespace JsonExSerializer
                         {
                             this.Cast(value.GetType());
                         }
-                        if (_context.HasConverter(prop.Property))
+                        if (prop.HasConverter)
                         {
-                            Serialize(value, currentPath + "." + prop.Name, _context.GetConverter(prop.Property));
+                            Serialize(value, currentPath + "." + prop.Name, prop.TypeConverter);
                         }
                         else
                         {

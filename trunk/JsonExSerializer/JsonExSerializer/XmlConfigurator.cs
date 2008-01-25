@@ -37,7 +37,6 @@ namespace JsonExSerializer
             handlers["ReferenceWritingType"] = new MapHandler(HandleReferenceWritingType);
             handlers["TypeBindings"] = new MapHandler(HandleTypeBindings);
             handlers["TypeConverters"] = new MapHandler(HandleTypeConverters);
-            handlers["TypeConverterFactories"] = new MapHandler(HandleTypeConverterFactories);
             handlers["CollectionHandlers"] = new MapHandler(HandleCollectionHandlers);
             handlers["IgnoreProperties"] = new MapHandler(HandleIgnoreProperties);
         }
@@ -167,31 +166,6 @@ namespace JsonExSerializer
         {
             SectionHandler handler = new SectionHandler(reader, "TypeConverters");
             handler.AddMethod(new MethodMap("add", "type property converter", new MethodDelegate(AddTypeConverter)));
-            handler.Process();
-        }
-
-        private void AddTypeConverterFactory(string tagName, string[] values)
-        {
-            string type = values[0];
-
-            if (string.IsNullOrEmpty(type))
-                throw new Exception("Must specify 'type' for TypeConverterFactories add");
-
-            // load the specified types
-            Type factoryType = Type.GetType(type, true);
-
-            ITypeConverterFactory converterFactory = (ITypeConverterFactory)Activator.CreateInstance(factoryType);
-            context.AddTypeConverterFactory(converterFactory);
-
-        }
-
-        /// <summary>
-        /// Handles the configuration of Type Converters factories for the TypeConverterFactories node
-        /// </summary>
-        private void HandleTypeConverterFactories()
-        {
-            SectionHandler handler = new SectionHandler(reader, "TypeConverterFactories");
-            handler.AddMethod(new MethodMap("add", "type", new MethodDelegate(AddTypeConverterFactory)));
             handler.Process();
         }
 

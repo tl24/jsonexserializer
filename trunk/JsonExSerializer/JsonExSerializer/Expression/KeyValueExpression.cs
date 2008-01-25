@@ -98,10 +98,10 @@ namespace JsonExSerializer.Expression
                 throw new Exception(string.Format("Could not find property {0} for type {1}", Key, parentObject.GetType()));
             }
             ValueExpression.SetResultTypeIfNotSet(hndlr.PropertyType);
-            if (context.HasConverter(hndlr.Property))
+            if (hndlr.HasConverter)
             {
                 // find the converter and set it for the property
-                IJsonTypeConverter converter = context.GetConverter(hndlr.Property);
+                IJsonTypeConverter converter = hndlr.TypeConverter;
                 IEvaluator defaultEvaluator = EvaluatorFactory.GetEvaluator(ValueExpression, context);
                 if (defaultEvaluator is ConverterEvaluator)
                 {

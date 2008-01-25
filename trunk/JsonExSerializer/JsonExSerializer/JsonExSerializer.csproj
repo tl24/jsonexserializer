@@ -77,9 +77,13 @@
     <Compile Include="Collections\ListCollectionBuilder.cs" />
     <Compile Include="JsonExSerializationException.cs" />
     <Compile Include="JsonWriter.cs" />
+    <Compile Include="MetaData\CustomTypeHandlerFactory.cs" />
+    <Compile Include="MetaData\FieldHandler.cs" />
     <Compile Include="MetaData\IPropertyHandler.cs" />
     <Compile Include="MetaData\ITypeHandler.cs" />
     <Compile Include="MetaData\ITypeHandlerFactory.cs" />
+    <Compile Include="MetaData\MemberHandler.cs" />
+    <Compile Include="MetaData\PropertyHandlerBase.cs" />
     <Compile Include="MetaData\TypeHandlerFactory.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Parser.cs" />
@@ -96,9 +100,7 @@
     <Compile Include="TypeConversion\ConverterUtil.cs" />
     <Compile Include="TypeConversion\DictionaryToListConverter.cs" />
     <Compile Include="TypeConversion\IJsonTypeConverter.cs" />
-    <Compile Include="TypeConversion\ITypeConverterFactory.cs" />
     <Compile Include="TypeConversion\TypeConverterAdapter.cs" />
-    <Compile Include="TypeConversion\DefaultConverterFactory.cs" />
     <Compile Include="MetaData\TypeHandler.cs" />
     <Compile Include="MetaData\PropertyHandler.cs" />
     <Compile Include="XmlConfigurator.cs" />

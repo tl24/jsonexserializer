@@ -45,27 +45,10 @@ namespace JsonExSerializerTests
         public void TestRegisterTypeConverter()
         {
             Serializer s = Serializer.GetSerializer(typeof(object), "TestRegisterTypeConverter");
-            IJsonTypeConverter typeConverter = s.Context.GetConverter(typeof(SimpleObject));
-            IJsonTypeConverter propConverter = s.Context.GetConverter(typeof(SimpleObject).GetProperty("BoolValue"));
+            IJsonTypeConverter typeConverter = s.Context.GetTypeHandler(typeof(SimpleObject)).TypeConverter;
+            IJsonTypeConverter propConverter = s.Context.GetTypeHandler(typeof(SimpleObject)).FindProperty("BoolValue").TypeConverter;
             Assert.IsNotNull(typeConverter, "No converter for simple object registered");
             Assert.IsNotNull(propConverter, "No converter for simple object, BoolValue property registered");
-        }
-
-        [Test]
-        public void TestRegisterTypeConverterFactory()
-        {
-            Serializer s = Serializer.GetSerializer(typeof(KeyOnlyObjectImpl), "TestTypeConverterFactories");
-            KeyOnlyObjectImpl ko = new KeyOnlyObjectImpl();
-            ko.ID = "TestID";
-            ko.Name = "TestName";
-
-            string result = s.Serialize(ko);
-
-            // assert string is ID only
-            Assert.AreEqual("\"" + ko.ID + "\"", result, "Factory converter should serialize to ID only");
-
-            KeyOnlyObjectImpl des = (KeyOnlyObjectImpl)s.Deserialize(result);
-            Assert.AreSame(ko, des);             
         }
 
         [Test]

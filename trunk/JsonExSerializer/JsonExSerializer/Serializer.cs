@@ -49,14 +49,25 @@ namespace JsonExSerializer
             return new Serializer(t, configSection);
         }
 
+        public static Serializer GetSerializer(Type t, SerializationContext context)
+        {
+            return new Serializer(t, context);
+        }
 
-        private Serializer(Type t, string configSection)
+        private Serializer(Type t, string configSection) 
         {
             _serializedType = t;
-            _context = new SerializationContext(this);
+            _context = new SerializationContext();
+            _context.SerializerInstance = this;
             XmlConfigurator.Configure(_context, configSection);
         }
 
+        private Serializer(Type t, SerializationContext context)
+        {
+            _serializedType = t;
+            _context = context;
+            _context.SerializerInstance = this;
+        }
         #region Serialization
 
         /// <summary>

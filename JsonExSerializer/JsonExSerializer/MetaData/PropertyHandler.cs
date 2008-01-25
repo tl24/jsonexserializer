@@ -7,42 +7,34 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using JsonExSerializer.TypeConversion;
 
 namespace JsonExSerializer.MetaData
 {
     /// <summary>
     /// Helper for a type's properties
     /// </summary>
-    public class PropertyHandler : IPropertyHandler
+    public class PropertyHandler : PropertyHandlerBase, IPropertyHandler
     {
-        private PropertyInfo _property;
-        private int _position = -1;
-
-        public PropertyHandler(PropertyInfo property)
+        public PropertyHandler(PropertyInfo property) : base(property)
         {
-            _property = property;
         }
 
         public PropertyHandler(PropertyInfo property, int position)
+            : base(property, position)
         {
-            _property = property;
-            _position = position;
         }
 
+        private PropertyInfo Property
+        {
+            get { return (PropertyInfo)_member; }
+        }
         /// <summary>
         /// The type for the property
         /// </summary>
         public Type PropertyType
         {
-            get { return _property.PropertyType; }
-        }
-
-        /// <summary>
-        ///  The name of the property
-        /// </summary>
-        public string Name
-        {
-            get { return _property.Name; }
+            get { return Property.PropertyType; }
         }
 
         /// <summary>
@@ -52,7 +44,7 @@ namespace JsonExSerializer.MetaData
         /// <returns>property value</returns>
         public virtual object GetValue(object instance)
         {
-            return _property.GetValue(instance, null);
+            return Property.GetValue(instance, null);
         }
 
         /// <summary>
@@ -62,20 +54,8 @@ namespace JsonExSerializer.MetaData
         /// <param name="value">the new value to set</param>
         public virtual void SetValue(object instance, object value)
         {
-            _property.SetValue(instance, value, null);
+            Property.SetValue(instance, value, null);
         }
 
-        /// <summary>
-        /// The System.Reflection.PropertyInfo instance represented by this PropertyHandler
-        /// </summary>
-        public PropertyInfo Property
-        {
-            get { return this._property; }
-        }
-
-        public int Position
-        {
-            get { return this._position; }
-        }
     }
 }

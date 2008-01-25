@@ -19,6 +19,21 @@ namespace JsonExSerializer.TypeConversion
     {
         private TypeConverter _converter;
 
+        /// <summary>
+        /// Gets a TypeConverterAdapter instace for the type if there is a valid
+        /// System.ComponentModel.TypeConverter for the type.  Otherwise
+        /// it returns null
+        /// </summary>
+        /// <param name="ForType"></param>
+        /// <returns></returns>
+        public static TypeConverterAdapter GetAdapter(Type ForType)
+        {
+            TypeConverter tc = TypeDescriptor.GetConverter(ForType);
+            if (tc.CanConvertFrom(typeof(string)) && tc.CanConvertTo(typeof(string)))
+                return new TypeConverterAdapter(tc);
+            else
+                return null;
+        }
         public TypeConverterAdapter(TypeConverter converter) {
             _converter = converter;
         }

@@ -22,25 +22,25 @@ namespace JsonExSerializerTests
         [Test]
         public void TestHasConverter()
         {
-            DefaultConverterFactory factory = new DefaultConverterFactory();
-            bool f = factory.HasConverter(typeof(Guid));
+            SerializationContext ctx = new SerializationContext();
+            bool f = ctx.TypeHandlerFactory[typeof(Guid)].HasConverter; 
 
             Assert.IsTrue(f, "Guid should have implicit TypeConverter through System.ComponentModel framework");
 
-            f = factory.HasConverter(typeof(SimpleObject));
+            f = ctx.TypeHandlerFactory[typeof(SimpleObject)].HasConverter;
 
             Assert.IsFalse(f, "SimpleObject should not have converter");
 
-            
-            f = factory.HasConverter(typeof(SimpleObject).GetProperty("ByteValue"));
+
+            f = ctx.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("ByteValue").HasConverter;
 
             Assert.IsFalse(f, "SimpleObject.ByteValue property does not have a converter");
 
             // test primitives
-            f = factory.HasConverter(typeof(int));
+            f = ctx.TypeHandlerFactory[typeof(int)].HasConverter;
             Assert.IsFalse(f, "No converters for primitive types");
 
-            f = factory.HasConverter(typeof(string));
+            f = ctx.TypeHandlerFactory[typeof(string)].HasConverter;
             Assert.IsFalse(f, "No converters for string");
         }
 
@@ -150,27 +150,6 @@ namespace JsonExSerializerTests
         {
             Serializer s = Serializer.GetSerializer(typeof(object));
             s.Context.RegisterTypeConverter(typeof(int), new MyImmutablePointConverter());
-        }
-
-        [Test]
-        public void TestConverterFactory()
-        {
-            Serializer s = Serializer.GetSerializer(typeof(KeyOnlyObjectImpl));
-            KeyOnlyObjectImpl ko = new KeyOnlyObjectImpl();
-            ko.ID = "TestID";
-            ko.Name = "TestName";
-
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
-            MockConverterFactory factory = new MockConverterFactory();
-            s.Context.AddTypeConverterFactory(factory);
-            string result = s.Serialize(ko);
-
-            // assert string is ID only
-            Assert.AreEqual("\"" + ko.ID + "\"", result, "Factory converter should serialize to ID only");
-
-            KeyOnlyObjectImpl des = (KeyOnlyObjectImpl) s.Deserialize(result);
-            Assert.AreSame(ko, des);
         }
     }
 }

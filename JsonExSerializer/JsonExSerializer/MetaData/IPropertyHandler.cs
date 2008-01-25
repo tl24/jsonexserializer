@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using JsonExSerializer.TypeConversion;
 namespace JsonExSerializer.MetaData
 {
     /// <summary>
@@ -23,12 +24,7 @@ namespace JsonExSerializer.MetaData
         /// If this is a constructor property, its position in the constructor args
         /// </summary>
         int Position { get; }
-     
-        /// <summary>
-        /// The Reflection PropertyInfo for this property
-        /// </summary>
-        PropertyInfo Property { get; }
-        
+             
         /// <summary>
         /// The system type of the property
         /// </summary>
@@ -40,5 +36,16 @@ namespace JsonExSerializer.MetaData
         /// <param name="instance"></param>
         /// <param name="value"></param>
         void SetValue(object instance, object value);
+
+        /// <summary>
+        /// Returns true if there is a converter defined for this property
+        /// </summary>
+        bool HasConverter { get; }
+
+        /// <summary>
+        /// Gets or sets a TypeConverter for this property if one exists.  Setting this property
+        /// will override any converter declared using attributes
+        /// </summary>
+        IJsonTypeConverter TypeConverter { get; set; }
     }
 }

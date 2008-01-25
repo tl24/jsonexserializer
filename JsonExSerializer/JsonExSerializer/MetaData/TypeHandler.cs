@@ -9,30 +9,30 @@ using System.Text;
 using System.Reflection;
 using System.Collections;
 using JsonExSerializer.Collections;
+using JsonExSerializer.MetaData;
+using JsonExSerializer.TypeConversion;
 
 namespace JsonExSerializer.MetaData
 {
     /// <summary>
     /// Helper class for dealing with types during serialization
     /// </summary>
-    public class TypeHandler : ITypeHandler
+    public class TypeHandler : MemberHandlerBase, ITypeHandler
     {
-        private Type _handledType;
-        private IList<IPropertyHandler> _properties;
-        private IList<IPropertyHandler> _constructorArgs;
+        protected IList<IPropertyHandler> _properties;
+        protected IList<IPropertyHandler> _constructorArgs;
 
         private bool _collectionLookedUp = false;
         private ICollectionHandler _collectionHandler;
-        private SerializationContext _context;
+        protected SerializationContext _context;
         private IDictionary<string, bool> _tempIgnore;
 
         /// <summary>
         /// internal constructor
         /// </summary>
         /// <param name="t"></param>
-        public TypeHandler(Type t, SerializationContext context)
+        public TypeHandler(Type t, SerializationContext context) : base(t)
         {
-            _handledType = t;
             _context = context;
             _tempIgnore = new Dictionary<string, bool>();
         }
@@ -44,30 +44,7 @@ namespace JsonExSerializer.MetaData
         {   
             if (_properties == null)
             {
-                _properties = new List<IPropertyHandler>();
-                _constructorArgs = new List<IPropertyHandler>();
-
-                PropertyInfo[] pInfos = _handledType.GetProperties(BindingFlags.Public|BindingFlags.Instance);
-                foreach (PropertyInfo pInfo in pInfos)
-                {
-                    // must be able to read and write the prop, otherwise its not 2-way 
-                    if (pInfo.CanRead)
-                    {
-                        if (pInfo.IsDefined(typeof(ConstructorParameterAttribute), false))
-                        {
-                            ConstructorParameterAttribute ctorAttr = (ConstructorParameterAttribute) pInfo.GetCustomAttributes(typeof(ConstructorParameterAttribute), false)[0];
-
-                            _constructorArgs.Add(new PropertyHandler(pInfo, ctorAttr.Position));
-                        } 
-                        else if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
-                            && pInfo.GetGetMethod().GetParameters().Length == 0
-                            && !_tempIgnore.ContainsKey(pInfo.Name)
-                            && pInfo.CanWrite)
-                        {
-                            _properties.Add(new PropertyHandler(pInfo));
-                        }
-                    }
-                }
+                ReadProperties(out _properties, out _constructorArgs);
                 if (_constructorArgs.Count > 0)
                 {
                     ((List<IPropertyHandler>)_constructorArgs).Sort(
@@ -77,6 +54,55 @@ namespace JsonExSerializer.MetaData
             }
         }
 
+        /// <summary>
+        /// Reads the properties and constructor arguments from type metadata
+        /// </summary>
+        /// <param name="Properties">properties collection</param>
+        /// <param name="ConstructorArguments">constructor arguments</param>
+        protected virtual void ReadProperties(out IList<IPropertyHandler> Properties, out IList<IPropertyHandler> ConstructorArguments)
+        {
+            Properties = new List<IPropertyHandler>();
+            ConstructorArguments = new List<IPropertyHandler>();
+
+            PropertyInfo[] pInfos = ForType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            MemberInfo[] mInfos = ForType.GetMembers(BindingFlags.Public | BindingFlags.Instance);
+            foreach (MemberInfo mInfo in mInfos)
+            {
+                PropertyInfo pInfo = mInfo as PropertyInfo;
+                FieldInfo fInfo = mInfo as FieldInfo;
+                // must be able to read and write the prop, otherwise its not 2-way 
+                if (pInfo != null && pInfo.CanRead)
+                {
+                    if (pInfo.IsDefined(typeof(ConstructorParameterAttribute), false))
+                    {
+                        ConstructorParameterAttribute ctorAttr = (ConstructorParameterAttribute)pInfo.GetCustomAttributes(typeof(ConstructorParameterAttribute), false)[0];
+
+                        ConstructorArguments.Add(new PropertyHandler(pInfo, ctorAttr.Position));
+                    }
+                    else if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
+                        && pInfo.GetGetMethod().GetParameters().Length == 0
+                        && !_tempIgnore.ContainsKey(pInfo.Name)
+                        && pInfo.CanWrite)
+                    {
+                        Properties.Add(new PropertyHandler(pInfo));
+                    }
+                }
+                else if (fInfo != null)
+                {
+                    if (fInfo.IsDefined(typeof(ConstructorParameterAttribute), false))
+                    {
+                        ConstructorParameterAttribute ctorAttr = (ConstructorParameterAttribute)fInfo.GetCustomAttributes(typeof(ConstructorParameterAttribute), false)[0];
+
+                        ConstructorArguments.Add(new FieldHandler(fInfo, ctorAttr.Position));
+                    }
+                    else if (!fInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
+                        && !_tempIgnore.ContainsKey(fInfo.Name))
+                    {
+                        Properties.Add(new FieldHandler(fInfo));
+                    }
+                }
+            }
+        }
         protected int PropertyHandlerComparison(IPropertyHandler a, IPropertyHandler b) {
             return a.Position - b.Position;
         }
@@ -123,6 +149,11 @@ namespace JsonExSerializer.MetaData
                 if (prop.Name == Name)
                     return prop;
             }
+            foreach (IPropertyHandler prop in ConstructorParameters)
+            {
+                if (prop.Name == Name)
+                    return prop;
+            }
             return null;
         }
 
@@ -150,14 +181,6 @@ namespace JsonExSerializer.MetaData
         public virtual void IgnoreProperty(PropertyInfo property)
         {
             IgnoreProperty(property.Name);
-        }
-
-        /// <summary>
-        /// The type of object that this typehandler represents
-        /// </summary>
-        public virtual Type ForType
-        {
-            get { return _handledType; }
         }
 
         /// <summary>
@@ -228,7 +251,34 @@ namespace JsonExSerializer.MetaData
             {
                 throw new CollectionException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }
-        }       
+        }
+
+        protected override IJsonTypeConverter CreateTypeConverter()
+        {
+            IJsonTypeConverter converter = CreateTypeConverter(ForType);
+            if (converter == null)
+                return GetDefaultTypeConverter(ForType);
+            else
+                return converter;
+        }
+
+        public override IJsonTypeConverter TypeConverter
+        {
+            get
+            {
+                if (ForType.IsPrimitive || ForType == typeof(string))
+                {
+                    _converterCreated = true;
+                    return null;
+                }
+                else
+                    return base.TypeConverter;
+            }
+            set
+            {
+                base.TypeConverter = value;
+            }
+        }
     }
 
 }

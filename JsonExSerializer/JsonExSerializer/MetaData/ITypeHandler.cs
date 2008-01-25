@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JsonExSerializer.Collections;
 using System.Reflection;
+using JsonExSerializer.TypeConversion;
 namespace JsonExSerializer.MetaData
 {
     /// <summary>
@@ -83,5 +84,15 @@ namespace JsonExSerializer.MetaData
         /// <returns></returns>
         bool IsCollection();
 
+        /// <summary>
+        /// Returns true if there is a converter defined for this property
+        /// </summary>
+        bool HasConverter { get; }
+
+        /// <summary>
+        /// Gets or sets a TypeConverter for this type if one is available.  Setting this property
+        /// will override any converter declared using attributes
+        /// </summary>
+        IJsonTypeConverter TypeConverter { get; set; }
     }
 }

@@ -125,6 +125,14 @@ namespace JsonExSerializer.MetaData
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public virtual bool IsEmpty
+        {
+            get { return Properties.Count == 0; }
+        }
+
+        /// <summary>
         /// Get the list of properties for this type
         /// </summary>
         public virtual IList<IPropertyHandler> Properties
@@ -172,15 +180,6 @@ namespace JsonExSerializer.MetaData
                 IPropertyHandler handler = FindProperty(name);
                 _properties.Remove(handler);
             }
-        }
-
-        /// <summary>
-        /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
-        /// </summary>
-        /// <param name="name">the name of the property</param>
-        public virtual void IgnoreProperty(PropertyInfo property)
-        {
-            IgnoreProperty(property.Name);
         }
 
         /// <summary>

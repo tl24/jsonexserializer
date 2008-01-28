@@ -24,6 +24,11 @@ namespace JsonExSerializer.MetaData
         IList<IPropertyHandler> ConstructorParameters { get; }
 
         /// <summary>
+        /// Returns true if the type has no serializable properties
+        /// </summary>
+        bool IsEmpty { get; }
+
+        /// <summary>
         /// Finds a property by name
         /// </summary>
         /// <param name="Name">the name of the property to find</param>
@@ -34,12 +39,6 @@ namespace JsonExSerializer.MetaData
         /// Returns the properties for this type that can be serialized/deserialized
         /// </summary>
         IList<IPropertyHandler> Properties { get; }
-
-        /// <summary>
-        /// Sets the ignore flag on the property so that it will not be serialized
-        /// </summary>
-        /// <param name="property">property to ignore</param>
-        void IgnoreProperty(PropertyInfo property);
 
         /// <summary>
         /// Sets the ignore flag on the property so that it will not be serialized

@@ -146,15 +146,10 @@ namespace JsonExSerializer
             Type objectType = Type.GetType(type, true);
             Type converterType = Type.GetType(converter, true);
 
-            PropertyInfo propertyObj = null;
             // check for the property element, if it exists, the converter is for a property on the type
-            if (!string.IsNullOrEmpty(property))
-            {
-                propertyObj = objectType.GetProperty(property);
-            }
             IJsonTypeConverter converterObj = (IJsonTypeConverter)Activator.CreateInstance(converterType);
-            if (propertyObj != null)
-                context.RegisterTypeConverter(propertyObj, converterObj);
+            if (!string.IsNullOrEmpty(property))
+                context.RegisterTypeConverter(objectType, property, converterObj);
             else
                 context.RegisterTypeConverter(objectType, converterObj);
 

@@ -264,9 +264,9 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="forType">the property to register</param>
         /// <param name="converter">the converter</param>
-        public void RegisterTypeConverter(PropertyInfo forProperty, IJsonTypeConverter converter)
+        public void RegisterTypeConverter(Type ForType, string PropertyName, IJsonTypeConverter Converter)
         {
-            TypeHandlerFactory.RegisterTypeConverter(forProperty.DeclaringType, forProperty.Name, converter);
+            TypeHandlerFactory.RegisterTypeConverter(ForType, PropertyName, Converter);
         }
 
         #endregion
@@ -314,16 +314,6 @@ namespace JsonExSerializer
         {
             ITypeHandler handler = GetTypeHandler(objectType);
             handler.IgnoreProperty(propertyName);
-        }
-
-        /// <summary>
-        /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
-        /// </summary>
-        /// <param name="property">the property</param>
-        public void IgnoreProperty(PropertyInfo property)
-        {
-            ITypeHandler handler = GetTypeHandler(property.DeclaringType);
-            handler.IgnoreProperty(property);
         }
 
         #endregion

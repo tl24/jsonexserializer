@@ -76,6 +76,7 @@
     <Compile Include="Mocks\SimpleObject.cs" />
     <Compile Include="SimpleConfigSettingsTests.cs" />
     <Compile Include="AdvancedConfigSettingTests.cs" />
+    <Compile Include="TypeHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JsonExSerializer\JsonExSerializer.csproj">

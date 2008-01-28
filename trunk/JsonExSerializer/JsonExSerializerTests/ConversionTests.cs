@@ -118,7 +118,7 @@ namespace JsonExSerializerTests
             ChainedConverter converter = new ChainedConverter();
             converter.Converters.Add(new StringToBoolConverter());
             converter.Converters.Add(new BoolToIntConverter());
-            s.Context.RegisterTypeConverter(mock.GetType().GetProperty("StringProp"), converter);
+            s.Context.RegisterTypeConverter(mock.GetType(), "StringProp", converter);
             string result = s.Serialize(mock);
             ChainedConversionMock actual = (ChainedConversionMock)s.Deserialize(result);
             Assert.AreEqual(mock.StringProp.StringProp, actual.StringProp.StringProp, "Chained conversion failed");
@@ -134,7 +134,7 @@ namespace JsonExSerializerTests
             Serializer s = Serializer.GetSerializer(typeof(MyLine));
             // ignore properties (Use both methods)
             s.Context.IgnoreProperty(typeof(MyLine), "Start");
-            s.Context.IgnoreProperty(typeof(MyLine).GetProperty("End"));
+            s.Context.IgnoreProperty(typeof(MyLine), "End");
             string result = s.Serialize(line);
             MyLine actual = (MyLine)s.Deserialize(result);
             Assert.IsNull(actual.Start, "Line start should be ignored");

@@ -36,7 +36,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CollectionException.cs" />
     <Compile Include="Collections\ArrayBuilder.cs" />
     <Compile Include="Collections\ArrayHandler.cs" />
     <Compile Include="Collections\CollectionConstructorHandler.cs" />
@@ -76,6 +75,7 @@
     <Compile Include="JsonExIgnoreAttribute.cs" />
     <Compile Include="Collections\ListCollectionBuilder.cs" />
     <Compile Include="JsonExSerializationException.cs" />
+    <Compile Include="JsonPropertyAttribute.cs" />
     <Compile Include="JsonWriter.cs" />
     <Compile Include="MetaData\CustomTypeHandlerFactory.cs" />
     <Compile Include="MetaData\FieldHandler.cs" />

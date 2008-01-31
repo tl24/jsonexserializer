@@ -145,7 +145,7 @@ namespace JsonExSerializerTests
         }
 
         [Test]
-        [ExpectedException(typeof(JsonExSerializationException))]
+        [ExpectedException(typeof(ArgumentException))]
         public void TestRegisterPrimitiveTypeConverter()
         {
             Serializer s = Serializer.GetSerializer(typeof(object));

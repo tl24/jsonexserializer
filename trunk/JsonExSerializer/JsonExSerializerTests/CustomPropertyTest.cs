@@ -131,5 +131,27 @@ namespace JsonExSerializerTests
         {
             return CreateTypeConverter(PropertyType);
         }
+
+        #region IPropertyHandler Members
+
+
+        public bool IsConstructorArgument
+        {
+            get { return false; }
+        }
+
+        public bool Ignored
+        {
+            get
+            {
+                return false;
+            }
+            set
+            {
+                
+            }
+        }
+
+        #endregion
     }
 }

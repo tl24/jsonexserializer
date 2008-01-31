@@ -38,6 +38,11 @@ namespace JsonExSerializer.MetaData
             get { return _position; }
         }
 
+        public virtual bool IsConstructorArgument
+        {
+            get { return _position >= 0; }
+        }
+
         protected override IJsonTypeConverter CreateTypeConverter()
         {
             return CreateTypeConverter(_member);

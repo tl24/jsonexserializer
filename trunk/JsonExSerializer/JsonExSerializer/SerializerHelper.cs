@@ -159,7 +159,7 @@ namespace JsonExSerializer
                         }
                         else if (o is ICollection && !(o is IDictionary))
                         {
-                            throw new CollectionException(o.GetType() + " is a collection but doesn't have a CollectionHandler");
+                            throw new InvalidOperationException(o.GetType() + " is a collection but doesn't have a CollectionHandler");
                         }
                         else
                         {
@@ -275,7 +275,7 @@ namespace JsonExSerializer
                     this.ConstructorArgsEnd();
                 }
 
-                if (!hasConstructor || handler.Properties.Count > 0)
+                if (!hasConstructor || !handler.IsEmpty)
                 {
                     hasInitializer = true;
                     this.ObjectStart();

@@ -26,6 +26,7 @@ namespace JsonExSerializer.MetaData
         private ICollectionHandler _collectionHandler;
         protected SerializationContext _context;
         private IDictionary<string, bool> _tempIgnore;
+        private bool? _empty;
 
         /// <summary>
         /// internal constructor
@@ -64,45 +65,30 @@ namespace JsonExSerializer.MetaData
             Properties = new List<IPropertyHandler>();
             ConstructorArguments = new List<IPropertyHandler>();
 
-            PropertyInfo[] pInfos = ForType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             MemberInfo[] mInfos = ForType.GetMembers(BindingFlags.Public | BindingFlags.Instance);
             foreach (MemberInfo mInfo in mInfos)
             {
-                PropertyInfo pInfo = mInfo as PropertyInfo;
-                FieldInfo fInfo = mInfo as FieldInfo;
+                IPropertyHandler prop = null;
                 // must be able to read and write the prop, otherwise its not 2-way 
-                if (pInfo != null && pInfo.CanRead)
+                if (mInfo is PropertyInfo)
                 {
-                    if (pInfo.IsDefined(typeof(ConstructorParameterAttribute), false))
-                    {
-                        ConstructorParameterAttribute ctorAttr = (ConstructorParameterAttribute)pInfo.GetCustomAttributes(typeof(ConstructorParameterAttribute), false)[0];
-
-                        ConstructorArguments.Add(new PropertyHandler(pInfo, ctorAttr.Position));
-                    }
-                    else if (!pInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
-                        && pInfo.GetGetMethod().GetParameters().Length == 0
-                        && !_tempIgnore.ContainsKey(pInfo.Name)
-                        && pInfo.CanWrite)
-                    {
-                        Properties.Add(new PropertyHandler(pInfo));
-                    }
+                    prop = new PropertyHandler((PropertyInfo) mInfo);
                 }
-                else if (fInfo != null)
+                else if (mInfo is FieldInfo)
                 {
-                    if (fInfo.IsDefined(typeof(ConstructorParameterAttribute), false))
-                    {
-                        ConstructorParameterAttribute ctorAttr = (ConstructorParameterAttribute)fInfo.GetCustomAttributes(typeof(ConstructorParameterAttribute), false)[0];
-
-                        ConstructorArguments.Add(new FieldHandler(fInfo, ctorAttr.Position));
-                    }
-                    else if (!fInfo.IsDefined(typeof(JsonExIgnoreAttribute), false)
-                        && !_tempIgnore.ContainsKey(fInfo.Name))
-                    {
-                        Properties.Add(new FieldHandler(fInfo));
-                    }
+                    prop = new FieldHandler((FieldInfo) mInfo);
+                }
+                if (prop != null) {
+                    if (prop.IsConstructorArgument)
+                        ConstructorArguments.Add(prop);
+                    else
+                        Properties.Add(prop);
+                    if (_tempIgnore != null && _tempIgnore.ContainsKey(prop.Name))
+                        prop.Ignored = true;
                 }
             }
         }
+
         protected int PropertyHandlerComparison(IPropertyHandler a, IPropertyHandler b) {
             return a.Position - b.Position;
         }
@@ -129,13 +115,41 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         public virtual bool IsEmpty
         {
-            get { return Properties.Count == 0; }
+            get
+            {
+                if (!_empty.HasValue)
+                    foreach (IPropertyHandler prop in AllProperties)
+                    {
+                        if (!prop.Ignored)
+                        {
+                            _empty = false;
+                            break;
+                        }
+                    }
+                if (!_empty.HasValue)
+                    _empty = true;
+
+
+                return _empty.Value;
+            }
         }
 
+        public virtual IEnumerable<IPropertyHandler> Properties
+        {
+            get
+            {
+                foreach (IPropertyHandler prop in AllProperties)
+                {
+                    if (!prop.Ignored)
+                        yield return prop;
+
+                }
+            }
+        }
         /// <summary>
         /// Get the list of properties for this type
         /// </summary>
-        public virtual IList<IPropertyHandler> Properties
+        public virtual IEnumerable<IPropertyHandler> AllProperties
         {
             get {
                 LoadProperties();
@@ -214,7 +228,7 @@ namespace JsonExSerializer.MetaData
             if (IsCollection()) {
                 return _collectionHandler;
             } else {
-                throw new CollectionException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
+                throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }            
         }
 
@@ -231,7 +245,7 @@ namespace JsonExSerializer.MetaData
             }
             else
             {
-                throw new CollectionException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
+                throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }
         }
 
@@ -248,7 +262,7 @@ namespace JsonExSerializer.MetaData
             }
             else
             {
-                throw new CollectionException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
+                throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }
         }
 

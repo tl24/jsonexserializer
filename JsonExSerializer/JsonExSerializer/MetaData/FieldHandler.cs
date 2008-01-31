@@ -10,6 +10,7 @@ namespace JsonExSerializer.MetaData
     /// </summary>
     public class FieldHandler : PropertyHandlerBase, IPropertyHandler
     {
+        private bool _ignored;
         /// <summary>
         /// Constructs a FieldHandler for a field on a type that is not a constructor
         /// parameter
@@ -18,6 +19,7 @@ namespace JsonExSerializer.MetaData
         public FieldHandler(FieldInfo field)
             : base(field)
         {
+            Initialize();
         }
 
         /// <summary>
@@ -29,6 +31,22 @@ namespace JsonExSerializer.MetaData
         public FieldHandler(FieldInfo field, int position)
             : base(field, position)
         {
+            Initialize();
+            _position = position;
+        }
+
+        private void Initialize()
+        {
+            if (Field.IsDefined(typeof(ConstructorParameterAttribute), false))
+            {
+                ConstructorParameterAttribute ctorAttr = (ConstructorParameterAttribute)Field.GetCustomAttributes(typeof(ConstructorParameterAttribute), false)[0];
+                _position = ctorAttr.Position;
+            }
+            if (Field.IsDefined(typeof(JsonExIgnoreAttribute), false))
+                _ignored = true;
+
+            if (Field.IsDefined(typeof(JsonPropertyAttribute), false))
+                _ignored = false;
         }
 
         /// <summary>
@@ -65,6 +83,16 @@ namespace JsonExSerializer.MetaData
         public void SetValue(object instance, object value)
         {
             Field.SetValue(instance, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the value indicating whether this property is ignored or not.  If the property
+        /// is ignored it will not be serialized.
+        /// </summary>
+        public virtual bool Ignored
+        {
+            get { return _ignored; }
+            set { _ignored = value; }
         }
     }
 }

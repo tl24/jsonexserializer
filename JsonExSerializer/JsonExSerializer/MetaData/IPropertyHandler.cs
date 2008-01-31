@@ -24,7 +24,12 @@ namespace JsonExSerializer.MetaData
         /// If this is a constructor property, its position in the constructor args
         /// </summary>
         int Position { get; }
-             
+
+        /// <summary>
+        /// Returns true if this property represents a constructor argument for the type
+        /// </summary>
+        bool IsConstructorArgument { get; }
+
         /// <summary>
         /// The system type of the property
         /// </summary>
@@ -47,5 +52,11 @@ namespace JsonExSerializer.MetaData
         /// will override any converter declared using attributes
         /// </summary>
         IJsonTypeConverter TypeConverter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value indicating whether this property is ignored or not.  If the property
+        /// is ignored it will not be serialized.
+        /// </summary>
+        bool Ignored { get; set; }
     }
 }

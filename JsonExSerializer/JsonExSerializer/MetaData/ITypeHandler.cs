@@ -38,7 +38,12 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Returns the properties for this type that can be serialized/deserialized
         /// </summary>
-        IList<IPropertyHandler> Properties { get; }
+        IEnumerable<IPropertyHandler> Properties { get; }
+
+        /// <summary>
+        /// Returns all properties for this type, even those that can NOT be serialized/deserialized
+        /// </summary>
+        IEnumerable<IPropertyHandler> AllProperties { get; }
 
         /// <summary>
         /// Sets the ignore flag on the property so that it will not be serialized

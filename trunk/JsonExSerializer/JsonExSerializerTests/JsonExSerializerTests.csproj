@@ -30,11 +30,11 @@
   <ItemGroup>
     <Reference Include="MbUnit.Framework, Version=1.0.2700.29885, Culture=neutral, PublicKeyToken=5e72ecd30bc408d5">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\MbUnit.Framework.dll</HintPath>
+      <HintPath>..\lib\MbUnit.Framework.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.4.0.2, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\nunit.framework.dll</HintPath>
+      <HintPath>..\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -67,7 +67,6 @@
     <Compile Include="Mocks\SemiComplexObject.cs" />
     <Compile Include="Mocks\SpecializedMock.cs" />
     <Compile Include="Mocks\SubClassMock.cs" />
-    <Compile Include="PerfTests.cs" />
     <Compile Include="ReferenceTests.cs" />
     <Compile Include="SerializeCtorTests.cs" />
     <Compile Include="SerializeObjectTests.cs" />

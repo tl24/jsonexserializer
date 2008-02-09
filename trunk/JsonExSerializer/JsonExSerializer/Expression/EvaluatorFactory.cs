@@ -35,23 +35,26 @@ namespace JsonExSerializer.Expression
 
     public class EvaluatorFactory
     {
+        private static Dictionary<Type, EvalCtor> _cache = new Dictionary<Type, EvalCtor>();
+
+        private delegate IEvaluator EvalCtor(ExpressionBase expression);
+        static EvaluatorFactory()
+        {
+            _cache[typeof(ObjectExpression)] = delegate (ExpressionBase e) { return new ObjectEvaluator((ObjectExpression) e); };
+            _cache[typeof(ValueExpression)] = delegate(ExpressionBase e) { return new ValueEvaluator((ValueExpression)e); };
+            _cache[typeof(NumericExpression)] = delegate(ExpressionBase e) { return new ValueEvaluator((NumericExpression)e); };
+            _cache[typeof(BooleanExpression)] = delegate(ExpressionBase e) { return new ValueEvaluator((BooleanExpression)e); };
+        }
         public static IEvaluator GetEvaluator(ExpressionBase expression, SerializationContext context)
         {
             Type evaluatorType = null;
             Type expType = expression.GetType();
             IEvaluator evaluator = null;
             ITypeHandler handler = context.GetTypeHandler(expression.ResultType);
-            if (expType.IsDefined(typeof(DefaultEvaluatorAttribute), false))
-            {
-                DefaultEvaluatorAttribute attr = (DefaultEvaluatorAttribute)expType.GetCustomAttributes(typeof(DefaultEvaluatorAttribute), false)[0];
-                evaluatorType = attr.EvaluatorType;
-                evaluator = (IEvaluator) Activator.CreateInstance(evaluatorType, expression);                
-            } else if (expression is ListExpression) {                
-                if (handler.IsCollection())
-                {
-                    evaluator = new CollectionBuilderEvaluator(expression);
-                }
-            }
+            evaluator = GetDefaultEvaluator(expression);          
+            if (evaluator == null && expression is ListExpression && handler.IsCollection())
+                evaluator = new CollectionBuilderEvaluator(expression);
+
             if (evaluator != null)
             {
                 evaluator.Context = context;
@@ -73,6 +76,16 @@ namespace JsonExSerializer.Expression
             {
                 throw new Exception("No suitable evaluator found for expression type: " + expression.GetType().FullName);
             }
+        }
+
+        private static IEvaluator GetDefaultEvaluator(ExpressionBase expression)
+        {
+            Type expType = expression.GetType();
+            EvalCtor evaluatorConstructor = null;
+            if (_cache.TryGetValue(expType, out evaluatorConstructor))
+                return evaluatorConstructor(expression);
+            else
+                return null;
         }
     }
 }

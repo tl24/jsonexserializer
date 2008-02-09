@@ -35,6 +35,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinarySerializerTest.cs" />
     <Compile Include="ISerializer.cs" />
     <Compile Include="JsonSerializerTest.cs" />
     <Compile Include="PerfTests.cs" />

@@ -8,7 +8,8 @@ namespace PerformanceTests
     {
         public static void Main(string[] args)
         {
-            //new XmlSerializerTest().RunTests();
+            new BinarySerializerTest().RunTests();
+            new XmlSerializerTest().RunTests();
             new JsonSerializerTest().RunTests();
         }
     }

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace PerformanceTests.TestDomain
 {
+    [Serializable]
     public class Order
     {
         private int _orderNumber;

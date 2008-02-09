@@ -4,6 +4,7 @@ using System.Text;
 
 namespace PerformanceTests.TestDomain
 {
+    [Serializable]
     public class Address
     {
         private string _streetAddress;

@@ -31,7 +31,7 @@ namespace PerformanceTests
             customer.Age = _testDataGen.RandomInt(1, 100);
             customer.Phone = _testDataGen.RandomInt(1111111111, 1888888888).ToString();
             customer.Ssn = _testDataGen.RandomInt(111111111, 999999999).ToString();
-            customer.DateOfBirth = new DateTime(1970, 1, 1);
+            
             customer.Addresses.Add(ProduceAddress());
             customer.Addresses[0].AddressType = 'B';
             customer.Addresses[0].IsPrimary = true;
@@ -43,6 +43,7 @@ namespace PerformanceTests
                 Order ord = ProduceOrder();
                 customer.Orders.Add(ord);
             }
+              
             return customer;
         }
 
@@ -54,7 +55,6 @@ namespace PerformanceTests
             ord.OrderNumber = _objectCount;
             ord.CcNumber = _testDataGen.RandomInt(1111111111, 1999999999).ToString();
             ord.CvvNumber = _testDataGen.RandomInt(111, 999);
-            ord.ExpireDate = new DateTime(2010, 1, 1);
             int itemsLeft = _maxObjectCount - _objectCount;
             if (itemsLeft > 0) {
                 int itemCount = _testDataGen.RandomInt(1, Math.Min(itemsLeft, _maxObjectCount / 2));

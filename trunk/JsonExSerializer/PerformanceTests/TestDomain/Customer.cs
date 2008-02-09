@@ -11,7 +11,6 @@ namespace PerformanceTests.TestDomain
         private string _phone;
         private string _ssn;
         private int _age;
-        private DateTime _dateOfBirth;
 
         private List<Address> _addresses = new List<Address>();
         private List<Order> _orders = new List<Order>();
@@ -44,12 +43,6 @@ namespace PerformanceTests.TestDomain
         {
             get { return this._age; }
             set { this._age = value; }
-        }
-
-        public System.DateTime DateOfBirth
-        {
-            get { return this._dateOfBirth; }
-            set { this._dateOfBirth = value; }
         }
 
         public System.Collections.Generic.List<PerformanceTests.TestDomain.Address> Addresses

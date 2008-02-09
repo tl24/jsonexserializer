@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer;
 using System.IO;
+using JsonExSerializer.MetaData;
+using PerformanceTests.TestDomain;
 
 namespace PerformanceTests
 {
@@ -13,6 +15,7 @@ namespace PerformanceTests
         public override void InitSerializer(Type t)
         {
             serializer = Serializer.GetSerializer(t);
+            //serializer.Context.TypeHandlerFactory = new CustTypeHandlerFactory(serializer.Context);
         }
 
         #region ISerializer Members

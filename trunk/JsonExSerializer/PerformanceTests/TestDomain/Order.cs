@@ -9,7 +9,6 @@ namespace PerformanceTests.TestDomain
         private int _orderNumber;
         private decimal _orderAmount;
         private string _ccNumber;
-        private DateTime _expireDate;
         private int _cvvNumber;
 
         private List<OrderItem> _orderItems = new List<OrderItem>();
@@ -24,12 +23,6 @@ namespace PerformanceTests.TestDomain
         {
             get { return this._ccNumber; }
             set { this._ccNumber = value; }
-        }
-
-        public System.DateTime ExpireDate
-        {
-            get { return this._expireDate; }
-            set { this._expireDate = value; }
         }
 
         public int CvvNumber

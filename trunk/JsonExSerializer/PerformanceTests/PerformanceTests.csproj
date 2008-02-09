@@ -43,6 +43,7 @@
     <Compile Include="RandomGenerator.cs" />
     <Compile Include="TestDomain\Address.cs" />
     <Compile Include="TestDomain\Customer.cs" />
+    <Compile Include="TestDomain\CustomerTypeHandler.cs" />
     <Compile Include="TestDomain\Order.cs" />
     <Compile Include="TestDomain\OrderItem.cs" />
     <Compile Include="TestObjectFactory.cs" />

@@ -20,6 +20,7 @@ namespace JsonExSerializer
         private TextReader _reader;
         private Stack<Token> _tokens;
         private char[] _symbols;
+        private StringBuilder _buffer;
 
         #endregion
 
@@ -33,6 +34,7 @@ namespace JsonExSerializer
             _tokens = new Stack<Token>();
             _symbols = "[]<>():,{}.".ToCharArray();
             Array.Sort<char>(_symbols);
+            _buffer = new StringBuilder();
         }
 
         /// <summary>
@@ -82,7 +84,9 @@ namespace JsonExSerializer
         /// <returns></returns>
         private Token ReadTokenFromReader()
         {
-            StringBuilder buffer = new StringBuilder();
+            StringBuilder buffer = _buffer;
+            buffer.Length = 0;
+
             int c;
             char ch;
 

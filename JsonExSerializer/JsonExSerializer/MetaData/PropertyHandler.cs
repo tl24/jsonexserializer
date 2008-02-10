@@ -101,5 +101,10 @@ namespace JsonExSerializer.MetaData
             if (!_ignored && !Property.CanRead)
                 throw new InvalidOperationException("Cannot serialize a property without a get method: " + ForType.FullName + ":" + Name);
         }
+
+        public override bool CanWrite
+        {
+            get { return Property.CanWrite; }
+        }
     }
 }

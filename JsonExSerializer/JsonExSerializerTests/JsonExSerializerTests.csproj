@@ -67,6 +67,11 @@
     <Compile Include="Mocks\SemiComplexObject.cs" />
     <Compile Include="Mocks\SpecializedMock.cs" />
     <Compile Include="Mocks\SubClassMock.cs" />
+    <Compile Include="ReadOnlyPropertyTests\ArrayParent.cs" />
+    <Compile Include="ReadOnlyPropertyTests\CollectionItem.cs" />
+    <Compile Include="ReadOnlyPropertyTests\CollectionParent.cs" />
+    <Compile Include="ReadOnlyPropertyTests\ObjectParent.cs" />
+    <Compile Include="ReadOnlyPropertyTests\ReadOnlyProperty.cs" />
     <Compile Include="ReferenceTests.cs" />
     <Compile Include="SerializeCtorTests.cs" />
     <Compile Include="SerializeObjectTests.cs" />

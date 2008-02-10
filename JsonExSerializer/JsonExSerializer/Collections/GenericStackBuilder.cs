@@ -17,6 +17,11 @@ namespace JsonExSerializer.Collections
             _stack = new Stack<T>();
         }
 
+        public GenericStackBuilder(Stack<T> stack)
+        {
+            _stack = stack;
+        }
+
         #region ICollectionBuilder Members
 
         public void Add(object item)

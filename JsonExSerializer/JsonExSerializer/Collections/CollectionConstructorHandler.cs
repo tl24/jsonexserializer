@@ -43,6 +43,11 @@ namespace JsonExSerializer.Collections
             return (ICollectionBuilder)Activator.CreateInstance(typeof(GenericCollectionCtorBuilder<>).MakeGenericType(itemType), collectionType);
         }
 
+        public ICollectionBuilder ConstructBuilder(object collection)
+        {
+            throw new InvalidOperationException("CollectionConstructorHandler does not support modify existing collections");
+        }
+
         public Type GetItemType(Type CollectionType)
         {
             Type t = null;

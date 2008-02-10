@@ -32,6 +32,11 @@ namespace JsonExSerializer.Collections
             return new ListCollectionBuilder(collectionType);
         }
 
+        public ICollectionBuilder ConstructBuilder(object collection)
+        {
+            return new ListCollectionBuilder((IList)collection);
+        }
+
         public Type GetItemType(Type CollectionType)
         {
             return typeof(object);

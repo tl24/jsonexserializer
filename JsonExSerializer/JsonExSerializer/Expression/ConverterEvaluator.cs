@@ -98,6 +98,10 @@ namespace JsonExSerializer.Expression
             set { this._converter = value; }
         }
 
+        public void SetResult(object value)
+        {
+            throw new Exception("The method or operation is not supported.");
+        }
 
     }
 }

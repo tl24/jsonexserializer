@@ -31,29 +31,27 @@ namespace JsonExSerializer.Expression
         /// If a reference cannot be created at this point an exception should be thrown
         /// </summary>
         /// <returns>A constructed object</returns>
-        public virtual object GetReference(SerializationContext context)
+        public virtual object GetReference(SerializationContext Context)
         {
-            // allow classes to set their own evaluator if necessary, but
-            // generally the factory should be used
-            if (_evaluator == null)
-            {
-                this._evaluator = EvaluatorFactory.GetEvaluator(this, context);
-            }
-            return _evaluator.GetReference();
+            return GetEvaluator(Context).GetReference();
         }
 
         // the result of this operation should be cached in case references are created
         // i.e. subsequent calls to Evaluate should return the exact same object as before
         // (when a reference type is involved)
-        public virtual object Evaluate(SerializationContext context)
+        public virtual object Evaluate(SerializationContext Context)
         {
             // allow classes to set their own evaluator if necessary, but
             // generally the factory should be used
+            return GetEvaluator(Context).Evaluate();            
+        }
+
+        public virtual IEvaluator GetEvaluator(SerializationContext Context) {
             if (_evaluator == null)
             {
-                this._evaluator = EvaluatorFactory.GetEvaluator(this, context);
+                this._evaluator = EvaluatorFactory.GetEvaluator(this, Context);
             }
-            return _evaluator.Evaluate();            
+            return this._evaluator;
         }
 
         public abstract ExpressionBase ResolveReference(ReferenceIdentifier refID);

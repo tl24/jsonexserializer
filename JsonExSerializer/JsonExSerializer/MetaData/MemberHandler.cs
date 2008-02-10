@@ -80,6 +80,9 @@ namespace JsonExSerializer.MetaData
             return converter;
         }
 
-
+        public virtual bool CanWrite
+        {
+            get { return true; }
+        }
     }
 }

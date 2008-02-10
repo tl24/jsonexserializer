@@ -8,6 +8,9 @@ namespace JsonExSerializer.Expression
 {
     public interface IEvaluator
     {
+
+        void SetResult(object value);
+
         /// <summary>
         /// Fully evaluates the expression for this evaluator
         /// </summary>

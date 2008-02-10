@@ -23,6 +23,12 @@ namespace JsonExSerializer.Collections
         {
             _stack = Activator.CreateInstance(stackType);
         }
+
+        public StackBuilder(Stack stack)
+        {
+            _stack = stack;
+        }
+
         #region ICollectionBuilder Members
 
         public virtual void Add(object item)

@@ -11,6 +11,7 @@ namespace JsonExSerializerTests
     [TestFixture]
     public class TypeHandlerTests
     {
+        [Test]
         public void IsEmpty_OnEmptyClass_ReturnsTrue()
         {
             SerializationContext context = new SerializationContext();
@@ -18,6 +19,7 @@ namespace JsonExSerializerTests
             Assert.IsTrue(EmptyClassHandler.IsEmpty, "IsEmpty should return true on class with no properties/fields");
         }
 
+        [Test]
         public void IsEmpty_OnClassWithOnlyIgnoredFields_ReturnsTrue()
         {
             SerializationContext context = new SerializationContext();
@@ -25,12 +27,15 @@ namespace JsonExSerializerTests
             Assert.IsTrue(IgnoredClassHandler.IsEmpty, "IsEmpty should return true on class with all properties/fields ignored");
         }
 
+        [Test]
         public void IsEmpty_OnNonEmptyClass_ReturnsFalse()
         {
             SerializationContext context = new SerializationContext();
             TypeHandler SimpleObjectHandler = new TypeHandler(typeof(SimpleObject), context);
             Assert.IsFalse(SimpleObjectHandler.IsEmpty, "IsEmpty should return false on class with properties/fields");
         }
+
+
 
         public class EmptyClass
         {
@@ -46,8 +51,11 @@ namespace JsonExSerializerTests
                 get { return this.iVal; }
                 set { this.iVal = value; }
             }
-
         }
+
+
+
+
     }
 
     

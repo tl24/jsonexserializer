@@ -2,14 +2,17 @@
     <property name="configuration" value="release" overwrite="false" />
     <property name="name" value="JsonExSerializer" />
 	<property name="tests" value="JsonExSerializerTests" />
+	<property name="perf.tests" value="PerformanceTests" />
 	<property name="solution" value="${name}.sln" />
 	<property name="svn.info.log" value="svn.version.txt" />
-	<property name="major.version" value="1" />
-	<property name="minor.version" value="4" />
+	<property name="major.version" value="2" />
+	<property name="minor.version" value="0" />
 	<property name="revision.version" value="0" />
 	<property name="info.version" value="${major.version}.${minor.version}" />
 	<property name="main.output.dir" value="${name}/bin/${configuration}" />
 	<property name="test.output.dir" value="${tests}/bin/${configuration}" />
+	<property name="perf.test.output.dir" value="${perf.tests}/bin/${configuration}" />
+	<property name="run.perf.tests" value="true" />
 	
 	<target name="get-head-revision"> 
 	  <exec
@@ -79,6 +82,26 @@
 				<attribute type="AssemblyFileVersionAttribute" value="${full.version}" />	
 		    </attributes>
 		</asminfo>
+		<asminfo output="PerformanceTests/Properties/AssemblyInfo.cs" language="CSharp">
+		    <imports>
+		        <import namespace="System" />
+		        <import namespace="System.Reflection" />
+		        <import namespace="System.Runtime.CompilerServices" />
+		        <import namespace="System.Runtime.InteropServices" />
+		    </imports>
+		    <attributes>
+		        <attribute type="AssemblyTitleAttribute" value="PerformanceTests" />
+		        <attribute type="AssemblyDescriptionAttribute" value=".NET Serialization Framework Performance Tests using JSON" />
+		        <attribute type="AssemblyProductAttribute" value="${name}" />
+		        <attribute type="AssemblyCopyrightAttribute" value="Copyright &#169; 2007" />
+		        <attribute type="ComVisibleAttribute" value="false" />
+				<attribute type="GuidAttribute" value="0464792e-0155-4baf-ba64-cb2ea4843097" />
+		        <attribute type="CLSCompliantAttribute" value="false" />
+				<attribute type="AssemblyInformationalVersionAttribute" value="${info.version}" />
+				<attribute type="AssemblyVersionAttribute" value="${full.version}" />
+				<attribute type="AssemblyFileVersionAttribute" value="${full.version}" />	
+		    </attributes>
+		</asminfo>		
 	</target>
     <target name="clean" description="Delete all previously compiled binaries.">
         <delete>
@@ -113,6 +136,13 @@
 				<include name="${tests}.pdb" />
 			</fileset>
 		</copy>
+		<copy todir="${build.dir}">
+			<fileset basedir="${perf.test.output.dir}">
+				<include name="${perf.tests}.exe" />
+				<include name="${perf.tests}.pdb" />
+			</fileset>
+		</copy>
+		
 	</target>
 	
   <target name="documentation" depends="compile">
@@ -152,9 +182,37 @@
 		    <exclude name="**/*.suo" />
 		    <exclude name="**/*.zip" />
 		</fileset>
-	</copy>	
+	</copy>
+	<copy todir="${build.dir}/src">
+		<fileset basedir=".">
+			<include name="PerformanceTests/**" />
+		    <exclude name="**/bin/**" />
+		    <exclude name="**/obj/**" />
+		    <exclude name="**/Release/**" />
+		    <exclude name="**/Debug/**" />
+		    <exclude name="**/*.user" />
+		    <exclude name="**/*.suo" />
+		    <exclude name="**/*.zip" />
+		</fileset>
+	</copy>		
   </target>
-  <target name="zip" depends="copy-outputs, documentation, copy-src">
+  <target name="unit-tests" depends="compile">
+      <mbunit
+         report-types="Html"
+         report-filename-format="unittests-${full.version}"
+         report-output-directory="${build.dir}/testresults"
+         halt-on-failure="true">
+         <assemblies>
+            <include name="${test.output.dir}/JsonExSerializerTests.dll" /> 
+         </assemblies>
+      </mbunit>
+  </target>
+  <target name="perf-tests" depends="compile" if="${run.perf.tests}">
+	  <mkdir dir="${build.dir}/testresults/" />
+	  <exec program="PerformanceTests.exe" basedir="${perf.test.output.dir}" output="${build.dir}/testresults/perf-test-results-${full.version}.txt">
+	  </exec>
+  </target>
+  <target name="zip" depends="copy-outputs, documentation, copy-src, unit-tests, perf-tests">
 	<zip zipfile="${name}-${full.version}.zip">
 	    <fileset basedir="${build.dir}">
 	        <include name="**/*" />

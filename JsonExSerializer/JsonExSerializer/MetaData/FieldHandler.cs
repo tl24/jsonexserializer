@@ -94,5 +94,10 @@ namespace JsonExSerializer.MetaData
             get { return _ignored; }
             set { _ignored = value; }
         }
+
+        public override bool CanWrite
+        {
+            get { return true; }
+        }
     }
 }

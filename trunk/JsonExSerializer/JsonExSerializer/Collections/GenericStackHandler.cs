@@ -25,6 +25,12 @@ namespace JsonExSerializer.Collections
             return (ICollectionBuilder) Activator.CreateInstance(typeof(GenericStackBuilder<>).MakeGenericType(itemType));
         }
 
+        public ICollectionBuilder ConstructBuilder(object collection)
+        {
+            Type itemType = GetItemType(collection.GetType());
+            return (ICollectionBuilder)Activator.CreateInstance(typeof(GenericStackBuilder<>).MakeGenericType(itemType), collection);
+        }
+
         public Type GetItemType(Type CollectionType)
         {
             return CollectionType.GetGenericArguments()[0];

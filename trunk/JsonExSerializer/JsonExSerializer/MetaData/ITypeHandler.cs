@@ -67,6 +67,14 @@ namespace JsonExSerializer.MetaData
         ICollectionBuilder GetCollectionBuilder(int itemCount);
 
         /// <summary>
+        /// Gets a collection builder to construct a collection to modify an existing collection
+        /// </summary>
+        /// <param name="itemCount">the collection to add items to</param>
+        /// <returns>a collection builder</returns>
+        /// <exception cref="CollectionException">If this type is not a collection type</exception>
+        ICollectionBuilder GetCollectionBuilder(object collection);
+
+        /// <summary>
         /// Returns the collection handler for this type, if the type is
         /// a collection.
         /// </summary>

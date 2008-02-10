@@ -24,6 +24,11 @@ namespace JsonExSerializer.Collections
             _collector = (ICollection<ItemT>)Activator.CreateInstance(_instanceType);
         }
 
+        public GenericCollectionBuilder(ICollection<ItemT> collection)
+        {
+            _collector = collection;
+        }
+
         #region ICollectionBuilder Members
 
         public void Add(object item)

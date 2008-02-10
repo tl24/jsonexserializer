@@ -28,6 +28,11 @@ namespace JsonExSerializer.Collections
             return new ArrayBuilder(collectionType, itemCount);
         }
 
+        public ICollectionBuilder ConstructBuilder(object collection)
+        {
+            throw new InvalidOperationException("ArrayHandler does not support modify existing collections");
+        }
+
         public Type GetItemType(Type CollectionType)
         {
             return CollectionType.GetElementType();

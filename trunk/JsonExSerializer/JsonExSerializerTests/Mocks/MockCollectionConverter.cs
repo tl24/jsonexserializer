@@ -30,6 +30,16 @@ namespace JsonExSerializerTests.Mocks
         }
 
         #endregion
+
+        #region ICollectionHandler Members
+
+
+        public ICollectionBuilder ConstructBuilder(object collection)
+        {
+            return new MockCollectionBuilder((MockCollection) collection);
+        }
+
+        #endregion
     }
 
     public class MockCollection
@@ -63,6 +73,12 @@ namespace JsonExSerializerTests.Mocks
         public MockCollectionBuilder()
         {
             result = new MockCollection();
+        }
+
+
+        public MockCollectionBuilder(MockCollection collection)
+        {
+            result = collection;
         }
 
         #region ICollectionBuilder Members

@@ -58,5 +58,10 @@ namespace JsonExSerializer.MetaData
         /// is ignored it will not be serialized.
         /// </summary>
         bool Ignored { get; set; }
+
+        /// <summary>
+        /// If true the property is writable
+        /// </summary>
+        bool CanWrite { get; }
     }
 }

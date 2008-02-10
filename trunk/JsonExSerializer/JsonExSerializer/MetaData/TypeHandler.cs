@@ -266,6 +266,23 @@ namespace JsonExSerializer.MetaData
             }
         }
 
+        /// <summary>
+        /// Returns a collection builder object for this type if it is a collection.
+        /// </summary>
+        /// <param name="context">the serialization context</param>
+        /// <returns>collection builder</returns>
+        public virtual ICollectionBuilder GetCollectionBuilder(object collection)
+        {
+            if (IsCollection())
+            {
+                return _collectionHandler.ConstructBuilder(collection);
+            }
+            else
+            {
+                throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
+            }
+        }
+
         protected override IJsonTypeConverter CreateTypeConverter()
         {
             IJsonTypeConverter converter = CreateTypeConverter(ForType);

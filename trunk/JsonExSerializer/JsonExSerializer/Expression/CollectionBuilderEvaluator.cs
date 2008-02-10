@@ -27,13 +27,23 @@ namespace JsonExSerializer.Expression
             _expression = expression;
         }
 
+        public void SetResult(object value)
+        {
+            if (_builder != null)
+                throw new InvalidOperationException("The collection result can not be set because it has already been evaluated");
+            ConstructBuilder(value);
+        }
 
-        private void ConstructBuilder()
+        private void ConstructBuilder(object collection)
         {
             ListExpression list = (ListExpression)Expression;
             ITypeHandler handler = Context.GetTypeHandler(list.ResultType);
-            _itemType = handler.GetCollectionItemType();
-            _builder = handler.GetCollectionBuilder(list.Items.Count);
+                _itemType = handler.GetCollectionItemType();
+            if (collection != null)
+                _builder = handler.GetCollectionBuilder(collection);
+            else
+                _builder = handler.GetCollectionBuilder(list.Items.Count);
+            
         }
 
 
@@ -41,8 +51,7 @@ namespace JsonExSerializer.Expression
         {
             if (_result == null)
             {
-                if (_builder == null)
-                    ConstructBuilder();
+                ICollectionBuilder builder = this.Builder;
 
                 ListExpression list = (ListExpression)Expression;
                 foreach (ExpressionBase item in list.Items)
@@ -52,7 +61,7 @@ namespace JsonExSerializer.Expression
                     _builder.Add(itemResult);
                 }
                 _result = _builder.GetResult();
-                _builder = null;
+                builder = null;
                 if (_result is IDeserializationCallback)
                 {
                     ((IDeserializationCallback)_result).OnAfterDeserialization();
@@ -65,9 +74,7 @@ namespace JsonExSerializer.Expression
         {
             if (_result == null)
             {
-                if (_builder == null)
-                    ConstructBuilder();
-                return _builder.GetReference();
+                return this.Builder.GetReference();
             }
             else
             {
@@ -75,6 +82,15 @@ namespace JsonExSerializer.Expression
             }
         }
 
+        private ICollectionBuilder Builder
+        {
+            get
+            {
+                if (_builder == null)
+                    ConstructBuilder(null);
+                return _builder;
+            }
+        }
         /// <summary>
         /// The expression being evaluated
         /// </summary>
@@ -89,5 +105,6 @@ namespace JsonExSerializer.Expression
             get { return this._context; }
             set { this._context = value; }
         }
+
     }
 }

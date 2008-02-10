@@ -28,6 +28,16 @@ namespace JsonExSerializer.Collections
         ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount);
 
         /// <summary>
+        /// Constructs a collection builder to update an existing collection.  The
+        /// type must be supported by this handler.
+        /// </summary>
+        /// <param name="collection">an existing istance of the collection class to be populated</param>
+        /// <param name="collectionType">the type to construct a builder for</param>
+        /// <returns>a collection builder</returns>
+        ICollectionBuilder ConstructBuilder(object collection);
+
+
+        /// <summary>
         /// Gets the type of items that this collection type holds
         /// </summary>
         /// <param name="CollectionType">the type of the collection</param>

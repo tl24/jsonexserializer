@@ -40,7 +40,7 @@ namespace JsonExSerializer.Expression
             throw new Exception("The method or operation is not implemented.");
         }
 
-        protected override void InitializeResult()
+        protected override void UpdateResult()
         {
             throw new Exception("The method or operation is not implemented.");
         }

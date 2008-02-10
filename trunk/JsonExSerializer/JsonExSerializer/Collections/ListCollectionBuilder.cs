@@ -23,6 +23,13 @@ namespace JsonExSerializer.Collections
             _list = (IList)Activator.CreateInstance(instanceType);
         }
 
+        public ListCollectionBuilder(IList list)
+        {
+            _instanceType = list.GetType();
+            _list = list;
+        }
+
+
         #region ICollectionBuilder Members
 
         public void Add(object item)

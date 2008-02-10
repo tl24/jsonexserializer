@@ -49,7 +49,7 @@ namespace JsonExSerializer.Expression
         /// <summary>
         /// Populate the list with its values
         /// </summary>
-        protected override void InitializeResult()
+        protected override void UpdateResult()
         {            
             foreach (KeyValueExpression Item in Expression.Properties)
             {

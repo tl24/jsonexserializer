@@ -40,6 +40,19 @@ namespace JsonExSerializer
         
         private ITypeHandlerFactory _typeHandlerFactory;
         private IDictionary _parameters;
+
+        /// <summary>
+        /// Set of options for handling Ignored properties encountered upon Deserialization
+        /// </summary>
+        public enum IgnoredPropertyOption
+        {
+            Ignore,
+            SetIfPossible,
+            ThrowException
+        }
+
+        private IgnoredPropertyOption _ignoredPropertyAction = IgnoredPropertyOption.ThrowException;
+
         #endregion
 
         #region Constructor
@@ -146,6 +159,14 @@ namespace JsonExSerializer
             set { this._referenceWritingType = value; }
         }
 
+        /// <summary>
+        /// Controls the action taken when an ignored property is encountered upon deserialization
+        /// </summary>
+        public IgnoredPropertyOption IgnoredPropertyAction
+        {
+            get { return this._ignoredPropertyAction; }
+            set { _ignoredPropertyAction = value; }
+        }
         #endregion
 
         #region Type Binding

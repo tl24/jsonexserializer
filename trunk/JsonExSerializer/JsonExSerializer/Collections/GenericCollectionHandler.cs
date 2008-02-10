@@ -36,6 +36,12 @@ namespace JsonExSerializer.Collections
             return (ICollectionBuilder) Activator.CreateInstance(typeof(GenericCollectionBuilder<>).MakeGenericType(itemType), collectionType);
         }
 
+        public ICollectionBuilder ConstructBuilder(object collection)
+        {
+            Type itemType = GetItemType(collection.GetType());
+            return (ICollectionBuilder)Activator.CreateInstance(typeof(GenericCollectionBuilder<>).MakeGenericType(itemType), collection);
+        }
+
         public Type GetItemType(Type CollectionType)
         {
             Type intfType = CollectionType.GetInterface(_IGenericCollectionName);

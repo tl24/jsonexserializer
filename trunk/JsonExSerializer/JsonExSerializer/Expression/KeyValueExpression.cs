@@ -97,6 +97,20 @@ namespace JsonExSerializer.Expression
             {
                 throw new Exception(string.Format("Could not find property {0} for type {1}", Key, parentObject.GetType()));
             }
+            if (hndlr.Ignored)
+            {
+                switch (context.IgnoredPropertyAction)
+                {
+                    case SerializationContext.IgnoredPropertyOption.Ignore:
+                        return null;
+                    case SerializationContext.IgnoredPropertyOption.SetIfPossible:
+                        if (!hndlr.CanWrite)
+                            return null;
+                        break;
+                    case SerializationContext.IgnoredPropertyOption.ThrowException:
+                        throw new Exception(string.Format("Can not set property {0} for type {1} because it is ignored and IgnorePropertyAction is set to ThrowException", Key, parentObject.GetType()));
+                }
+            }
             ValueExpression.SetResultTypeIfNotSet(hndlr.PropertyType);
             if (hndlr.HasConverter)
             {
@@ -112,8 +126,18 @@ namespace JsonExSerializer.Expression
                 evaluator.Context = context;
                 ValueExpression.Evaluator = evaluator;
             }
-            object result = ValueExpression.Evaluate(context);
-            hndlr.SetValue(parentObject, result);
+            object result = null;
+            if (!hndlr.CanWrite)
+            {
+                result = hndlr.GetValue(parentObject);
+                ValueExpression.GetEvaluator(context).SetResult(result);
+                ValueExpression.Evaluate(context);
+            }
+            else
+            {
+                result = ValueExpression.Evaluate(context);
+                hndlr.SetValue(parentObject, result);
+            }
             return result;
         }
 

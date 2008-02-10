@@ -42,7 +42,7 @@ namespace JsonExSerializer.Expression
         }
 
         protected abstract object Construct();  // constructs the object
-        protected abstract void InitializeResult();  // initializes the result..populates properties, etc
+        protected abstract void UpdateResult();  // initializes the result..populates properties, etc
 
         /// <summary>
         /// Evaluate the expression and return the result
@@ -56,7 +56,7 @@ namespace JsonExSerializer.Expression
                 {
                     _result = Construct();
                 }
-                InitializeResult();
+                UpdateResult();
                 IDeserializationCallback callback = _result as IDeserializationCallback;
                 if (callback != null)
                     callback.OnAfterDeserialization();
@@ -65,6 +65,7 @@ namespace JsonExSerializer.Expression
             }
             return _result;
         }
+
 
         /// <summary>
         /// The expression being evaluated
@@ -79,6 +80,15 @@ namespace JsonExSerializer.Expression
         {
             get { return this._context; }
             set { this._context = value; }
+        }
+
+        public void SetResult(object value)
+        {
+            if (_result != null && value != null && !object.ReferenceEquals(_result, value))
+            {
+                throw new InvalidOperationException("Can't update result, the result has already been set or the object has been evaluated already.");
+            }
+            _result = value;
         }
 
 

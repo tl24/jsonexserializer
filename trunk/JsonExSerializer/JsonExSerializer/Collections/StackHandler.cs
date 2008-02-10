@@ -29,6 +29,11 @@ namespace JsonExSerializer.Collections
             return new StackBuilder(collectionType);
         }
 
+        public ICollectionBuilder ConstructBuilder(object collection)
+        {
+            return new StackBuilder((Stack) collection);
+        }
+
         public Type GetItemType(Type CollectionType)
         {
             return typeof(object);

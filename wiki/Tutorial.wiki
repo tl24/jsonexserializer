@@ -29,3 +29,21 @@ public class Customer {
 }
 }}}
 
+Get an instance of a serializer for this class.
+{{{
+   Customer cust = new Customer();
+   cust.ID = 23;
+   cust.FirstName = "Fred";
+   cust.LastName = "Flintstone";
+   Serializer serializer = Serializer.GetSerializer(typeof(Customer));
+   string result = serializer.Serialize();
+}}}
+
+The output should look something like this:
+{{{
+{
+   ID: 23,
+   FirstName: "Fred",
+   LastName: "Flintstone"
+}
+}}}

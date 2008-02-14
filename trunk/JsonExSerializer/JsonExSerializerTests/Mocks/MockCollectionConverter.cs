@@ -2,44 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.Collections;
+using System.Collections;
 
 namespace JsonExSerializerTests.Mocks
 {
-    public class MockCollectionHandler : ICollectionHandler
+    public class MockCollectionHandler : CollectionHandler
     {
-        #region ICollectionHandler Members
-
-        public bool IsCollection(Type collectionType)
+        public override bool IsCollection(Type collectionType)
         {
             return collectionType == typeof(MockCollection);
         }
 
-        public ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount)
+        public override ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount)
         {
             return new MockCollectionBuilder();
         }
 
-        public Type GetItemType(Type CollectionType)
+        public override Type GetItemType(Type CollectionType)
         {
             return typeof(char);
         }
 
-        public System.Collections.IEnumerable GetEnumerable(object collection)
+        public override IEnumerable GetEnumerable(object collection)
         {
             return ((MockCollection)collection).Value();
         }
 
-        #endregion
-
-        #region ICollectionHandler Members
-
-
-        public ICollectionBuilder ConstructBuilder(object collection)
+        public override ICollectionBuilder ConstructBuilder(object collection)
         {
             return new MockCollectionBuilder((MockCollection) collection);
         }
 
-        #endregion
     }
 
     public class MockCollection

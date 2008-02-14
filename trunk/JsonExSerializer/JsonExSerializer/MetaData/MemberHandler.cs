@@ -61,10 +61,6 @@ namespace JsonExSerializer.MetaData
             return null;
         }
 
-        protected IJsonTypeConverter GetDefaultTypeConverter(Type type)
-        {
-            return TypeConverterAdapter.GetAdapter(type);
-        }
         /// <summary>
         /// Constructs a converter from the convert attribute
         /// </summary>

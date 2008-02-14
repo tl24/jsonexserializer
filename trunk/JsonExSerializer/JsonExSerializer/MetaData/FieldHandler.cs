@@ -8,9 +8,8 @@ namespace JsonExSerializer.MetaData
     /// <summary>
     /// Handles a public field on an object
     /// </summary>
-    public class FieldHandler : PropertyHandlerBase, IPropertyHandler
+    public class FieldHandler : PropertyHandlerBase
     {
-        private bool _ignored;
         /// <summary>
         /// Constructs a FieldHandler for a field on a type that is not a constructor
         /// parameter
@@ -60,7 +59,7 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Gets the type of the field
         /// </summary>
-        public Type PropertyType
+        public override Type PropertyType
         {
             get { return Field.FieldType; }
         }
@@ -70,7 +69,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="instance">the object instance to retrieve the field value from</param>
         /// <returns>field value</returns>
-        public object GetValue(object instance)
+        public override object GetValue(object instance)
         {
             return Field.GetValue(instance);
         }
@@ -80,19 +79,9 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="instance">the object instance to retrieve the field value from</param>
         /// <param name="value">field value</param>
-        public void SetValue(object instance, object value)
+        public override void SetValue(object instance, object value)
         {
             Field.SetValue(instance, value);
-        }
-
-        /// <summary>
-        /// Gets or sets the value indicating whether this property is ignored or not.  If the property
-        /// is ignored it will not be serialized.
-        /// </summary>
-        public virtual bool Ignored
-        {
-            get { return _ignored; }
-            set { _ignored = value; }
         }
 
         public override bool CanWrite

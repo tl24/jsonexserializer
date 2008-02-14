@@ -8,16 +8,16 @@ namespace JsonExSerializer.MetaData
     /// <summary>
     /// Factory for TypeHandlers
     /// </summary>
-    public class TypeHandlerFactory : ITypeHandlerFactory
+    public class TypeHandlerFactory
     {
    
         private SerializationContext _context;
-        private IDictionary<Type, ITypeHandler> _cache;
+        private IDictionary<Type, TypeHandler> _cache;
 
         public TypeHandlerFactory(SerializationContext context)
         {
             _context = context;
-            _cache = new Dictionary<Type, ITypeHandler>();
+            _cache = new Dictionary<Type, TypeHandler>();
         }
 
         public SerializationContext Context
@@ -25,14 +25,14 @@ namespace JsonExSerializer.MetaData
             get { return this._context; }
         }
 
-        public ITypeHandler this[Type forType]
+        public TypeHandler this[Type forType]
         {
             get { return CreateTypeHandler(forType); }
         }
 
-        private ITypeHandler CreateTypeHandler(Type forType)
+        private TypeHandler CreateTypeHandler(Type forType)
         {
-            ITypeHandler handler;
+            TypeHandler handler;
             if (!_cache.ContainsKey(forType))
             {
                 _cache[forType] = handler = CreateNew(forType);
@@ -45,7 +45,7 @@ namespace JsonExSerializer.MetaData
             
         }
 
-        protected virtual ITypeHandler CreateNew(Type forType)
+        protected virtual TypeHandler CreateNew(Type forType)
         {
             return new TypeHandler(forType, _context);
         }

@@ -15,7 +15,7 @@ namespace JsonExSerializer.Expression
     /// <summary>
     /// Evaluator for Object expressions
     /// </summary>
-    public class ObjectEvaluator : ComplexEvaluatorBase
+    sealed class ObjectEvaluator : ComplexEvaluatorBase
     {
 
         public ObjectEvaluator(ObjectExpression expression)
@@ -29,7 +29,7 @@ namespace JsonExSerializer.Expression
             Expression.SetResultTypeIfNotSet(typeof(Hashtable));
             if (Expression.ConstructorArguments.Count > 0)
             {
-                ITypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
+                TypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
                 if (handler.ConstructorParameters.Count == Expression.ConstructorArguments.Count)
                 {
                     for (int i = 0; i < handler.ConstructorParameters.Count; i++)
@@ -68,7 +68,7 @@ namespace JsonExSerializer.Expression
         /// Determines the constructor argument types when there are no mappings for them.
         /// it does this by searching the constructors on the created type for a compatible match.
         /// </summary>
-        private void DetermineConstructorArgTypes(IList<IPropertyHandler> definedArguments)
+        private void DetermineConstructorArgTypes(IList<AbstractPropertyHandler> definedArguments)
         {
 
             int argCount = Expression.ConstructorArguments.Count;

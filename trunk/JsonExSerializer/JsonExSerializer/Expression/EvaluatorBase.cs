@@ -12,7 +12,7 @@ namespace JsonExSerializer.Expression
     /// <summary>
     /// Base class for evaluators
     /// </summary>
-    public abstract class EvaluatorBase : IEvaluator {
+    abstract class EvaluatorBase : IEvaluator {
 
         // the expression to evaluate;
         protected ExpressionBase _expression;

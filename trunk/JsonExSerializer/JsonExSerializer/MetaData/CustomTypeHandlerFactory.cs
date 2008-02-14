@@ -20,7 +20,7 @@ namespace JsonExSerializer.MetaData
             _typeHandlerType = TypeHandlerType;
         }
 
-        protected override ITypeHandler CreateNew(Type forType)
+        protected override TypeHandler CreateNew(Type forType)
         {
             ConstructorInfo constructor = GetConstructor();
             ParameterInfo[] parms = constructor.GetParameters();
@@ -32,7 +32,7 @@ namespace JsonExSerializer.MetaData
                 else if (parms[i].ParameterType.IsAssignableFrom(typeof(SerializationContext)))
                     args[i] = this.Context;
             }
-            return (ITypeHandler)constructor.Invoke(args);
+            return (TypeHandler)constructor.Invoke(args);
         }
 
         private ConstructorInfo GetConstructor()

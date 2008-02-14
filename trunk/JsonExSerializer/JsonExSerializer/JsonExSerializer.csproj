@@ -44,7 +44,7 @@
     <Compile Include="Collections\GenericCollectionHandler.cs" />
     <Compile Include="Collections\GenericStackBuilder.cs" />
     <Compile Include="Collections\GenericStackHandler.cs" />
-    <Compile Include="Collections\ICollectionHandler.cs" />
+    <Compile Include="Collections\CollectionHandler.cs" />
     <Compile Include="Collections\ListHandler.cs" />
     <Compile Include="Collections\StackBuilder.cs" />
     <Compile Include="Collections\StackHandler.cs" />
@@ -68,6 +68,7 @@
     <Compile Include="Expression\ReferenceIdentifier.cs" />
     <Compile Include="Expression\ValueEvaluator.cs" />
     <Compile Include="Expression\ValueExpression.cs" />
+    <Compile Include="IContextAware.cs" />
     <Compile Include="IDeserializationCallback.cs" />
     <Compile Include="IJsonWriter.cs" />
     <Compile Include="ISerializationCallback.cs" />
@@ -77,11 +78,9 @@
     <Compile Include="JsonExSerializationException.cs" />
     <Compile Include="JsonPropertyAttribute.cs" />
     <Compile Include="JsonWriter.cs" />
+    <Compile Include="MetaData\AbstractPropertyHandler.cs" />
     <Compile Include="MetaData\CustomTypeHandlerFactory.cs" />
     <Compile Include="MetaData\FieldHandler.cs" />
-    <Compile Include="MetaData\IPropertyHandler.cs" />
-    <Compile Include="MetaData\ITypeHandler.cs" />
-    <Compile Include="MetaData\ITypeHandlerFactory.cs" />
     <Compile Include="MetaData\MemberHandler.cs" />
     <Compile Include="MetaData\PropertyHandlerBase.cs" />
     <Compile Include="MetaData\TypeHandlerFactory.cs" />

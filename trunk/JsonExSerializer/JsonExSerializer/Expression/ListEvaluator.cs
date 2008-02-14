@@ -10,7 +10,7 @@ using System.Collections;
 
 namespace JsonExSerializer.Expression
 {
-    public class ListEvaluator : ComplexEvaluatorBase
+    sealed class ListEvaluator : ComplexEvaluatorBase
     {
 
         public ListEvaluator(ListExpression expression)

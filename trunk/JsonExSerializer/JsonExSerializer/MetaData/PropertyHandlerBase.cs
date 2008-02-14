@@ -9,9 +9,8 @@ namespace JsonExSerializer.MetaData
     /// <summary>
     /// Base class for Properties and Fields of a Type
     /// </summary>
-    public class PropertyHandlerBase : MemberHandlerBase
+    public abstract class PropertyHandlerBase : AbstractPropertyHandler
     {
-        protected int _position = -1;
         protected MemberInfo _member;
         public PropertyHandlerBase(MemberInfo member)
             : base(member.DeclaringType)
@@ -28,19 +27,9 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         ///  The name of the property
         /// </summary>
-        public string Name
+        public override string Name
         {
             get { return _member.Name; }
-        }
-
-        public int Position
-        {
-            get { return _position; }
-        }
-
-        public virtual bool IsConstructorArgument
-        {
-            get { return _position >= 0; }
         }
 
         protected override IJsonTypeConverter CreateTypeConverter()

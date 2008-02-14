@@ -13,7 +13,7 @@ namespace JsonExSerializer.Expression
     /// <summary>
     /// Base class evaluator for complex objects: javascript object and collection
     /// </summary>
-    public abstract class ComplexEvaluatorBase : EvaluatorBase
+    abstract class ComplexEvaluatorBase : EvaluatorBase
     {
         protected bool _isConstructing;
 
@@ -37,7 +37,7 @@ namespace JsonExSerializer.Expression
                 args[i] = carg.Evaluate(Context);
             }
             _isConstructing = false;
-            ITypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
+            TypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
             return handler.CreateInstance(args);
         }
 

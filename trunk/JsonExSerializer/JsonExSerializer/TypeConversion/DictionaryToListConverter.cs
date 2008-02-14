@@ -36,7 +36,7 @@ namespace JsonExSerializer.TypeConversion
         public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             IDictionary dictionary = (IDictionary) Activator.CreateInstance(sourceType);
-            IPropertyHandler propHandler = null;
+            AbstractPropertyHandler propHandler = null;
             ICollection coll = (ICollection)item;
             foreach (object colItem in coll)
             {

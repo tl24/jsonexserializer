@@ -18,7 +18,7 @@ namespace JsonExSerializer.Expression
     /// This class will alter the normal evaluation of the value by loading the propertyinfo
     /// for this key, from the parent and checking for a property converter.
     /// </summary>
-    public class KeyValueExpression : ExpressionBase {
+    public sealed class KeyValueExpression : ExpressionBase {
         private ExpressionBase _keyExpression;
         private ExpressionBase _valueExpression;
 
@@ -92,7 +92,7 @@ namespace JsonExSerializer.Expression
         public object EvaluateObjectProperty(SerializationContext context, object parentObject)
         {
             // lookup info for the type
-            IPropertyHandler hndlr = context.GetTypeHandler(parentObject.GetType()).FindProperty(Key);
+            AbstractPropertyHandler hndlr = context.GetTypeHandler(parentObject.GetType()).FindProperty(Key);
             if (hndlr == null)
             {
                 throw new Exception(string.Format("Could not find property {0} for type {1}", Key, parentObject.GetType()));

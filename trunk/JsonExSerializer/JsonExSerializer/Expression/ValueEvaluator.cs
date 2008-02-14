@@ -9,7 +9,7 @@ using System.Text;
 
 namespace JsonExSerializer.Expression
 {
-    public class ValueEvaluator : EvaluatorBase {
+    class ValueEvaluator : EvaluatorBase {
 
         public ValueEvaluator(ValueExpression expression)
             : base(expression)
@@ -46,7 +46,7 @@ namespace JsonExSerializer.Expression
         }
     }
 
-    public class NumericEvaluator : ValueEvaluator
+    sealed class NumericEvaluator : ValueEvaluator
     {
         public NumericEvaluator(NumericExpression expression)
             : base(expression)
@@ -69,7 +69,7 @@ namespace JsonExSerializer.Expression
         }
     }
 
-    public class BooleanEvaluator : ValueEvaluator
+    sealed class BooleanEvaluator : ValueEvaluator
     {
         public BooleanEvaluator(BooleanExpression expression)
             : base(expression)

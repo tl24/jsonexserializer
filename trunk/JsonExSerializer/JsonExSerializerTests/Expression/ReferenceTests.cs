@@ -9,7 +9,7 @@ namespace JsonExSerializerTests.Expression
     [TestFixture]
     public class ReferenceTests
     {
-
+      
         [Test(Description="Resolving reference for this should return root")]
         public void RootObjectTest()
         {
@@ -105,5 +105,6 @@ namespace JsonExSerializerTests.Expression
             ExpressionBase actual = root.ResolveReference(new ReferenceIdentifier("this.0.1"));
             Assert.AreSame(childB, actual, "this.1.0 did not resolve correctly");
         }
+         
     }
 }

@@ -13,7 +13,7 @@ namespace JsonExSerializer.Expression
     /// <summary>
     /// Evaluator for types with converters
     /// </summary>
-    public class ConverterEvaluator : IEvaluator
+    class ConverterEvaluator : IEvaluator
     {
         protected ExpressionBase _expression;
         protected SerializationContext _context;

@@ -11,7 +11,7 @@ using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.Expression
 {
-    public class CollectionBuilderEvaluator : IEvaluator
+    sealed class CollectionBuilderEvaluator : IEvaluator
     {
         private ExpressionBase _expression;
         private SerializationContext _context;
@@ -37,12 +37,13 @@ namespace JsonExSerializer.Expression
         private void ConstructBuilder(object collection)
         {
             ListExpression list = (ListExpression)Expression;
-            ITypeHandler handler = Context.GetTypeHandler(list.ResultType);
-                _itemType = handler.GetCollectionItemType();
+            TypeHandler typeHandler = Context.GetTypeHandler(list.ResultType);
+            CollectionHandler collHandler = typeHandler.GetCollectionHandler();
+            _itemType = collHandler.GetItemType(typeHandler.ForType);
             if (collection != null)
-                _builder = handler.GetCollectionBuilder(collection);
+                _builder = collHandler.ConstructBuilder(collection);
             else
-                _builder = handler.GetCollectionBuilder(list.Items.Count);
+                _builder = collHandler.ConstructBuilder(typeHandler.ForType, list.Items.Count);
             
         }
 

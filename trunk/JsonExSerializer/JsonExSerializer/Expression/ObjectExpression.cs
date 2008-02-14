@@ -13,7 +13,7 @@ namespace JsonExSerializer.Expression
     /// Represents a javascript object
     /// </summary>
     [DefaultEvaluator(typeof(ObjectEvaluator))]
-    public class ObjectExpression : ComplexExpressionBase {
+    public sealed class ObjectExpression : ComplexExpressionBase {
 
         private IList<KeyValueExpression> _properties;
 

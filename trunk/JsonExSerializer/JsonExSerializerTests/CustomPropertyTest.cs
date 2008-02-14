@@ -67,7 +67,7 @@ namespace JsonExSerializerTests
         {
         }
 
-        protected override void ReadProperties(out IList<IPropertyHandler> Properties, out IList<IPropertyHandler> ConstructorArguments)
+        protected override void ReadProperties(out IList<AbstractPropertyHandler> Properties, out IList<AbstractPropertyHandler> ConstructorArguments)
         {
             base.ReadProperties(out Properties, out ConstructorArguments);
             Properties.Add(new MethodPairPropertyHandler(this.ForType, "Name"));
@@ -76,7 +76,7 @@ namespace JsonExSerializerTests
 
     }
 
-    public class MethodPairPropertyHandler : MemberHandlerBase, IPropertyHandler
+    public class MethodPairPropertyHandler : AbstractPropertyHandler
     {
         private string _getMethod;
         private string _setMethod;
@@ -95,52 +95,34 @@ namespace JsonExSerializerTests
             _propertyName = PropertyName;
         }
 
-        #region IPropertyHandler Members
-
-
-        public string Name
+        public override string Name
         {
             get { return _propertyName; }
         }
 
-        public int Position
-        {
-            get { return 0; }
-        }
-
-        public Type PropertyType
+        public override Type PropertyType
         {
             get {
                 return this.ForType.GetMethod(_getMethod).ReturnType;
             }
         }
 
-        public object GetValue(object instance)
+        public override object GetValue(object instance)
         {
             return this.ForType.GetMethod(_getMethod).Invoke(instance, null);
         }
 
-        public void SetValue(object instance, object value)
+        public override void SetValue(object instance, object value)
         {
             this.ForType.GetMethod(_setMethod).Invoke(instance, new object[] { value });
         }
-
-        #endregion
 
         protected override JsonExSerializer.TypeConversion.IJsonTypeConverter CreateTypeConverter()
         {
             return CreateTypeConverter(PropertyType);
         }
 
-        #region IPropertyHandler Members
-
-
-        public bool IsConstructorArgument
-        {
-            get { return false; }
-        }
-
-        public bool Ignored
+        public override bool Ignored
         {
             get
             {
@@ -152,6 +134,5 @@ namespace JsonExSerializerTests
             }
         }
 
-        #endregion
     }
 }

@@ -33,7 +33,7 @@ namespace JsonExSerializer.Expression
 
     }
 
-    public class EvaluatorFactory
+    class EvaluatorFactory
     {
         private static Dictionary<Type, EvalCtor> _cache = new Dictionary<Type, EvalCtor>();
 
@@ -50,7 +50,7 @@ namespace JsonExSerializer.Expression
             Type evaluatorType = null;
             Type expType = expression.GetType();
             IEvaluator evaluator = null;
-            ITypeHandler handler = context.GetTypeHandler(expression.ResultType);
+            TypeHandler handler = context.GetTypeHandler(expression.ResultType);
             evaluator = GetDefaultEvaluator(expression);          
             if (evaluator == null && expression is ListExpression && handler.IsCollection())
                 evaluator = new CollectionBuilderEvaluator(expression);

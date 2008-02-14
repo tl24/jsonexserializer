@@ -12,7 +12,7 @@ namespace JsonExSerializer.Expression
     /// <summary>
     /// A reference to another object
     /// </summary>
-    public class  ReferenceExpression :  ExpressionBase
+    public sealed class ReferenceExpression : ExpressionBase
     {
         private ExpressionBase _reference;   // the expression that is referenced
         private ReferenceIdentifier _refID; // the reference ID

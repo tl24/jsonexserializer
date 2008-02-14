@@ -12,7 +12,7 @@ namespace JsonExSerializer.Expression
     /// <summary>
     /// Expression to represent a javascript List/Array
     /// </summary>
-    public class ListExpression : ComplexExpressionBase {
+    public sealed class ListExpression : ComplexExpressionBase {
         private IList<ExpressionBase> _items;
 
         public ListExpression()

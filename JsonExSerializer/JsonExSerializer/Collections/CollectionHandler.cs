@@ -10,14 +10,14 @@ using System.Collections;
 
 namespace JsonExSerializer.Collections
 {
-    public interface ICollectionHandler
+    public abstract class CollectionHandler
     {
         /// <summary>
         /// Checks to see if the collection type is handled by this handler.
         /// </summary>
         /// <param name="collectionType">the type to check</param>
         /// <returns>true if this handler can process the collection type</returns>
-        bool IsCollection(Type collectionType);
+        public abstract bool IsCollection(Type collectionType);
 
         /// <summary>
         /// Constructs a collection builder for the given collection type.  The
@@ -25,7 +25,7 @@ namespace JsonExSerializer.Collections
         /// </summary>
         /// <param name="collectionType">the type to construct a builder for</param>
         /// <returns>a collection builder</returns>
-        ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount);
+        public abstract ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount);
 
         /// <summary>
         /// Constructs a collection builder to update an existing collection.  The
@@ -34,15 +34,18 @@ namespace JsonExSerializer.Collections
         /// <param name="collection">an existing istance of the collection class to be populated</param>
         /// <param name="collectionType">the type to construct a builder for</param>
         /// <returns>a collection builder</returns>
-        ICollectionBuilder ConstructBuilder(object collection);
+        public abstract ICollectionBuilder ConstructBuilder(object collection);
 
 
         /// <summary>
-        /// Gets the type of items that this collection type holds
+        /// Gets the type of items that this collection type holds.  The default is System.Object.
         /// </summary>
         /// <param name="CollectionType">the type of the collection</param>
         /// <returns>the item type</returns>
-        Type GetItemType(Type CollectionType);
+        public virtual Type GetItemType(Type CollectionType)
+        {
+            return typeof(object);
+        }
 
         /// <summary>
         /// Gets the enumerable property of the collection.  This is normally
@@ -50,6 +53,12 @@ namespace JsonExSerializer.Collections
         /// </summary>
         /// <param name="collection">the collection</param>
         /// <returns>an IEnumerable object</returns>
-        IEnumerable GetEnumerable(object collection);
+        public virtual IEnumerable GetEnumerable(object collection)
+        {
+            if (collection is IEnumerable)
+                return (IEnumerable)collection;
+            else
+                throw new Exception("Must Override GetEnumerable for " + this.GetType().Name + " to provide an enumerable class");
+        }
     }
 }

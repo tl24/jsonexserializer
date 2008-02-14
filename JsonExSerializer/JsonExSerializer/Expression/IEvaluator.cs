@@ -6,7 +6,7 @@
 using System;
 namespace JsonExSerializer.Expression
 {
-    public interface IEvaluator
+    public interface IEvaluator : IContextAware
     {
 
         void SetResult(object value);
@@ -25,7 +25,5 @@ namespace JsonExSerializer.Expression
         object GetReference();
 
         ExpressionBase Expression { get; set; }
-
-        SerializationContext Context { get; set; }
     }
 }

@@ -174,7 +174,7 @@ namespace JsonExSerializer
             // load the specified types
             Type handlerType = Type.GetType(type, true);
 
-            ICollectionHandler collHandler = (ICollectionHandler)Activator.CreateInstance(handlerType);
+            CollectionHandler collHandler = (CollectionHandler)Activator.CreateInstance(handlerType);
             context.RegisterCollectionHandler(collHandler);
         }
 

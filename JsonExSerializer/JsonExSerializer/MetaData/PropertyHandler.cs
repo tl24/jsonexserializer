@@ -14,10 +14,8 @@ namespace JsonExSerializer.MetaData
     /// <summary>
     /// Helper for a type's properties
     /// </summary>
-    public class PropertyHandler : PropertyHandlerBase, IPropertyHandler
+    public class PropertyHandler : PropertyHandlerBase
     {
-        private bool _ignored;
-
         public PropertyHandler(PropertyInfo property) : base(property)
         {
             Initialize();
@@ -39,7 +37,7 @@ namespace JsonExSerializer.MetaData
             }
             if (Property.IsDefined(typeof(JsonExIgnoreAttribute), false)
                 || !(Property.GetGetMethod().GetParameters().Length == 0 && Property.CanRead)
-                || !Property.CanWrite)
+                || (!Property.CanWrite && _position == -1))
             {
                 _ignored = true;
             }
@@ -56,7 +54,7 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// The type for the property
         /// </summary>
-        public Type PropertyType
+        public override Type PropertyType
         {
             get { return Property.PropertyType; }
         }
@@ -66,7 +64,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="instance">the object to retrieve this property value from</param>
         /// <returns>property value</returns>
-        public virtual object GetValue(object instance)
+        public override object GetValue(object instance)
         {
             return Property.GetValue(instance, null);
         }
@@ -76,19 +74,19 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="instance">the object instance to set the property value on</param>
         /// <param name="value">the new value to set</param>
-        public virtual void SetValue(object instance, object value)
+        public override void SetValue(object instance, object value)
         {
             Property.SetValue(instance, value, null);
         }
 
-        public virtual bool Ignored
+        public override bool Ignored
         {
-            get { return _ignored; }
+            get { return base.Ignored; }
             set
             {
-                if (_ignored != value)
+                if (base.Ignored != value)
                 {
-                    _ignored = value;
+                    base.Ignored = value;
                     Validate();
                 }
             }
@@ -96,9 +94,12 @@ namespace JsonExSerializer.MetaData
 
         private void Validate()
         {
-            if (!_ignored && !Property.CanWrite && PropertyType.IsPrimitive)
+            if (IsConstructorArgument)
+                return;
+
+            if (!Ignored && !CanWrite && PropertyType.IsPrimitive)
                 throw new InvalidOperationException("Cannot serialize a primitive property without a public set method: " + ForType.FullName + ":" + Name);
-            if (!_ignored && !Property.CanRead)
+            if (!Ignored && !Property.CanRead)
                 throw new InvalidOperationException("Cannot serialize a property without a get method: " + ForType.FullName + ":" + Name);
         }
 

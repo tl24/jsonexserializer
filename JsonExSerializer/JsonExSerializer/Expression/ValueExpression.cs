@@ -41,7 +41,7 @@ namespace JsonExSerializer.Expression
     /// distinguished types for evaluator purposes
     /// </summary>
     [DefaultEvaluator(typeof(NumericEvaluator))]
-    public class NumericExpression : ValueExpression
+    public sealed class NumericExpression : ValueExpression
     {
         public NumericExpression(string value)
             : base(value)
@@ -53,7 +53,7 @@ namespace JsonExSerializer.Expression
     /// distinguished types for evaluator purposes
     /// </summary>
     [DefaultEvaluator(typeof(BooleanEvaluator))]
-    public class BooleanExpression : ValueExpression
+    public sealed class BooleanExpression : ValueExpression
     {
         public BooleanExpression(string value)
             : base(value)

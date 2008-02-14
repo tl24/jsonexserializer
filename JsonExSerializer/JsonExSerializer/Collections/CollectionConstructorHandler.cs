@@ -15,11 +15,9 @@ namespace JsonExSerializer.Collections
     /// with an constructor matching (ICollection) or (IEnumerable&lt;&gt;)
     /// or (IEnumerable).
     /// </summary>
-    public class CollectionConstructorHandler : ICollectionHandler
+    public class CollectionConstructorHandler : CollectionHandler
     {
-        #region ICollectionHandler Members
-
-        public bool IsCollection(Type collectionType)
+        public override bool IsCollection(Type collectionType)
         {
             // Implements ICollection and has a constructor that takes a single element of type ICollection
             Type ienumGeneric = collectionType.GetInterface(typeof(IEnumerable<>).Name);
@@ -36,19 +34,19 @@ namespace JsonExSerializer.Collections
             }
         }
 
-        public ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount)
+        public override ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount)
         {
             Type itemType = GetItemType(collectionType);
             // will make a generic builder either way, but itemType might be object
             return (ICollectionBuilder)Activator.CreateInstance(typeof(GenericCollectionCtorBuilder<>).MakeGenericType(itemType), collectionType);
         }
 
-        public ICollectionBuilder ConstructBuilder(object collection)
+        public override ICollectionBuilder ConstructBuilder(object collection)
         {
             throw new InvalidOperationException("CollectionConstructorHandler does not support modify existing collections");
         }
 
-        public Type GetItemType(Type CollectionType)
+        public override Type GetItemType(Type CollectionType)
         {
             Type t = null;
             if ((t = CollectionType.GetInterface(typeof(ICollection<>).Name)) != null)
@@ -65,11 +63,5 @@ namespace JsonExSerializer.Collections
             }
         }
 
-        public IEnumerable GetEnumerable(object collection)
-        {
-            return (IEnumerable) collection;
-        }
-
-        #endregion
     }
 }

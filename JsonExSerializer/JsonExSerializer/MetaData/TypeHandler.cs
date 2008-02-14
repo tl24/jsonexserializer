@@ -17,13 +17,13 @@ namespace JsonExSerializer.MetaData
     /// <summary>
     /// Helper class for dealing with types during serialization
     /// </summary>
-    public class TypeHandler : MemberHandlerBase, ITypeHandler
+    public class TypeHandler : MemberHandlerBase
     {
-        protected IList<IPropertyHandler> _properties;
-        protected IList<IPropertyHandler> _constructorArgs;
+        protected IList<AbstractPropertyHandler> _properties;
+        protected IList<AbstractPropertyHandler> _constructorArgs;
 
         private bool _collectionLookedUp = false;
-        private ICollectionHandler _collectionHandler;
+        private CollectionHandler _collectionHandler;
         protected SerializationContext _context;
         private IDictionary<string, bool> _tempIgnore;
         private bool? _empty;
@@ -48,8 +48,8 @@ namespace JsonExSerializer.MetaData
                 ReadProperties(out _properties, out _constructorArgs);
                 if (_constructorArgs.Count > 0)
                 {
-                    ((List<IPropertyHandler>)_constructorArgs).Sort(
-                        new Comparison<IPropertyHandler>(PropertyHandlerComparison));
+                    ((List<AbstractPropertyHandler>)_constructorArgs).Sort(
+                        new Comparison<AbstractPropertyHandler>(PropertyHandlerComparison));
                 }
                 _tempIgnore.Clear();
             }
@@ -60,15 +60,15 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="Properties">properties collection</param>
         /// <param name="ConstructorArguments">constructor arguments</param>
-        protected virtual void ReadProperties(out IList<IPropertyHandler> Properties, out IList<IPropertyHandler> ConstructorArguments)
+        protected virtual void ReadProperties(out IList<AbstractPropertyHandler> Properties, out IList<AbstractPropertyHandler> ConstructorArguments)
         {
-            Properties = new List<IPropertyHandler>();
-            ConstructorArguments = new List<IPropertyHandler>();
+            Properties = new List<AbstractPropertyHandler>();
+            ConstructorArguments = new List<AbstractPropertyHandler>();
 
             MemberInfo[] mInfos = ForType.GetMembers(BindingFlags.Public | BindingFlags.Instance);
             foreach (MemberInfo mInfo in mInfos)
             {
-                IPropertyHandler prop = null;
+                AbstractPropertyHandler prop = null;
                 // must be able to read and write the prop, otherwise its not 2-way 
                 if (mInfo is PropertyInfo)
                 {
@@ -89,7 +89,8 @@ namespace JsonExSerializer.MetaData
             }
         }
 
-        protected int PropertyHandlerComparison(IPropertyHandler a, IPropertyHandler b) {
+        protected int PropertyHandlerComparison(AbstractPropertyHandler a, AbstractPropertyHandler b)
+        {
             return a.Position - b.Position;
         }
 
@@ -101,7 +102,7 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Get the list of constructor parameters for this type
         /// </summary>
-        public virtual IList<IPropertyHandler> ConstructorParameters
+        public virtual IList<AbstractPropertyHandler> ConstructorParameters
         {
             get
             {
@@ -118,7 +119,7 @@ namespace JsonExSerializer.MetaData
             get
             {
                 if (!_empty.HasValue)
-                    foreach (IPropertyHandler prop in AllProperties)
+                    foreach (AbstractPropertyHandler prop in AllProperties)
                     {
                         if (!prop.Ignored)
                         {
@@ -134,11 +135,11 @@ namespace JsonExSerializer.MetaData
             }
         }
 
-        public virtual IEnumerable<IPropertyHandler> Properties
+        public virtual IEnumerable<AbstractPropertyHandler> Properties
         {
             get
             {
-                foreach (IPropertyHandler prop in AllProperties)
+                foreach (AbstractPropertyHandler prop in AllProperties)
                 {
                     if (!prop.Ignored)
                         yield return prop;
@@ -149,7 +150,7 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Get the list of properties for this type
         /// </summary>
-        public virtual IEnumerable<IPropertyHandler> AllProperties
+        public virtual IEnumerable<AbstractPropertyHandler> AllProperties
         {
             get {
                 LoadProperties();
@@ -164,14 +165,14 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="Name">the name of the property</param>
         /// <returns>TypeHandlerProperty instance for the property or null if not found</returns>
-        public IPropertyHandler FindProperty(string Name)
+        public AbstractPropertyHandler FindProperty(string Name)
         {
-            foreach (IPropertyHandler prop in Properties)
+            foreach (AbstractPropertyHandler prop in Properties)
             {
                 if (prop.Name == Name)
                     return prop;
             }
-            foreach (IPropertyHandler prop in ConstructorParameters)
+            foreach (AbstractPropertyHandler prop in ConstructorParameters)
             {
                 if (prop.Name == Name)
                     return prop;
@@ -191,7 +192,7 @@ namespace JsonExSerializer.MetaData
             }
             else
             {
-                IPropertyHandler handler = FindProperty(name);
+                AbstractPropertyHandler handler = FindProperty(name);
                 _properties.Remove(handler);
             }
         }
@@ -205,7 +206,7 @@ namespace JsonExSerializer.MetaData
         {
             if (!_collectionLookedUp)
             {
-                foreach (ICollectionHandler handler in _context.CollectionHandlers)
+                foreach (CollectionHandler handler in _context.CollectionHandlers)
                 {
                     if (handler.IsCollection(ForType))
                     {
@@ -223,7 +224,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public virtual ICollectionHandler GetCollectionHandler()
+        public virtual CollectionHandler GetCollectionHandler()
         {
             if (IsCollection()) {
                 return _collectionHandler;
@@ -232,62 +233,11 @@ namespace JsonExSerializer.MetaData
             }            
         }
 
-        /// <summary>
-        /// If the object is a collection or array gets the type 
-        /// of its elements.
-        /// </summary>
-        /// <returns></returns>
-        public virtual Type GetCollectionItemType()
-        {
-            if (IsCollection())
-            {
-                return _collectionHandler.GetItemType(ForType);
-            }
-            else
-            {
-                throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
-            }
-        }
-
-        /// <summary>
-        /// Returns a collection builder object for this type if it is a collection.
-        /// </summary>
-        /// <param name="context">the serialization context</param>
-        /// <returns>collection builder</returns>
-        public virtual ICollectionBuilder GetCollectionBuilder(int itemCount)
-        {
-            if (IsCollection())
-            {
-                return _collectionHandler.ConstructBuilder(ForType, itemCount);
-            }
-            else
-            {
-                throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
-            }
-        }
-
-        /// <summary>
-        /// Returns a collection builder object for this type if it is a collection.
-        /// </summary>
-        /// <param name="context">the serialization context</param>
-        /// <returns>collection builder</returns>
-        public virtual ICollectionBuilder GetCollectionBuilder(object collection)
-        {
-            if (IsCollection())
-            {
-                return _collectionHandler.ConstructBuilder(collection);
-            }
-            else
-            {
-                throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
-            }
-        }
-
         protected override IJsonTypeConverter CreateTypeConverter()
         {
             IJsonTypeConverter converter = CreateTypeConverter(ForType);
             if (converter == null)
-                return GetDefaultTypeConverter(ForType);
+                return TypeConverterAdapter.GetAdapter(ForType);
             else
                 return converter;
         }

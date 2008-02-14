@@ -13,7 +13,7 @@ namespace JsonExSerializer.Expression
     /// a class for working with a reference identifier
     /// e.g. this.Customer.Address[1].Name;
     /// </summary>
-    public class ReferenceIdentifier 
+    public sealed class ReferenceIdentifier 
     {
         private Queue<string> parts;
 

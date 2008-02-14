@@ -13,7 +13,7 @@ namespace PerformanceTests
         private Serializer serializer;
 
         public override void InitSerializer(Type t)
-        {
+        {            
             serializer = Serializer.GetSerializer(t);
             //serializer.Context.TypeHandlerFactory = new CustTypeHandlerFactory(serializer.Context);
         }

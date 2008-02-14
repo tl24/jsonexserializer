@@ -13,7 +13,7 @@ namespace PerformanceTests.TestDomain
         {
         }
 
-        protected override ITypeHandler CreateNew(Type forType)
+        protected override TypeHandler CreateNew(Type forType)
         {
             if (forType == typeof(Customer))
                 return new CustomerTypeHandler(forType, this.Context);
@@ -28,37 +28,33 @@ namespace PerformanceTests.TestDomain
         {
         }
 
-        protected override void ReadProperties(out IList<IPropertyHandler> Properties, out IList<IPropertyHandler> ConstructorArguments)
+        protected override void ReadProperties(out IList<AbstractPropertyHandler> Properties, out IList<AbstractPropertyHandler> ConstructorArguments)
         {
-            Properties = new List<IPropertyHandler>();
+            Properties = new List<AbstractPropertyHandler>();
             Properties.Add(new FirstPH(this.ForType));
             Properties.Add(new LastPH(this.ForType));
             Properties.Add(new PhonePH(this.ForType));
             Properties.Add(new SSNPH(this.ForType));
             Properties.Add(new AgePH(this.ForType));
-            ConstructorArguments = new List<IPropertyHandler>();
+            ConstructorArguments = new List<AbstractPropertyHandler>();
         }
     }
 
-    public abstract class CustomerPHBase : MemberHandlerBase, IPropertyHandler {
+    public abstract class CustomerPHBase : AbstractPropertyHandler
+    {
         private string _name;
 
         public CustomerPHBase(Type forType, string name) : base(forType) {
             _name = name;
         }
 
-        public string Name { get { return _name; } }
-        public int Position { get { return -1; } }
-        public bool IsConstructorArgument { get { return false; } }
-        public bool Ignored
+        public override string Name { get { return _name; } }
+        public override bool Ignored
         {
             get { return false; }
             set { ; }
         }
 
-        public abstract object GetValue(object instance);
-        public abstract Type PropertyType { get; }
-        public abstract void SetValue(object instance, object value);
         protected override JsonExSerializer.TypeConversion.IJsonTypeConverter CreateTypeConverter()
         {
             return null;

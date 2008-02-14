@@ -9,7 +9,7 @@ using System.Text;
 
 namespace JsonExSerializer.Expression
 {
-    public class NullExpression : ExpressionBase
+    sealed class NullExpression : ExpressionBase
     {
         public override object Evaluate(SerializationContext context)
         {

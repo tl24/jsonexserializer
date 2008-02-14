@@ -36,9 +36,9 @@ namespace JsonExSerializer
 
         private TwoWayDictionary<Type, string> _typeBindings;
         private Serializer _serializerInstance;
-        private List<ICollectionHandler> _collectionHandlers;
+        private List<CollectionHandler> _collectionHandlers;
         
-        private ITypeHandlerFactory _typeHandlerFactory;
+        private TypeHandlerFactory _typeHandlerFactory;
         private IDictionary _parameters;
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace JsonExSerializer
             _typeBindings[typeof(double)] = "double";
 
             // collections
-            _collectionHandlers = new List<ICollectionHandler>();
+            _collectionHandlers = new List<CollectionHandler>();
             _collectionHandlers.Add(new GenericCollectionHandler());
             _collectionHandlers.Add(new ArrayHandler());
             _collectionHandlers.Add(new ListHandler());
@@ -299,17 +299,17 @@ namespace JsonExSerializer
         /// or multiple types of collections.
         /// </summary>
         /// <param name="handler">the collection handler</param>
-        public void RegisterCollectionHandler(ICollectionHandler handler)
+        public void RegisterCollectionHandler(CollectionHandler handler)
         {
             _collectionHandlers.Add(handler);
         }
 
-        internal List<ICollectionHandler> CollectionHandlers
+        internal List<CollectionHandler> CollectionHandlers
         {
             get { return _collectionHandlers; }
         }
 
-        public ITypeHandler GetTypeHandler(Type objectType)
+        public TypeHandler GetTypeHandler(Type objectType)
         {
             return TypeHandlerFactory[objectType];
         }
@@ -318,7 +318,7 @@ namespace JsonExSerializer
         /// Gets or sets the TypeHandlerFactory which is responsible for
         /// creating ITypeHandlers which manage type metadata
         /// </summary>
-        public ITypeHandlerFactory TypeHandlerFactory
+        public TypeHandlerFactory TypeHandlerFactory
         {
             get { return _typeHandlerFactory; }
             set { _typeHandlerFactory = value; }
@@ -333,7 +333,7 @@ namespace JsonExSerializer
         /// <param name="propertyName">the name of the property</param>
         public void IgnoreProperty(Type objectType, string propertyName)
         {
-            ITypeHandler handler = GetTypeHandler(objectType);
+            TypeHandler handler = GetTypeHandler(objectType);
             handler.IgnoreProperty(propertyName);
         }
 

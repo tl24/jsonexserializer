@@ -132,7 +132,7 @@ namespace JsonExSerializer
                             refInfo = new ReferenceInfo(currentPath);
                             _refs[o] = refInfo;
                         }
-                        ITypeHandler handler = _context.GetTypeHandler(o.GetType());
+                        TypeHandler handler = _context.GetTypeHandler(o.GetType());
 
                         // Check for a converter and convert
                         if (converter != null || handler.HasConverter)
@@ -239,7 +239,7 @@ namespace JsonExSerializer
                 return;
             }
 
-            ITypeHandler handler = _context.GetTypeHandler(obj.GetType());
+            TypeHandler handler = _context.GetTypeHandler(obj.GetType());
             
             if (obj is ISerializationCallback)
             {
@@ -256,7 +256,7 @@ namespace JsonExSerializer
                     hasConstructor = true;
                     this.ConstructorStart(obj.GetType());
                     this.ConstructorArgsStart();
-                    foreach (IPropertyHandler ctorParm in handler.ConstructorParameters)
+                    foreach (AbstractPropertyHandler ctorParm in handler.ConstructorParameters)
                     {
                         object value = ctorParm.GetValue(obj);
                         if (value != null && _context.OutputTypeInformation && value.GetType() != ctorParm.PropertyType)
@@ -280,7 +280,7 @@ namespace JsonExSerializer
                     hasInitializer = true;
                     this.ObjectStart();
 
-                    foreach (IPropertyHandler prop in handler.Properties)
+                    foreach (AbstractPropertyHandler prop in handler.Properties)
                     {
                         this.Key(prop.Name);
                         object value = prop.GetValue(obj);
@@ -373,10 +373,10 @@ namespace JsonExSerializer
         /// <param name="currentPath">the object's path</param>
         private void SerializeCollection(object collection, string currentPath)
         {
-            ITypeHandler handler = _context.GetTypeHandler(collection.GetType());
+            TypeHandler handler = _context.GetTypeHandler(collection.GetType());
 
             bool outputTypeInfo = _context.OutputTypeInformation;
-            ICollectionHandler collectionHandler = handler.GetCollectionHandler();
+            CollectionHandler collectionHandler = handler.GetCollectionHandler();
             Type elemType = collectionHandler.GetItemType(handler.ForType);
 
             this.ArrayStart();

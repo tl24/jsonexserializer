@@ -9,7 +9,7 @@ namespace JsonExSerializerTests.ReadOnlyPropertyTests
     {
         private CollItem _item = new CollItem();
 
-        [JsonProperty]
+        [JsonExProperty]
         public CollItem Item
         {
             get { return _item; }

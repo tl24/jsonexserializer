@@ -9,7 +9,7 @@ namespace JsonExSerializerTests.ReadOnlyPropertyTests
     {
         private List<CollItem> _items = new List<CollItem>();
 
-        [JsonProperty]
+        [JsonExProperty]
         public IList<CollItem> Items
         {
             get { return _items; }

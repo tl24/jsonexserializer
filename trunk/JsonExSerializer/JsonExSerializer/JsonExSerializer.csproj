@@ -76,7 +76,7 @@
     <Compile Include="JsonExIgnoreAttribute.cs" />
     <Compile Include="Collections\ListCollectionBuilder.cs" />
     <Compile Include="JsonExSerializationException.cs" />
-    <Compile Include="JsonPropertyAttribute.cs" />
+    <Compile Include="JsonExPropertyAttribute.cs" />
     <Compile Include="JsonWriter.cs" />
     <Compile Include="MetaData\AbstractPropertyHandler.cs" />
     <Compile Include="MetaData\CustomTypeHandlerFactory.cs" />

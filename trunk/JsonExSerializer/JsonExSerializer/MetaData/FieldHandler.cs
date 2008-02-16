@@ -44,7 +44,7 @@ namespace JsonExSerializer.MetaData
             if (Field.IsDefined(typeof(JsonExIgnoreAttribute), false))
                 _ignored = true;
 
-            if (Field.IsDefined(typeof(JsonPropertyAttribute), false))
+            if (Field.IsDefined(typeof(JsonExPropertyAttribute), false))
                 _ignored = false;
         }
 

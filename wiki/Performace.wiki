@@ -12,3 +12,5 @@ Each test is 2500 iterations.
 
 || *Type* || *Serialization* || *Deserialization* ||
 || JsonExSerializer || 7.221ms per iteration || 12.477ms per iteration ||
+|| BinaryFormmatter || 5.069ms per iteration || 2.809ms per iteration ||
+|| XMLSerializer || 2.966ms per iteration || 1.816ms per iteration ||

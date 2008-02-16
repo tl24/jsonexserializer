@@ -15,4 +15,4 @@ Each test is 2500 iterations.
 || BinaryFormmatter || 5.069ms per iteration || 2.809ms per iteration ||
 || XMLSerializer || 2.966ms per iteration || 1.816ms per iteration ||
 
-[http://chart.apis.google.com/chart?chs=200x125&chd=t:48.14,33.79,19.77|83.18,18.73,12.04&cht=bvg&chco=cc0000,00aa00&chxt=x,y&chxl=0:|Json|Binary|Xml|&chxr=1,0,15 Chart]
+[http://chart.apis.google.com/chart?chs=200x125&chd=t:48.14,33.79,19.77|83.18,18.73,12.04&cht=bvg&chco=cc0000,00aa00&chxt=x,y&chxl=0:|Json|Binary|Xml|&chxr=1,0,15&chtt=Performance%20Times%20ms%20per%20Iteration Chart]

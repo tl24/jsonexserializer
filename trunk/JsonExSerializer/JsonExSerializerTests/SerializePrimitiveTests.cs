@@ -20,7 +20,7 @@ namespace JsonExSerializerTests
         [RowTest]
         public void SerializeLongTest(long expected)
         {
-            Serializer s = Serializer.GetSerializer(typeof(long));
+            Serializer s = new Serializer(typeof(long));
             s.Context.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(), result.Trim(), "long did not serialize correctly");
@@ -37,7 +37,7 @@ namespace JsonExSerializerTests
         [RowTest]
         public void SerializeIntTest(int expected)
         {
-            Serializer s = Serializer.GetSerializer(typeof(int));
+            Serializer s = new Serializer(typeof(int));
             s.Context.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(), result.Trim(), "Int did not serialize correctly");
@@ -50,7 +50,7 @@ namespace JsonExSerializerTests
         [RowTest]
         public void SerializeUIntTest(uint expected)
         {
-            Serializer s = Serializer.GetSerializer(typeof(uint));
+            Serializer s = new Serializer(typeof(uint));
             s.Context.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(), result.Trim(), "UInt did not serialize correctly");
@@ -64,7 +64,7 @@ namespace JsonExSerializerTests
         [RowTest]
         public void SerializeShortTest(short expected)
         {
-            Serializer s = Serializer.GetSerializer(typeof(short));
+            Serializer s = new Serializer(typeof(short));
             s.Context.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(), result.Trim(), "Short did not serialize correctly");
@@ -75,7 +75,7 @@ namespace JsonExSerializerTests
         [RowTest]
         public void SerializeBoolTest(bool expected)
         {
-            Serializer s = Serializer.GetSerializer(typeof(bool));
+            Serializer s = new Serializer(typeof(bool));
             s.Context.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(), result.Trim(), "Bool true did not serialize correctly");
@@ -92,7 +92,7 @@ namespace JsonExSerializerTests
         [RowTest]
         public void SerializeFloatTest(float expected)
         {
-            Serializer s = Serializer.GetSerializer(typeof(float));
+            Serializer s = new Serializer(typeof(float));
             s.Context.SetJsonStrictOptions();
             float actual;
             string result = s.Serialize(expected);
@@ -112,7 +112,7 @@ namespace JsonExSerializerTests
         [RowTest]
         public void SerializeDoubleTest(double expected)
         {
-            Serializer s = Serializer.GetSerializer(typeof(double));
+            Serializer s = new Serializer(typeof(double));
             s.Context.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected, double.Parse(result), "double did not serialize correctly");
@@ -126,7 +126,7 @@ namespace JsonExSerializerTests
         [RowTest]
         public void SerializeByteTest(byte expected)
         {
-            Serializer s = Serializer.GetSerializer(typeof(byte));
+            Serializer s = new Serializer(typeof(byte));
             s.Context.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected, byte.Parse(result), "byte did not serialize correctly");
@@ -137,7 +137,7 @@ namespace JsonExSerializerTests
         [Test]
         public void SerializeStringTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(string));
+            Serializer s = new Serializer(typeof(string));
             s.Context.SetJsonStrictOptions();
             string expected = "simple";
             string result = s.Serialize(expected);
@@ -147,7 +147,7 @@ namespace JsonExSerializerTests
         [Test]
         public void SerializeSpecialCharacterStringTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(string));
+            Serializer s = new Serializer(typeof(string));
             string expected = "Are you sure? (y\\n)\r\n";
             string result = s.Serialize(expected);
             string actual = (string) s.Deserialize(result);
@@ -157,7 +157,7 @@ namespace JsonExSerializerTests
         [Test]
         public void SerializeEnumTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(SimpleEnum));
+            Serializer s = new Serializer(typeof(SimpleEnum));
             string result = s.Serialize(SimpleEnum.EnumValue2);
             SimpleEnum se = (SimpleEnum)s.Deserialize(result);
             Assert.AreEqual(SimpleEnum.EnumValue2, se, "Enum values not correct");
@@ -166,7 +166,7 @@ namespace JsonExSerializerTests
         [Test]
         public void SerializeFlagsEnumTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(MockFlagsEnum));
+            Serializer s = new Serializer(typeof(MockFlagsEnum));
             MockFlagsEnum expected = MockFlagsEnum.BitOne | MockFlagsEnum.BitFour | MockFlagsEnum.BitFive;
             string result = s.Serialize(expected);
             MockFlagsEnum actual = (MockFlagsEnum)s.Deserialize(result);
@@ -176,7 +176,7 @@ namespace JsonExSerializerTests
         [Test]
         public void TestCastAlias()
         {
-            Serializer s = Serializer.GetSerializer(typeof(object));
+            Serializer s = new Serializer(typeof(object));
             int expected = 3456;
             string result = s.Serialize(expected);
             int actual = (int)s.Deserialize(result);
@@ -186,7 +186,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeEmptyString()
         {
-            Serializer s = Serializer.GetSerializer(typeof(object));
+            Serializer s = new Serializer(typeof(object));
             object value = s.Deserialize("");
             Assert.IsNull(value, "Deserialize empty string should be null");
         }
@@ -202,7 +202,7 @@ namespace JsonExSerializerTests
 
         public void TestDate(DateTime expected)
         {
-            Serializer s = Serializer.GetSerializer(typeof(DateTime));
+            Serializer s = new Serializer(typeof(DateTime));
             s.Context.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             DateTime actual = (DateTime)s.Deserialize(result);
@@ -218,7 +218,7 @@ namespace JsonExSerializerTests
         public void SerializeDecimalTest(string decimalString) {
             Debug.WriteLine(decimal.MinValue.ToString());
             decimal expected = decimal.Parse(decimalString);
-            Serializer s = Serializer.GetSerializer(typeof(decimal));
+            Serializer s = new Serializer(typeof(decimal));
             s.Context.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected, decimal.Parse(result), "decimal did not serialize correctly");
@@ -228,7 +228,7 @@ namespace JsonExSerializerTests
 
         public void SerializeStringEscapesTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(string));
+            Serializer s = new Serializer(typeof(string));
             string data = "\u0000\u0001\u0002\r\n\t\f\b\"/\\";
             string result = s.Serialize(data);
             string actual = (string)s.Deserialize(result);

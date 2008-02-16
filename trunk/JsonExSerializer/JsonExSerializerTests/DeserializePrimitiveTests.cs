@@ -13,7 +13,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeIntTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(int));
+            Serializer s = new Serializer(typeof(int));
             int value = 32;
             int result = (int)s.Deserialize(value.ToString());
             Assert.AreEqual(value, result, "Int not deserialized correctly");
@@ -30,7 +30,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeLongTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(long));
+            Serializer s = new Serializer(typeof(long));
             long value = 32;
             long result = (long)s.Deserialize(value.ToString());
             Assert.AreEqual(value, result, "long not deserialized correctly");
@@ -47,7 +47,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeShortTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(short));
+            Serializer s = new Serializer(typeof(short));
             short value = 32;
             short result = (short)s.Deserialize(value.ToString());
             Assert.AreEqual(value, result, "short not deserialized correctly");
@@ -64,7 +64,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeFloatTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(float));
+            Serializer s = new Serializer(typeof(float));
             float value = 32.44f;
             float result = (float)s.Deserialize(value.ToString());
             Assert.AreEqual(value, result, "float not deserialized correctly");
@@ -88,7 +88,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializedoubleTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(double));
+            Serializer s = new Serializer(typeof(double));
             double value = 32.44;
             double result = (double)s.Deserialize(value.ToString());
             Assert.AreEqual(value, result, "double not deserialized correctly");
@@ -109,7 +109,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeBoolTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(bool));
+            Serializer s = new Serializer(typeof(bool));
             bool value = true;
             bool result = (bool)s.Deserialize(value.ToString());
             Assert.AreEqual(value, result, "Bool true not deserialized correctly");
@@ -125,7 +125,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeStringTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(string));
+            Serializer s = new Serializer(typeof(string));
             string value = "test";
             string result = (string)s.Deserialize("\"" + value + "\"");
             Assert.AreEqual(value, result, "Simple double quote string did not deserialize correctly");
@@ -138,7 +138,7 @@ namespace JsonExSerializerTests
         [Test]
         public void UnicodeEscapeTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(string));
+            Serializer s = new Serializer(typeof(string));
             string expected = "\u0164\u0112\u0161\u0164";
             string toDeserialize = @"""\u0164\u0112\u0161\u0164""";
             string result = (string)s.Deserialize(toDeserialize);

@@ -16,7 +16,7 @@ namespace JsonExSerializerTests
         public void StringArrayTest()
         {
             string[] value = { "one", "two", "three", "four" };
-            Serializer s = Serializer.GetSerializer(value.GetType());
+            Serializer s = new Serializer(value.GetType());
             string result = s.Serialize(value);
 
             string[] actual = (string[]) s.Deserialize(result);
@@ -28,7 +28,7 @@ namespace JsonExSerializerTests
         public void IntArrayTest()
         {
             int[] value = { int.MinValue, 0, int.MaxValue, -2, 35 };
-            Serializer s = Serializer.GetSerializer(value.GetType());
+            Serializer s = new Serializer(value.GetType());
             string result = s.Serialize(value);
 
             int[] actual = (int[])s.Deserialize(result);
@@ -50,7 +50,7 @@ namespace JsonExSerializerTests
             uint uivalue = 333;
 
             object[] value = { ivalue, svalue, strvalue, fvalue, dvalue, boolvalue, sbvalue, usvalue, uivalue };
-            Serializer s = Serializer.GetSerializer(value.GetType());
+            Serializer s = new Serializer(value.GetType());
             string result = s.Serialize(value);
             object[] actual = (object[])s.Deserialize(result);
             Assert.AreEqual(ivalue, actual[0]);
@@ -77,7 +77,7 @@ namespace JsonExSerializerTests
         public void TestArrayCast()
         {
             object[] data = { 1, "string", new ArrayList() };
-            Serializer s = Serializer.GetSerializer(typeof(object));
+            Serializer s = new Serializer(typeof(object));
             string result = s.Serialize(data);
             object[] actual = (object[]) s.Deserialize(result);
             Assert.AreEqual(data, actual, "Cast to array not correct");

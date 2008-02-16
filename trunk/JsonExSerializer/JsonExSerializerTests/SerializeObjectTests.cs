@@ -25,7 +25,7 @@ namespace JsonExSerializerTests
             src.ShortValue = short.MaxValue;
             src.StringValue = "The simple string";
 
-            Serializer s = Serializer.GetSerializer(typeof(SimpleObject));
+            Serializer s = new Serializer(typeof(SimpleObject));
             string result = s.Serialize(src);
             SimpleObject dst = (SimpleObject) s.Deserialize(result);
             ValidateSimpleObjects(src, dst);
@@ -47,7 +47,7 @@ namespace JsonExSerializerTests
             complex.SimpleObject = src;
             complex.Name = "MyComplexObject";
 
-            Serializer s = Serializer.GetSerializer(typeof(SemiComplexObject));
+            Serializer s = new Serializer(typeof(SemiComplexObject));
             string result = s.Serialize(complex);
             SemiComplexObject complexDest = (SemiComplexObject) s.Deserialize(result);
             Assert.AreEqual(complex.Name, complexDest.Name, "SemiComplex Name not deserialized correctly");
@@ -59,7 +59,7 @@ namespace JsonExSerializerTests
         {
             SpecializedMock expected = new SpecializedMock();
             expected.Name = null;
-            Serializer s = Serializer.GetSerializer(typeof(SpecializedMock));
+            Serializer s = new Serializer(typeof(SpecializedMock));
             string result = s.Serialize(expected);
             SpecializedMock actual = (SpecializedMock)s.Deserialize(result);
             Assert.IsNull(actual.Name, "Null value not serialized, deserialized correctly");
@@ -70,7 +70,7 @@ namespace JsonExSerializerTests
         {
             SpecializedMock co = new SpecializedMock(33);
             co.Name = "ThirtyThree";
-            Serializer s = Serializer.GetSerializer(typeof(SpecializedMock));
+            Serializer s = new Serializer(typeof(SpecializedMock));
             string result = s.Serialize(co);
             SpecializedMock actual = (SpecializedMock)s.Deserialize(result);
             Assert.AreEqual(co.Name, actual.Name, "Name properties don't match");
@@ -83,7 +83,7 @@ namespace JsonExSerializerTests
             SpecializedMock co = new SpecializedMock(33);
             co.Name = "ThirtyThree";
             co.IgnoredProp = "IgnoreMe";
-            Serializer s = Serializer.GetSerializer(typeof(SpecializedMock));
+            Serializer s = new Serializer(typeof(SpecializedMock));
             string result = s.Serialize(co);
             SpecializedMock actual = (SpecializedMock)s.Deserialize(result);
             Assert.AreNotEqual(co.IgnoredProp, actual.IgnoredProp, "Ignored property not ignored");
@@ -95,7 +95,7 @@ namespace JsonExSerializerTests
             SubClassMock co = new SubClassMock();
             co.Name = "ThirtyThree";
             co.SubClassProp = "Some Subclass";
-            Serializer s = Serializer.GetSerializer(typeof(SubClassMock));
+            Serializer s = new Serializer(typeof(SubClassMock));
             string result = s.Serialize(co);
             SubClassMock actual = (SubClassMock)s.Deserialize(result);
             Assert.AreEqual(co.Name, actual.Name, "Base class properties don't match");
@@ -108,7 +108,7 @@ namespace JsonExSerializerTests
         [Test]
         public void CastWithGenericsTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(IDictionary<string, int>));
+            Serializer s = new Serializer(typeof(IDictionary<string, int>));
             IDictionary<string, int> dict = new Dictionary<string, int>();
             dict.Add("one", 1);
             dict.Add("two", 2);
@@ -125,7 +125,7 @@ namespace JsonExSerializerTests
         [Test]
         public void EnumDictionaryKeyTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(IDictionary<string, int>));
+            Serializer s = new Serializer(typeof(IDictionary<string, int>));
             IDictionary<SimpleEnum, string> dict = new Dictionary<SimpleEnum, string>();
             dict.Add(SimpleEnum.EnumValue1, "value1");
             dict.Add(SimpleEnum.EnumValue2, "value2");
@@ -138,7 +138,7 @@ namespace JsonExSerializerTests
         [Test]
         public void StructTypeTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(MockValueType));
+            Serializer s = new Serializer(typeof(MockValueType));
             MockValueType value = new MockValueType(5, 10);
             string result = s.Serialize(value);
 

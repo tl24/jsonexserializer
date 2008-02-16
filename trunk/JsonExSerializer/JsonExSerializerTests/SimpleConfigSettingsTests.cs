@@ -14,7 +14,7 @@ namespace JsonExSerializerTests
         [SetUp]
         public void Setup()
         {
-            serializer = Serializer.GetSerializer(typeof(object), "SimpleSettingsConfig");
+            serializer = new Serializer(typeof(object), "SimpleSettingsConfig");
             context = serializer.Context;
         }
 

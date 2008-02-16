@@ -47,7 +47,7 @@ namespace JsonExSerializerTests
         [Test]
         public void ConvertGuidTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(Guid));
+            Serializer s = new Serializer(typeof(Guid));
             Guid g = Guid.NewGuid();
             string result = s.Serialize(g);
             Guid actual = (Guid)s.Deserialize(result);
@@ -57,7 +57,7 @@ namespace JsonExSerializerTests
         [Test]
         public void ClassAttributeTest()
         {
-            Serializer serializer = Serializer.GetSerializer(typeof(MyImmutablePoint));
+            Serializer serializer = new Serializer(typeof(MyImmutablePoint));
             MyImmutablePoint expectedPt = new MyImmutablePoint(12, -10);
             string result = serializer.Serialize(expectedPt);
             MyImmutablePoint actualPt = (MyImmutablePoint) serializer.Deserialize(result);
@@ -70,7 +70,7 @@ namespace JsonExSerializerTests
             MockCallbackObject expected = new MockCallbackObject();
             expected.Name = "callback";
 
-            Serializer s = Serializer.GetSerializer(expected.GetType());
+            Serializer s = new Serializer(expected.GetType());
             string result = s.Serialize(expected);
             Assert.AreEqual(1, expected.BeforeSerializeCount, "BeforeSerialize incorrect count");
             Assert.AreEqual(1, expected.AfterSerializeCount, "AfterSerialize incorrect count");
@@ -83,7 +83,7 @@ namespace JsonExSerializerTests
         public void SelfConversionTest()
         {
             SelfConverter expected = new SelfConverter();
-            Serializer s = Serializer.GetSerializer(typeof(SelfConverter));
+            Serializer s = new Serializer(typeof(SelfConverter));
             string result = s.Serialize(expected);
             SelfConverter actual = (SelfConverter)s.Deserialize(result);
             Assert.AreEqual(expected, actual, "Selfconversion failed");
@@ -96,7 +96,7 @@ namespace JsonExSerializerTests
             line.Start = new MyImmutablePoint(1, 5);
             line.End = new MyImmutablePoint(2, 12);
 
-            Serializer s = Serializer.GetSerializer(typeof(MyLine));
+            Serializer s = new Serializer(typeof(MyLine));
             string result = s.Serialize(line);
             MyLine actual = (MyLine)s.Deserialize(result);
             Assert.AreEqual(line.Start, actual.Start, "Line start not equal");
@@ -114,7 +114,7 @@ namespace JsonExSerializerTests
         {
             ChainedConversionMock mock = new ChainedConversionMock();
             mock.StringProp = new StringHolder("True");
-            Serializer s = Serializer.GetSerializer(typeof(ChainedConversionMock));
+            Serializer s = new Serializer(typeof(ChainedConversionMock));
             ChainedConverter converter = new ChainedConverter();
             converter.Converters.Add(new StringToBoolConverter());
             converter.Converters.Add(new BoolToIntConverter());
@@ -131,7 +131,7 @@ namespace JsonExSerializerTests
             line.Start = new MyImmutablePoint(1, 5);
             line.End = new MyImmutablePoint(2, 12);
 
-            Serializer s = Serializer.GetSerializer(typeof(MyLine));
+            Serializer s = new Serializer(typeof(MyLine));
             // ignore properties (Use both methods)
             s.Context.IgnoreProperty(typeof(MyLine), "Start");
             s.Context.IgnoreProperty(typeof(MyLine), "End");
@@ -148,7 +148,7 @@ namespace JsonExSerializerTests
         [ExpectedException(typeof(ArgumentException))]
         public void TestRegisterPrimitiveTypeConverter()
         {
-            Serializer s = Serializer.GetSerializer(typeof(object));
+            Serializer s = new Serializer(typeof(object));
             s.Context.RegisterTypeConverter(typeof(int), new MyImmutablePointConverter());
         }
     }

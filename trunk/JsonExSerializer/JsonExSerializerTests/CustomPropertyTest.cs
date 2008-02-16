@@ -13,7 +13,7 @@ namespace JsonExSerializerTests
         [Test]
         public void WhenCustomMetaDataIsReturn_ItsSerializedCorrectly()
         {
-            Serializer s = Serializer.GetSerializer(typeof(CustomClass));
+            Serializer s = new Serializer(typeof(CustomClass));
             s.Context.TypeHandlerFactory = new CustomTypeHandlerFactory(typeof(CustomClassTypeHandler), s.Context);
             CustomClass cust = new CustomClass();
             cust.SetID(23);

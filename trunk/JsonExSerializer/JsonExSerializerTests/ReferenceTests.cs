@@ -52,7 +52,7 @@ namespace JsonExSerializerTests
         [ExpectedException(typeof(JsonExSerializationException))]
         public void CircularReferenceError()
         {
-            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            Serializer s = new Serializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.ErrorCircularReferences;
             string result = s.Serialize(simple);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
@@ -63,7 +63,7 @@ namespace JsonExSerializerTests
         [ExpectedException(typeof(JsonExSerializationException))]
         public void DeepCircularReferenceError()
         {
-            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            Serializer s = new Serializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.ErrorCircularReferences;
             string result = s.Serialize(deep);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
@@ -72,7 +72,7 @@ namespace JsonExSerializerTests
         [Test]
         public void CircularReferenceIgnore()
         {
-            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            Serializer s = new Serializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.IgnoreCircularReferences;
             string result = s.Serialize(simple);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
@@ -82,7 +82,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeepCircularReferenceIgnore()
         {
-            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            Serializer s = new Serializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.IgnoreCircularReferences;
             string result = s.Serialize(deep);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
@@ -93,7 +93,7 @@ namespace JsonExSerializerTests
         [Test]
         public void CircularReferenceWrite()
         {
-            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            Serializer s = new Serializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
             string result = s.Serialize(simple);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
@@ -103,7 +103,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DeepCircularReferenceWrite()
         {
-            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            Serializer s = new Serializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
             string result = s.Serialize(deep);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
@@ -114,7 +114,7 @@ namespace JsonExSerializerTests
         public void TestCollectionIndexReference()
         {
             MockReferenceObject[] mockArray = new MockReferenceObject[] { simple };
-            Serializer s = Serializer.GetSerializer(typeof(MockReferenceObject));
+            Serializer s = new Serializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
             string result = s.Serialize(mockArray);
             MockReferenceObject[] actual = (MockReferenceObject[]) s.Deserialize(result);

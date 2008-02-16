@@ -9,7 +9,7 @@ namespace JsonExSerializerTests.ReadOnlyPropertyTests
     {
         private string[] _items = { "one", "two" };
 
-        [JsonProperty]
+        [JsonExProperty]
         public string[] Items
         {
             get { return _items; }

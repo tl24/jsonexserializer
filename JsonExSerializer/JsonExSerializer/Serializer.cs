@@ -18,13 +18,13 @@ namespace JsonExSerializer
     /// </summary>
     /// <example>
     /// <c>
-    ///     Serializer serializerObject = Serializer.GetSerializer(typeof(MyClass));
+    ///     Serializer serializerObject = new Serializer(typeof(MyClass));
     ///     MyClass myClass = new MyClass();
     ///     /* set properties on myClass */
     ///     string data = serializerObject.Serialize(myClass);
     /// </c>
     /// </example>
-    public sealed class Serializer
+    public class Serializer
     {
         private Type _serializedType;
         private SerializationContext _context;
@@ -34,6 +34,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="t">type</param>
         /// <returns>a serializer</returns>
+        [Obsolete("Use the Serializer(Type) constructor")]
         public static Serializer GetSerializer(Type t)
         {
             return GetSerializer(t, "JsonExSerializer");
@@ -44,17 +45,24 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="t">type</param>
         /// <returns>a serializer</returns>
+        [Obsolete("Use the Serializer(Type, string) constructor")]
         public static Serializer GetSerializer(Type t, string configSection)
         {
             return new Serializer(t, configSection);
         }
 
+        [Obsolete("Use the Serializer(Type, SerializationContext) constructor")]
         public static Serializer GetSerializer(Type t, SerializationContext context)
         {
             return new Serializer(t, context);
         }
 
-        private Serializer(Type t, string configSection) 
+        public Serializer(Type t)
+            : this(t, "JsonExSerializer")
+        {
+        }
+
+        public Serializer(Type t, string configSection) 
         {
             _serializedType = t;
             _context = new SerializationContext();
@@ -62,7 +70,7 @@ namespace JsonExSerializer
             XmlConfigurator.Configure(_context, configSection);
         }
 
-        private Serializer(Type t, SerializationContext context)
+        public Serializer(Type t, SerializationContext context)
         {
             _serializedType = t;
             _context = context;
@@ -70,6 +78,18 @@ namespace JsonExSerializer
         }
         #region Serialization
 
+        /// <summary>
+        /// Serialize the object and write the data to the stream parameter.
+        /// </summary>
+        /// <param name="o">the object to serialize</param>
+        /// <param name="stream">stream for the serialized data</param>
+        public void Serialize(object o, Stream stream)
+        {
+            using (StreamWriter sw = new StreamWriter(stream))
+            {                
+                Serialize(o, sw);
+            }
+        }
         /// <summary>
         /// Serialize the object and write the data to the writer parameter.
         /// The caller is expected to close the writer when done.
@@ -103,6 +123,19 @@ namespace JsonExSerializer
 
         #region Deserialization
 
+        /// <summary>
+        /// Read the serialized data from the stream and return the
+        /// deserialized object.
+        /// </summary>
+        /// <param name="stream">stream to read the data from</param>
+        /// <returns>the deserialized object</returns>
+        public object Deserialize(Stream stream)
+        {
+            using (StreamReader sr = new StreamReader(stream))
+            {
+                return Deserialize(sr);
+            }
+        }
         /// <summary>
         /// Read the serialized data from the reader and return the
         /// deserialized object.

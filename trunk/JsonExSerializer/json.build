@@ -31,7 +31,7 @@
 	  <!-- Make sure we have found the index of the substring -->
 	  <if test="${bool::parse(int::parse(index.of.revision) != -1)}">
 	   
-	    <property name="build.version" value="${string::substring(svn.head.revision, int::parse(index.of.revision) + 10, 2)}" verbose="true"/>
+	    <property name="build.version" value="${string::substring(svn.head.revision, int::parse(index.of.revision) + 10, 3)}" verbose="true"/>
 		<property name="full.version" value="${major.version}.${minor.version}.${revision.version}.${build.version}" />
 		<property name="build.dir" value="build/${name}-${full.version}" />
 	    <delete file="${svn.info.log}" />

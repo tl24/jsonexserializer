@@ -14,7 +14,7 @@ namespace JsonExSerializerTests
         [Test]
         public void StringArrayListTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(ArrayList));
+            Serializer s = new Serializer(typeof(ArrayList));
             ArrayList strings = new ArrayList();
             strings.Add("one");
             strings.Add("two");
@@ -27,7 +27,7 @@ namespace JsonExSerializerTests
         [Test]
         public void IntListTest()
         {
-            Serializer s = Serializer.GetSerializer(typeof(List<int>));
+            Serializer s = new Serializer(typeof(List<int>));
             List<int> ints = new List<int>();
             ints.Add(0);
             ints.Add(int.MinValue);
@@ -44,7 +44,7 @@ namespace JsonExSerializerTests
         [Test]
         public void SimpleObjectLinkedList()
         {
-            Serializer s = Serializer.GetSerializer(typeof(LinkedList<SimpleObject>));
+            Serializer s = new Serializer(typeof(LinkedList<SimpleObject>));
             LinkedList<SimpleObject> objects = new LinkedList<SimpleObject>();
             SimpleObject obj = null;
             
@@ -90,7 +90,7 @@ namespace JsonExSerializerTests
             expectedQueue.Enqueue(4);
             expectedQueue.Enqueue(2);
             expectedQueue.Enqueue(1);
-            Serializer s = Serializer.GetSerializer(typeof(Queue));
+            Serializer s = new Serializer(typeof(Queue));
             string result = s.Serialize(expectedQueue);
 
             Queue actualQueue = (Queue)s.Deserialize(result);
@@ -104,7 +104,7 @@ namespace JsonExSerializerTests
             expectedQueue.Enqueue(4.3f);
             expectedQueue.Enqueue(2.9934f);
             expectedQueue.Enqueue(-0.456f);
-            Serializer s = Serializer.GetSerializer(typeof(Queue<float>));
+            Serializer s = new Serializer(typeof(Queue<float>));
             string result = s.Serialize(expectedQueue);
 
             Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
@@ -116,7 +116,7 @@ namespace JsonExSerializerTests
         {
             Queue<float> expectedQueue = new Queue<float>();
             expectedQueue.Enqueue(float.MaxValue);
-            Serializer s = Serializer.GetSerializer(typeof(object));
+            Serializer s = new Serializer(typeof(object));
             string result = s.Serialize(expectedQueue);
             Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
             Assert.AreEqual(expectedQueue, actualQueue, "Generic types not equal");
@@ -130,7 +130,7 @@ namespace JsonExSerializerTests
             expectedBits[3] = true;
             expectedBits[4] = true;
 
-            Serializer s = Serializer.GetSerializer(typeof(BitArray));
+            Serializer s = new Serializer(typeof(BitArray));
             string result = s.Serialize(expectedBits);
 
             BitArray actualBits = (BitArray)s.Deserialize(result);
@@ -147,7 +147,7 @@ namespace JsonExSerializerTests
             expectedStack.Push("3");
             expectedStack.Push("2");
             expectedStack.Push("1");            
-            Serializer s = Serializer.GetSerializer(expectedStack.GetType());
+            Serializer s = new Serializer(expectedStack.GetType());
             string result = s.Serialize(expectedStack);
 
             Stack actualStack = (Stack)s.Deserialize(result);
@@ -163,7 +163,7 @@ namespace JsonExSerializerTests
             expectedStack.Push(3);
             expectedStack.Push(2);
             expectedStack.Push(1);
-            Serializer s = Serializer.GetSerializer(expectedStack.GetType());
+            Serializer s = new Serializer(expectedStack.GetType());
             string result = s.Serialize(expectedStack);
 
             Stack<int> actualStack = (Stack<int>)s.Deserialize(result);

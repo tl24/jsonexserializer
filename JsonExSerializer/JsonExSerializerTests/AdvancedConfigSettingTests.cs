@@ -14,7 +14,7 @@ namespace JsonExSerializerTests
         [Test]
         public void TestAddBinding()
         {
-            Serializer s = Serializer.GetSerializer(typeof(object), "TypeBindingAdd");
+            Serializer s = new Serializer(typeof(object), "TypeBindingAdd");
             Assert.AreEqual("SimpleObject", s.Context.GetTypeAlias(typeof(SimpleObject)));
             // check that defaults are still mapped
             Assert.AreEqual("int", s.Context.GetTypeAlias(typeof(int)));
@@ -23,7 +23,7 @@ namespace JsonExSerializerTests
         [Test]
         public void TestRemoveBinding()
         {
-            Serializer s = Serializer.GetSerializer(typeof(object), "TypeBindingRemove");
+            Serializer s = new Serializer(typeof(object), "TypeBindingRemove");
             // verify int is not mapped
             // <remove type="System.Int32, mscorlib" />
             Assert.IsNull(s.Context.GetTypeAlias(typeof(int)));
@@ -35,7 +35,7 @@ namespace JsonExSerializerTests
         [Test]
         public void TestClearAddBinding()
         {
-            Serializer s = Serializer.GetSerializer(typeof(object), "TypeBindingClearAdd");
+            Serializer s = new Serializer(typeof(object), "TypeBindingClearAdd");
             Assert.AreEqual("SimpleObject", s.Context.GetTypeAlias(typeof(SimpleObject)));
             // check that defaults are not mapped
             Assert.IsNull(s.Context.GetTypeAlias(typeof(int)));
@@ -44,7 +44,7 @@ namespace JsonExSerializerTests
         [Test]
         public void TestRegisterTypeConverter()
         {
-            Serializer s = Serializer.GetSerializer(typeof(object), "TestRegisterTypeConverter");
+            Serializer s = new Serializer(typeof(object), "TestRegisterTypeConverter");
             IJsonTypeConverter typeConverter = s.Context.GetTypeHandler(typeof(SimpleObject)).TypeConverter;
             IJsonTypeConverter propConverter = s.Context.GetTypeHandler(typeof(SimpleObject)).FindProperty("BoolValue").TypeConverter;
             Assert.IsNotNull(typeConverter, "No converter for simple object registered");
@@ -54,7 +54,7 @@ namespace JsonExSerializerTests
         [Test]
         public void TestCollectionHandler()
         {
-            Serializer s = Serializer.GetSerializer(typeof(MockCollection), "TestCollectionHandlers");
+            Serializer s = new Serializer(typeof(MockCollection), "TestCollectionHandlers");
             MockCollection coll = new MockCollection("test");
             string result = s.Serialize(coll);
             MockCollection actual = (MockCollection) s.Deserialize(result);
@@ -68,7 +68,7 @@ namespace JsonExSerializerTests
             line.Start = new MyImmutablePoint(1, 5);
             line.End = new MyImmutablePoint(2, 12);
 
-            Serializer s = Serializer.GetSerializer(typeof(MyLine), "TestIgnoreProperties");
+            Serializer s = new Serializer(typeof(MyLine), "TestIgnoreProperties");
             string result = s.Serialize(line);
             MyLine actual = (MyLine)s.Deserialize(result);
             Assert.IsNull(actual.Start, "Line start should be ignored");

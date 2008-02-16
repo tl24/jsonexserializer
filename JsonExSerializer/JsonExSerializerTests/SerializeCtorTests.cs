@@ -15,7 +15,7 @@ namespace JsonExSerializerTests
         public void SimpleConstructorNoInitTest()
         {
             MyPointConstructor pt = new MyPointConstructor(3, 9);
-            Serializer s = Serializer.GetSerializer(pt.GetType());
+            Serializer s = new Serializer(pt.GetType());
             string result = s.Serialize(pt);
             MyPointConstructor actual = (MyPointConstructor)s.Deserialize(result);
             Assert.AreEqual(pt, actual, "Simple Constructor with no initializer failed");

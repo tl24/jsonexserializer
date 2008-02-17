@@ -8,43 +8,64 @@ Add your content here.
 
 = Sample Class =
 {{{
-public class Customer {
-   private int _id;
-   private string _firstName;
-   private string _lastName;
-   
-   public int ID {
-      get { return _id; }
-      set { _id = value; }
-   }
+    public class Customer
+    {
+        private int _id;
+        private string _firstName;
+        private string _lastName;
+        private string _phoneNumber;
+        private List<Order> _orders;
 
-   public string FirstName {
-      get { return _firstName; }
-      set { _firstName = value; }
-   }
+        public int Id
+        {
+            get { return this._id; }
+            set { this._id = value; }
+        }
 
-   public string LastName {
-      get { return _lastName; }
-      set { _lastName = value; }
-   }   
-}
+        public string FirstName
+        {
+            get { return this._firstName; }
+            set { this._firstName = value; }
+        }
+
+        public string LastName
+        {
+            get { return this._lastName; }
+            set { this._lastName = value; }
+        }
+
+        public string PhoneNumber
+        {
+            get { return this._phoneNumber; }
+            set { this._phoneNumber = value; }
+        }
+    }
 }}}
 
 Get an instance of a serializer for this class.
 {{{
-   Customer cust = new Customer();
-   cust.ID = 23;
-   cust.FirstName = "Fred";
-   cust.LastName = "Flintstone";
+   // customer
+   Customer customer = new Customer();
+   customer.Id = 1;
+   customer.FirstName = "Bob";
+   customer.LastName = "Smith";
+   customer.PhoneNumber = "(222)444-9987";
    Serializer serializer = Serializer.GetSerializer(typeof(Customer));
    string result = serializer.Serialize();
+   Console.WriteLine(result);
 }}}
 
 The output should look something like this:
 {{{
+/*
+  Created by JsonExSerializer
+  Assembly: Samples, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Type: Sample01.Customer
+*/
 {
-   ID: 23,
-   FirstName: "Fred",
-   LastName: "Flintstone"
+    "Id":1,
+    "FirstName":"Bob",
+    "LastName":"Smith",
+    "PhoneNumber":"(222)444-9987"
 }
 }}}

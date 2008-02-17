@@ -1,10 +1,9 @@
-#summary One-sentence summary of this page.
+#summary Tutorial for basic serialization
 #labels In-Progress
 
 = Introduction =
 
-Add your content here.
-
+This tutorial walks you through serializing a simple class.  First we'll start with a sample Customer class.  The source is shown here:
 
 = Sample Class =
 {{{
@@ -42,7 +41,7 @@ Add your content here.
     }
 }}}
 
-Get an instance of a serializer for this class.
+Next we'll populate the class with values and serialize it.  To do that we'll need to get an instance of a serializer for the Customer class, and call the Serialize method.
 {{{
    // customer
    Customer customer = new Customer();
@@ -50,9 +49,11 @@ Get an instance of a serializer for this class.
    customer.FirstName = "Bob";
    customer.LastName = "Smith";
    customer.PhoneNumber = "(222)444-9987";
-   Serializer serializer = Serializer.GetSerializer(typeof(Customer));
-   string result = serializer.Serialize();
-   Console.WriteLine(result);
+
+   // serialize to a string
+   Serializer serializer = new Serializer(typeof(Customer));
+   string jsonText = serializer.Serialize(customer);
+   Console.WriteLine(jsonText);
 }}}
 
 The output should look something like this:
@@ -68,4 +69,9 @@ The output should look something like this:
     "LastName":"Smith",
     "PhoneNumber":"(222)444-9987"
 }
+}}}
+
+To deserialize the customer object is just as easy.  We'll use the same serializer and the string that we wrote the previous result to to deserialize the class.
+{{{
+  Customer deserializedCustomer = (Customer) serializer.Deserialize(jsonText);
 }}}

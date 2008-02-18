@@ -1,4 +1,5 @@
 #summary Tutorial for basic serialization
+#labels Featured
 
 = Introduction =
 

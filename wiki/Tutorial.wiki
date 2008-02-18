@@ -75,3 +75,46 @@ To deserialize the customer object is just as easy.  We'll use the same serializ
 {{{
   Customer deserializedCustomer = (Customer) serializer.Deserialize(jsonText);
 }}}
+
+Next we'll add an orders collection to the customer object.  Collections are serialized as javascript arrays.  The Order class looks like this:
+{{{
+    public class Order
+    {
+        private decimal _amount;
+        private string _orderNumber;
+        private int _itemCount;
+
+        public decimal Amount
+        {
+            get { return this._amount; }
+            set { this._amount = value; }
+        }
+
+        public string OrderNumber
+        {
+            get { return this._orderNumber; }
+            set { this._orderNumber = value; }
+        }
+
+        public int ItemCount
+        {
+            get { return this._itemCount; }
+            set { this._itemCount = value; }
+        }
+    }
+}}}
+
+And we'll declare it in the customer object like this:
+
+{{{
+   public class Customer {
+
+     /* Other properties omitted ... */
+
+     private List<Order> _orders;
+     public List<Order> Orders
+     {
+         get { return this._orders; }
+         set { this._orders = value; }
+     }
+}}}

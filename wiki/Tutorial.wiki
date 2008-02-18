@@ -1,5 +1,4 @@
 #summary Tutorial for basic serialization
-#labels In-Progress
 
 = Introduction =
 
@@ -117,4 +116,56 @@ And we'll declare it in the customer object like this:
          get { return this._orders; }
          set { this._orders = value; }
      }
+   }
 }}}
+
+Let's populate the Orders collection and add it to the Customer
+{{{
+    // orders
+    Order order1 = new Order();
+    order1.Amount = new decimal(54.99);
+    order1.OrderNumber = "ORD123";
+    order1.ItemCount = 3;
+
+    Order order2 = new Order();
+    order2.Amount = new decimal(99.99);
+    order2.OrderNumber = "ORD235";
+    order2.ItemCount = 10;
+
+    List<Order> orders = new List<Order>();
+    orders.Add(order1);
+    orders.Add(order2);
+
+    customer.Orders = orders;
+}}}
+
+Now the output should look like this:
+{{{
+/*
+  Created by JsonExSerializer
+  Assembly: Samples, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Type: Sample01.Customer
+*/
+{
+    "Id":1,
+    "FirstName":"Bob",
+    "LastName":"Smith",
+    "PhoneNumber":"(222)444-9987",
+    "Orders":
+    [
+        {
+            "Amount":54.99,
+            "OrderNumber":"ORD123",
+            "ItemCount":3
+        },
+        {
+            "Amount":99.99,
+            "OrderNumber":"ORD235",
+            "ItemCount":10
+        }
+    ]
+}
+
+}}}
+
+There's the basics of using the Serializer.  In later installments we'll look at more advanced scenarios.

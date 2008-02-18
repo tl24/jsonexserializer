@@ -1,4 +1,5 @@
 #summary A Basic guide to how to use the serializer
+#labels Featured
 ===Usage:===
 To serialize and deserialize objects, first you must get an instance of a serializer.
 {{{

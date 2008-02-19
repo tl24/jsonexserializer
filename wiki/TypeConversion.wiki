@@ -89,12 +89,6 @@ In cases where you can't modify the serialized class or don't want to, you can r
 }}}
 This also works for properties as well, you just need to register the converter with the PropertyInfo object from the System.Reflection namespace for the property to serialize.
 
-=== ITypeConverterFactory ===
-For special cases you can create a TypeConverterFactory.  Perhaps in the case where you want to convert objects that implement a certain interface and aren't tied to a specific class.  The type converter factory can be registered through the serialization context as well.
-{{{
-    Serializer s = Serializer.GetSerializer(...);
-    s.Context.AddTypeConverterFactory(new MyInterfaceConverterFactory());
-}}}
 
 === System.ComponentModel.TypeConverter ===
 And finally, JsonEx will also use the .NET framework System.ComponentModel.TypeConverter if there is one available and it allows conversion to and from a string.

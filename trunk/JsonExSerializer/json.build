@@ -5,16 +5,18 @@
 	<property name="perf.tests" value="PerformanceTests" />
 	<property name="solution" value="${name}.sln" />
 	<property name="svn.info.log" value="svn.version.txt" />
-	<property name="major.version" value="2" />
-	<property name="minor.version" value="0" />
-	<property name="revision.version" value="0" />
-	<property name="info.version" value="${major.version}.${minor.version}" />
+	<property name="versionfile" value="version.txt" />
+	<property name="revision.version" value="0" />	
 	<property name="main.output.dir" value="${name}/bin/${configuration}" />
 	<property name="test.output.dir" value="${tests}/bin/${configuration}" />
 	<property name="perf.test.output.dir" value="${perf.tests}/bin/${configuration}" />
 	<property name="run.perf.tests" value="true" />
 	
-	<target name="get-head-revision"> 
+	<target name="get-major-version">
+		<loadfile property="info.version" file="${versionfile}" />
+	</target>
+	
+	<target name="get-head-revision" depends="get-major-version"> 
 	  <exec
 	    program="svn.exe"
 	    commandline="info ${solution} -r HEAD"
@@ -32,7 +34,7 @@
 	  <if test="${bool::parse(int::parse(index.of.revision) != -1)}">
 	   
 	    <property name="build.version" value="${string::substring(svn.head.revision, int::parse(index.of.revision) + 10, 3)}" verbose="true"/>
-		<property name="full.version" value="${major.version}.${minor.version}.${revision.version}.${build.version}" />
+		<property name="full.version" value="${info.version}.${revision.version}.${build.version}" />
 		<property name="build.dir" value="build/${name}-${full.version}" />
 	    <delete file="${svn.info.log}" />
 	    

@@ -67,6 +67,7 @@
     <Compile Include="Mocks\SemiComplexObject.cs" />
     <Compile Include="Mocks\SpecializedMock.cs" />
     <Compile Include="Mocks\SubClassMock.cs" />
+    <Compile Include="NestedFieldTest.cs" />
     <Compile Include="ReadOnlyPropertyTests\ArrayParent.cs" />
     <Compile Include="ReadOnlyPropertyTests\CollectionItem.cs" />
     <Compile Include="ReadOnlyPropertyTests\CollectionParent.cs" />

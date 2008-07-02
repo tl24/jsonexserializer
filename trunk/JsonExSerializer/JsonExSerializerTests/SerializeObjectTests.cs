@@ -158,5 +158,6 @@ namespace JsonExSerializerTests
             Assert.AreEqual(src.ShortValue, dst.ShortValue, "SimpleObject.ShortValue not equal");
             Assert.AreEqual(src.StringValue, dst.StringValue, "SimpleObject.StringValue not equal");
         }
+
     }
 }

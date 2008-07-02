@@ -54,6 +54,7 @@
     <Compile Include="Expression\ComplexEvaluatorBase.cs" />
     <Compile Include="Expression\ComplexExpressionBase.cs" />
     <Compile Include="Expression\ConverterEvaluator.cs" />
+    <Compile Include="Expression\CtorArgTypeResolver.cs" />
     <Compile Include="Expression\EvaluatorBase.cs" />
     <Compile Include="Expression\EvaluatorFactory.cs" />
     <Compile Include="Expression\ExpressionBase.cs" />

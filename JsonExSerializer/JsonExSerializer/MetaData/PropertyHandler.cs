@@ -43,8 +43,6 @@ namespace JsonExSerializer.MetaData
             }
             if (Property.IsDefined(typeof(JsonExPropertyAttribute), false))
                 _ignored = false;
-
-            Validate();
         }
 
         private PropertyInfo Property
@@ -77,30 +75,6 @@ namespace JsonExSerializer.MetaData
         public override void SetValue(object instance, object value)
         {
             Property.SetValue(instance, value, null);
-        }
-
-        public override bool Ignored
-        {
-            get { return base.Ignored; }
-            set
-            {
-                if (base.Ignored != value)
-                {
-                    base.Ignored = value;
-                    Validate();
-                }
-            }
-        }
-
-        private void Validate()
-        {
-            if (IsConstructorArgument)
-                return;
-
-            if (!Ignored && !CanWrite && PropertyType.IsPrimitive)
-                throw new InvalidOperationException("Cannot serialize a primitive property without a public set method: " + ForType.FullName + ":" + Name);
-            if (!Ignored && !Property.CanRead)
-                throw new InvalidOperationException("Cannot serialize a property without a get method: " + ForType.FullName + ":" + Name);
         }
 
         public override bool CanWrite

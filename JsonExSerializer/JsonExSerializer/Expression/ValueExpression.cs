@@ -46,7 +46,21 @@ namespace JsonExSerializer.Expression
         public NumericExpression(string value)
             : base(value)
         {
-        }           
+        }
+
+        public bool IsFloatingPoint()
+        {
+            switch (Type.GetTypeCode(this.ResultType))
+            {
+                case TypeCode.Double:
+                case TypeCode.Single:
+                case TypeCode.Decimal:
+                    return true;
+                default:
+                    return Value.Contains(".");
+
+            }
+        }
     }
 
     /// <summary>

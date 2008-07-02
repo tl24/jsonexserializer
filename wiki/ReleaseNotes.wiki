@@ -1,6 +1,6 @@
 #summary Release Notes
 
-= 2.1 =
+== 2.1 7/2/2008 ==
   * Issue 14 - Bug: Wrong constructor used in certain circumstances
   * Issue 15 - Bug: Validation prevented serializing a property with no setter
 

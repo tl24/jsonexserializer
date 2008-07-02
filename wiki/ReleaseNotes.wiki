@@ -1,0 +1,15 @@
+#summary Release Notes
+
+= 2.1 =
+* Issue 14 - Bug: Wrong constructor used in certain circumstances
+* Issue 15 - Bug: Validation prevented serializing a property with no setter
+
+
+= 2.0 =
+* Major performance improvements
+* Support for constructor arguments
+* Support for public fields
+* Added Configuration via config file
+
+= 1.0 =
+* Initial Release

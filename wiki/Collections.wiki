@@ -26,7 +26,7 @@ public class MyCollectionHandler : ICollectionHandler {
       }
    }
    
-   public ICollectionBuilder ConstructBuilder(Type collectionType) {
+   public ICollectionBuilder ConstructBuilder(Type collectionType, int ItemCount) {
       return new MyCollectionBuilder();
    }
 

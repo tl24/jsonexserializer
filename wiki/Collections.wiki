@@ -55,6 +55,11 @@ public class MyCollectionBuilder : ICollectionBuilder {
    public object GetResult() {
       return _instance;
    }
+
+   public object GetReference() {
+      return _instance;
+   }
+
 }
 
 ...

@@ -5,7 +5,7 @@
 Occasionally you don't want certain properties to be serialized on your objects.  Any property that does not have both a getter and a setter is ignored by default.  For your other properties and public fields there are several ways of excluding them from serialization.
 
 
-= [JsonExIgnore] =
+= `[JsonExIgnore`] =
 
 The first way is to attach the JsonExIgnore attribute to your property or field.
 

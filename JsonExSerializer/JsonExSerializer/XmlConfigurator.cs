@@ -24,6 +24,7 @@ namespace JsonExSerializer
         private delegate void MapHandler();
         private Dictionary<string, MapHandler> handlers = new Dictionary<string, MapHandler>();
         private string sectionName;
+        private int _collectionInsertPoint = 0;
 
         private XmlConfigurator(XmlReader reader, SerializationContext context, string sectionName)
         {
@@ -175,7 +176,7 @@ namespace JsonExSerializer
             Type handlerType = Type.GetType(type, true);
 
             CollectionHandler collHandler = (CollectionHandler)Activator.CreateInstance(handlerType);
-            context.RegisterCollectionHandler(collHandler);
+            context.CollectionHandlers.Insert(_collectionInsertPoint++, collHandler);
         }
 
         /// <summary>

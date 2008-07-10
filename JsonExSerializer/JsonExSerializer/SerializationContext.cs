@@ -301,10 +301,13 @@ namespace JsonExSerializer
         /// <param name="handler">the collection handler</param>
         public void RegisterCollectionHandler(CollectionHandler handler)
         {
-            _collectionHandlers.Add(handler);
+            _collectionHandlers.Insert(0, handler);
         }
 
-        internal List<CollectionHandler> CollectionHandlers
+        /// <summary>
+        /// CollectionHandlers provide support for collections(JSON Arrays)
+        /// </summary>
+        public List<CollectionHandler> CollectionHandlers
         {
             get { return _collectionHandlers; }
         }

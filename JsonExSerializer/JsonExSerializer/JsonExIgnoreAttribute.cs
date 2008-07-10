@@ -9,7 +9,7 @@ using System.Text;
 
 namespace JsonExSerializer
 {
-    [AttributeUsage(AttributeTargets.Property,Inherited=false)]
+    [AttributeUsage(AttributeTargets.Property|AttributeTargets.Field,Inherited=false)]
     public sealed class JsonExIgnoreAttribute : System.Attribute
     {
     }

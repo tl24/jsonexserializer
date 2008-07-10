@@ -10,12 +10,15 @@ Occasionally you don't want certain properties to be serialized on your objects.
 The first way is to attach the JsonExIgnore attribute to your property or field.
 
 {{{
-public class MyClass {
 
-   [JsonExIgnore]
-   public int MyProperty {
-     get { return _myProperty; }
-     set { _myProperty = value; }
+namespace MyNamespace {
+   public class MyClass {
+
+      [JsonExIgnore]
+      public int MyProperty {
+        get { return _myProperty; }
+        set { _myProperty = value; }
+      }
    }
 }
 

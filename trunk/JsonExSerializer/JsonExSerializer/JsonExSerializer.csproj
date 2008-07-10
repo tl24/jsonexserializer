@@ -74,6 +74,7 @@
     <Compile Include="IJsonWriter.cs" />
     <Compile Include="ISerializationCallback.cs" />
     <Compile Include="JsonConvertAttribute.cs" />
+    <Compile Include="JsonExCollectionAttribute.cs" />
     <Compile Include="JsonExIgnoreAttribute.cs" />
     <Compile Include="Collections\ListCollectionBuilder.cs" />
     <Compile Include="JsonExSerializationException.cs" />

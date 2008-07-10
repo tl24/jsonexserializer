@@ -72,11 +72,11 @@ namespace JsonExSerializer.MetaData
                 // must be able to read and write the prop, otherwise its not 2-way 
                 if (mInfo is PropertyInfo)
                 {
-                    prop = new PropertyHandler((PropertyInfo) mInfo);
+                    prop = CreatePropertyHandler((PropertyInfo) mInfo);
                 }
                 else if (mInfo is FieldInfo)
                 {
-                    prop = new FieldHandler((FieldInfo) mInfo);
+                    prop = CreateFieldHandler((FieldInfo) mInfo);
                 }
                 if (prop != null) {
                     if (prop.IsConstructorArgument)
@@ -87,6 +87,26 @@ namespace JsonExSerializer.MetaData
                         prop.Ignored = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// Constructs a PropertyHandler instance from the PropertyInfo
+        /// </summary>
+        /// <param name="Property"></param>
+        /// <returns></returns>
+        protected virtual PropertyHandler CreatePropertyHandler(PropertyInfo Property)
+        {
+            return new PropertyHandler(Property);
+        }
+
+        /// <summary>
+        /// Constructs a FieldHandler instance from the FieldInfo
+        /// </summary>
+        /// <param name="Field"></param>
+        /// <returns></returns>
+        protected virtual FieldHandler CreateFieldHandler(FieldInfo Field)
+        {
+            return new FieldHandler(Field);
         }
 
         protected int PropertyHandlerComparison(AbstractPropertyHandler a, AbstractPropertyHandler b)
@@ -206,12 +226,19 @@ namespace JsonExSerializer.MetaData
         {
             if (!_collectionLookedUp)
             {
-                foreach (CollectionHandler handler in _context.CollectionHandlers)
+                if (this.ForType.IsDefined(typeof(JsonExCollectionAttribute), true))
                 {
-                    if (handler.IsCollection(ForType))
+                    _collectionHandler = GetCollectionHandlerFromAttribute();
+                }
+                else
+                {
+                    foreach (CollectionHandler handler in _context.CollectionHandlers)
                     {
-                        _collectionHandler = handler;
-                        break;
+                        if (handler.IsCollection(ForType))
+                        {
+                            _collectionHandler = handler;
+                            break;
+                        }
                     }
                 }
                 _collectionLookedUp = true;
@@ -219,6 +246,29 @@ namespace JsonExSerializer.MetaData
             return _collectionHandler != null;
         }
 
+        /// <summary>
+        /// Reads the JsonExCollection attribute for the class and loads the collection handler from that.  It first
+        /// checks the list of collectionhandlers to see if its already been loaded.
+        /// </summary>
+        /// <returns>CollectionHandler specified by the JsonExCollection attribute</returns>
+        protected virtual CollectionHandler GetCollectionHandlerFromAttribute() {
+            JsonExCollectionAttribute attr = ((JsonExCollectionAttribute[])this.ForType.GetCustomAttributes(typeof(JsonExCollectionAttribute), true))[0];
+            Type collHandlerType = attr.GetCollectionHandlerType();
+            // Try exact type match first
+            CollectionHandler handler = _context.CollectionHandlers.Find(delegate(CollectionHandler h) { return h.GetType() == collHandlerType; });
+            if (handler != null)
+                return handler;
+
+            // try inherited type next
+            handler = _context.CollectionHandlers.Find(delegate(CollectionHandler h) { return collHandlerType.IsInstanceOfType(h); });
+            if (handler != null)
+                return handler;
+
+            // create the handler and install it
+            handler = (CollectionHandler) Activator.CreateInstance(collHandlerType);
+            _context.RegisterCollectionHandler(handler);
+            return handler;
+        }
         /// <summary>
         /// Returns a collection handler if this object is a collection
         /// </summary>

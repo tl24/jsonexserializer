@@ -35,7 +35,15 @@ namespace JsonExSerializerTests
             Assert.IsFalse(SimpleObjectHandler.IsEmpty, "IsEmpty should return false on class with properties/fields");
         }
 
-
+        [Test]
+        public void IsCollection_ReturnsAttributeValueForJsonExCollection()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeHandler CollectionTypeHandler = new TypeHandler(typeof(StronglyTypedCollection), context);
+            Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
+            Assert.IsInstanceOfType(typeof(StronglyTypedCollectionHandler), CollectionTypeHandler.GetCollectionHandler(), "Wrong collection handler");
+            Assert.AreSame(typeof(string), CollectionTypeHandler.GetCollectionHandler().GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
+        }
 
         public class EmptyClass
         {

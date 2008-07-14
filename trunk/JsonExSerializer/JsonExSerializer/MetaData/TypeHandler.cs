@@ -227,23 +227,24 @@ namespace JsonExSerializer.MetaData
             if (!_collectionLookedUp)
             {
                 if (this.ForType.IsDefined(typeof(JsonExCollectionAttribute), true))
-                {
                     _collectionHandler = GetCollectionHandlerFromAttribute();
-                }
                 else
-                {
-                    foreach (CollectionHandler handler in _context.CollectionHandlers)
-                    {
-                        if (handler.IsCollection(ForType))
-                        {
-                            _collectionHandler = handler;
-                            break;
-                        }
-                    }
-                }
+                    _collectionHandler = FindCollectionHandler();
                 _collectionLookedUp = true;
             }
             return _collectionHandler != null;
+        }
+
+        private CollectionHandler FindCollectionHandler()
+        {
+            foreach (CollectionHandler handler in _context.CollectionHandlers)
+            {
+                if (handler.IsCollection(ForType))
+                {
+                    return handler;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -253,19 +254,36 @@ namespace JsonExSerializer.MetaData
         /// <returns>CollectionHandler specified by the JsonExCollection attribute</returns>
         protected virtual CollectionHandler GetCollectionHandlerFromAttribute() {
             JsonExCollectionAttribute attr = ((JsonExCollectionAttribute[])this.ForType.GetCustomAttributes(typeof(JsonExCollectionAttribute), true))[0];
+            if (!attr.IsValid())
+                throw new Exception("Invalid JsonExCollectionAttribute specified for " + this.ForType + ", either CollectionHandlerType or ItemType or both must be specified");
+
             Type collHandlerType = attr.GetCollectionHandlerType();
+            Type itemType = attr.GetItemType();
+
             // Try exact type match first
-            CollectionHandler handler = _context.CollectionHandlers.Find(delegate(CollectionHandler h) { return h.GetType() == collHandlerType; });
-            if (handler != null)
-                return handler;
+            CollectionHandler handler = null;
 
-            // try inherited type next
-            handler = _context.CollectionHandlers.Find(delegate(CollectionHandler h) { return collHandlerType.IsInstanceOfType(h); });
-            if (handler != null)
-                return handler;
+            if (collHandlerType == null) {
+                handler = FindCollectionHandler();
+                handler = new CollectionHandlerWrapper(handler, this.ForType, itemType);
+            }
 
-            // create the handler and install it
-            handler = (CollectionHandler) Activator.CreateInstance(collHandlerType);
+            if (handler == null)
+            {
+                handler = _context.CollectionHandlers.Find(delegate(CollectionHandler h) { return h.GetType() == collHandlerType; });
+                if (handler != null)
+                    return handler;
+
+                // try inherited type next
+                handler = _context.CollectionHandlers.Find(delegate(CollectionHandler h) { return collHandlerType.IsInstanceOfType(h); });
+                if (handler != null)
+                    return handler;
+
+                // create the handler
+                handler = (CollectionHandler)Activator.CreateInstance(collHandlerType);
+            }
+
+            // install the handler
             _context.RegisterCollectionHandler(handler);
             return handler;
         }

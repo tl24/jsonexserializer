@@ -7,7 +7,7 @@ using JsonExSerializer;
 
 namespace JsonExSerializerTests.Mocks
 {
-    [JsonExCollection(typeof(StronglyTypedCollectionHandler))]
+    [JsonExCollection(CollectionHandlerType=typeof(StronglyTypedCollectionHandler))]
     public class StronglyTypedCollection : CollectionBase
     {
 
@@ -19,6 +19,14 @@ namespace JsonExSerializerTests.Mocks
         {
             this.List.Add(Item);
         }
+    }
+
+    /// <summary>
+    /// Use List handler but override type
+    /// </summary>
+    [JsonExCollection(ItemType=typeof(string))]
+    public class StronglyTypedCollection2 : StronglyTypedCollection
+    {
     }
 
     public class StronglyTypedCollectionHandler : CollectionHandler

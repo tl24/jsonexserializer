@@ -70,15 +70,15 @@ namespace JsonExSerializerTests
             Assert.AreEqual(expected.ToString(), result.Trim(), "Short did not serialize correctly");
         }
 
-        [Row(true)]
-        [Row(false)]
+        [Row(true, "true")]
+        [Row(false, "false")]
         [RowTest]
-        public void SerializeBoolTest(bool expected)
+        public void SerializeBoolTest(bool Value, string Expected)
         {
             Serializer s = new Serializer(typeof(bool));
             s.Context.SetJsonStrictOptions();
-            string result = s.Serialize(expected);
-            Assert.AreEqual(expected.ToString(), result.Trim(), "Bool true did not serialize correctly");
+            string result = s.Serialize(Value);
+            Assert.AreEqual(Expected, result.Trim(), "Bool did not serialize correctly");
         }
 
         [Row(32.34f)]

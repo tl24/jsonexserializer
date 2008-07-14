@@ -5,6 +5,7 @@ using MbUnit.Framework;
 using JsonExSerializer;
 using JsonExSerializer.MetaData;
 using JsonExSerializerTests.Mocks;
+using JsonExSerializer.Collections;
 
 namespace JsonExSerializerTests
 {
@@ -42,6 +43,16 @@ namespace JsonExSerializerTests
             TypeHandler CollectionTypeHandler = new TypeHandler(typeof(StronglyTypedCollection), context);
             Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
             Assert.IsInstanceOfType(typeof(StronglyTypedCollectionHandler), CollectionTypeHandler.GetCollectionHandler(), "Wrong collection handler");
+            Assert.AreSame(typeof(string), CollectionTypeHandler.GetCollectionHandler().GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
+        }
+
+        [Test]
+        public void IsCollection_ReturnsDefaultValueForJsonExCollection_WhenItemTypeOnlySpecified()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeHandler CollectionTypeHandler = new TypeHandler(typeof(StronglyTypedCollection2), context);
+            Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
+            Assert.IsInstanceOfType(typeof(CollectionHandlerWrapper), CollectionTypeHandler.GetCollectionHandler(), "Wrong collection handler");
             Assert.AreSame(typeof(string), CollectionTypeHandler.GetCollectionHandler().GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
         }
 

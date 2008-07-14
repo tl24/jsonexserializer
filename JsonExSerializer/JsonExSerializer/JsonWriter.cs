@@ -145,7 +145,7 @@ namespace JsonExSerializer
         public IJsonWriter Value(bool value)
         {
             PreWrite(OpType.OpValue);
-            _writer.Write(value);
+            _writer.Write(value.ToString().ToLower());
             return this;
         }
 

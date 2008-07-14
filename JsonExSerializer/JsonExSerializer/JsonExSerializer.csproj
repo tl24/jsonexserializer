@@ -39,6 +39,7 @@
     <Compile Include="Collections\ArrayBuilder.cs" />
     <Compile Include="Collections\ArrayHandler.cs" />
     <Compile Include="Collections\CollectionConstructorHandler.cs" />
+    <Compile Include="Collections\CollectionHandlerWrapper.cs" />
     <Compile Include="Collections\GenericCollectionBuilder.cs" />
     <Compile Include="Collections\GenericCollectionCtorBuilder.cs" />
     <Compile Include="Collections\GenericCollectionHandler.cs" />

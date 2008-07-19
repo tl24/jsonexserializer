@@ -1,8 +1,9 @@
 #summary Release Notes
 
 == Release 2.1.1  (Jul 19 2008) ==
-  * Issue 18 - Bug: Boolean properties serialized with Proper Case (True/False)
   * Issue 16 - Enhancement: Allow you to insert CollectionHandlers before the end of the list
+  * Issue 18 - Bug: Boolean properties serialized with Proper Case (True/False)
+  * Fixed some internal issues around finding ignored properties
 
 == Release 2.1   (Jul 02 2008) ==
   * Issue 14 - Bug: Wrong constructor used in certain circumstances

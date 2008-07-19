@@ -39,7 +39,7 @@ namespace JsonExSerializerTests
                     .Value(3.14f)
                     .Value(345.8765)
                 .ArrayEnd();
-            AssertMatch("[True,1,\"test\",3.14,345.8765]", "simple array test");
+            AssertMatch("[true,1,\"test\",3.14,345.8765]", "simple array test");
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace JsonExSerializerTests
                     .Value(true)
                 .ObjectEnd();
 
-            AssertMatch("{\"StringValue\":\"ValueText\",\"LongVal\":1234,\"BoolVal\":True}", "");
+            AssertMatch("{\"StringValue\":\"ValueText\",\"LongVal\":1234,\"BoolVal\":true}", "");
         }
 
         [Test]
@@ -146,7 +146,7 @@ namespace JsonExSerializerTests
                         .QuotedValue("ValueText")
                     .ObjectEnd()
                 .ObjectEnd();
-            AssertMatch("{\"StringValue\":\"ValueText\",\"LongVal\":1234,\"BoolVal\":True,\"ComplexObject\":{\"KeyText\":\"ValueText\"}}", "");
+            AssertMatch("{\"StringValue\":\"ValueText\",\"LongVal\":1234,\"BoolVal\":true,\"ComplexObject\":{\"KeyText\":\"ValueText\"}}", "");
         }
 
         [Test]
@@ -187,7 +187,7 @@ namespace JsonExSerializerTests
                         .QuotedValue("ValueText")
                     .ObjectEnd()
                 .ArrayEnd();
-            AssertMatch("[True,1,\"test\",3.14,345.8765,{\"KeyText\":\"ValueText\"}]", "object inside array test");
+            AssertMatch("[true,1,\"test\",3.14,345.8765,{\"KeyText\":\"ValueText\"}]", "object inside array test");
         }
 
         [Test]
@@ -208,7 +208,7 @@ namespace JsonExSerializerTests
                     .ArrayEnd()
                 .ObjectEnd();
 
-            AssertMatch("{\"FirstArray\":[123,True],\"KeyText\":\"ValueText\",\"LastArray\":[\"last\"]}", "One item object test");
+            AssertMatch("{\"FirstArray\":[123,true],\"KeyText\":\"ValueText\",\"LastArray\":[\"last\"]}", "One item object test");
         }
     }
 }

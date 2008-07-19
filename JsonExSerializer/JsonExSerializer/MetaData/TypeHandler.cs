@@ -187,7 +187,7 @@ namespace JsonExSerializer.MetaData
         /// <returns>TypeHandlerProperty instance for the property or null if not found</returns>
         public AbstractPropertyHandler FindProperty(string Name)
         {
-            foreach (AbstractPropertyHandler prop in Properties)
+            foreach (AbstractPropertyHandler prop in AllProperties)
             {
                 if (prop.Name == Name)
                     return prop;
@@ -206,15 +206,10 @@ namespace JsonExSerializer.MetaData
         /// <param name="name">the name of the property</param>
         public virtual void IgnoreProperty(string name)
         {
-            if (_properties == null)
-            {
-                _tempIgnore[name] = true;
-            }
-            else
-            {
-                AbstractPropertyHandler handler = FindProperty(name);
-                _properties.Remove(handler);
-            }
+            AbstractPropertyHandler handler = FindProperty(name);
+            if (handler == null)
+                throw new ArgumentException("Property " + name + " does not exist on Type " + this.ForType, "name");
+            handler.Ignored = true;
         }
 
         /// <summary>

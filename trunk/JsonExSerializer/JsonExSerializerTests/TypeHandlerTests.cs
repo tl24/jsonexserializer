@@ -6,6 +6,7 @@ using JsonExSerializer;
 using JsonExSerializer.MetaData;
 using JsonExSerializerTests.Mocks;
 using JsonExSerializer.Collections;
+using MbUnit.Core.Exceptions;
 
 namespace JsonExSerializerTests
 {
@@ -54,6 +55,40 @@ namespace JsonExSerializerTests
             Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
             Assert.IsInstanceOfType(typeof(CollectionHandlerWrapper), CollectionTypeHandler.GetCollectionHandler(), "Wrong collection handler");
             Assert.AreSame(typeof(string), CollectionTypeHandler.GetCollectionHandler().GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
+        }
+
+        [Test]
+        public void FindProperty_FindsIgnoredProperties()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeHandler handler = context.GetTypeHandler(typeof(IgnoredFieldClass));
+            AbstractPropertyHandler fieldHandler = handler.FindProperty("IVal");
+            Assert.IsNotNull(fieldHandler, "Ignored property not found");
+        }
+
+        [Test]
+        public void IgnoreProperty_DoesNotDeleteField()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeHandler handler = context.GetTypeHandler(typeof(SimpleObject));
+            foreach(AbstractPropertyHandler prop in handler.AllProperties)
+                ;  // force properties to load
+
+            handler.IgnoreProperty("IntValue");
+            bool found = false;
+            foreach (AbstractPropertyHandler prop in handler.AllProperties)
+                if (prop.Name == "IntValue")
+                    found = true;
+            Assert.IsTrue(found, "Ignored property deleted");
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentException))]
+        public void IgnoreProperty_WhenFieldDoesntExist_ThrowsError()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeHandler handler = context.GetTypeHandler(typeof(SimpleObject));
+                handler.IgnoreProperty("Foo");
         }
 
         public class EmptyClass

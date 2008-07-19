@@ -15,8 +15,8 @@ namespace JsonExSerializerTests
     {
 
         [RowTest]
-        [Row(true, "True")]
-        [Row(false,"False")]
+        [Row(true, "true")]
+        [Row(false,"false")]
         public void TestBoolValue(bool bVal, string expected)
         {
             jsonWriter.Value(bVal);

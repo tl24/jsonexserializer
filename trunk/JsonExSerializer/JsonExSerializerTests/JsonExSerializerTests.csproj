@@ -48,6 +48,7 @@
     <Compile Include="DeserializePrimitiveTests.cs" />
     <Compile Include="Expression\ReferenceTests.cs" />
     <Compile Include="FieldTests.cs" />
+    <Compile Include="IgnorePropertyActionTests.cs" />
     <Compile Include="JsonWriterComplexTests.cs" />
     <Compile Include="JsonWriterTestBase.cs" />
     <Compile Include="JsonWriterTests.cs" />
@@ -92,9 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="lib\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

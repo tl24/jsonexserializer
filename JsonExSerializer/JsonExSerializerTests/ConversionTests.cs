@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using MbUnit.Framework;
 using JsonExSerializer.TypeConversion;
 using JsonExSerializerTests.Mocks;
 using System.ComponentModel;
@@ -150,6 +150,34 @@ namespace JsonExSerializerTests
         {
             Serializer s = new Serializer(typeof(object));
             s.Context.RegisterTypeConverter(typeof(int), new MyImmutablePointConverter());
+        }
+
+        [Test]
+        public void DictionaryToListTest()
+        {
+            Serializer s = new Serializer(typeof(Dictionary<string, SimpleObject>));
+            DictionaryToListConverter converter = new DictionaryToListConverter();
+            converter.Context = "StringValue";
+            s.Context.RegisterTypeConverter(typeof(Dictionary<string, SimpleObject>), converter);
+            Dictionary<string, SimpleObject> dictionary = new Dictionary<string, SimpleObject>();
+            dictionary["One"] = new SimpleObject();
+            dictionary["One"].StringValue = "One";
+            dictionary["One"].IntValue = 1;
+
+            dictionary["Two"] = new SimpleObject();
+            dictionary["Two"].StringValue = "Two";
+            dictionary["Two"].IntValue = 2;
+
+            object list = converter.ConvertFrom(dictionary, s.Context);
+            Assert.IsTrue(s.Context.TypeHandlerFactory[list.GetType()].IsCollection(), "Converted list is not a collection");
+
+            Dictionary<string, SimpleObject> targetDictionary = (Dictionary<string, SimpleObject>) converter.ConvertTo(list, dictionary.GetType(), s.Context);
+            Assert.AreEqual(2, targetDictionary.Count, "Wrong number of items");
+            Assert.IsTrue(targetDictionary.ContainsKey("One"), "Key (One) not in converted dictionary");
+            Assert.IsTrue(targetDictionary.ContainsKey("Two"), "Key (Two) not in converted dictionary");
+
+            Assert.AreEqual(1, targetDictionary["One"].IntValue, "One Value wrong");
+            Assert.AreEqual(2, targetDictionary["Two"].IntValue, "Two Value wrong");
         }
     }
 }

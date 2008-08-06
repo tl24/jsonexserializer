@@ -325,32 +325,42 @@ namespace JsonExSerializer
 
                 if (escape)
                 {
-                    if (ch == quoteChar)
-                        buffer.Append(ch);
-                    else if (ch == 't') // horizantal tab
-                        buffer.Append('\t');
-                    else if (ch == 'n') // newline
-                        buffer.Append('\n');
-                    else if (ch == '\\') // reverse solidus
-                        buffer.Append('\\');
-                    else if (ch == '/')  // solidus
-                        buffer.Append('/');
-                    else if (ch == 'b')  // backspace
-                        buffer.Append('\b');
-                    else if (ch == 'f')  // formfeed
-                        buffer.Append('\f');
-                    else if (ch == 'r') // carriage return
-                        buffer.Append('\r');
-                    else if (ch == 'u') // unicode escape sequence \unnnn
+                    switch (ch)
                     {
-                        char[] ucodeChar = new char[4];
-                        int nRead = _reader.Read(ucodeChar, 0, 4);
-                        if (nRead != 4)
-                            throw new ParseException("Invalid unicode escape sequence, expecting \"\\unnnn\", but got " + (new string(ucodeChar, 0, nRead)));
-                        buffer.Append((char)uint.Parse(new string(ucodeChar), System.Globalization.NumberStyles.HexNumber));
+                        case 't': // horizantal tab
+                            buffer.Append('\t');
+                            break;
+                        case 'n': // newline
+                            buffer.Append('\n');
+                            break;
+                        case '\\': // reverse solidus
+                            buffer.Append('\\');
+                            break;
+                        case '/':  // solidus
+                            buffer.Append('/');
+                            break;
+                        case 'b':  // backspace
+                            buffer.Append('\b');
+                            break;
+                        case 'f':  // formfeed
+                            buffer.Append('\f');
+                            break;
+                        case 'r': // carriage return
+                            buffer.Append('\r');
+                            break;
+                        case 'u': // unicode escape sequence \unnnn
+                            {
+                                char[] ucodeChar = new char[4];
+                                int nRead = _reader.Read(ucodeChar, 0, 4);
+                                if (nRead != 4)
+                                    throw new ParseException("Invalid unicode escape sequence, expecting \"\\unnnn\", but got " + (new string(ucodeChar, 0, nRead)));
+                                buffer.Append((char)uint.Parse(new string(ucodeChar), System.Globalization.NumberStyles.HexNumber));
+                            }
+                            break;
+                        default:
+                            buffer.Append(ch);
+                            break;
                     }
-                    else
-                        buffer.Append(ch);
                     escape = false;
                 }
                 else

@@ -10,7 +10,7 @@ namespace PerformanceTests
 {
     public class JsonSerializerTest : AbstractPerfTestBase
     {
-        private Serializer serializer;
+        protected Serializer serializer;
 
         public override void InitSerializer(Type t)
         {            
@@ -47,5 +47,14 @@ namespace PerformanceTests
         }
 
         #endregion
+    }
+
+    public class JsonDynamicTests : JsonSerializerTest
+    {
+        public override void InitSerializer(Type t)
+        {
+            base.InitSerializer(t);
+            serializer.Context.TypeHandlerFactory = new CustomTypeHandlerFactory(typeof(DynamicTypeHandler), serializer.Context);
+        }
     }
 }

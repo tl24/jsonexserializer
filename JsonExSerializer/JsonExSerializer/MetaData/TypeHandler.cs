@@ -25,7 +25,6 @@ namespace JsonExSerializer.MetaData
         private bool _collectionLookedUp = false;
         private CollectionHandler _collectionHandler;
         protected SerializationContext _context;
-        private IDictionary<string, bool> _tempIgnore;
         private bool? _empty;
 
         /// <summary>
@@ -35,7 +34,6 @@ namespace JsonExSerializer.MetaData
         public TypeHandler(Type t, SerializationContext context) : base(t)
         {
             _context = context;
-            _tempIgnore = new Dictionary<string, bool>();
         }
 
         /// <summary>
@@ -51,7 +49,6 @@ namespace JsonExSerializer.MetaData
                     ((List<AbstractPropertyHandler>)_constructorArgs).Sort(
                         new Comparison<AbstractPropertyHandler>(PropertyHandlerComparison));
                 }
-                _tempIgnore.Clear();
             }
         }
 
@@ -83,8 +80,6 @@ namespace JsonExSerializer.MetaData
                         ConstructorArguments.Add(prop);
                     else
                         Properties.Add(prop);
-                    if (_tempIgnore != null && _tempIgnore.ContainsKey(prop.Name))
-                        prop.Ignored = true;
                 }
             }
         }

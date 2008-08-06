@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using MbUnit.Framework;
 using JsonExSerializer.Expression;
 
 namespace JsonExSerializerTests.Expression
@@ -31,7 +31,7 @@ namespace JsonExSerializerTests.Expression
         }
 
         [Test(Description="Value types can't resolve references or be references")]
-        [ExpectedException(ExceptionType=typeof(Exception))]
+        [ExpectedException(typeof(Exception))]
         public void ValueTypeReferenceTest()
         {
             ValueExpression value = new ValueExpression("");
@@ -39,7 +39,7 @@ namespace JsonExSerializerTests.Expression
         }
 
         [Test(Description = "Reference types can't be references")]
-        [ExpectedException(ExceptionType = typeof(Exception))]
+        [ExpectedException(typeof(Exception))]
         public void ReferenceTypeReferenceTest()
         {
             ReferenceExpression refExp = new ReferenceExpression(new ReferenceIdentifier(""));

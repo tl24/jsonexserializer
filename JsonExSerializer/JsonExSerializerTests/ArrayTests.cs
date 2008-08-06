@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using MbUnit.Framework;
 using JsonExSerializer;
-using NUnit.Framework.Constraints;
-using NUnit.Framework.SyntaxHelpers;
 using System.Collections;
 
 namespace JsonExSerializerTests
@@ -80,7 +78,14 @@ namespace JsonExSerializerTests
             Serializer s = new Serializer(typeof(object));
             string result = s.Serialize(data);
             object[] actual = (object[]) s.Deserialize(result);
-            Assert.AreEqual(data, actual, "Cast to array not correct");
+            Assert.AreEqual(data.Length, actual.Length, "Invalid counts");
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (data[i] is ICollection && actual[i] is ICollection)
+                    CollectionAssert.AreEqual((ICollection) data[i], (ICollection) actual[i]);
+                else
+                    Assert.AreEqual(data[i], actual[i], "Elements " + i + " not equal");
+            }
         }
     }
 }

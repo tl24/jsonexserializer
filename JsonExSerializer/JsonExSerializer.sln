@@ -6,9 +6,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonExSerializerTests", "JsonExSerializerTests\JsonExSerializerTests.csproj", "{726BE6B3-1D44-453D-9039-B181D0D22F9C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C935D873-7D7A-4756-93C0-F8310B23D64D}"
-	ProjectSection(SolutionItems) = preProject
-		JsonExSerializer.msbuild = JsonExSerializer.msbuild
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTests", "PerformanceTests\PerformanceTests.csproj", "{469087B8-9712-448D-B758-F139A75DDAF2}"
 EndProject

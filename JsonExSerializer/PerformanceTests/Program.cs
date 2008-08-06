@@ -8,9 +8,12 @@ namespace PerformanceTests
     {
         public static void Main(string[] args)
         {
-            new BinarySerializerTest().RunTests();
-            new XmlSerializerTest().RunTests();
-            new JsonSerializerTest().RunTests();
+            //new BinarySerializerTest().RunTests();
+            //new XmlSerializerTest().RunTests();
+            //new JsonSerializerTest().RunTests();
+            new JsonDynamicTests().RunTests();
+            //CreateTests.RunCreateTests(10000000);
+            //CreateTests.RunCreateTests(10000000);
         }
     }
 }

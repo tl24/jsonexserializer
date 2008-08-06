@@ -83,6 +83,8 @@
     <Compile Include="JsonWriter.cs" />
     <Compile Include="MetaData\AbstractPropertyHandler.cs" />
     <Compile Include="MetaData\CustomTypeHandlerFactory.cs" />
+    <Compile Include="MetaData\DynamicPropertyHandler.cs" />
+    <Compile Include="MetaData\DynamicTypeHandler.cs" />
     <Compile Include="MetaData\FieldHandler.cs" />
     <Compile Include="MetaData\MemberHandler.cs" />
     <Compile Include="MetaData\PropertyHandlerBase.cs" />
@@ -102,6 +104,7 @@
     <Compile Include="TypeConversion\ConverterUtil.cs" />
     <Compile Include="TypeConversion\DictionaryToListConverter.cs" />
     <Compile Include="TypeConversion\IJsonTypeConverter.cs" />
+    <Compile Include="TypeConversion\JsonConverterBase.cs" />
     <Compile Include="TypeConversion\TypeConverterAdapter.cs" />
     <Compile Include="MetaData\TypeHandler.cs" />
     <Compile Include="MetaData\PropertyHandler.cs" />

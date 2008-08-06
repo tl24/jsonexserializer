@@ -48,6 +48,7 @@ namespace JsonExSerializer.MetaData
         protected virtual TypeHandler CreateNew(Type forType)
         {
             return new TypeHandler(forType, _context);
+            //return new DynamicTypeHandler(forType, _context);
         }
 
         public void RegisterTypeConverter(Type forType, IJsonTypeConverter converter)

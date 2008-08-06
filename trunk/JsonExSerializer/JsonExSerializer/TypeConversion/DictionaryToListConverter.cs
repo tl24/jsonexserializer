@@ -15,38 +15,37 @@ namespace JsonExSerializer.TypeConversion
     /// Converts a dictionary of objects to a list.  On Deserialization, a property
     /// of the value type is used as the key.
     /// </summary>
-    public class DictionaryToListConverter : IJsonTypeConverter
+    public class DictionaryToListConverter : JsonConverterBase
     {
-        private Type _sourceType;
-        private string _context;
+
+        public DictionaryToListConverter()
+        {
+            this.Context = "";
+        }
 
         #region IJsonTypeConverter Members
 
-        public Type GetSerializedType(Type sourceType)
+        public override Type GetSerializedType(Type sourceType)
         {
             return typeof(Object);
         }
 
-        public object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, SerializationContext serializationContext)
         {
             IDictionary dictionary = (IDictionary)item;
             return dictionary.Values;
         }
 
-        public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             IDictionary dictionary = (IDictionary) Activator.CreateInstance(sourceType);
-            AbstractPropertyHandler propHandler = null;
             ICollection coll = (ICollection)item;
             foreach (object colItem in coll)
             {
+                AbstractPropertyHandler propHandler = serializationContext.GetTypeHandler(colItem.GetType()).FindProperty(Context.ToString());
                 if (propHandler == null)
                 {
-                    propHandler = serializationContext.GetTypeHandler(_sourceType).FindProperty(_context);
-                    if (propHandler == null)
-                    {
-                        throw new MissingMemberException("Type: " + item.GetType().Name + " does not have an accessible property: " + _context);
-                    }
+                    throw new MissingMemberException("Type: " + item.GetType().Name + " does not have an accessible property: " + _context);
                 }
 
                 dictionary[propHandler.GetValue(colItem)] = colItem;
@@ -54,9 +53,10 @@ namespace JsonExSerializer.TypeConversion
             return dictionary;
         }
 
-        public object Context
+        public override object Context
         {
-            set { _context = value != null ? value.ToString() : ""; }
+            get { return base.Context; }
+            set { base.Context = value != null ? value.ToString() : ""; }
         }
 
         #endregion

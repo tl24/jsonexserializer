@@ -45,7 +45,7 @@ namespace JsonExSerializer.MetaData
                 _ignored = false;
         }
 
-        private PropertyInfo Property
+        protected PropertyInfo Property
         {
             get { return (PropertyInfo)_member; }
         }

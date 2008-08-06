@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using MbUnit.Framework;
 using JsonExSerializer;
 using JsonExSerializerTests.Mocks;
 
@@ -116,7 +116,7 @@ namespace JsonExSerializerTests
             string result = s.Serialize(dict);
             // make sure concrete type is correct
             Dictionary<string, int> actual = (Dictionary<string, int>)s.Deserialize(result);
-            Assert.AreEqual(actual, dict, "Generic dictionaries not equal");
+            AssertDictionariesEqual<string, int>(dict, actual, "dictionaries not equal");
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace JsonExSerializerTests
             string result = s.Serialize(dict);
             // make sure concrete type is correct
             Dictionary<SimpleEnum, string> actual = (Dictionary<SimpleEnum, string>)s.Deserialize(result);
-            Assert.AreEqual(actual, dict, "Enum keyed dictionaries not equal");
+            AssertDictionariesEqual<SimpleEnum, string>(actual, dict, "Enum keyed dictionaries not equal");
         }
 
         [Test]
@@ -144,6 +144,26 @@ namespace JsonExSerializerTests
 
             MockValueType actual = (MockValueType)s.Deserialize(result);
             Assert.AreEqual(value, actual, "Structs not equal");
+        }
+
+        public object TestStructGetter(object o)
+        {
+            return ((MockValueType)o).X;
+        }
+
+        public object TestClassGetter(object o)
+        {
+            return ((SimpleObject)o).BoolValue;
+        }
+
+        public object TestObjectConstructor()
+        {
+            return new SimpleObject();
+        }
+
+        public object TestStructConstructor()
+        {
+            return new MockValueType();
         }
 
         public void ValidateSimpleObjects(SimpleObject src, SimpleObject dst)
@@ -159,5 +179,13 @@ namespace JsonExSerializerTests
             Assert.AreEqual(src.StringValue, dst.StringValue, "SimpleObject.StringValue not equal");
         }
 
+        public void AssertDictionariesEqual<K, V>(IDictionary<K, V> expected, IDictionary<K, V> actual, string message)
+        {
+            Assert.AreEqual(expected.Count, actual.Count, message + " Counts not equal");
+            foreach (K key in expected.Keys)
+            {
+                Assert.AreEqual(expected[key], actual[key], message + " Values not equal for key: " + key);
+            }
+        }
     }
 }

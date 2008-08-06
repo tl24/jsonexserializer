@@ -25,6 +25,8 @@ namespace JsonExSerializer.Expression
                 return Enum.Parse(Expression.ResultType, Expression.Value);
             else if (Expression.ResultType == typeof(object))
                 return Expression.Value;
+            else if (Expression.ResultType == typeof(string))
+                return Expression.Value;
             else
                 return Convert.ChangeType(Expression.Value, Expression.ResultType);
         }

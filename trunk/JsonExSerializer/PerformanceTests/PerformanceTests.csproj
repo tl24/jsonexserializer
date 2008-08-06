@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinarySerializerTest.cs" />
+    <Compile Include="CreateTests.cs" />
     <Compile Include="ISerializer.cs" />
     <Compile Include="JsonSerializerTest.cs" />
     <Compile Include="PerfTests.cs" />

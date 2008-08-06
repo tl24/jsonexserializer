@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using MbUnit.Framework;
 using JsonExSerializer;
 using System.Collections;
 using JsonExSerializerTests.Mocks;
@@ -21,7 +21,7 @@ namespace JsonExSerializerTests
             strings.Add("3");
             string result = s.Serialize(strings);
             ArrayList actual = (ArrayList) s.Deserialize(result);
-            Assert.AreEqual(strings, actual);
+            CollectionAssert.AreEqual(strings, actual);            
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace JsonExSerializerTests
             ints.Add(int.MinValue + 1);
             string result = s.Serialize(ints);
             List<int> actual = (List<int>)s.Deserialize(result);
-            Assert.AreEqual(ints, actual);
+            CollectionAssert.AreEqual(ints, actual);
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace JsonExSerializerTests
 
             LinkedList<SimpleObject> actual = (LinkedList<SimpleObject>)s.Deserialize(result);
 
-            Assert.AreEqual(objects, actual);
+            CollectionAssert.AreEqual(objects, actual);
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace JsonExSerializerTests
             string result = s.Serialize(expectedQueue);
 
             Queue actualQueue = (Queue)s.Deserialize(result);
-            Assert.AreEqual(expectedQueue, actualQueue, "Non-generic queues not equal");
+            CollectionAssert.AreEqual(expectedQueue, actualQueue);
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace JsonExSerializerTests
             string result = s.Serialize(expectedQueue);
 
             Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
-            Assert.AreEqual(expectedQueue, actualQueue, "Generic queues not equal");
+            CollectionAssert.AreEqual(expectedQueue, actualQueue);
         }
 
         [Test]
@@ -119,7 +119,7 @@ namespace JsonExSerializerTests
             Serializer s = new Serializer(typeof(object));
             string result = s.Serialize(expectedQueue);
             Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
-            Assert.AreEqual(expectedQueue, actualQueue, "Generic types not equal");
+            CollectionAssert.AreEqual(expectedQueue, actualQueue);
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace JsonExSerializerTests
             string result = s.Serialize(expectedBits);
 
             BitArray actualBits = (BitArray)s.Deserialize(result);
-            Assert.AreEqual(expectedBits, actualBits, "Bit arrays not equal");
+            CollectionAssert.AreEqual(expectedBits, actualBits);
             
         }
 
@@ -151,7 +151,7 @@ namespace JsonExSerializerTests
             string result = s.Serialize(expectedStack);
 
             Stack actualStack = (Stack)s.Deserialize(result);
-            Assert.AreEqual(expectedStack, actualStack, "Non-generic stack class not equal");
+            CollectionAssert.AreEqual(expectedStack, actualStack);
         }
 
         [Test]
@@ -167,7 +167,7 @@ namespace JsonExSerializerTests
             string result = s.Serialize(expectedStack);
 
             Stack<int> actualStack = (Stack<int>)s.Deserialize(result);
-            Assert.AreEqual(expectedStack, actualStack, "generic stack class not equal");
+            CollectionAssert.AreEqual(expectedStack, actualStack);
         }
     }
 }

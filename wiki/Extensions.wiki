@@ -7,7 +7,7 @@ JsonExSerializer has added extensions to the JSON specification in order to faci
 
 Example:
 {{{
-   Serializer serializer = Serializer.GetSerializer(typeof(MyClass));
+   Serializer serializer = new Serializer(typeof(MyClass));
    serializer.Context.SetJsonStrictOptions();
 }}}
 
@@ -19,7 +19,7 @@ Example:
 
 Example:
 {{{
-   Serializer serializer = Serializer.GetSerializer(typeof(int));
+   Serializer serializer = new Serializer(typeof(int));
    serializer.Context.OutputTypeComment = true;  // on by default
    string result = serializer.Serialize(32);
 }}}
@@ -44,7 +44,7 @@ Example:
    al.Add(true);
    al.Add(324);
    al.Add(new Guid("4c14dd8c-2351-4bee-bda9-c33e61d64330"));
-   Serializer serializer = Serializer.GetSerializer(typeof(ArrayList));
+   Serializer serializer = new Serializer(typeof(ArrayList));
    serializer.Context.OutputTypeInformation = true;  // on by default
    string result = serializer.Serialize(al);
 }}}

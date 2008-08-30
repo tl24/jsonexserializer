@@ -24,6 +24,12 @@ By default, when creating the Serializer it will look for a config section named
 }}}
 
 The following options can be set in the config file:
-|| *Item* || *Description* || *Context Equivalent* ||
-|| IsCompact || Turns indenting on/off ||                                                           IsCompact ||
-|| OutputTypeComment || Puts a comment before the serialized text || OutputTypeComment ||
+|| *Item* || *Description* || *Values* ||
+|| IsCompact || Turns indenting on/off || true / false ||     
+|| OutputTypeComment || Puts a comment before the serialized text || true / false ||
+|| OutputTypeInformation || Turns off printing of type information during Serialization || true / false ||
+|| ReferenceWritingType || Controls how between objecst are handled || WriteIdentifier / IgnoreCircularReferences / ErrorCircularReferences || 
+|| TypeBindings || Add/Remove type bindings || See below ||
+|| TypeConverters || Configure Type Converters || See below ||
+|| CollectionHandlers || Configure Collection handlers || See below ||
+|| IgnoreProperties || Ignore properties for serialization || See below ||

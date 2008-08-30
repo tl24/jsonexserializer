@@ -62,3 +62,16 @@ TypeBindings are only relevant when OutputTypeInformation is turned on.  They sh
      </TypeBindings>
   </JsonExSerializer>
 }}}
+
+=== TypeConverters ===
+You can add type converters in the TypeConverters section.
+{{{
+  <JsonExSerializer>
+    <TypeConverters>
+      <!-- converter for type -->
+      <add type="JsonExSerializerTests.Mocks.SimpleObject, JsonExSerializerTests" converter="JsonExSerializerTests.Mocks.SelfConverter, JsonExSerializerTests" />
+      <!-- converter for a property on a type -->
+      <add type="JsonExSerializerTests.Mocks.SimpleObject, JsonExSerializerTests" property="BoolValue" converter="JsonExSerializerTests.Mocks.BoolToIntConverter, JsonExSerializerTests" />
+    </TypeConverters>
+  </JsonExSerializer>
+}}}

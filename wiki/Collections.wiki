@@ -1,4 +1,4 @@
-#labels List,Array
+#labels List,Array,CollectionHandler,CollectionHandlers
 Collections are pretty inconsistent in the .NET framework.  For more info on this see [http://blogs.msdn.com/madst/archive/2006/10/10/What-is-a-collection_3F00_.aspx here].
 The problem is you have ICollection, which is great for iterating over, but it doesn't have an Add method, so you can't deserialize the collection using the ICollection interface.  IList does have an add method, but not everything implements IList.  Classes like Stack, Queue don't implement IList.  .NET 2.0 brought us ICollection<T> which does have add, but again not everything implements it.
 

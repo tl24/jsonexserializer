@@ -25,4 +25,5 @@ By default, when creating the Serializer it will look for a config section named
 
 The following options can be set in the config file:
 || *Item* || *Description* || *Context Equivalent* ||
-                                                    
+|| IsCompact || Turns indenting on/off ||                                                           IsCompact ||
+|| OutputTypeComment || Puts a comment before the serialized text || OutputTypeComment ||

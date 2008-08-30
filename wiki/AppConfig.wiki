@@ -75,3 +75,13 @@ You can add type converters in the TypeConverters section.
     </TypeConverters>
   </JsonExSerializer>
 }}}
+
+=== CollectionHandlers ===
+CollectionHandlers are added in the CollectionHandlers section.
+{{{
+  <JsonExSerializer>
+    <CollectionHandlers>
+      <add type="JsonExSerializerTests.Mocks.MockCollectionHandler, JsonExSerializerTests" />
+    </CollectionHandlers>
+  </JsonExSerializer>
+}}}

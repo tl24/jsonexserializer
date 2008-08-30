@@ -77,7 +77,7 @@ You can add type converters in the TypeConverters section.
 }}}
 
 === [Collections CollectionHandlers] ===
-CollectionHandlers are added in the CollectionHandlers section.
+[Collections CollectionHandlers] are added in the CollectionHandlers section.
 {{{
   <JsonExSerializer>
     <CollectionHandlers>

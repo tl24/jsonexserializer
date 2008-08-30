@@ -1,0 +1,28 @@
+#summary Configuring the Serializer
+
+= Introduction =
+
+You may setup commonly used settings for the serializer in your app.config or web.config file.  The various settings in the Serializer config section all correspond to properties or methods on the Context property of the Serializer.
+
+
+= Details =
+
+Declare the section handler in the configSections like this:
+{{{
+  <configSections>
+    <section name="JsonExSerializer" type="JsonExSerializer.XmlConfigSection, JsonExSerializer"/>
+  </configSections>
+}}}
+
+By default, when creating the Serializer it will look for a config section named "JsonExSerializer" for any default settings.  You can also pass in the name of a section to use a different section.
+{{{
+   // uses default JsonExSerializer section if it exists
+   Serializer s = new Serializer(typeof(MyClass));  
+
+   // uses the MyClassConfig section of the config file
+   Serializer s = new Serializer(typeof(MyClass), "MyClassConfig");
+}}}
+
+The following options can be set in the config file:
+|| *Item* || *Description* || *Context Equivalent* ||
+                                                    

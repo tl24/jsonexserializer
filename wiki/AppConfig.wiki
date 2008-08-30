@@ -33,3 +33,32 @@ The following options can be set in the config file:
 || TypeConverters || Configure Type Converters || See below ||
 || CollectionHandlers || Configure Collection handlers || See below ||
 || IgnoreProperties || Ignore properties for serialization || See below ||
+
+=== Simple Options ===
+These settings will turn off all non-standard JSON extensions.
+
+{{{
+  <JsonExSerializer>
+    <IsCompact>false</IsCompact>
+    <OutputTypeComment>false</OutputTypeComment>
+    <OutputTypeInformation>false</OutputTypeInformation>
+    <ReferenceWritingType>ErrorCircularReferences</ReferenceWritingType>
+  </JsonExSerializer>
+}}}
+
+=== TypeBindings ===
+TypeBindings are only relevant when OutputTypeInformation is turned on.  They shorten the full type information down to an alias.  In the TypeBindings section you may add, remove, or clear all type bindings.
+
+{{{
+  <JsonExSerializer>
+     <TypeBindings>
+        <!-- clears all default bindings (Not recommended) -->
+        <clear />
+        <add alias="int" type="System.Int32, mscorlib" />
+        <!-- remove by Type -->
+        <remove type="System.Int32, mscorlib" />
+        <!-- remove by Alias -->
+        <remove alias="float" />
+     </TypeBindings>
+  </JsonExSerializer>
+}}}

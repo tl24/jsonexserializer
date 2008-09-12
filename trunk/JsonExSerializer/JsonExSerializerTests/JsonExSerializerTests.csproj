@@ -49,6 +49,7 @@
     <Compile Include="JsonWriterTestBase.cs" />
     <Compile Include="JsonWriterTests.cs" />
     <Compile Include="JsonWriterTypeTests.cs" />
+    <Compile Include="MetaData\DynamicMethodUtilTests.cs" />
     <Compile Include="Mocks\ChainedConversion.cs" />
     <Compile Include="Mocks\ConvertedObject.cs" />
     <Compile Include="Mocks\JsonWriterMock.cs" />

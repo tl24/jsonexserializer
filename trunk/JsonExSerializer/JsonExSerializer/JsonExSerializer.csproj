@@ -83,6 +83,7 @@
     <Compile Include="JsonWriter.cs" />
     <Compile Include="MetaData\AbstractPropertyHandler.cs" />
     <Compile Include="MetaData\CustomTypeHandlerFactory.cs" />
+    <Compile Include="MetaData\DynamicMethodUtil.cs" />
     <Compile Include="MetaData\DynamicPropertyHandler.cs" />
     <Compile Include="MetaData\DynamicTypeHandler.cs" />
     <Compile Include="MetaData\FieldHandler.cs" />

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Globalization;
+using JsonExSerializer.Framework;
 
 namespace JsonExSerializer
 {
@@ -57,11 +58,22 @@ namespace JsonExSerializer
             return new Serializer(t, context);
         }
 
+        /// <summary>
+        /// Constructs a serializer to (de)serialize the given type using the
+        /// default configuration section "JsonExSerializer" if it exists.
+        /// </summary>
+        /// <param name="t">the type to serialize/deserialize</param>
         public Serializer(Type t)
             : this(t, "JsonExSerializer")
         {
         }
 
+
+        /// <summary>
+        /// Constructs a serializer to (de)serialize the given type using the
+        /// specified configuration section.
+        /// </summary>
+        /// <param name="t">the type to serialize/deserialize</param>
         public Serializer(Type t, string configSection) 
         {
             _serializedType = t;
@@ -70,6 +82,11 @@ namespace JsonExSerializer
             XmlConfigurator.Configure(_context, configSection);
         }
 
+        /// <summary>
+        /// Constructs a serializer with an existing context  to (de)serialize the given type
+        /// </summary>
+        /// <param name="t">the type to serialize/deserialize</param>
+        /// <param name="context"></param>
         public Serializer(Type t, SerializationContext context)
         {
             _serializedType = t;

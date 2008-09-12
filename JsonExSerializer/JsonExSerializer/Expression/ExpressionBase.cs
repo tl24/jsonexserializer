@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using JsonExSerializer.Framework.Visitors;
 
 namespace JsonExSerializer.Expression
 {
@@ -87,6 +88,12 @@ namespace JsonExSerializer.Expression
             set { this._evaluator = value; }
         }
 
-
+        /// <summary>
+        /// Accept a visitor to this node
+        /// </summary>
+        public void Accept(VisitorBase visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

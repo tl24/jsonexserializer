@@ -36,8 +36,12 @@ namespace JsonExSerializer.Expression
                 if (p == null)
                     throw new Exception("Unable to find root element to resolve the reference");
 
+                ReferenceVisitor visitor = new ReferenceVisitor(_refID);
+                visitor.Visit(p);
+                if (visitor.ReferencedExpression == null)
+                    throw new Exception("Unable to resolve reference to " + _refID);
                 //we found the root, resolve it
-                _reference = p.ResolveReference(_refID);
+                _reference = visitor.ReferencedExpression;
             }
             return _reference.GetReference(context);
         }

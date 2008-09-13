@@ -53,20 +53,5 @@ namespace JsonExSerializer.Expression
             Properties.Add(expression);
             return expression;
         }
-
-        protected override ExpressionBase ResolveChildReference(ReferenceIdentifier refID)
-        {
-            string key = refID.Current;
-            foreach (KeyValueExpression exp in Properties)
-            {
-                if (exp.Key == key)
-                {
-                    return exp.ResolveReference(refID);
-                }
-            }
-            // if we get here we didn't find it
-            throw new Exception("Unable to resolve reference: " + refID);
-        }
-
     } 
 }

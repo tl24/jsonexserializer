@@ -55,8 +55,6 @@ namespace JsonExSerializer.Expression
             return this._evaluator;
         }
 
-        public abstract ExpressionBase ResolveReference(ReferenceIdentifier refID);
-
         public virtual ExpressionBase Parent
         {
             get { return this._parent; }

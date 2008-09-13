@@ -50,10 +50,5 @@ namespace JsonExSerializer.Expression
         {
             throw new InvalidOperationException("A reference cannot be created from a reference");
         }
-
-        public override ExpressionBase ResolveReference(ReferenceIdentifier refID)
-        {
-            throw new Exception("A reference cannot be resolved from a reference");
-        }
     }
 }

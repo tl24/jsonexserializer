@@ -148,18 +148,5 @@ namespace JsonExSerializer.Expression
             throw new InvalidOperationException("KeyValueExpression should not be referenced, only the ValueExpression property");
         }
 
-        public override ExpressionBase ResolveReference(ReferenceIdentifier refID)
-        {
-            if (refID.Current == Key)
-            {
-                return ValueExpression.ResolveReference(refID);
-            }
-            else
-            {
-                throw new Exception("Unable to resolve reference: " + refID);
-            }
-        }
-
-
     } 
 }

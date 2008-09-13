@@ -20,10 +20,5 @@ namespace JsonExSerializer.Expression
         {
             throw new Exception("Cannot reference null");
         }
-
-        public override ExpressionBase ResolveReference(ReferenceIdentifier refID)
-        {
-            throw new Exception("Cannot reference null");
-        }
     }
 }

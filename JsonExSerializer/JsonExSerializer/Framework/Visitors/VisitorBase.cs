@@ -10,6 +10,11 @@ using System.Reflection;
 
 namespace JsonExSerializer.Framework.Visitors
 {
+    /// <summary>
+    /// Base implementation of the Visitor class that achieves multi-dispatch
+    /// using reflection.  Methods starting with "Visit" will be found and
+    /// matched with the incoming type.
+    /// </summary>
     public class VisitorBase : IVisitor
     {
         private IDictionary<Type, MethodInfo> _methodCache;

@@ -30,11 +30,6 @@ namespace JsonExSerializer.Expression
             get { return this._value; }
             set { this._value = value; }
         }
-
-        public override ExpressionBase ResolveReference(ReferenceIdentifier refID)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
     }
 
     /// <summary>

@@ -61,7 +61,6 @@
     <Compile Include="Expression\ExpressionBase.cs" />
     <Compile Include="Expression\IEvaluator.cs" />
     <Compile Include="Expression\KeyValueExpression.cs" />
-    <Compile Include="Expression\ListEvaluator.cs" />
     <Compile Include="Expression\ListExpression.cs" />
     <Compile Include="Expression\NullExpression.cs" />
     <Compile Include="Expression\ObjectEvaluator.cs" />
@@ -71,6 +70,9 @@
     <Compile Include="Expression\ReferenceVisitor.cs" />
     <Compile Include="Expression\ValueEvaluator.cs" />
     <Compile Include="Expression\ValueExpression.cs" />
+    <Compile Include="Framework\AssignReferenceStage.cs" />
+    <Compile Include="Framework\IParsingStage.cs" />
+    <Compile Include="Framework\Visitors\CollectReferencesVisitor.cs" />
     <Compile Include="IContextAware.cs" />
     <Compile Include="IDeserializationCallback.cs" />
     <Compile Include="IJsonWriter.cs" />

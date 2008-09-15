@@ -10,6 +10,11 @@ namespace PerformanceTests
     {
         BinaryFormatter binFormatter;
 
+        public BinarySerializerTest(int ObjectCount, int Iterations)
+            : base(ObjectCount, Iterations)
+        {
+        }
+
         public override void InitSerializer(Type t)
         {
             binFormatter = new BinaryFormatter();

@@ -15,10 +15,5 @@ namespace JsonExSerializer.Expression
         {
             return null;
         }
-
-        public override object GetReference(SerializationContext context)
-        {
-            throw new Exception("Cannot reference null");
-        }
     }
 }

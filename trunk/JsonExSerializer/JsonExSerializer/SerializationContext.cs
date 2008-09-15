@@ -11,6 +11,7 @@ using System.Reflection;
 using JsonExSerializer.Collections;
 using JsonExSerializer.MetaData;
 using System.Collections;
+using JsonExSerializer.Framework;
 
 namespace JsonExSerializer
 {
@@ -40,6 +41,8 @@ namespace JsonExSerializer
         
         private TypeHandlerFactory _typeHandlerFactory;
         private IDictionary _parameters;
+
+        private List<IParsingStage> _parsingStages;
 
         /// <summary>
         /// Set of options for handling Ignored properties encountered upon Deserialization
@@ -267,6 +270,19 @@ namespace JsonExSerializer
         public IDictionary Parameters
         {
             get { return _parameters; }
+        }
+
+        internal IList<IParsingStage> ParsingStages
+        {
+            get
+            {
+                if (_parsingStages == null)
+                {
+                    _parsingStages = new List<IParsingStage>();
+                    _parsingStages.Add(new AssignReferenceStage(this));
+                }
+                return _parsingStages;
+            }
         }
         #region TypeConverter
 

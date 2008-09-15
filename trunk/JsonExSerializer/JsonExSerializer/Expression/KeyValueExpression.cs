@@ -21,6 +21,7 @@ namespace JsonExSerializer.Expression
     public sealed class KeyValueExpression : ExpressionBase {
         private ExpressionBase _keyExpression;
         private ExpressionBase _valueExpression;
+        private object parentResult;
 
         public KeyValueExpression(ExpressionBase key, ExpressionBase value)
         {
@@ -49,53 +50,58 @@ namespace JsonExSerializer.Expression
             set { this._valueExpression = value; }
         }
 
-        public override object Evaluate(SerializationContext context)
+        public override ExpressionBase Parent
         {
-            return Evaluate(context, this.Parent.GetReference(context));
+            get
+            {
+                return base.Parent;
+            }
+            set
+            {
+                base.Parent = value;
+                value.ObjectConstructed += new EventHandler<ObjectConstructedEventArgs>(parent_ObjectConstructed);
+            }
         }
 
-        public object Evaluate(SerializationContext context, object parentResult)
+        void parent_ObjectConstructed(object sender, ObjectConstructedEventArgs e)
         {
-            if (Parent.ResultType.GetInterface(typeof(IDictionary).FullName) != null)
+            parentResult = e.Result;
+        }
+
+        public override object Evaluate(SerializationContext context)
+        {
+            if (parentResult == null)
+                throw new InvalidOperationException("Unabled to evaluate expression, parent object has not been evaluated yet");
+            if (((ObjectExpression)Parent).IsDictionary)
             {
-                return EvaluateDictionaryItem(context, parentResult);
+                return EvaluateDictionaryItem(context);
             }
             else
             {
-                return EvaluateObjectProperty(context, parentResult);
+                return EvaluateObjectProperty(context);
             }
         }
 
-        public object EvaluateDictionaryItem(SerializationContext context, object parentObject)
+        public object EvaluateDictionaryItem(SerializationContext context)
         {
             if (ValueExpression.ResultType == typeof(object) || ValueExpression.ResultType == null) {
-                Type keyType = typeof(string);
-                Type valueType = typeof(object);
-                // attempt to figure out what the types of the values are, if no type is set already
-                if (Parent.ResultType.GetInterface(typeof(IDictionary<,>).Name) != null)
-                {
-                    Type genDict = Parent.ResultType.GetInterface(typeof(IDictionary<,>).Name);
-                    Type[] genArgs = genDict.GetGenericArguments();
-                    keyType = genArgs[0];
-                    valueType = genArgs[1];
-                }
                 // if no type set, set one
-                KeyExpression.SetResultTypeIfNotSet(keyType);
-                ValueExpression.SetResultTypeIfNotSet(valueType);
+                KeyExpression.SetResultTypeIfNotSet(((ObjectExpression)Parent).DictionaryKeyType);
+                ValueExpression.SetResultTypeIfNotSet(((ObjectExpression)Parent).DictionaryValueType);
             }
             object keyObject = KeyExpression.Evaluate(context);
             object result = ValueExpression.Evaluate(context);
-            ((IDictionary)parentObject)[keyObject] = result;
+            ((IDictionary)parentResult)[keyObject] = result;
             return result;
         }
 
-        public object EvaluateObjectProperty(SerializationContext context, object parentObject)
+        public object EvaluateObjectProperty(SerializationContext context)
         {
             // lookup info for the type
-            AbstractPropertyHandler hndlr = context.GetTypeHandler(parentObject.GetType()).FindProperty(Key);
+            AbstractPropertyHandler hndlr = context.GetTypeHandler(parentResult.GetType()).FindProperty(Key);
             if (hndlr == null)
             {
-                throw new Exception(string.Format("Could not find property {0} for type {1}", Key, parentObject.GetType()));
+                throw new Exception(string.Format("Could not find property {0} for type {1}", Key, parentResult.GetType()));
             }
             if (hndlr.Ignored)
             {
@@ -108,7 +114,7 @@ namespace JsonExSerializer.Expression
                             return null;
                         break;
                     case SerializationContext.IgnoredPropertyOption.ThrowException:
-                        throw new Exception(string.Format("Can not set property {0} for type {1} because it is ignored and IgnorePropertyAction is set to ThrowException", Key, parentObject.GetType()));
+                        throw new Exception(string.Format("Can not set property {0} for type {1} because it is ignored and IgnorePropertyAction is set to ThrowException", Key, parentResult.GetType()));
                 }
             }
             ValueExpression.SetResultTypeIfNotSet(hndlr.PropertyType);
@@ -129,23 +135,17 @@ namespace JsonExSerializer.Expression
             object result = null;
             if (!hndlr.CanWrite)
             {
-                result = hndlr.GetValue(parentObject);
+                result = hndlr.GetValue(parentResult);
                 ValueExpression.GetEvaluator(context).SetResult(result);
+                ValueExpression.OnObjectConstructed(result);
                 ValueExpression.Evaluate(context);
             }
             else
             {
                 result = ValueExpression.Evaluate(context);
-                hndlr.SetValue(parentObject, result);
+                hndlr.SetValue(parentResult, result);
             }
             return result;
-        }
-
-        public override object GetReference(SerializationContext context)
-        {
-            // any references should always point to the value object
-            // so this should never get called
-            throw new InvalidOperationException("KeyValueExpression should not be referenced, only the ValueExpression property");
         }
 
     } 

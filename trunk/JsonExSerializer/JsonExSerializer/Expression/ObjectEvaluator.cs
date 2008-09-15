@@ -60,7 +60,7 @@ namespace JsonExSerializer.Expression
             foreach (KeyValueExpression Item in Expression.Properties)
             {
                 // evaluate the item and let it assign itself?
-                Item.Evaluate(Context, this._result);
+                Item.Evaluate(Context);
             }
         }
 

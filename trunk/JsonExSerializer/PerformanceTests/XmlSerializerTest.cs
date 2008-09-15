@@ -10,6 +10,11 @@ namespace PerformanceTests
     {
         private XmlSerializer serializer;
 
+        public XmlSerializerTest(int ObjectCount, int Iterations)
+            : base(ObjectCount, Iterations)
+        {
+        }
+
         public override void InitSerializer(Type t)
         {
             serializer = new XmlSerializer(t);

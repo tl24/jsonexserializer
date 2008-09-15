@@ -16,10 +16,6 @@ namespace JsonExSerializer.Expression
         {
         }
 
-        public override object GetReference() {
-            throw new Exception("Value types can not be referenced");
-        }
-
         public override object Evaluate() {
             if (Expression.ResultType.IsEnum)
                 return Enum.Parse(Expression.ResultType, Expression.Value);

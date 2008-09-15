@@ -10,8 +10,25 @@ using JsonExSerializer.Framework.Visitors;
 
 namespace JsonExSerializer.Expression
 {
-// The base for all expressions
 
+    public class ObjectConstructedEventArgs : EventArgs
+    {
+        private object _result;
+
+        public ObjectConstructedEventArgs(object Result)
+        {
+            _result = Result;
+        }
+
+        public object Result
+        {
+            get { return this._result; }
+        }
+    }
+
+    /// <summary>
+    /// The base class for all expressions
+    /// </summary>
     public abstract class ExpressionBase
     {
 
@@ -24,17 +41,14 @@ namespace JsonExSerializer.Expression
             _resultType = typeof(object);
         }
 
-        ///<summary>
-        /// Returns an object that can be used as a reference.
-        /// This could be a partially constructed object, or fully-constructed.
-        /// The expression must keep track that this method has been called, and
-        /// not create a new object when evaluate is called.
-        /// If a reference cannot be created at this point an exception should be thrown
-        /// </summary>
-        /// <returns>A constructed object</returns>
-        public virtual object GetReference(SerializationContext Context)
+        public event EventHandler<ObjectConstructedEventArgs> ObjectConstructed;
+
+        public void OnObjectConstructed(object Result)
         {
-            return GetEvaluator(Context).GetReference();
+            if (ObjectConstructed != null)
+            {
+                ObjectConstructed(this, new ObjectConstructedEventArgs(Result));
+            }
         }
 
         // the result of this operation should be cached in case references are created

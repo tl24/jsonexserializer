@@ -18,7 +18,7 @@ namespace JsonExSerializer.Framework
         #region Member Variables
 
         private TextReader _reader;
-        private Stack<Token> _tokens;
+        private Queue<Token> _tokens;
         private char[] _symbols;
         private StringBuilder _buffer;
 
@@ -31,10 +31,12 @@ namespace JsonExSerializer.Framework
         public TokenStream(TextReader reader)
         {
             _reader = reader;
-            _tokens = new Stack<Token>();
+            _tokens = new Queue<Token>();
             _symbols = "[]<>():,{}.".ToCharArray();
             Array.Sort<char>(_symbols);
             _buffer = new StringBuilder();
+            ReadAllTokens();
+            _buffer = null;
         }
 
         /// <summary>
@@ -45,11 +47,9 @@ namespace JsonExSerializer.Framework
         public Token PeekToken()
         {
             if (_tokens.Count == 0)
-            {
-                _tokens.Push(ReadToken());
-            }
-
-            return _tokens.Peek();
+                return Token.Empty;
+            else
+                return _tokens.Peek();
         }
 
         /// <summary>
@@ -60,13 +60,9 @@ namespace JsonExSerializer.Framework
         public Token ReadToken()
         {
             if (_tokens.Count > 0)
-            {
-                return _tokens.Pop();
-            }
+                return _tokens.Dequeue();
             else
-            {
-                return ReadTokenFromReader();
-            }
+                return Token.Empty;
         }
 
         /// <summary>
@@ -78,6 +74,13 @@ namespace JsonExSerializer.Framework
             return PeekToken() == Token.Empty;
         }
 
+        private void ReadAllTokens()
+        {
+            Token t;
+            while ((t = ReadTokenFromReader()) != Token.Empty)
+                _tokens.Enqueue(t);
+            _tokens.Enqueue(Token.Empty);
+        }
         /// <summary>
         /// Reads a token from the text reader and returns it
         /// </summary>

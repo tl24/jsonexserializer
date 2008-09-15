@@ -31,15 +31,6 @@ namespace JsonExSerializer.Expression
             _converter = converter;
         }
 
-        public virtual object GetReference()
-        {
-            if (_isEvaluating)
-            {
-                throw new InvalidOperationException("Can't reference a converted object from within itself");
-            }
-            return Evaluate();
-        }
-
         public virtual object Evaluate()
         {
             if (_result == null)
@@ -62,6 +53,7 @@ namespace JsonExSerializer.Expression
                 {
                     _result = _converter.ConvertTo(tempResult, sourceType, Context);
                 }
+                Expression.OnObjectConstructed(_result);
                 if (_result is IDeserializationCallback)
                 {
                     ((IDeserializationCallback)_result).OnAfterDeserialization();

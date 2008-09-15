@@ -12,6 +12,12 @@ namespace PerformanceTests
     {
         protected Serializer serializer;
 
+
+        public JsonSerializerTest(int ObjectCount, int Iterations)
+            : base(ObjectCount, Iterations)
+        {
+        }
+
         public override void InitSerializer(Type t)
         {            
             serializer = new Serializer(t);
@@ -42,7 +48,7 @@ namespace PerformanceTests
         {
             using (StreamReader fr = new StreamReader(FileName))
             {
-                return serializer.Deserialize(fr);
+                return serializer.Deserialize(fr.ReadToEnd());
             }
         }
 
@@ -51,6 +57,12 @@ namespace PerformanceTests
 
     public class JsonDynamicTests : JsonSerializerTest
     {
+
+        public JsonDynamicTests(int ObjectCount, int Iterations)
+            : base(ObjectCount, Iterations)
+        {
+        }
+
         public override void InitSerializer(Type t)
         {
             base.InitSerializer(t);

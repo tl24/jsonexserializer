@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Collections;
 
 namespace JsonExSerializer.Expression
 {
@@ -16,11 +17,31 @@ namespace JsonExSerializer.Expression
     public sealed class ObjectExpression : ComplexExpressionBase {
 
         private IList<KeyValueExpression> _properties;
+        private bool _isDictionary = false;
+        private Type _dictionaryKeyType = typeof(string);
+        private Type _dictionaryValueType = typeof(object);
 
         public ObjectExpression()
         {
             _properties = new List<KeyValueExpression>();
+            this.ObjectConstructed += new EventHandler<ObjectConstructedEventArgs>(ObjectExpression_ObjectConstructed);
         }
+
+        void ObjectExpression_ObjectConstructed(object sender, ObjectConstructedEventArgs e)
+        {
+            if (ResultType.GetInterface(typeof(IDictionary).FullName) != null)
+            {
+                _isDictionary = true;
+                Type genDict = ResultType.GetInterface(typeof(IDictionary<,>).Name);
+                // attempt to figure out what the types of the values are, if no type is set already
+                if (genDict != null)
+                {
+                    Type[] genArgs = genDict.GetGenericArguments();
+                    _dictionaryKeyType = genArgs[0];
+                    _dictionaryValueType = genArgs[1];
+                }
+            }
+       }
         /// <summary>
         /// The object's properties
         /// </summary>
@@ -52,6 +73,21 @@ namespace JsonExSerializer.Expression
             expression.ValueExpression.Parent = this;
             Properties.Add(expression);
             return expression;
+        }
+        
+        public bool IsDictionary
+        {
+            get { return this._isDictionary; }
+        }
+
+        public System.Type DictionaryKeyType
+        {
+            get { return this._dictionaryKeyType; }
+        }
+
+        public System.Type DictionaryValueType
+        {
+            get { return this._dictionaryValueType; }
         }
     } 
 }

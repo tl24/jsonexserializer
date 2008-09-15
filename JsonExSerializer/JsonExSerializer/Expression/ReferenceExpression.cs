@@ -16,39 +16,41 @@ namespace JsonExSerializer.Expression
     {
         private ExpressionBase _reference;   // the expression that is referenced
         private ReferenceIdentifier _refID; // the reference ID
+        private object result;
+
         public ReferenceExpression(ReferenceIdentifier refID)
         {
             this._refID = refID;
         }
 
-        public override object Evaluate(SerializationContext context) {
-            if (_reference == null)
-            {
-                // find the root so we can resolve this reference
-                ExpressionBase p = this.Parent;
-                while (p != null)
-                {
-                    if (p.Parent == null)
-                        break;
-
-                    p = p.Parent;
-                }
-                if (p == null)
-                    throw new Exception("Unable to find root element to resolve the reference");
-
-                ReferenceVisitor visitor = new ReferenceVisitor(_refID);
-                visitor.Visit(p);
-                if (visitor.ReferencedExpression == null)
-                    throw new Exception("Unable to resolve reference to " + _refID);
-                //we found the root, resolve it
-                _reference = visitor.ReferencedExpression;
-            }
-            return _reference.GetReference(context);
+        public ReferenceIdentifier ReferenceIdentifier
+        {
+            get { return _refID; }
         }
 
-        public override object GetReference(SerializationContext context)
+        public ExpressionBase ReferencedExpression
         {
-            throw new InvalidOperationException("A reference cannot be created from a reference");
+            get { return _reference; }
+            set
+            {
+                if (_reference == value)
+                    return;
+                if (_reference != null)
+                    throw new InvalidOperationException("Attempt to change referenced expression after its already been set");
+                _reference = value;
+                _reference.ObjectConstructed += new EventHandler<ObjectConstructedEventArgs>(Reference_ObjectConstructed);
+            }
+        }
+
+        void Reference_ObjectConstructed(object sender, ObjectConstructedEventArgs e)
+        {
+            result = e.Result;
+        }
+
+        public override object Evaluate(SerializationContext context) {
+            if (result == null)
+                throw new InvalidOperationException("Attempt to reference " + ReferenceIdentifier + " before its constructed");
+            return result;
         }
     }
 }

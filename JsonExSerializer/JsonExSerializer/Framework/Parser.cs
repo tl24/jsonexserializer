@@ -92,6 +92,10 @@ namespace JsonExSerializer.Framework
         {
             ExpressionBase expr = ParseExpression();
             expr.SetResultTypeIfNotSet(_deserializedType);
+            foreach (IParsingStage stage in _context.ParsingStages)
+            {
+                expr = stage.Execute(expr);
+            }
             return expr.Evaluate(this._context);
         }
 

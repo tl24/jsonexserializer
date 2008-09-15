@@ -23,4 +23,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersionAttribute("2.1")]
 [assembly: AssemblyVersionAttribute("2.1.1.144")]
 [assembly: AssemblyFileVersionAttribute("2.1.1.144")]
-
+[assembly: InternalsVisibleTo("JsonExSerializerTests")]

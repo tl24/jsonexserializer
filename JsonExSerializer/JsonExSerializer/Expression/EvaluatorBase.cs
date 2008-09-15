@@ -28,19 +28,6 @@ namespace JsonExSerializer.Expression
             _expression = expression;
         }
 
-        /// <summary>
-        /// Gets a reference to the final object.  The reference does not
-        /// need to be fully initialized
-        /// </summary>
-        /// <returns>object reference</returns>
-        public virtual object GetReference()
-        {
-            if (_result == null) {
-               _result = Construct();
-            }
-            return _result;
-        }
-
         protected abstract object Construct();  // constructs the object
         protected abstract void UpdateResult();  // initializes the result..populates properties, etc
 
@@ -55,6 +42,7 @@ namespace JsonExSerializer.Expression
                 if (_result == null)
                 {
                     _result = Construct();
+                    this.Expression.OnObjectConstructed(_result);
                 }
                 UpdateResult();
                 IDeserializationCallback callback = _result as IDeserializationCallback;

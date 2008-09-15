@@ -96,9 +96,9 @@ namespace JsonExSerializer.MetaData
             DynamicMethod getter = new DynamicMethod(
                 String.Concat("_Get", Property.Name, "_"),
                 typeof(object), arguments, DeclaringType);
-            
+
             ILGenerator generator = getter.GetILGenerator();
-            
+
             generator.DeclareLocal(typeof(object));
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Castclass, DeclaringType);
@@ -113,57 +113,65 @@ namespace JsonExSerializer.MetaData
              * Create the delegate and return it
              */
             return (GenericGetter)getter.CreateDelegate(typeof(GenericGetter));
+        }
+
+        public static GenericSetter CreatePropertySetter(PropertyInfo Property)
+        {
+
+            /*
+             * If there's no setter return null
+             */
+            MethodInfo setMethod = Property.GetSetMethod();
+            if (setMethod == null)
+                throw new ArgumentException("Property has no set method:" + Property.Name);
+
+
+            return GetSetterInvoker(Property.Name, setMethod);
+        }
+
+        public static GenericSetter GetSetterInvoker(string Name, MethodInfo MethodToInvoke)
+        {
+            Type DeclaringType = MethodToInvoke.DeclaringType;
+            Type firstArg = MethodToInvoke.GetParameters()[0].ParameterType;
+
+            /*
+             * Create the dynamic method
+             */
+            Type[] arguments = new Type[2];
+            arguments[0] = arguments[1] = typeof(object);
+
+            DynamicMethod setter = new DynamicMethod(
+                String.Concat("_Call", Name, "_"),
+                typeof(void), arguments, DeclaringType);
+            ILGenerator generator = setter.GetILGenerator();
+
+            // load the target object
+            generator.Emit(OpCodes.Ldarg_0);
+            // cast or unbox it
+            if (DeclaringType.IsClass)
+                generator.Emit(OpCodes.Castclass, DeclaringType);
+            else
+                generator.Emit(OpCodes.Unbox_Any, DeclaringType);
+
+            // load the value
+            generator.Emit(OpCodes.Ldarg_1);
+
+            // cast if necessary
+            if (firstArg.IsClass)
+                generator.Emit(OpCodes.Castclass, firstArg);
+            else
+                generator.Emit(OpCodes.Unbox_Any, firstArg);
+
+            // call the setter
+            generator.EmitCall(OpCodes.Callvirt, MethodToInvoke, null);
+
+            // return
+            generator.Emit(OpCodes.Ret);
+
+            /*
+             * Create the delegate and return it
+             */
+            return (GenericSetter)setter.CreateDelegate(typeof(GenericSetter));
+        }
     }
-
-    public static GenericSetter CreatePropertySetter(PropertyInfo Property)
-    {
-        Type DeclaringType = Property.DeclaringType;
-
-        /*
-         * If there's no setter return null
-         */
-        MethodInfo setMethod = Property.GetSetMethod();
-        if (setMethod == null)
-            throw new ArgumentException("Property has no set method:" + Property.Name);
-
-        /*
-         * Create the dynamic method
-         */
-        Type[] arguments = new Type[2];
-        arguments[0] = arguments[1] = typeof(object);
-
-        DynamicMethod setter = new DynamicMethod(
-            String.Concat("_Set", Property.Name, "_"),
-            typeof(void), arguments, DeclaringType);
-        ILGenerator generator = setter.GetILGenerator();
-
-        // load the target object
-        generator.Emit(OpCodes.Ldarg_0);
-        // cast or unbox it
-        if (DeclaringType.IsClass)
-            generator.Emit(OpCodes.Castclass, DeclaringType);
-        else
-            generator.Emit(OpCodes.Unbox_Any, DeclaringType);
-
-        // load the value
-        generator.Emit(OpCodes.Ldarg_1);
-
-        // cast if necessary
-        if (Property.PropertyType.IsClass)
-            generator.Emit(OpCodes.Castclass, Property.PropertyType);
-        else
-            generator.Emit(OpCodes.Unbox_Any, Property.PropertyType);
-
-        // call the setter
-        generator.EmitCall(OpCodes.Callvirt, setMethod, null);
-
-        // return
-        generator.Emit(OpCodes.Ret);
-
-        /*
-         * Create the delegate and return it
-         */
-        return (GenericSetter)setter.CreateDelegate(typeof(GenericSetter));
-    }
-}
 }

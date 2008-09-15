@@ -15,10 +15,12 @@ namespace PerformanceTests
 
         private object _testData;
         private int _objectCount;
+        private int _iterations;
 
-        public AbstractPerfTestBase()
+        public AbstractPerfTestBase(int ObjectCount, int Iterations)
         {
-            _objectCount = 100;
+            _objectCount = ObjectCount;
+            _iterations = Iterations;
             TestObjectFactory factory = new TestObjectFactory(_objectCount);
             _testData = factory.ProduceObjects();
         }
@@ -29,10 +31,10 @@ namespace PerformanceTests
             //results.Add(DeserializeTest(_objectCount, 1000));
 
             //results.Add(SerializeTest(_objectCount, 10000));
-            results.Add(SerializeTest(_objectCount, 2500));
+            results.Add(SerializeTest(_objectCount, _iterations));
 
             //results.Add(DeserializeTest(_objectCount, 10000));
-            results.Add(DeserializeTest(_objectCount, 2500));
+            results.Add(DeserializeTest(_objectCount, _iterations));
             return results;
         }
 

@@ -51,11 +51,12 @@ namespace JsonExSerializer.Framework
                 comment += "*/" + "\r\n";
                 this.Comment(comment);
             }
-            if (o != null && _context.OutputTypeInformation && o.GetType() != _serializedType)
+            ExpressionBase expr = Serialize(o, "this", null);
+            if (o != null && o.GetType() != _serializedType)
             {
-                WriteCast(o.GetType());
+                expr = new CastExpression(o.GetType(), expr);
             }
-            Serialize(o, "this", null);
+            ExpressionWriter.Write(this, _context, expr);
         }
 
         /// <summary>
@@ -63,13 +64,12 @@ namespace JsonExSerializer.Framework
         /// currentPath such as "this.name", etc.  This is an internal method that can be called recursively.
         /// </summary>
         /// <param name="o">the object to serialize</param>
-        /// <param name="indent">indent level for formating</param>
         /// <param name="currentPath">the current path for reference writing</param>
-        private void Serialize(object o, string currentPath, IJsonTypeConverter converter)
+        private ExpressionBase Serialize(object o, string currentPath, IJsonTypeConverter converter)
         {
             if (o == null)
             {
-                this.SpecialValue("null");
+                return new NullExpression();
             }
             else
             {
@@ -77,16 +77,22 @@ namespace JsonExSerializer.Framework
                 switch (Type.GetTypeCode(o.GetType()))
                 {
                     case TypeCode.Char:
-                        this.QuotedValue(((char)o).ToString());
-                        break;
                     case TypeCode.String:
-                        this.QuotedValue((string)o);
+                    case TypeCode.DateTime:
+                        return new ValueExpression(o);
                         break;
+                    case TypeCode.Byte:
+                    case TypeCode.Int16:
+                    case TypeCode.Int32:
+                    case TypeCode.Int64:
+                    case TypeCode.SByte:
+                    case TypeCode.UInt16:
+                    case TypeCode.UInt32:
                     case TypeCode.Double:
-                        this.Value((double) o);
-                        break;
                     case TypeCode.Single:
-                        this.Value((float)o);
+                    case TypeCode.UInt64:
+                    case TypeCode.Decimal:
+                        return new NumericExpression(o);
                         break;
                     case TypeCode.Object:
                         ReferenceInfo refInfo = null;
@@ -107,13 +113,11 @@ namespace JsonExSerializer.Framework
                                     if (!refInfo.CanReference)
                                         throw new JsonExSerializationException("Can't reference object: " + refPath + " from " + currentPath + ", either it is a collection, or it has not been converted yet");
 
-                                    this.SpecialValue(refPath);
-                                    return;
+                                    return new ReferenceExpression(refPath);
                                 case SerializationContext.ReferenceOption.IgnoreCircularReferences:
                                     if (currentPath.StartsWith(refPath))
                                     {
-                                        this.SpecialValue("null");
-                                        return;
+                                        return new NullExpression();
                                     }
                                     break;
                                 case SerializationContext.ReferenceOption.ErrorCircularReferences:
@@ -135,22 +139,22 @@ namespace JsonExSerializer.Framework
                             converter = (converter != null) ? converter : handler.TypeConverter;
                             o = converter.ConvertFrom(o, _context);
                             // call serialize again in case the new type has a converter
-                            Serialize(o, currentPath, null);
+                            ExpressionBase expr = Serialize(o, currentPath, null);
                             refInfo.CanReference = true;    // can't reference inside the object
-                            return;
+                            return expr;
                         }
                         else if (o is IJsonTypeConverter)
                         {
                             o = ((IJsonTypeConverter)o).ConvertFrom(o, _context);
                             // call serialize again in case the new type has a converter
-                            Serialize(o, currentPath, null);
+                            ExpressionBase expr = Serialize(o, currentPath, null);
                             refInfo.CanReference = true;    // can't reference inside the object
-                            return;
+                            return expr;
                         }
                         
                         if (handler.IsCollection())
                         {
-                            SerializeCollection(o, currentPath);
+                            return SerializeCollection(o, currentPath);
                         }
                         else if (o is ICollection && !(o is IDictionary))
                         {
@@ -159,62 +163,19 @@ namespace JsonExSerializer.Framework
                         else
                         {
                             refInfo.CanReference = true;    // regular object, can reference at any time
-                            SerializeObject(o, currentPath);
+                            return SerializeObject(o, currentPath);
                         }
                         break;
-                    case TypeCode.DateTime:
-                        WriteDateTime((DateTime)o);
-                        break;
                     case TypeCode.Boolean:
-                        this.Value((bool) o);
-                        break;
-                    case TypeCode.Byte:
-                        WriteByte((byte)o);
-                        break;
-                    case TypeCode.DBNull:
-                        WriteDBNull((DBNull)o);
+                        return new BooleanExpression((bool) o);
                         break;
                     case TypeCode.Empty:
                         throw new ApplicationException("Unsupported value (Empty): " + o);
-                    case TypeCode.Int16:
-                        WriteInt16((short)o);
-                        break;
-                    case TypeCode.Int32:
-                        this.Value((int)o);
-                        break;
-                    case TypeCode.Int64:
-                        WriteInt64((long)o);
-                        break;
-                    case TypeCode.SByte:
-                        WriteSByte((sbyte)o);
-                        break;
-
-                    case TypeCode.UInt16:
-                        WriteUInt16((ushort)o);
-                        break;
-                    case TypeCode.UInt32:
-                        WriteUInt32((uint)o);
-                        break;
-                    case TypeCode.UInt64:
-                        WriteUInt64((ulong)o);
-                        break;
-                    case TypeCode.Decimal:
-                        WriteDecimal((decimal)o);
-                        break;
                     default:
-                        this.SpecialValue(Convert.ToString(o));
+                        return new ValueExpression(Convert.ToString(o));
                         break;
                 }
             }
-        }
-
-        /// <summary>
-        /// serialize an enum type
-        /// </summary>
-        /// <param name="o">the enum to serialize</param>
-        private void SerializeEnum(Enum enm)
-        {
-            _writer.Write(Enum.Format(enm.GetType(), enm, "d"));
         }
 
         /// <summary>
@@ -226,12 +187,11 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="o">the object to serialize</param>
         /// <param name="currentPath">object's path</param>
-        private void SerializeObject(object obj, string currentPath)
+        private ExpressionBase SerializeObject(object obj, string currentPath)
         {
             if (obj is IDictionary)
             {
-                SerializeDictionary((IDictionary) obj, currentPath);
-                return;
+                return SerializeDictionary((IDictionary) obj, currentPath);
             }
 
             TypeHandler handler = _context.GetTypeHandler(obj.GetType());
@@ -243,61 +203,52 @@ namespace JsonExSerializer.Framework
 
             bool hasConstructor = false;
             bool hasInitializer = false;
-
+            ObjectExpression expression = new ObjectExpression();
             try
             {
                 if (handler.ConstructorParameters.Count > 0)
                 {
-                    hasConstructor = true;
-                    this.ConstructorStart(obj.GetType());
-                    this.ConstructorArgsStart();
+                    expression.ResultType = obj.GetType();
                     foreach (AbstractPropertyHandler ctorParm in handler.ConstructorParameters)
                     {
                         object value = ctorParm.GetValue(obj);
-                        if (value != null && _context.OutputTypeInformation && value.GetType() != ctorParm.PropertyType)
-                        {
-                            this.Cast(value.GetType());
-                        }
+                        ExpressionBase argExpr;
                         if (ctorParm.HasConverter)
                         {
-                            Serialize(value, "", ctorParm.TypeConverter);
+                            argExpr = Serialize(value, "", ctorParm.TypeConverter);
                         }
                         else
                         {
-                            Serialize(value, "", null);
+                            argExpr = Serialize(value, "", null);
                         }
+                        if (value != null && value.GetType() != ctorParm.PropertyType)
+                        {
+                            argExpr = new CastExpression(value.GetType(), argExpr);
+                        }
+                        expression.ConstructorArguments.Add(argExpr);
                     }
-                    this.ConstructorArgsEnd();
                 }
 
-                if (!hasConstructor || !handler.IsEmpty)
-                {
-                    hasInitializer = true;
-                    this.ObjectStart();
 
-                    foreach (AbstractPropertyHandler prop in handler.Properties)
+                foreach (AbstractPropertyHandler prop in handler.Properties)
+                {
+                    object value = prop.GetValue(obj);
+                    ExpressionBase valueExpr;
+                    if (prop.HasConverter)
                     {
-                        this.Key(prop.Name);
-                        object value = prop.GetValue(obj);
-                        if (value != null && _context.OutputTypeInformation && value.GetType() != prop.PropertyType)
-                        {
-                            this.Cast(value.GetType());
-                        }
-                        if (prop.HasConverter)
-                        {
-                            Serialize(value, currentPath + "." + prop.Name, prop.TypeConverter);
-                        }
-                        else
-                        {
-                            Serialize(value, currentPath + "." + prop.Name, null);
-                        }
+                        valueExpr = Serialize(value, currentPath + "." + prop.Name, prop.TypeConverter);
                     }
-                    this.ObjectEnd();
+                    else
+                    {
+                        valueExpr = Serialize(value, currentPath + "." + prop.Name, null);
+                    }
+                    if (value != null && value.GetType() != prop.PropertyType)
+                    {
+                        valueExpr = new CastExpression(value.GetType(), valueExpr);
+                    }
+                    expression.Add(prop.Name, valueExpr);
                 }
-                if (hasConstructor)
-                {
-                    this.ConstructorEnd();
-                }
+                return expression;
             }
             finally
             {
@@ -317,10 +268,8 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="dictionary">the dictionary object</param>
         /// <param name="currentPath">object's path</param>
-        private void SerializeDictionary(IDictionary dictionary, string currentPath)
+        private ExpressionBase SerializeDictionary(IDictionary dictionary, string currentPath)
         {
-            this.ObjectStart();
-
             Type itemType = typeof(object);
             Type genericDictionary = null;
 
@@ -333,20 +282,22 @@ namespace JsonExSerializer.Framework
             {
                 ((ISerializationCallback)dictionary).OnBeforeSerialization();
             }
+            ObjectExpression expression = new ObjectExpression();
             try
             {
                 foreach (DictionaryEntry pair in dictionary)
                 {
                     //Serialize(pair.Key, subindent, "", null);
                     //may not work in all cases
-                    this.Key(pair.Key.ToString());                    
                     object value = pair.Value;
-                    if (value != null && _context.OutputTypeInformation && value.GetType() != itemType)
+                    ExpressionBase valueExpr = Serialize(value, currentPath + "." + pair.Key.ToString(), null);
+                    if (value != null && value.GetType() != itemType)
                     {
-                        this.Cast(value.GetType());
+                        valueExpr = new CastExpression(value.GetType(), valueExpr);
                     }
-                    Serialize(value, currentPath + "." + pair.Key.ToString(), null);
+                    expression.Add(pair.Key.ToString(), valueExpr);
                 }
+                return expression;
             }
             finally
             {
@@ -357,7 +308,7 @@ namespace JsonExSerializer.Framework
                     ((ISerializationCallback)dictionary).OnAfterSerialization();
                 }
             }
-            this.ObjectEnd();
+            
         }
 
         /// <summary>
@@ -366,32 +317,33 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="collection">collection</param>
         /// <param name="currentPath">the object's path</param>
-        private void SerializeCollection(object collection, string currentPath)
+        private ExpressionBase SerializeCollection(object collection, string currentPath)
         {
             TypeHandler handler = _context.GetTypeHandler(collection.GetType());
 
-            bool outputTypeInfo = _context.OutputTypeInformation;
             CollectionHandler collectionHandler = handler.GetCollectionHandler();
             Type elemType = collectionHandler.GetItemType(handler.ForType);
 
-            this.ArrayStart();
             int index = 0;
 
             if (collection is ISerializationCallback)
             {
                 ((ISerializationCallback)collection).OnBeforeSerialization();
             }
+            ListExpression expression = new ListExpression();
             try
             {
                 foreach (object value in collectionHandler.GetEnumerable(collection))
                 {
-                    if (outputTypeInfo && value.GetType() != elemType)
+                    ExpressionBase itemExpr = Serialize(value, currentPath + ".[" + index + "]", null);
+                    if (value != null && value.GetType() != elemType)
                     {
-                        this.Cast(value.GetType());
+                        itemExpr = new CastExpression(value.GetType(), itemExpr);
                     }
-                    Serialize(value, currentPath + ".[" + index + "]", null);
+                    expression.Add(itemExpr);
                     index++;
                 }
+                return expression;
             }
             finally
             {
@@ -401,69 +353,6 @@ namespace JsonExSerializer.Framework
                 {
                     ((ISerializationCallback)collection).OnAfterSerialization();
                 }
-            }
-
-            this.ArrayEnd();
-        }
-
-        private void WriteDateTime(DateTime value)
-        {
-            // quote it to protect it from number parsing
-            this.QuotedValue(value.ToString());
-        }
-
-        private void WriteByte(byte value)
-        {
-            this.Value(value);
-        }
-        private void WriteDBNull(DBNull value)
-        {
-            _writer.Write(value);
-        }
-        private void WriteInt16(short value)
-        {
-            this.Value(value);
-        }
-        private void WriteInt32(int value)
-        {
-            this.Value(value);
-        }
-        private void WriteInt64(long value)
-        {
-            this.Value(value);
-        }
-        private void WriteSByte(sbyte value)
-        {
-            this.Value(value);
-        }
-        private void WriteUInt16(ushort value)
-        {
-            this.Value(value);
-        }
-        private void WriteUInt32(uint value)
-        {
-            this.Value(value);
-        }
-        private void WriteUInt64(ulong value)
-        {
-            this.SpecialValue(string.Format("{0}", value));
-        }
-        private void WriteDecimal(decimal value)
-        {
-            this.SpecialValue(string.Format("{0}", value));
-        }
-
-        /// <summary>
-        /// Writes a type cast for an object.  The cast will be one of two forms:
-        /// (System.Type)
-        /// or
-        /// ("SomeNamespace.SomeType, SomeAssembly")
-        /// </summary>
-        /// <param name="t">the type to cast</param>
-        private void WriteCast(Type t)
-        {
-            if (t != typeof(string)) {
-                this.Cast(t);
             }
         }
 

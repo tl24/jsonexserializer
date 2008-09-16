@@ -48,7 +48,7 @@ namespace PerformanceTests
         {
             using (StreamReader fr = new StreamReader(FileName))
             {
-                return serializer.Deserialize(fr.ReadToEnd());
+                return serializer.Deserialize(fr);
             }
         }
 

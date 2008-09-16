@@ -61,7 +61,8 @@
 		        <attribute type="CLSCompliantAttribute" value="true" />
 				<attribute type="AssemblyInformationalVersionAttribute" value="${info.version}" />
 				<attribute type="AssemblyVersionAttribute" value="${full.version}" />
-				<attribute type="AssemblyFileVersionAttribute" value="${full.version}" />	
+				<attribute type="AssemblyFileVersionAttribute" value="${full.version}" />
+				<attribute type="InternalsVisibleTo" value="JsonExSerializerTests" />
 		    </attributes>
 		</asminfo>
 		<asminfo output="JsonExSerializerTests/Properties/AssemblyInfo.cs" language="CSharp">

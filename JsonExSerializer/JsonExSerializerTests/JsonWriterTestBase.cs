@@ -20,13 +20,13 @@ namespace JsonExSerializerTests
         /// <summary>
         /// This will be the instance used to test
         /// </summary>
-        protected JsonWriter jsonWriter;
+        protected IJsonWriter jsonWriter;
 
         [SetUp]
         public virtual void Setup()
         {
             stringWriter = new StringWriter();
-            jsonWriter = new JsonWriterMock(stringWriter, true);
+            jsonWriter = new JsonWriter(stringWriter, true);
         }
 
         [TearDown]

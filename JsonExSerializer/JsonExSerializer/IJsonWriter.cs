@@ -155,12 +155,5 @@ namespace JsonExSerializer
         /// <param name="Assembly">The assembly name</param>
         /// <returns></returns>
         IJsonWriter Cast(string NamespaceAndClass, string Assembly);
-
-        /// <summary>
-        /// Serializes any type of object completely
-        /// </summary>
-        /// <param name="value">the object to write</param>
-        /// <returns>json writer</returns>
-        IJsonWriter WriteObject(object value);
     }
 }

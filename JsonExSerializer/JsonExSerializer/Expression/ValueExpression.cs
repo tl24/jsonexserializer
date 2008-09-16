@@ -15,20 +15,25 @@ namespace JsonExSerializer.Expression
     [DefaultEvaluator(typeof(ValueEvaluator))]
     public class ValueExpression: ExpressionBase
     {
-        private string _value;
+        private object _value;
 
-        public ValueExpression(string value)
+        public ValueExpression(object value)
         {
             _value = value;
+        }
+
+        public object Value
+        {
+            get { return _value; }
+            set { _value = value; }
         }
 
         /// <summary>
         /// The value for the expression
         /// </summary>
-        public virtual string Value
+        public virtual string StringValue
         {
-            get { return this._value; }
-            set { this._value = value; }
+            get { return (this._value ?? string.Empty).ToString(); }
         }
     }
 
@@ -38,7 +43,7 @@ namespace JsonExSerializer.Expression
     [DefaultEvaluator(typeof(NumericEvaluator))]
     public sealed class NumericExpression : ValueExpression
     {
-        public NumericExpression(string value)
+        public NumericExpression(object value)
             : base(value)
         {
         }
@@ -52,7 +57,7 @@ namespace JsonExSerializer.Expression
                 case TypeCode.Decimal:
                     return true;
                 default:
-                    return Value.Contains(".");
+                    return StringValue.Contains(".");
 
             }
         }
@@ -64,7 +69,7 @@ namespace JsonExSerializer.Expression
     [DefaultEvaluator(typeof(BooleanEvaluator))]
     public sealed class BooleanExpression : ValueExpression
     {
-        public BooleanExpression(string value)
+        public BooleanExpression(object value)
             : base(value)
         {
         }

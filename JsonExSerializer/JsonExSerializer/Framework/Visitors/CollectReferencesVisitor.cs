@@ -45,5 +45,10 @@ namespace JsonExSerializer.Framework.Visitors
         {
             Visit(KeyValue.ValueExpression);
         }
+
+        public void Visit(CastExpression Cast)
+        {
+            Visit(Cast.Expression);
+        }
     }
 }

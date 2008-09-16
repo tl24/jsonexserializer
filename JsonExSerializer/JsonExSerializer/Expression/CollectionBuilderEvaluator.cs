@@ -40,6 +40,9 @@ namespace JsonExSerializer.Expression
             TypeHandler typeHandler = Context.GetTypeHandler(list.ResultType);
             CollectionHandler collHandler = typeHandler.GetCollectionHandler();
             _itemType = collHandler.GetItemType(typeHandler.ForType);
+            if (_itemType == null)
+                throw new Exception("Null item type returned from " + collHandler.GetType() + " for Collection type: " + typeHandler.ForType);
+
             if (collection != null)
                 _builder = collHandler.ConstructBuilder(collection);
             else
@@ -66,7 +69,7 @@ namespace JsonExSerializer.Expression
                 }
                 foreach (ExpressionBase item in list.Items)
                 {
-                    item.SetResultTypeIfNotSet(_itemType);
+                    item.ResultType = _itemType;
                     object itemResult = item.Evaluate(Context);
                     _builder.Add(itemResult);
                 }

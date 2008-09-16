@@ -26,7 +26,6 @@ namespace JsonExSerializer.Expression
         protected override object Construct()
         {
             // set the default type if none set
-            Expression.SetResultTypeIfNotSet(typeof(Hashtable));
             if (Expression.ConstructorArguments.Count > 0)
             {
                 TypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
@@ -37,7 +36,7 @@ namespace JsonExSerializer.Expression
                 for (int i = 0; i < resolvedTypes.Length; i++)
                 {
                     if (resolvedTypes[i] != null)
-                        Expression.ConstructorArguments[i].SetResultTypeIfNotSet(resolvedTypes[i]);
+                        Expression.ConstructorArguments[i].ResultType = resolvedTypes[i];
                 }
             }
             return base.Construct();

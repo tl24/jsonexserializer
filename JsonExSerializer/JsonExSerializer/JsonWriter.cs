@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace JsonExSerializer
 {
-    public abstract class JsonWriter : IJsonWriter
+    public class JsonWriter : IJsonWriter
     {
 
         protected TextWriter _writer;
@@ -248,7 +248,57 @@ namespace JsonExSerializer
         /// Writes out the type for an object in regular C# code syntax
         /// </summary>
         /// <param name="t">the type to write</param>
-        protected abstract void WriteTypeInfo(Type t);
+        protected virtual void WriteTypeInfo(Type t)
+        {
+            if (t.IsArray)
+            {
+                WriteTypeInfo(t.GetElementType());
+                _writer.Write("[]");
+                return;
+            }
+
+            Assembly core = typeof(object).Assembly;
+
+            if (t.IsGenericType && !t.IsGenericTypeDefinition)
+            {
+                WriteTypeInfo(t.GetGenericTypeDefinition()); 
+                _writer.Write('<');
+                bool writeComma = false;
+                foreach (Type genArgType in t.GetGenericArguments())
+                {
+                    if (writeComma)
+                        _writer.Write(',');
+                    writeComma = true;
+                    WriteTypeInfo(genArgType);
+                }
+                _writer.Write('>');
+            }
+            else
+            {                
+                if (t.Assembly == core)
+                {
+                    string typeName = t.FullName;
+                    if (t.IsGenericTypeDefinition)
+                    {
+                        typeName = typeName.Substring(0, typeName.LastIndexOf('`'));
+                    }
+                    _writer.Write(typeName);
+                }
+                else
+                {
+                    AssemblyName asmblyName = t.Assembly.GetName();
+                    _writer.Write('"');
+                    _writer.Write(t.FullName);
+                    _writer.Write(",");
+                    if (t.Assembly.GlobalAssemblyCache)
+                        _writer.Write(asmblyName.FullName);
+                    else
+                        _writer.Write(asmblyName.Name);
+
+                    _writer.Write('"');
+                }
+            }        
+        }
 
         /// <summary>
         /// Writes out the type info specified by the NamespaceAndClass string.
@@ -300,9 +350,6 @@ namespace JsonExSerializer
             _writer.Write(')');
             return this;
         }
-
-        public abstract IJsonWriter WriteObject(object value);
-
 
         public void Dispose()
         {

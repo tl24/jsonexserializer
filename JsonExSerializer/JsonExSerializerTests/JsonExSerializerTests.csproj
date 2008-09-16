@@ -42,6 +42,7 @@
     <Compile Include="ConversionTests.cs" />
     <Compile Include="CustomPropertyTest.cs" />
     <Compile Include="DeserializePrimitiveTests.cs" />
+    <Compile Include="Expression\ExpressionWriterTests.cs" />
     <Compile Include="Expression\ReferenceTests.cs" />
     <Compile Include="FieldTests.cs" />
     <Compile Include="IgnorePropertyActionTests.cs" />
@@ -52,7 +53,6 @@
     <Compile Include="MetaData\DynamicMethodUtilTests.cs" />
     <Compile Include="Mocks\ChainedConversion.cs" />
     <Compile Include="Mocks\ConvertedObject.cs" />
-    <Compile Include="Mocks\JsonWriterMock.cs" />
     <Compile Include="Mocks\MockCallbackObject.cs" />
     <Compile Include="Mocks\MockCollectionConverter.cs" />
     <Compile Include="Mocks\MockFields.cs" />

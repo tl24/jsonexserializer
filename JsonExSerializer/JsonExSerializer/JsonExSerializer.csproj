@@ -51,6 +51,7 @@
     <Compile Include="Collections\StackHandler.cs" />
     <Compile Include="Collections\ICollectionBuilder.cs" />
     <Compile Include="ConstructorParameterAttribute.cs" />
+    <Compile Include="Expression\CastExpression.cs" />
     <Compile Include="Expression\CollectionBuilderEvaluator.cs" />
     <Compile Include="Expression\ComplexEvaluatorBase.cs" />
     <Compile Include="Expression\ComplexExpressionBase.cs" />
@@ -67,7 +68,8 @@
     <Compile Include="Expression\ObjectExpression.cs" />
     <Compile Include="Expression\ReferenceExpression.cs" />
     <Compile Include="Expression\ReferenceIdentifier.cs" />
-    <Compile Include="Expression\ReferenceVisitor.cs" />
+    <Compile Include="Framework\ExpressionWriter.cs" />
+    <Compile Include="Framework\Visitors\ReferenceVisitor.cs" />
     <Compile Include="Expression\ValueEvaluator.cs" />
     <Compile Include="Expression\ValueExpression.cs" />
     <Compile Include="Framework\AssignReferenceStage.cs" />

@@ -91,7 +91,7 @@ namespace JsonExSerializer.Framework
         public object Parse()
         {
             ExpressionBase expr = ParseExpression();
-            expr.SetResultTypeIfNotSet(_deserializedType);
+            expr.ResultType = _deserializedType;
             foreach (IParsingStage stage in _context.ParsingStages)
             {
                 expr = stage.Execute(expr);
@@ -205,11 +205,11 @@ namespace JsonExSerializer.Framework
             Token tok = ReadToken();
             Debug.Assert(tok == LParenToken, "Invalid starting token for ParseCast: " + tok);
             Type desiredType = ParseTypeSpecifier();
+            CastExpression cast = new CastExpression(desiredType);
             tok = ReadToken();
             RequireToken(RParenToken, tok, "Invalid Type Cast Syntax");
-            ExpressionBase result = ParseExpression();
-            result.ResultType = desiredType;
-            return result;
+            cast.Expression = ParseExpression();
+            return cast;
         }
 
         /// <summary>

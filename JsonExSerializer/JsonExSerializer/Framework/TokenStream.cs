@@ -13,7 +13,7 @@ namespace JsonExSerializer.Framework
     /// <summary>
     /// Tokenizes input from the specified reader and returns tokens for the parser to parse.
     /// </summary>
-    class TokenStream
+    sealed class TokenStream
     {
         #region Member Variables
 
@@ -21,7 +21,7 @@ namespace JsonExSerializer.Framework
         private Queue<Token> _tokens;
         private char[] _symbols;
         private StringBuilder _buffer;
-
+        private int _capacity;
         #endregion
 
         /// <summary>
@@ -31,12 +31,12 @@ namespace JsonExSerializer.Framework
         public TokenStream(TextReader reader)
         {
             _reader = reader;
-            _tokens = new Queue<Token>();
+            _capacity = 16;
+            _tokens = new Queue<Token>(_capacity);
             _symbols = "[]<>():,{}.".ToCharArray();
             Array.Sort<char>(_symbols);
             _buffer = new StringBuilder();
-            ReadAllTokens();
-            _buffer = null;
+            //Fill();
         }
 
         /// <summary>
@@ -46,6 +46,9 @@ namespace JsonExSerializer.Framework
         /// <see cref="Token.Empty"/>
         public Token PeekToken()
         {
+            if (_tokens.Count == 0)
+                Fill();
+
             if (_tokens.Count == 0)
                 return Token.Empty;
             else
@@ -59,6 +62,9 @@ namespace JsonExSerializer.Framework
         /// <see cref="Token.Empty"/>
         public Token ReadToken()
         {
+            if (_tokens.Count == 0)
+                Fill();
+
             if (_tokens.Count > 0)
                 return _tokens.Dequeue();
             else
@@ -74,13 +80,16 @@ namespace JsonExSerializer.Framework
             return PeekToken() == Token.Empty;
         }
 
-        private void ReadAllTokens()
+        private void Fill()
         {
             Token t;
             while ((t = ReadTokenFromReader()) != Token.Empty)
                 _tokens.Enqueue(t);
-            _tokens.Enqueue(Token.Empty);
+
+            if (t == Token.Empty)
+                _tokens.Enqueue(Token.Empty);
         }
+
         /// <summary>
         /// Reads a token from the text reader and returns it
         /// </summary>
@@ -454,6 +463,5 @@ namespace JsonExSerializer.Framework
         }
 
         #endregion
-
     }
 }

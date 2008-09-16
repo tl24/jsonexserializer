@@ -20,7 +20,7 @@ namespace JsonExSerializer.Framework.Visitors
             References.Add(reference);
         }
 
-        public void Visit(ComplexExpressionBase ComplexExpression)
+        public void VisitComplex(ComplexExpressionBase ComplexExpression)
         {
             foreach (ExpressionBase expr in ComplexExpression.ConstructorArguments)
                 Visit(expr);
@@ -28,7 +28,7 @@ namespace JsonExSerializer.Framework.Visitors
 
         public void Visit(ListExpression list)
         {
-            Visit(typeof(ComplexExpressionBase), list);
+            VisitComplex(list);
 
             foreach (ExpressionBase item in list.Items)
                 Visit(item);
@@ -36,8 +36,8 @@ namespace JsonExSerializer.Framework.Visitors
 
         public void Visit(ObjectExpression objExpr)
         {
-            Visit(typeof(ComplexExpressionBase), objExpr);
-            foreach (ExpressionBase item in objExpr.Properties)
+            VisitComplex(objExpr);
+            foreach (KeyValueExpression item in objExpr.Properties)
                 Visit(item);
         }
 

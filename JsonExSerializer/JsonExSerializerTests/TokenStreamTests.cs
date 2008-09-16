@@ -73,6 +73,33 @@ namespace JsonExSerializerTests
             TestTokens(number, new Token(TokenType.Number, number));
         }
 
+        [Test]
+        public void SimpleObjectTest()
+        {
+            string toParse = "{\"key\":\"value\"}";
+            Token[] expected = new Token[] { 
+                new Token(TokenType.Symbol,"{"),
+                new Token(TokenType.DoubleQuotedString, "key"),
+                new Token(TokenType.Symbol, ":"),
+                new Token(TokenType.DoubleQuotedString, "value"),
+                new Token(TokenType.Symbol,"}")
+            };
+            TestTokens(toParse, expected);
+        }
+
+        [Test]
+        public void SimpleListTest()
+        {
+            string toParse = "[\"item1\",\"item2\"]";
+            Token[] expected = new Token[] { 
+                new Token(TokenType.Symbol,"["),
+                new Token(TokenType.DoubleQuotedString, "item1"),
+                new Token(TokenType.Symbol, ","),
+                new Token(TokenType.DoubleQuotedString, "item2"),
+                new Token(TokenType.Symbol,"]")
+            };
+            TestTokens(toParse, expected);
+        }
         internal void TestTokens(string toParse, params Token[] expected)
         {
             TokenStream stream = new TokenStream(new StringReader(toParse));

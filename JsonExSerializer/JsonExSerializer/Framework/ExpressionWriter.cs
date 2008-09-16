@@ -35,6 +35,11 @@ namespace JsonExSerializer.Framework
             _actions[typeof(CastExpression)] = WriteCast;
         }
 
+        public static void Write(IJsonWriter Writer, SerializationContext context, ExpressionBase Expression)
+        {
+            new ExpressionWriter(Writer, context).Write(Expression);
+        }
+
         public void Write(ExpressionBase Expression)
         {
             _actions[Expression.GetType()](Expression);
@@ -49,14 +54,25 @@ namespace JsonExSerializer.Framework
         {
             NumericExpression numeric = (NumericExpression)Expression;
             object value = numeric.Value;
-            if (value is double)
-                _jsonWriter.Value((double)value);
-            else if (value is float)
-                _jsonWriter.Value((float)value);
-            else if (value is long)
-                _jsonWriter.Value((long)value);
-            else
-                _jsonWriter.Value((long)Convert.ChangeType(value, typeof(long)));
+            switch (Type.GetTypeCode(value.GetType()))
+            {
+                case TypeCode.Double:
+                    _jsonWriter.Value((double)value);
+                    break;
+                case TypeCode.Single:
+                    _jsonWriter.Value((float)value);
+                    break;
+                case TypeCode.Int64:
+                    _jsonWriter.Value((long)value);
+                    break;
+                case TypeCode.Decimal:
+                case TypeCode.UInt64:
+                    _jsonWriter.SpecialValue(string.Format("{0}", value));
+                    break;
+                default:
+                    _jsonWriter.Value((long)Convert.ChangeType(value, typeof(long)));
+                    break;
+            }
         }
 
         private void WriteValue(ExpressionBase Expression)

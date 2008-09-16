@@ -13,6 +13,12 @@ namespace JsonExSerializer.Expression
             _resultType = CastedType;
         }
 
+        public CastExpression(Type CastedType, ExpressionBase Expression)
+            : this(CastedType)
+        {
+            _expression = Expression;
+        }
+
         public override Type ResultType
         {
             get {  return base.ResultType;  }

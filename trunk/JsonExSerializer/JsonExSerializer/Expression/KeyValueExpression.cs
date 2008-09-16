@@ -34,7 +34,7 @@ namespace JsonExSerializer.Expression
             get {
                 if (!(_keyExpression is ValueExpression))
                     throw new InvalidOperationException("Key property is not valid when key expression is not a ValueExpression");
-                return ((ValueExpression)this._keyExpression).Value; 
+                return ((ValueExpression)this._keyExpression).StringValue; 
             }
         }
 
@@ -84,11 +84,9 @@ namespace JsonExSerializer.Expression
 
         public object EvaluateDictionaryItem(SerializationContext context)
         {
-            if (ValueExpression.ResultType == typeof(object) || ValueExpression.ResultType == null) {
-                // if no type set, set one
-                KeyExpression.SetResultTypeIfNotSet(((ObjectExpression)Parent).DictionaryKeyType);
-                ValueExpression.SetResultTypeIfNotSet(((ObjectExpression)Parent).DictionaryValueType);
-            }
+            // if no type set, set one
+            KeyExpression.ResultType = ((ObjectExpression)Parent).DictionaryKeyType;
+            ValueExpression.ResultType = ((ObjectExpression)Parent).DictionaryValueType;
             object keyObject = KeyExpression.Evaluate(context);
             object result = ValueExpression.Evaluate(context);
             ((IDictionary)parentResult)[keyObject] = result;
@@ -117,7 +115,7 @@ namespace JsonExSerializer.Expression
                         throw new Exception(string.Format("Can not set property {0} for type {1} because it is ignored and IgnorePropertyAction is set to ThrowException", Key, parentResult.GetType()));
                 }
             }
-            ValueExpression.SetResultTypeIfNotSet(hndlr.PropertyType);
+            ValueExpression.ResultType = hndlr.PropertyType;
             if (hndlr.HasConverter)
             {
                 // find the converter and set it for the property

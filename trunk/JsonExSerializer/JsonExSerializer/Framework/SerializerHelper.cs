@@ -12,6 +12,7 @@ using JsonExSerializer.TypeConversion;
 using JsonExSerializer.Collections;
 using System.Reflection;
 using JsonExSerializer.MetaData;
+using JsonExSerializer.Expression;
 
 namespace JsonExSerializer.Framework
 {
@@ -32,11 +33,6 @@ namespace JsonExSerializer.Framework
             _context = context;
             //_writer = writer;
             _refs = new Dictionary<object, ReferenceInfo>(new ReferenceEqualityComparer<object>());
-        }
-
-        public override IJsonWriter WriteObject(object o)
-        {
-            throw new Exception("Method not implemented");
         }
 
         /// <summary>
@@ -60,7 +56,6 @@ namespace JsonExSerializer.Framework
                 WriteCast(o.GetType());
             }
             Serialize(o, "this", null);
-            
         }
 
         /// <summary>
@@ -483,54 +478,7 @@ namespace JsonExSerializer.Framework
                 _writer.Write(alias);
                 return;
             }
-            else if (t.IsArray)
-            {
-                WriteTypeInfo(t.GetElementType());
-                _writer.Write("[]");
-                return;
-            }
-
-            Assembly core = typeof(object).Assembly;
-
-            if (t.IsGenericType && !t.IsGenericTypeDefinition)
-            {
-                WriteTypeInfo(t.GetGenericTypeDefinition()); 
-                _writer.Write('<');
-                bool writeComma = false;
-                foreach (Type genArgType in t.GetGenericArguments())
-                {
-                    if (writeComma)
-                        _writer.Write(',');
-                    writeComma = true;
-                    WriteTypeInfo(genArgType);
-                }
-                _writer.Write('>');
-            }
-            else
-            {                
-                if (t.Assembly == core)
-                {
-                    string typeName = t.FullName;
-                    if (t.IsGenericTypeDefinition)
-                    {
-                        typeName = typeName.Substring(0, typeName.LastIndexOf('`'));
-                    }
-                    _writer.Write(typeName);
-                }
-                else
-                {
-                    AssemblyName asmblyName = t.Assembly.GetName();
-                    _writer.Write('"');
-                    _writer.Write(t.FullName);
-                    _writer.Write(",");
-                    if (t.Assembly.GlobalAssemblyCache)
-                        _writer.Write(asmblyName.FullName);
-                    else
-                        _writer.Write(asmblyName.Name);
-
-                    _writer.Write('"');
-                }
-            }
+            base.WriteTypeInfo(t);
         }
 
         /// <summary>

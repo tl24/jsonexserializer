@@ -65,11 +65,6 @@ namespace JsonExSerializer.Expression
                 if (_definedParameters.Length > i)
                     definedType = _definedParameters[i];
 
-                if (value.ResultType != typeof(object))
-                {
-                    constructor.types[i] = value.ResultType;
-                    continue;
-                }
                 Type inferredType = null;
                 if (value is ValueExpression)
                     inferredType = GetValueType(parameter, (ValueExpression)value);

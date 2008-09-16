@@ -25,6 +25,7 @@ namespace JsonExSerializer.Expression
         {
             _properties = new List<KeyValueExpression>();
             this.ObjectConstructed += new EventHandler<ObjectConstructedEventArgs>(ObjectExpression_ObjectConstructed);
+            _resultType = typeof(Hashtable);
         }
 
         void ObjectExpression_ObjectConstructed(object sender, ObjectConstructedEventArgs e)
@@ -74,7 +75,18 @@ namespace JsonExSerializer.Expression
             Properties.Add(expression);
             return expression;
         }
-        
+
+        /// <summary>
+        /// Add a property to this object
+        /// </summary>
+        /// <param name="key">the key for the property</param>
+        /// <param name="value">the value for the property</param>
+        /// <returns>KeyValueExpression that was added</returns>
+        public KeyValueExpression Add(string key, ExpressionBase value)
+        {
+            return Add(new ValueExpression(key), value);
+        }
+
         public bool IsDictionary
         {
             get { return this._isDictionary; }

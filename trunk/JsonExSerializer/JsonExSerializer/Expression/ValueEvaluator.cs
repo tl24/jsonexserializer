@@ -18,13 +18,13 @@ namespace JsonExSerializer.Expression
 
         public override object Evaluate() {
             if (Expression.ResultType.IsEnum)
-                return Enum.Parse(Expression.ResultType, Expression.Value);
+                return Enum.Parse(Expression.ResultType, Expression.StringValue);
             else if (Expression.ResultType == typeof(object))
-                return Expression.Value;
+                return Expression.StringValue;
             else if (Expression.ResultType == typeof(string))
-                return Expression.Value;
+                return Expression.StringValue;
             else
-                return Convert.ChangeType(Expression.Value, Expression.ResultType);
+                return Convert.ChangeType(Expression.StringValue, Expression.ResultType);
         }
 
         public new ValueExpression Expression
@@ -55,10 +55,10 @@ namespace JsonExSerializer.Expression
         {
             if (Expression.ResultType == typeof(object))
             {
-                if (Expression.Value.Contains("."))
-                    return Convert.ToDouble(Expression.Value);
+                if (Expression.StringValue.Contains("."))
+                    return Convert.ToDouble(Expression.StringValue);
                 else
-                    return Convert.ToInt64(Expression.Value);
+                    return Convert.ToInt64(Expression.StringValue);
             }
             else
             {
@@ -78,7 +78,7 @@ namespace JsonExSerializer.Expression
         {
             if (Expression.ResultType == typeof(object))
             {
-                return Convert.ToBoolean(Expression.Value);
+                return Convert.ToBoolean(Expression.StringValue);
             }
             else
             {

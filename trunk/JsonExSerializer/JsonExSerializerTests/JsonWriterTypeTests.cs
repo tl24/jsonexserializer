@@ -60,7 +60,7 @@ namespace JsonExSerializerTests
                     .QuotedValue("Test")
                 .ObjectEnd();
 
-            AssertMatch("(JsonExSerializerTests.Mocks.SimpleObject){\"StringValue\":\"Test\"}", "Object Cast");
+            AssertMatch("(\"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"){\"StringValue\":\"Test\"}", "Object Cast");
         }
 
         [Test]
@@ -96,7 +96,7 @@ namespace JsonExSerializerTests
                     .Cast(typeof(byte)).Value(255)
                 .ObjectEnd();
 
-            AssertMatch("(JsonExSerializerTests.Mocks.SimpleObject){\"ByteValue\":(System.Byte)255}", "Object Cast");
+            AssertMatch("(\"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"){\"ByteValue\":(System.Byte)255}", "Object Cast");
         }
 
         
@@ -170,7 +170,7 @@ namespace JsonExSerializerTests
                 .Value(4)
                 .ConstructorArgsEnd()
                 .ConstructorEnd();
-            AssertMatch("new JsonExSerializerTests.Mocks.SimpleObject({\"x\":10,\"y\":-10},0,4)", "TestObjectInCtorArgs Constructor");
+            AssertMatch("new \"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"({\"x\":10,\"y\":-10},0,4)", "TestObjectInCtorArgs Constructor");
         }
 
         [Test]
@@ -192,7 +192,7 @@ namespace JsonExSerializerTests
                 .Value(0)
                 .ObjectEnd()
                 .ConstructorEnd();
-            AssertMatch("new JsonExSerializerTests.Mocks.SimpleObject({\"x\":10,\"y\":-10}){\"z\":-20,\"q\":0}", "Test Constructor With Initializer");
+            AssertMatch("new \"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"({\"x\":10,\"y\":-10}){\"z\":-20,\"q\":0}", "Test Constructor With Initializer");
         }
     }
 }

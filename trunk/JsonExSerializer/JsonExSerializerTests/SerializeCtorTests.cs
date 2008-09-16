@@ -27,7 +27,7 @@ namespace JsonExSerializerTests
         {
             Serializer s = new Serializer(typeof(CtorMock));
             ObjectExpression expr = new ObjectExpression();
-            expr.SetResultTypeIfNotSet(typeof(CtorMock));
+            expr.ResultType = typeof(CtorMock);
             NumericExpression IDExpr = new NumericExpression("10");
             ValueExpression StrExpr = new ValueExpression("name");
             expr.ConstructorArguments.Add(IDExpr);
@@ -42,7 +42,7 @@ namespace JsonExSerializerTests
         {
             Serializer s = new Serializer(typeof(CtorMock2));
             ObjectExpression expr = new ObjectExpression();
-            expr.SetResultTypeIfNotSet(typeof(CtorMock2));
+            expr.ResultType = typeof(CtorMock2);
             NumericExpression IDExpr = new NumericExpression("10");
             ObjectExpression objExpr = new ObjectExpression();
             objExpr.ConstructorArguments.Add(new ValueExpression("name"));
@@ -54,8 +54,8 @@ namespace JsonExSerializerTests
             CollectionAssert.AreElementsEqual(new Type[] { typeof(int), typeof(MyObject2) }, argTypes);
 
             // Try to construct
-            IDExpr.SetResultTypeIfNotSet(typeof(int));
-            objExpr.SetResultTypeIfNotSet(typeof(MyObject2));
+            IDExpr.ResultType = typeof(int);
+            objExpr.ResultType = typeof(MyObject2);
             object result = expr.Evaluate(s.Context);
         }
     }

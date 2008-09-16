@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Collections;
 
 namespace JsonExSerializer.Expression
 {
@@ -18,6 +19,7 @@ namespace JsonExSerializer.Expression
         public ListExpression()
         {
             _items = new List<ExpressionBase>();
+            _resultType = typeof(ArrayList);
         }
 
         public IList<ExpressionBase> Items

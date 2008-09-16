@@ -18,6 +18,11 @@ namespace JsonExSerializer.Expression
         private ReferenceIdentifier _refID; // the reference ID
         private object result;
 
+        public ReferenceExpression(string ReferenceIdentifier)
+        {
+            this._refID = new ReferenceIdentifier(ReferenceIdentifier);
+        }
+
         public ReferenceExpression(ReferenceIdentifier refID)
         {
             this._refID = refID;

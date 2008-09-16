@@ -78,7 +78,7 @@ namespace JsonExSerializer.Expression
         /// <summary>
         /// The type for the evaluated result
         /// </summary>
-        public System.Type ResultType
+        public virtual Type ResultType
         {
             get { return this._resultType; }
             set { this._resultType = value; }

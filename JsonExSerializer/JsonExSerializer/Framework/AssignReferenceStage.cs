@@ -35,10 +35,10 @@ namespace JsonExSerializer.Framework
 
         private void ResolveReference(ReferenceExpression reference, ExpressionBase Root)
         {
-            ReferenceVisitor visitor = new ReferenceVisitor(reference.ReferenceIdentifier);
+            ReferenceVisitor visitor = new ReferenceVisitor(reference.Path);
             visitor.Visit(Root);
             if (visitor.ReferencedExpression == null)
-                throw new Exception("Unable to resolve reference to " + reference.ReferenceIdentifier);
+                throw new Exception("Unable to resolve reference to " + reference.Path);
             reference.ReferencedExpression = visitor.ReferencedExpression;
         }
 

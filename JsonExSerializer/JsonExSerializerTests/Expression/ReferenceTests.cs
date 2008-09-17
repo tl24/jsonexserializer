@@ -16,7 +16,7 @@ namespace JsonExSerializerTests.Expression
         public void RootObjectTest()
         {
             ObjectExpression rootAsObject = new ObjectExpression();
-            ExpressionBase result = ResolveReference(rootAsObject, "this");
+            ExpressionBase result = ResolveReference(rootAsObject, JsonPath.Root);
 
             Assert.AreSame(rootAsObject, result, "Resolve reference for this should return root");
         }
@@ -25,7 +25,7 @@ namespace JsonExSerializerTests.Expression
         public void RootCollectionTest()
         {
             ListExpression rootAsList = new ListExpression();
-            ExpressionBase result = ResolveReference(rootAsList, "this");
+            ExpressionBase result = ResolveReference(rootAsList, JsonPath.Root);
 
             Assert.AreSame(rootAsList, result, "Resolve reference for this should return root");
         }
@@ -35,15 +35,15 @@ namespace JsonExSerializerTests.Expression
         public void ValueTypeReferenceTest()
         {
             ValueExpression value = new ValueExpression("");
-            ExpressionBase actual = ResolveReference(value, "this");
+            ExpressionBase actual = ResolveReference(value, JsonPath.Root);
         }
 
         [Test(Description = "Reference types can't be references")]
         [ExpectedException(typeof(Exception))]
         public void ReferenceTypeReferenceTest()
         {
-            ReferenceExpression refExp = new ReferenceExpression(new ReferenceIdentifier(""));
-            ExpressionBase actual = ResolveReference(refExp, "this");
+            ReferenceExpression refExp = new ReferenceExpression(new JsonPath(""));
+            ExpressionBase actual = ResolveReference(refExp, JsonPath.Root);
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace JsonExSerializerTests.Expression
 
         protected ExpressionBase ResolveReference(ExpressionBase Root, string reference)
         {
-            ReferenceVisitor visitor = new ReferenceVisitor(new ReferenceIdentifier(reference));
+            ReferenceVisitor visitor = new ReferenceVisitor(new JsonPath(reference));
             Root.Accept(visitor);
             return visitor.ReferencedExpression;
         }

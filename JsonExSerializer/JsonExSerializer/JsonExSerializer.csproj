@@ -67,7 +67,7 @@
     <Compile Include="Expression\ObjectEvaluator.cs" />
     <Compile Include="Expression\ObjectExpression.cs" />
     <Compile Include="Expression\ReferenceExpression.cs" />
-    <Compile Include="Expression\ReferenceIdentifier.cs" />
+    <Compile Include="Expression\JsonPath.cs" />
     <Compile Include="Framework\ExpressionWriter.cs" />
     <Compile Include="Framework\Visitors\ReferenceVisitor.cs" />
     <Compile Include="Expression\ValueEvaluator.cs" />

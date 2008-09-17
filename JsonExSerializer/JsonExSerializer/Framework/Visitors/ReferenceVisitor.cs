@@ -8,10 +8,10 @@ namespace JsonExSerializer.Framework.Visitors
 {
     public class ReferenceVisitor : VisitorBase
     {
-        ReferenceIdentifier _refID;
+        JsonPath _refID;
         ExpressionBase _expr;
 
-        public ReferenceVisitor(ReferenceIdentifier RefID)
+        public ReferenceVisitor(JsonPath RefID)
         {
             _refID = RefID;
         }
@@ -27,7 +27,7 @@ namespace JsonExSerializer.Framework.Visitors
             if (_expr != null)
                 return; // found it
 
-            string key = _refID.Current;
+            string key = _refID.Top;
             foreach (KeyValueExpression exp in expression.Properties)
             {
                 if (exp.Key == key)
@@ -43,7 +43,7 @@ namespace JsonExSerializer.Framework.Visitors
 
         public void VisitKeyValue(KeyValueExpression keyValue)
         {
-            if (_refID.Current == keyValue.Key)
+            if (_refID.Top == keyValue.Key)
             {
                 Visit(keyValue.ValueExpression);
             }
@@ -64,7 +64,7 @@ namespace JsonExSerializer.Framework.Visitors
             if (_expr != null)
                 return; // found it
 
-            int index = _refID.CurrentIndex;
+            int index = _refID.TopAsInt;
             if (index < 0 || index >= expression.Items.Count)
             {
                 throw new ArgumentOutOfRangeException("Reference to collection item out of range: " + _refID);
@@ -75,7 +75,7 @@ namespace JsonExSerializer.Framework.Visitors
 
         public void VisitComplexBase(ComplexExpressionBase expression)
         {
-            if (_refID.Current == "this")
+            if (_refID.Top == JsonPath.Root)
             {
                 if (expression.Parent != null)
                 {

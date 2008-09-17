@@ -68,7 +68,7 @@ namespace JsonExSerializer.Framework
         private readonly Token NullToken = new Token(TokenType.Identifier, "null");
 
         /// <summary> this </summary>
-        private readonly Token ReferenceStartToken = new Token(TokenType.Identifier, "this");
+        private readonly Token ReferenceStartToken = new Token(TokenType.Identifier, JsonPath.Root);
         #endregion
 
         public Parser(Type t, TextReader reader, SerializationContext context)
@@ -168,7 +168,7 @@ namespace JsonExSerializer.Framework
         /// <returns></returns>
         private ExpressionBase ParseReference()
         {
-            ReferenceIdentifier refID = new ReferenceIdentifier();
+            JsonPath refID = new JsonPath();
             Token tok = ReadToken();
             RequireToken(ReferenceStartToken, tok, "Invalid starting token for ParseReference");
 

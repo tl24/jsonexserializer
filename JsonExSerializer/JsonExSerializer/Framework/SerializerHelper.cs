@@ -51,7 +51,7 @@ namespace JsonExSerializer.Framework
                 comment += "*/" + "\r\n";
                 this.Comment(comment);
             }
-            ExpressionBase expr = Serialize(o, "this", null);
+            ExpressionBase expr = Serialize(o, JsonPath.Root, null);
             if (o != null && o.GetType() != _serializedType)
             {
                 expr = new CastExpression(o.GetType(), expr);
@@ -94,6 +94,11 @@ namespace JsonExSerializer.Framework
                     case TypeCode.Decimal:
                         return new NumericExpression(o);
                         break;
+                    case TypeCode.Boolean:
+                        return new BooleanExpression((bool)o);
+                        break;
+                    case TypeCode.Empty:
+                        throw new ApplicationException("Unsupported value (Empty): " + o);
                     case TypeCode.Object:
                         ReferenceInfo refInfo = null;
 
@@ -166,11 +171,6 @@ namespace JsonExSerializer.Framework
                             return SerializeObject(o, currentPath);
                         }
                         break;
-                    case TypeCode.Boolean:
-                        return new BooleanExpression((bool) o);
-                        break;
-                    case TypeCode.Empty:
-                        throw new ApplicationException("Unsupported value (Empty): " + o);
                     default:
                         return new ValueExpression(Convert.ToString(o));
                         break;
@@ -201,8 +201,6 @@ namespace JsonExSerializer.Framework
                 ((ISerializationCallback)obj).OnBeforeSerialization();
             }
 
-            bool hasConstructor = false;
-            bool hasInitializer = false;
             ObjectExpression expression = new ObjectExpression();
             try
             {

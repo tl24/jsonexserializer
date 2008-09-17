@@ -13,16 +13,18 @@ namespace JsonExSerializer.Expression
     /// a class for working with a reference identifier
     /// e.g. this.Customer.Address[1].Name;
     /// </summary>
-    public sealed class ReferenceIdentifier 
+    public sealed class JsonPath 
     {
         private Queue<string> parts;
 
-        public ReferenceIdentifier()
+        public const string Root = "this";
+
+        public JsonPath()
         {
             parts = new Queue<string>();
         }
 
-        public ReferenceIdentifier(string partsString) : this()
+        public JsonPath(string partsString) : this()
         {
             string[] partsArray = partsString.Split('.');
             foreach (string p in partsArray)
@@ -42,7 +44,7 @@ namespace JsonExSerializer.Expression
         /// <summary>
         /// The current piece of the reference
         /// </summary>
-        public string Current {
+        public string Top {
             get
             {
                 return parts.Peek();
@@ -52,7 +54,7 @@ namespace JsonExSerializer.Expression
         /// <summary>
         /// The current piece as an integer, for collections
         /// </summary>
-        public int CurrentIndex {
+        public int TopAsInt {
             get
             {
                 return int.Parse(parts.Peek());
@@ -63,7 +65,7 @@ namespace JsonExSerializer.Expression
         /// The child path
         /// </summary>
         /// <returns>the child path</returns> 
-        public ReferenceIdentifier ChildReference()
+        public JsonPath ChildReference()
         {
             parts.Dequeue();
             return this;

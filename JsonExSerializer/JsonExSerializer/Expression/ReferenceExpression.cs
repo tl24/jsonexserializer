@@ -15,22 +15,22 @@ namespace JsonExSerializer.Expression
     public sealed class ReferenceExpression : ExpressionBase
     {
         private ExpressionBase _reference;   // the expression that is referenced
-        private ReferenceIdentifier _refID; // the reference ID
+        private JsonPath _path; // path to the referenced expression
         private object result;
 
-        public ReferenceExpression(string ReferenceIdentifier)
+        public ReferenceExpression(string ReferencePath)
         {
-            this._refID = new ReferenceIdentifier(ReferenceIdentifier);
+            this._path = new JsonPath(ReferencePath);
         }
 
-        public ReferenceExpression(ReferenceIdentifier refID)
+        public ReferenceExpression(JsonPath ReferencePath)
         {
-            this._refID = refID;
+            this._path = ReferencePath;
         }
 
-        public ReferenceIdentifier ReferenceIdentifier
+        public JsonPath Path
         {
-            get { return _refID; }
+            get { return _path; }
         }
 
         public ExpressionBase ReferencedExpression
@@ -54,7 +54,7 @@ namespace JsonExSerializer.Expression
 
         public override object Evaluate(SerializationContext context) {
             if (result == null)
-                throw new InvalidOperationException("Attempt to reference " + ReferenceIdentifier + " before its constructed");
+                throw new InvalidOperationException("Attempt to reference " + Path + " before its constructed");
             return result;
         }
     }

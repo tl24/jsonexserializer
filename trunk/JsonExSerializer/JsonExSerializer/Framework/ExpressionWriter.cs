@@ -128,7 +128,7 @@ namespace JsonExSerializer.Framework
         private void WriteReference(ExpressionBase Expression)
         {
             ReferenceExpression refExpr = (ReferenceExpression)Expression;
-            _jsonWriter.SpecialValue(refExpr.ReferenceIdentifier.ToString());
+            _jsonWriter.SpecialValue(refExpr.Path.ToString());
         }
 
         private void WriteCast(ExpressionBase Expression)

@@ -172,19 +172,20 @@ namespace JsonExSerializer.Framework
             Token tok = ReadToken();
             RequireToken(ReferenceStartToken, tok, "Invalid starting token for ParseReference");
 
-            refID.AddPart(tok.value);
-            while ((tok = PeekToken()) == PeriodToken)
+            while (PeekToken() == PeriodToken || PeekToken() == LSquareToken)
             {
                 tok = ReadToken(); // separator "."
-                tok = ReadToken(); // type part
+                if (tok == PeriodToken)
+                    tok = ReadToken(); // type part
+
                 if (tok == LSquareToken)
                 {
-                    refID.AddPart(ReadToken().value); // index
+                    refID = refID.Append(ReadToken().value); // index
                     ReadToken(); // ]
                 }
                 else if (tok.type == TokenType.Identifier)
                 {
-                    refID.AddPart(tok.value);
+                    refID = refID.Append(tok.value);
                 }
                 else
                 {

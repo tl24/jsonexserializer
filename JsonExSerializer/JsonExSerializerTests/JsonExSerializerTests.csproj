@@ -43,6 +43,7 @@
     <Compile Include="CustomPropertyTest.cs" />
     <Compile Include="DeserializePrimitiveTests.cs" />
     <Compile Include="Expression\ExpressionWriterTests.cs" />
+    <Compile Include="Expression\JsonPathTests.cs" />
     <Compile Include="Expression\ReferenceTests.cs" />
     <Compile Include="FieldTests.cs" />
     <Compile Include="IgnorePropertyActionTests.cs" />

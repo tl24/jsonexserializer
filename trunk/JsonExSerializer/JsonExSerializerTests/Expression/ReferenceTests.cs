@@ -54,7 +54,7 @@ namespace JsonExSerializerTests.Expression
             root.Add(new ValueExpression("child1"), child1);
             ObjectExpression child2 = new ObjectExpression();
             root.Add(new ValueExpression("child2"), child2);
-            ExpressionBase actual = ResolveReference(root, "this.child2");
+            ExpressionBase actual = ResolveReference(root, "this['child2']");
             Assert.AreSame(child2, actual, "this.child2 did not resolve correctly");
         }
 
@@ -67,7 +67,7 @@ namespace JsonExSerializerTests.Expression
             root.Add(child1);
             root.Add(child2);
 
-            ExpressionBase actual = ResolveReference(root, "this.1");
+            ExpressionBase actual = ResolveReference(root, "this[1]");
             Assert.AreSame(child2, actual, "this.1 did not resolve correctly");
         }
 
@@ -84,8 +84,8 @@ namespace JsonExSerializerTests.Expression
             ObjectExpression childB = new ObjectExpression();
             child2.Add(new ValueExpression("childB"), childB);
 
-            ExpressionBase actual = ResolveReference(root, "this.child2.childB");
-            Assert.AreSame(childB, actual, "this.child2.childB did not resolve correctly");
+            ExpressionBase actual = ResolveReference(root, "this['child2']['childB']");
+            Assert.AreSame(childB, actual, "this['child2']['childB'] did not resolve correctly");
         }
 
         [Test]
@@ -102,8 +102,8 @@ namespace JsonExSerializerTests.Expression
             child1.Add(childB);
 
 
-            ExpressionBase actual = ResolveReference(root, "this.0.1");
-            Assert.AreSame(childB, actual, "this.1.0 did not resolve correctly");
+            ExpressionBase actual = ResolveReference(root, "this[0][1]");
+            Assert.AreSame(childB, actual, "this[0][1] did not resolve correctly");
         }
 
         protected ExpressionBase ResolveReference(ExpressionBase Root, string reference)

@@ -51,7 +51,7 @@ namespace JsonExSerializer.Framework
                 comment += "*/" + "\r\n";
                 this.Comment(comment);
             }
-            ExpressionBase expr = Serialize(o, JsonPath.Root, null);
+            ExpressionBase expr = Serialize(o, new JsonPath(), null);
             if (o != null && o.GetType() != _serializedType)
             {
                 expr = new CastExpression(o.GetType(), expr);
@@ -65,7 +65,7 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="o">the object to serialize</param>
         /// <param name="currentPath">the current path for reference writing</param>
-        private ExpressionBase Serialize(object o, string currentPath, IJsonTypeConverter converter)
+        private ExpressionBase Serialize(object o, JsonPath currentPath, IJsonTypeConverter converter)
         {
             if (o == null)
             {
@@ -111,7 +111,7 @@ namespace JsonExSerializer.Framework
                              * be ignored depending on the option. Otherwise write a reference to it
                              */ 
                             refInfo = _refs[o];
-                            string refPath = refInfo.Path;
+                            JsonPath refPath = refInfo.Path;
                             switch (_context.ReferenceWritingType)
                             {
                                 case SerializationContext.ReferenceOption.WriteIdentifier:
@@ -187,7 +187,7 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="o">the object to serialize</param>
         /// <param name="currentPath">object's path</param>
-        private ExpressionBase SerializeObject(object obj, string currentPath)
+        private ExpressionBase SerializeObject(object obj, JsonPath currentPath)
         {
             if (obj is IDictionary)
             {
@@ -211,13 +211,14 @@ namespace JsonExSerializer.Framework
                     {
                         object value = ctorParm.GetValue(obj);
                         ExpressionBase argExpr;
+                        // TODO: Improve reference support when constructor arguments are refactored
                         if (ctorParm.HasConverter)
                         {
-                            argExpr = Serialize(value, "", ctorParm.TypeConverter);
+                            argExpr = Serialize(value, new JsonPath(""), ctorParm.TypeConverter);
                         }
                         else
                         {
-                            argExpr = Serialize(value, "", null);
+                            argExpr = Serialize(value, new JsonPath(""), null);
                         }
                         if (value != null && value.GetType() != ctorParm.PropertyType)
                         {
@@ -234,11 +235,11 @@ namespace JsonExSerializer.Framework
                     ExpressionBase valueExpr;
                     if (prop.HasConverter)
                     {
-                        valueExpr = Serialize(value, currentPath + "." + prop.Name, prop.TypeConverter);
+                        valueExpr = Serialize(value, currentPath.Append(prop.Name), prop.TypeConverter);
                     }
                     else
                     {
-                        valueExpr = Serialize(value, currentPath + "." + prop.Name, null);
+                        valueExpr = Serialize(value, currentPath.Append(prop.Name), null);
                     }
                     if (value != null && value.GetType() != prop.PropertyType)
                     {
@@ -266,7 +267,7 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="dictionary">the dictionary object</param>
         /// <param name="currentPath">object's path</param>
-        private ExpressionBase SerializeDictionary(IDictionary dictionary, string currentPath)
+        private ExpressionBase SerializeDictionary(IDictionary dictionary, JsonPath currentPath)
         {
             Type itemType = typeof(object);
             Type genericDictionary = null;
@@ -288,7 +289,7 @@ namespace JsonExSerializer.Framework
                     //Serialize(pair.Key, subindent, "", null);
                     //may not work in all cases
                     object value = pair.Value;
-                    ExpressionBase valueExpr = Serialize(value, currentPath + "." + pair.Key.ToString(), null);
+                    ExpressionBase valueExpr = Serialize(value, currentPath.Append(pair.Key.ToString()), null);
                     if (value != null && value.GetType() != itemType)
                     {
                         valueExpr = new CastExpression(value.GetType(), valueExpr);
@@ -315,7 +316,7 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="collection">collection</param>
         /// <param name="currentPath">the object's path</param>
-        private ExpressionBase SerializeCollection(object collection, string currentPath)
+        private ExpressionBase SerializeCollection(object collection, JsonPath currentPath)
         {
             TypeHandler handler = _context.GetTypeHandler(collection.GetType());
 
@@ -333,7 +334,7 @@ namespace JsonExSerializer.Framework
             {
                 foreach (object value in collectionHandler.GetEnumerable(collection))
                 {
-                    ExpressionBase itemExpr = Serialize(value, currentPath + ".[" + index + "]", null);
+                    ExpressionBase itemExpr = Serialize(value, currentPath.Append(index), null);
                     if (value != null && value.GetType() != elemType)
                     {
                         itemExpr = new CastExpression(value.GetType(), itemExpr);
@@ -373,10 +374,10 @@ namespace JsonExSerializer.Framework
         /// </summary>
         private class ReferenceInfo
         {
-            public string Path;
+            public JsonPath Path;
             public bool CanReference = false;
 
-            public ReferenceInfo(string Path)
+            public ReferenceInfo(JsonPath Path)
             {
                 this.Path = Path;
             }

@@ -15,30 +15,50 @@ namespace JsonExSerializer.Expression
     /// </summary>
     public sealed class JsonPath 
     {
-        private Queue<string> parts;
+        private string[] parts;
+        private int head = 0;
 
+        /// <summary>
+        /// Identifier for the Root object
+        /// </summary>
         public const string Root = "this";
 
         public JsonPath()
         {
-            parts = new Queue<string>();
+            parts = new string[] { Root };
         }
 
-        public JsonPath(string partsString) : this()
+        public JsonPath(string partsString)
         {
-            string[] partsArray = partsString.Split('.');
-            foreach (string p in partsArray)
-                parts.Enqueue(p);
+            this.parts = partsString.Split(new string[] { "['", "']", "[", "]" },StringSplitOptions.RemoveEmptyEntries);
+        }
 
+        private JsonPath(string[] parts, string part)
+            : this()
+        {
+            this.parts = new string[parts.Length + 1];
+            Array.Copy(parts, this.parts, parts.Length);
+            this.parts[parts.Length] = part;
+        }
+
+        private JsonPath(string[] parts, int head)
+        {
+            this.parts = parts;
+            this.head = head;
         }
         /// <summary>
         /// Adds a part to the reference.  A part
         /// is one value between the period separators of a reference.
         /// </summary>
         /// <param name="part">the part to add</param>
-        public void AddPart(string part)
+        public JsonPath Append(string part)
         {
-            parts.Enqueue(part);
+            return new JsonPath(this.parts, part);
+        }
+
+        public JsonPath Append(int part)
+        {
+            return Append(part.ToString());
         }
 
         /// <summary>
@@ -47,7 +67,7 @@ namespace JsonExSerializer.Expression
         public string Top {
             get
             {
-                return parts.Peek();
+                return parts[head];
             }
         }
 
@@ -57,7 +77,7 @@ namespace JsonExSerializer.Expression
         public int TopAsInt {
             get
             {
-                return int.Parse(parts.Peek());
+                return int.Parse(Top);
             }
         }
 
@@ -67,26 +87,34 @@ namespace JsonExSerializer.Expression
         /// <returns>the child path</returns> 
         public JsonPath ChildReference()
         {
-            parts.Dequeue();
-            return this;
+            if (IsEmpty)
+                throw new InvalidOperationException("The Path is empty");
+            return new JsonPath(this.parts, this.head + 1);
+        }
+
+        public bool StartsWith(JsonPath value)
+        {
+            return this.ToString().StartsWith(value.ToString());
         }
 
         /// <summary>
         /// Returns true if the path is empty
         /// </summary>
         public bool IsEmpty {
-            get { return parts.Count == 0; }
+            get { return parts.Length == head; }
         }
 
         public override string ToString()
         {
-            string result = "";
-            foreach (string part in parts)
-            {
-                if (result != string.Empty)
-                    result += ".";
+            string result = Top;
 
-                result += part;
+            for (int i = head+1; i < parts.Length;i++)
+            {
+                int dummy;
+                if (int.TryParse(parts[i], out dummy))
+                    result += string.Format("[{0}]", parts[i]);
+                else
+                    result += string.Format("['{0}']", parts[i]);
             }
             return result;
         }

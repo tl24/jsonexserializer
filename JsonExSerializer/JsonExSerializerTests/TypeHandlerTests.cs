@@ -62,7 +62,7 @@ namespace JsonExSerializerTests
         {
             SerializationContext context = new SerializationContext();
             TypeHandler handler = context.GetTypeHandler(typeof(IgnoredFieldClass));
-            AbstractPropertyHandler fieldHandler = handler.FindProperty("IVal");
+            IPropertyHandler fieldHandler = handler.FindProperty("IVal");
             Assert.IsNotNull(fieldHandler, "Ignored property not found");
         }
 
@@ -71,12 +71,12 @@ namespace JsonExSerializerTests
         {
             SerializationContext context = new SerializationContext();
             TypeHandler handler = context.GetTypeHandler(typeof(SimpleObject));
-            foreach(AbstractPropertyHandler prop in handler.AllProperties)
+            foreach(IPropertyHandler prop in handler.AllProperties)
                 ;  // force properties to load
 
             handler.IgnoreProperty("IntValue");
             bool found = false;
-            foreach (AbstractPropertyHandler prop in handler.AllProperties)
+            foreach (IPropertyHandler prop in handler.AllProperties)
                 if (prop.Name == "IntValue")
                     found = true;
             Assert.IsTrue(found, "Ignored property deleted");

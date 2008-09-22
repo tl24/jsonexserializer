@@ -42,7 +42,7 @@ namespace JsonExSerializer.Expression
             return base.Construct();
         }
 
-        private Type[] GetConstructorParameterTypes(IList<AbstractPropertyHandler> ConstructorParameters)
+        private Type[] GetConstructorParameterTypes(IList<IPropertyHandler> ConstructorParameters)
         {
             Type[] types = new Type[ConstructorParameters.Count];
             for (int i = 0; i < ConstructorParameters.Count; i++)

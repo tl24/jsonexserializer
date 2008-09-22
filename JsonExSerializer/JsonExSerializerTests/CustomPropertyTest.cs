@@ -67,7 +67,7 @@ namespace JsonExSerializerTests
         {
         }
 
-        protected override void ReadProperties(out IList<AbstractPropertyHandler> Properties, out IList<AbstractPropertyHandler> ConstructorArguments)
+        protected override void ReadProperties(out IList<IPropertyHandler> Properties, out IList<IPropertyHandler> ConstructorArguments)
         {
             base.ReadProperties(out Properties, out ConstructorArguments);
             Properties.Add(new MethodPairPropertyHandler(this.ForType, "Name"));

@@ -37,7 +37,7 @@ namespace JsonExSerializer.TypeConversion
                 foreach (object key in values.Keys)
                 {
                     string stringKey = key.ToString();
-                    AbstractPropertyHandler prop = _handler.FindProperty(stringKey);
+                    IPropertyHandler prop = _handler.FindProperty(stringKey);
                     if (prop == null && !ignoreMissingProperties)
                     {
                         throw new MissingMemberException("Can't find a property for " + stringKey);

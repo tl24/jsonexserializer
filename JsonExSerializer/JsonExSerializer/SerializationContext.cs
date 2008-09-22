@@ -12,6 +12,7 @@ using JsonExSerializer.Collections;
 using JsonExSerializer.MetaData;
 using System.Collections;
 using JsonExSerializer.Framework;
+using JsonExSerializer.Framework.ObjectHandlers;
 
 namespace JsonExSerializer
 {
@@ -43,6 +44,8 @@ namespace JsonExSerializer
         private IDictionary _parameters;
 
         private List<IParsingStage> _parsingStages;
+
+        private ObjectHandlerCollection _objectHandlers;
 
         /// <summary>
         /// Set of options for handling Ignored properties encountered upon Deserialization
@@ -100,6 +103,8 @@ namespace JsonExSerializer
 
             // type conversion
             _typeHandlerFactory.RegisterTypeConverter(typeof(System.Collections.BitArray), new BitArrayConverter());
+
+            _objectHandlers = new ObjectHandlerCollection(this);
         }
 
         #endregion
@@ -342,6 +347,13 @@ namespace JsonExSerializer
             get { return _typeHandlerFactory; }
             set { _typeHandlerFactory = value; }
         }
+
+        public ObjectHandlerCollection ObjectHandlers
+        {
+            get { return _objectHandlers; }
+            set { _objectHandlers = value; }
+        }
+
         #endregion
 
         #region Ignore Properties

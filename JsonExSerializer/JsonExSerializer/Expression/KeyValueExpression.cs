@@ -96,7 +96,7 @@ namespace JsonExSerializer.Expression
         public object EvaluateObjectProperty(SerializationContext context)
         {
             // lookup info for the type
-            AbstractPropertyHandler hndlr = context.GetTypeHandler(parentResult.GetType()).FindProperty(Key);
+            IPropertyHandler hndlr = context.GetTypeHandler(parentResult.GetType()).FindProperty(Key);
             if (hndlr == null)
             {
                 throw new Exception(string.Format("Could not find property {0} for type {1}", Key, parentResult.GetType()));

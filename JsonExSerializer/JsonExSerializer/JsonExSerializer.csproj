@@ -69,6 +69,17 @@
     <Compile Include="Expression\ReferenceExpression.cs" />
     <Compile Include="Expression\JsonPath.cs" />
     <Compile Include="Framework\ExpressionWriter.cs" />
+    <Compile Include="Framework\ObjectHandlers\BooleanObjectHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\CollectionObjectHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\DictionaryObjectHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\IObjectHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\ISerializerHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\JsonObjectHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\NullObjectHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\NumericObjectHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\ObjectHandlerBase.cs" />
+    <Compile Include="Framework\ObjectHandlers\ValueObjectHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\ObjectHandlerCollection.cs" />
     <Compile Include="Framework\Visitors\ReferenceVisitor.cs" />
     <Compile Include="Expression\ValueEvaluator.cs" />
     <Compile Include="Expression\ValueExpression.cs" />
@@ -94,6 +105,7 @@
     <Compile Include="MetaData\DynamicPropertyHandler.cs" />
     <Compile Include="MetaData\DynamicTypeHandler.cs" />
     <Compile Include="MetaData\FieldHandler.cs" />
+    <Compile Include="MetaData\IPropertyHandler.cs" />
     <Compile Include="MetaData\MemberHandler.cs" />
     <Compile Include="MetaData\PropertyHandlerBase.cs" />
     <Compile Include="MetaData\TypeHandlerFactory.cs" />

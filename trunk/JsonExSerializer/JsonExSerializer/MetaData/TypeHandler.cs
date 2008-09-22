@@ -19,8 +19,8 @@ namespace JsonExSerializer.MetaData
     /// </summary>
     public class TypeHandler : MemberHandlerBase
     {
-        protected IList<AbstractPropertyHandler> _properties;
-        protected IList<AbstractPropertyHandler> _constructorArgs;
+        protected IList<IPropertyHandler> _properties;
+        protected IList<IPropertyHandler> _constructorArgs;
 
         private bool _collectionLookedUp = false;
         private CollectionHandler _collectionHandler;
@@ -46,8 +46,8 @@ namespace JsonExSerializer.MetaData
                 ReadProperties(out _properties, out _constructorArgs);
                 if (_constructorArgs.Count > 0)
                 {
-                    ((List<AbstractPropertyHandler>)_constructorArgs).Sort(
-                        new Comparison<AbstractPropertyHandler>(PropertyHandlerComparison));
+                    ((List<IPropertyHandler>)_constructorArgs).Sort(
+                        new Comparison<IPropertyHandler>(PropertyHandlerComparison));
                 }
             }
         }
@@ -57,15 +57,15 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="Properties">properties collection</param>
         /// <param name="ConstructorArguments">constructor arguments</param>
-        protected virtual void ReadProperties(out IList<AbstractPropertyHandler> Properties, out IList<AbstractPropertyHandler> ConstructorArguments)
+        protected virtual void ReadProperties(out IList<IPropertyHandler> Properties, out IList<IPropertyHandler> ConstructorArguments)
         {
-            Properties = new List<AbstractPropertyHandler>();
-            ConstructorArguments = new List<AbstractPropertyHandler>();
+            Properties = new List<IPropertyHandler>();
+            ConstructorArguments = new List<IPropertyHandler>();
 
             MemberInfo[] mInfos = ForType.GetMembers(BindingFlags.Public | BindingFlags.Instance);
             foreach (MemberInfo mInfo in mInfos)
             {
-                AbstractPropertyHandler prop = null;
+                IPropertyHandler prop = null;
                 // must be able to read and write the prop, otherwise its not 2-way 
                 if (mInfo is PropertyInfo)
                 {
@@ -104,7 +104,7 @@ namespace JsonExSerializer.MetaData
             return new FieldHandler(Field);
         }
 
-        protected int PropertyHandlerComparison(AbstractPropertyHandler a, AbstractPropertyHandler b)
+        protected int PropertyHandlerComparison(IPropertyHandler a, IPropertyHandler b)
         {
             return a.Position - b.Position;
         }
@@ -117,7 +117,7 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Get the list of constructor parameters for this type
         /// </summary>
-        public virtual IList<AbstractPropertyHandler> ConstructorParameters
+        public virtual IList<IPropertyHandler> ConstructorParameters
         {
             get
             {
@@ -134,7 +134,7 @@ namespace JsonExSerializer.MetaData
             get
             {
                 if (!_empty.HasValue)
-                    foreach (AbstractPropertyHandler prop in AllProperties)
+                    foreach (IPropertyHandler prop in AllProperties)
                     {
                         if (!prop.Ignored)
                         {
@@ -150,11 +150,11 @@ namespace JsonExSerializer.MetaData
             }
         }
 
-        public virtual IEnumerable<AbstractPropertyHandler> Properties
+        public virtual IEnumerable<IPropertyHandler> Properties
         {
             get
             {
-                foreach (AbstractPropertyHandler prop in AllProperties)
+                foreach (IPropertyHandler prop in AllProperties)
                 {
                     if (!prop.Ignored)
                         yield return prop;
@@ -165,7 +165,7 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Get the list of properties for this type
         /// </summary>
-        public virtual IEnumerable<AbstractPropertyHandler> AllProperties
+        public virtual IEnumerable<IPropertyHandler> AllProperties
         {
             get {
                 LoadProperties();
@@ -180,14 +180,14 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="Name">the name of the property</param>
         /// <returns>TypeHandlerProperty instance for the property or null if not found</returns>
-        public AbstractPropertyHandler FindProperty(string Name)
+        public IPropertyHandler FindProperty(string Name)
         {
-            foreach (AbstractPropertyHandler prop in AllProperties)
+            foreach (IPropertyHandler prop in AllProperties)
             {
                 if (prop.Name == Name)
                     return prop;
             }
-            foreach (AbstractPropertyHandler prop in ConstructorParameters)
+            foreach (IPropertyHandler prop in ConstructorParameters)
             {
                 if (prop.Name == Name)
                     return prop;
@@ -201,7 +201,7 @@ namespace JsonExSerializer.MetaData
         /// <param name="name">the name of the property</param>
         public virtual void IgnoreProperty(string name)
         {
-            AbstractPropertyHandler handler = FindProperty(name);
+            IPropertyHandler handler = FindProperty(name);
             if (handler == null)
                 throw new ArgumentException("Property " + name + " does not exist on Type " + this.ForType, "name");
             handler.Ignored = true;

@@ -13,13 +13,14 @@ using JsonExSerializer.Collections;
 using System.Reflection;
 using JsonExSerializer.MetaData;
 using JsonExSerializer.Expression;
+using JsonExSerializer.Framework.ObjectHandlers;
 
 namespace JsonExSerializer.Framework
 {
     /// <summary>
     /// Class to do the work of serializing an object
     /// </summary>
-    sealed class SerializerHelper : JsonWriter
+    sealed class SerializerHelper : JsonWriter, ISerializerHandler
     {
         private Type _serializedType;
         private SerializationContext _context;
@@ -58,14 +59,17 @@ namespace JsonExSerializer.Framework
             }
             ExpressionWriter.Write(this, _context, expr);
         }
-
+        public ExpressionBase Serialize(object o, JsonPath currentPath)
+        {
+            return Serialize(o, currentPath, null);
+        }
         /// <summary>
         /// Serialize the given object at the current indent level.  The path to the object is represented by
         /// currentPath such as "this.name", etc.  This is an internal method that can be called recursively.
         /// </summary>
         /// <param name="o">the object to serialize</param>
         /// <param name="currentPath">the current path for reference writing</param>
-        private ExpressionBase Serialize(object o, JsonPath currentPath, IJsonTypeConverter converter)
+        public ExpressionBase Serialize(object o, JsonPath currentPath, IJsonTypeConverter converter)
         {
             if (o == null)
             {
@@ -79,8 +83,7 @@ namespace JsonExSerializer.Framework
                     case TypeCode.Char:
                     case TypeCode.String:
                     case TypeCode.DateTime:
-                        return new ValueExpression(o);
-                        break;
+                        return SerializeValue(o, currentPath);
                     case TypeCode.Byte:
                     case TypeCode.Int16:
                     case TypeCode.Int32:
@@ -92,11 +95,9 @@ namespace JsonExSerializer.Framework
                     case TypeCode.Single:
                     case TypeCode.UInt64:
                     case TypeCode.Decimal:
-                        return new NumericExpression(o);
-                        break;
+                        return SerializeNumber(o, currentPath);
                     case TypeCode.Boolean:
-                        return new BooleanExpression((bool)o);
-                        break;
+                        return SerializeBoolean(o, currentPath);
                     case TypeCode.Empty:
                         throw new ApplicationException("Unsupported value (Empty): " + o);
                     case TypeCode.Object:
@@ -156,203 +157,40 @@ namespace JsonExSerializer.Framework
                             refInfo.CanReference = true;    // can't reference inside the object
                             return expr;
                         }
-                        
-                        if (handler.IsCollection())
-                        {
-                            return SerializeCollection(o, currentPath);
-                        }
-                        else if (o is ICollection && !(o is IDictionary))
-                        {
-                            throw new InvalidOperationException(o.GetType() + " is a collection but doesn't have a CollectionHandler");
-                        }
-                        else
+
+                        if (o is ISerializationCallback)
+                            ((ISerializationCallback)o).OnBeforeSerialization();
+
+                        try
                         {
                             refInfo.CanReference = true;    // regular object, can reference at any time
-                            return SerializeObject(o, currentPath);
+                            IObjectHandler objHandler = _context.ObjectHandlers.GetHandler(o);
+                            return objHandler.GetExpression(o, currentPath, this);
                         }
-                        break;
+                        finally
+                        {
+                            if (o is ISerializationCallback)
+                                ((ISerializationCallback)o).OnAfterSerialization();
+                        }
                     default:
                         return new ValueExpression(Convert.ToString(o));
-                        break;
                 }
             }
         }
 
-        /// <summary>
-        /// Serialize a non-primitive non-scalar object.  Will use the
-        /// following notation:
-        /// <c>
-        ///  { prop1: "value1", prop2: "value2" }
-        /// </c>
-        /// </summary>
-        /// <param name="o">the object to serialize</param>
-        /// <param name="currentPath">object's path</param>
-        private ExpressionBase SerializeObject(object obj, JsonPath currentPath)
+        private ExpressionBase SerializeBoolean(object o, JsonPath CurrentPath)
         {
-            if (obj is IDictionary)
-            {
-                return SerializeDictionary((IDictionary) obj, currentPath);
-            }
-
-            TypeHandler handler = _context.GetTypeHandler(obj.GetType());
-            
-            if (obj is ISerializationCallback)
-            {
-                ((ISerializationCallback)obj).OnBeforeSerialization();
-            }
-
-            ObjectExpression expression = new ObjectExpression();
-            try
-            {
-                if (handler.ConstructorParameters.Count > 0)
-                {
-                    expression.ResultType = obj.GetType();
-                    foreach (AbstractPropertyHandler ctorParm in handler.ConstructorParameters)
-                    {
-                        object value = ctorParm.GetValue(obj);
-                        ExpressionBase argExpr;
-                        // TODO: Improve reference support when constructor arguments are refactored
-                        if (ctorParm.HasConverter)
-                        {
-                            argExpr = Serialize(value, new JsonPath(""), ctorParm.TypeConverter);
-                        }
-                        else
-                        {
-                            argExpr = Serialize(value, new JsonPath(""), null);
-                        }
-                        if (value != null && value.GetType() != ctorParm.PropertyType)
-                        {
-                            argExpr = new CastExpression(value.GetType(), argExpr);
-                        }
-                        expression.ConstructorArguments.Add(argExpr);
-                    }
-                }
-
-
-                foreach (AbstractPropertyHandler prop in handler.Properties)
-                {
-                    object value = prop.GetValue(obj);
-                    ExpressionBase valueExpr;
-                    if (prop.HasConverter)
-                    {
-                        valueExpr = Serialize(value, currentPath.Append(prop.Name), prop.TypeConverter);
-                    }
-                    else
-                    {
-                        valueExpr = Serialize(value, currentPath.Append(prop.Name), null);
-                    }
-                    if (value != null && value.GetType() != prop.PropertyType)
-                    {
-                        valueExpr = new CastExpression(value.GetType(), valueExpr);
-                    }
-                    expression.Add(prop.Name, valueExpr);
-                }
-                return expression;
-            }
-            finally
-            {
-                // make sure this is in a finally block in case the ISerializationCallback interface
-                // is used to control thread locks
-                if (obj is ISerializationCallback)
-                {
-                    ((ISerializationCallback)obj).OnAfterSerialization();
-                }
-            }
-            
+            return _context.ObjectHandlers.BooleanHandler.GetExpression(o, CurrentPath, this);
         }
 
-        /// <summary>
-        /// Serialize an object implementing IDictionary.  The serialized data is similar to a regular
-        /// object, except that the keys of the dictionary are used instead of properties.
-        /// </summary>
-        /// <param name="dictionary">the dictionary object</param>
-        /// <param name="currentPath">object's path</param>
-        private ExpressionBase SerializeDictionary(IDictionary dictionary, JsonPath currentPath)
+        private ExpressionBase SerializeValue(object o, JsonPath CurrentPath)
         {
-            Type itemType = typeof(object);
-            Type genericDictionary = null;
-
-            if ((genericDictionary = dictionary.GetType().GetInterface(typeof(IDictionary<,>).Name)) != null)
-            {
-                itemType = genericDictionary.GetGenericArguments()[1];
-            }
-
-            if (dictionary is ISerializationCallback)
-            {
-                ((ISerializationCallback)dictionary).OnBeforeSerialization();
-            }
-            ObjectExpression expression = new ObjectExpression();
-            try
-            {
-                foreach (DictionaryEntry pair in dictionary)
-                {
-                    //Serialize(pair.Key, subindent, "", null);
-                    //may not work in all cases
-                    object value = pair.Value;
-                    ExpressionBase valueExpr = Serialize(value, currentPath.Append(pair.Key.ToString()), null);
-                    if (value != null && value.GetType() != itemType)
-                    {
-                        valueExpr = new CastExpression(value.GetType(), valueExpr);
-                    }
-                    expression.Add(pair.Key.ToString(), valueExpr);
-                }
-                return expression;
-            }
-            finally
-            {
-                // make sure this is in a finally block in case the ISerializationCallback interface
-                // is used to control thread locks
-                if (dictionary is ISerializationCallback)
-                {
-                    ((ISerializationCallback)dictionary).OnAfterSerialization();
-                }
-            }
-            
+            return _context.ObjectHandlers.ValueHandler.GetExpression(o, CurrentPath, this);
         }
 
-        /// <summary>
-        /// Serialize an object that acts like a collection.
-        /// The syntax will be: [item1, item2, item3]
-        /// </summary>
-        /// <param name="collection">collection</param>
-        /// <param name="currentPath">the object's path</param>
-        private ExpressionBase SerializeCollection(object collection, JsonPath currentPath)
+        private ExpressionBase SerializeNumber(object o, JsonPath CurrentPath)
         {
-            TypeHandler handler = _context.GetTypeHandler(collection.GetType());
-
-            CollectionHandler collectionHandler = handler.GetCollectionHandler();
-            Type elemType = collectionHandler.GetItemType(handler.ForType);
-
-            int index = 0;
-
-            if (collection is ISerializationCallback)
-            {
-                ((ISerializationCallback)collection).OnBeforeSerialization();
-            }
-            ListExpression expression = new ListExpression();
-            try
-            {
-                foreach (object value in collectionHandler.GetEnumerable(collection))
-                {
-                    ExpressionBase itemExpr = Serialize(value, currentPath.Append(index), null);
-                    if (value != null && value.GetType() != elemType)
-                    {
-                        itemExpr = new CastExpression(value.GetType(), itemExpr);
-                    }
-                    expression.Add(itemExpr);
-                    index++;
-                }
-                return expression;
-            }
-            finally
-            {
-                // make sure this is in a finally block in case the ISerializationCallback interface
-                // is used to control thread locks
-                if (collection is ISerializationCallback)
-                {
-                    ((ISerializationCallback)collection).OnAfterSerialization();
-                }
-            }
+            return _context.ObjectHandlers.NumericHandler.GetExpression(o, CurrentPath, this);
         }
 
         /// <summary>
@@ -382,5 +220,6 @@ namespace JsonExSerializer.Framework
                 this.Path = Path;
             }
         }
+
     }
 }

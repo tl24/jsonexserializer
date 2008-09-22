@@ -7,7 +7,7 @@ namespace JsonExSerializer.MetaData
     /// <summary>
     /// Base Implementation of an object property
     /// </summary>
-    public abstract class AbstractPropertyHandler : MemberHandlerBase
+    public abstract class AbstractPropertyHandler : MemberHandlerBase, IPropertyHandler
     {
         protected bool _ignored = false;
         protected int _position = -1;

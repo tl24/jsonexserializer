@@ -78,7 +78,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return expression;
         }
 
-        public override bool CanHandle(object Data)
+        public override bool CanHandle(Type ObjectType)
         {
             return true;
         }

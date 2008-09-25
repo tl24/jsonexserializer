@@ -18,9 +18,9 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         {
         }
 
-        public override bool CanHandle(object Data)
+        public override bool CanHandle(Type ObjectType)
         {
-            return Context.TypeHandlerFactory[Data.GetType()].IsCollection();
+            return Context.TypeHandlerFactory[ObjectType].IsCollection();
         }
 
         public override ExpressionBase GetExpression(object Data, JsonPath CurrentPath, ISerializerHandler Serializer)

@@ -21,9 +21,9 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return new NumericExpression(data);
         }
 
-        public override bool CanHandle(object Data)
+        public override bool CanHandle(Type ObjectType)
         {
-            switch (Type.GetTypeCode(Data.GetType()))
+            switch (Type.GetTypeCode(ObjectType))
             {
                 case TypeCode.Byte:
                 case TypeCode.Int16:

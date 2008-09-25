@@ -20,18 +20,16 @@ namespace JsonExSerializer.Collections
         public override bool IsCollection(Type collectionType)
         {
             // Implements ICollection and has a constructor that takes a single element of type ICollection
-            Type ienumGeneric = collectionType.GetInterface(typeof(IEnumerable<>).Name);
             if ((typeof(ICollection).IsAssignableFrom(collectionType)
-                 || ienumGeneric != null)
-                && (collectionType.GetConstructor(new Type[] { typeof(ICollection) }) != null)
-                    || (ienumGeneric != null && collectionType.GetConstructor(new Type[] { ienumGeneric }) != null))
-            {
+                && (collectionType.GetConstructor(new Type[] { typeof(ICollection) }) != null)))
                 return true;
-            }
+
+
+            Type ienumGeneric = collectionType.GetInterface(typeof(IEnumerable<>).Name);
+            if (ienumGeneric != null && collectionType.GetConstructor(new Type[] { ienumGeneric }) != null)
+                return true;
             else
-            {
                 return false;
-            }
         }
 
         public override ICollectionBuilder ConstructBuilder(Type collectionType, int itemCount)

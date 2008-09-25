@@ -23,9 +23,11 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         }
 
 
-        public override bool CanHandle(object Data)
+        public override bool CanHandle(Type ObjectType)
         {
-            return ((Data is string) || (Data is char) || (Data is DateTime));
+            return (typeof(string).IsAssignableFrom(ObjectType)
+                || typeof(char).IsAssignableFrom(ObjectType)
+                || typeof(DateTime).IsAssignableFrom(ObjectType));
         }
     }
 }

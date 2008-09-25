@@ -49,7 +49,7 @@ namespace JsonExSerializerTests
         }
 
         [Test]
-        [ExpectedException(typeof(JsonExSerializationException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void CircularReferenceError()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
@@ -60,7 +60,7 @@ namespace JsonExSerializerTests
 
 
         [Test]
-        [ExpectedException(typeof(JsonExSerializationException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void DeepCircularReferenceError()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));

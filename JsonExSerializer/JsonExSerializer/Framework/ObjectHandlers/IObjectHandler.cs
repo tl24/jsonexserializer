@@ -8,6 +8,6 @@ namespace JsonExSerializer.Framework.ObjectHandlers
     public interface IObjectHandler
     {
         ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer);
-        bool CanHandle(object Data);
+        bool CanHandle(Type ObjectType);
     }
 }

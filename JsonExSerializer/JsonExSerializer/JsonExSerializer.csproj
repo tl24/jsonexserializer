@@ -78,6 +78,7 @@
     <Compile Include="Framework\ObjectHandlers\NullObjectHandler.cs" />
     <Compile Include="Framework\ObjectHandlers\NumericObjectHandler.cs" />
     <Compile Include="Framework\ObjectHandlers\ObjectHandlerBase.cs" />
+    <Compile Include="Framework\ObjectHandlers\TypeConverterObjectHandler.cs" />
     <Compile Include="Framework\ObjectHandlers\ValueObjectHandler.cs" />
     <Compile Include="Framework\ObjectHandlers\ObjectHandlerCollection.cs" />
     <Compile Include="Framework\Visitors\ReferenceVisitor.cs" />

@@ -39,143 +39,134 @@ namespace JsonExSerializer.Framework
         /// <summary>
         /// Serialize the given object
         /// </summary>
-        /// <param name="o">object to serialize</param>
-        public void Serialize(object o)
+        /// <param name="value">object to serialize</param>
+        public void Serialize(object value)
         {
-            if (o != null && _context.OutputTypeComment)
+            if (value != null && _context.OutputTypeComment)
             {
                 string comment = "";
                 comment += "/*" + "\r\n";
                 comment += "  Created by JsonExSerializer" + "\r\n";
-                comment += "  Assembly: " + o.GetType().Assembly.ToString() + "\r\n";
-                comment += "  Type: " + o.GetType().FullName + "\r\n";
+                comment += "  Assembly: " + value.GetType().Assembly.ToString() + "\r\n";
+                comment += "  Type: " + value.GetType().FullName + "\r\n";
                 comment += "*/" + "\r\n";
                 this.Comment(comment);
             }
-            ExpressionBase expr = Serialize(o, new JsonPath(), null);
-            if (o != null && o.GetType() != _serializedType)
+            ExpressionBase expr = Serialize(value, new JsonPath(), null);
+            if (value != null && value.GetType() != _serializedType)
             {
-                expr = new CastExpression(o.GetType(), expr);
+                expr = new CastExpression(value.GetType(), expr);
             }
             ExpressionWriter.Write(this, _context, expr);
         }
-        public ExpressionBase Serialize(object o, JsonPath currentPath)
+
+        public ExpressionBase Serialize(object value, JsonPath currentPath)
         {
-            return Serialize(o, currentPath, null);
+            return Serialize(value, currentPath, null);
         }
         /// <summary>
         /// Serialize the given object at the current indent level.  The path to the object is represented by
         /// currentPath such as "this.name", etc.  This is an internal method that can be called recursively.
         /// </summary>
-        /// <param name="o">the object to serialize</param>
+        /// <param name="value">the object to serialize</param>
         /// <param name="currentPath">the current path for reference writing</param>
-        public ExpressionBase Serialize(object o, JsonPath currentPath, IJsonTypeConverter converter)
+        public ExpressionBase Serialize(object value, JsonPath currentPath, IJsonTypeConverter converter)
         {
-            if (o == null)
+            if (value == null)
             {
                 return new NullExpression();
             }
             else
             {
-                // Get the typecode and call the approriate method
-                switch (Type.GetTypeCode(o.GetType()))
+
+                ExpressionBase expr = HandleReference(value, currentPath);
+                if (expr != null)
+                    return expr;
+
+                if (value is ISerializationCallback)
+                    ((ISerializationCallback)value).OnBeforeSerialization();
+
+                try
                 {
-                    case TypeCode.Char:
-                    case TypeCode.String:
-                    case TypeCode.DateTime:
-                        return SerializeValue(o, currentPath);
-                    case TypeCode.Byte:
-                    case TypeCode.Int16:
-                    case TypeCode.Int32:
-                    case TypeCode.Int64:
-                    case TypeCode.SByte:
-                    case TypeCode.UInt16:
-                    case TypeCode.UInt32:
-                    case TypeCode.Double:
-                    case TypeCode.Single:
-                    case TypeCode.UInt64:
-                    case TypeCode.Decimal:
-                        return SerializeNumber(o, currentPath);
-                    case TypeCode.Boolean:
-                        return SerializeBoolean(o, currentPath);
-                    case TypeCode.Empty:
-                        throw new ApplicationException("Unsupported value (Empty): " + o);
-                    case TypeCode.Object:
-                        ReferenceInfo refInfo = null;
-
-                        if (_refs.ContainsKey(o))
-                        {
-                            /*
-                             * This object has already been seen by the serializer so
-                             * determine what to do with it.  If its part of the current path
-                             * then its a circular reference and an error needs to be thrown or it should
-                             * be ignored depending on the option. Otherwise write a reference to it
-                             */ 
-                            refInfo = _refs[o];
-                            JsonPath refPath = refInfo.Path;
-                            switch (_context.ReferenceWritingType)
-                            {
-                                case SerializationContext.ReferenceOption.WriteIdentifier:
-                                    if (!refInfo.CanReference)
-                                        throw new JsonExSerializationException("Can't reference object: " + refPath + " from " + currentPath + ", either it is a collection, or it has not been converted yet");
-
-                                    return new ReferenceExpression(refPath);
-                                case SerializationContext.ReferenceOption.IgnoreCircularReferences:
-                                    if (currentPath.StartsWith(refPath))
-                                    {
-                                        return new NullExpression();
-                                    }
-                                    break;
-                                case SerializationContext.ReferenceOption.ErrorCircularReferences:
-                                    if (currentPath.StartsWith(refPath))
-                                    {
-                                        throw new JsonExSerializationException("Circular reference detected.  Current path: " + currentPath + ", reference to: " + refPath);
-                                    }
-                                    break;
-                            }
-                        } else {
-                            refInfo = new ReferenceInfo(currentPath);
-                            _refs[o] = refInfo;
-                        }
-                        TypeHandler handler = _context.GetTypeHandler(o.GetType());
-
-                        // Check for a converter and convert
-                        if (converter != null || handler.HasConverter)
-                        {
-                            converter = (converter != null) ? converter : handler.TypeConverter;
-                            o = converter.ConvertFrom(o, _context);
-                            // call serialize again in case the new type has a converter
-                            ExpressionBase expr = Serialize(o, currentPath, null);
-                            refInfo.CanReference = true;    // can't reference inside the object
-                            return expr;
-                        }
-                        else if (o is IJsonTypeConverter)
-                        {
-                            o = ((IJsonTypeConverter)o).ConvertFrom(o, _context);
-                            // call serialize again in case the new type has a converter
-                            ExpressionBase expr = Serialize(o, currentPath, null);
-                            refInfo.CanReference = true;    // can't reference inside the object
-                            return expr;
-                        }
-
-                        if (o is ISerializationCallback)
-                            ((ISerializationCallback)o).OnBeforeSerialization();
-
-                        try
-                        {
-                            refInfo.CanReference = true;    // regular object, can reference at any time
-                            IObjectHandler objHandler = _context.ObjectHandlers.GetHandler(o);
-                            return objHandler.GetExpression(o, currentPath, this);
-                        }
-                        finally
-                        {
-                            if (o is ISerializationCallback)
-                                ((ISerializationCallback)o).OnAfterSerialization();
-                        }
-                    default:
-                        return new ValueExpression(Convert.ToString(o));
+                    //TODO: this is too early for converters
+                    SetCanReference(value);    // regular object, can reference at any time
+                    IObjectHandler objHandler;
+                    if (converter != null)
+                    {
+                        TypeConverterObjectHandler converterHandler = (TypeConverterObjectHandler)_context.ObjectHandlers.Find(typeof(TypeConverterObjectHandler));
+                        //TODO: make sure it exists
+                        return converterHandler.GetExpression(value, converter, currentPath, this);
+                    }
+                    objHandler = _context.ObjectHandlers.GetHandler(value);
+                    return objHandler.GetExpression(value, currentPath, this);
+                }
+                finally
+                {
+                    if (value is ISerializationCallback)
+                        ((ISerializationCallback)value).OnAfterSerialization();
                 }
             }
+        }
+
+        public ExpressionBase HandleReference(object value, JsonPath CurrentPath)
+        {
+            if (!value.GetType().IsClass)
+                return null;
+
+            ReferenceInfo refInfo = null;
+            if (_refs.ContainsKey(value))
+            {
+                /*
+                 * This object has already been seen by the serializer so
+                 * determine what to do with it.  If its part of the current path
+                 * then its a circular reference and an error needs to be thrown or it should
+                 * be ignored depending on the option. Otherwise write a reference to it
+                 */
+                refInfo = _refs[value];
+                JsonPath refPath = refInfo.Path;
+                switch (_context.ReferenceWritingType)
+                {
+                    case SerializationContext.ReferenceOption.WriteIdentifier:
+                        if (!refInfo.CanReference)
+                            throw new InvalidOperationException("Can't reference object: " + refPath + " from " + CurrentPath + ", either it is a collection, or it has not been converted yet");
+
+                        return new ReferenceExpression(refPath);
+                    case SerializationContext.ReferenceOption.IgnoreCircularReferences:
+                        if (CurrentPath.StartsWith(refPath))
+                        {
+                            return new NullExpression();
+                        }
+                        break;
+                    case SerializationContext.ReferenceOption.ErrorCircularReferences:
+                        if (CurrentPath.StartsWith(refPath))
+                        {
+                            throw new InvalidOperationException("Circular reference detected.  Current path: " + CurrentPath + ", reference to: " + refPath);
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                refInfo = new ReferenceInfo(CurrentPath);
+                _refs[value] = refInfo;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Indicates that the object can now be referenced.  Any attempts to build a reference to the current object before
+        /// this method is called will result in an exception.
+        /// </summary>
+        /// <param name="value">the object being referenced</param>
+        public void SetCanReference(object value) {
+            if (!value.GetType().IsClass)
+                return;
+
+            ReferenceInfo refInfo;
+            if (!_refs.TryGetValue(value, out refInfo))
+                throw new ArgumentException(string.Format("No reference information available for {0}.  HandleReference must be called before calling SetCanReference", value), "value");
+
+            refInfo.CanReference = true;
         }
 
         private ExpressionBase SerializeBoolean(object o, JsonPath CurrentPath)

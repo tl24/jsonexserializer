@@ -13,16 +13,22 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         private IObjectHandler _nullHandler;
         private IObjectHandler _defaultHandler;
         private SerializationContext _context;
-
+        private Dictionary<Type, IObjectHandler> _cache = new Dictionary<Type, IObjectHandler>();
         public ObjectHandlerCollection(SerializationContext Context)
         {
             _context = Context;
-            _valueHandler = new ValueObjectHandler(Context);
-            _numericHandler = new NumericObjectHandler(Context);
-            _booleanHandler = new BooleanObjectHandler(Context);
+            //_valueHandler = new ValueObjectHandler(Context);
+            //_numericHandler = new NumericObjectHandler(Context);
+            //_booleanHandler = new BooleanObjectHandler(Context);
+
+            Add(new NumericObjectHandler(Context));
+            Add(new BooleanObjectHandler(Context));
+            Add(new ValueObjectHandler(Context));
+
             _defaultHandler = new JsonObjectHandler(Context);
-            this.InnerList.Add(new CollectionObjectHandler(Context));
-            this.InnerList.Add(new DictionaryObjectHandler(Context));
+            Add(new TypeConverterObjectHandler(Context));
+            Add(new CollectionObjectHandler(Context));
+            Add(new DictionaryObjectHandler(Context));
         }
 
         public IObjectHandler ValueHandler
@@ -61,15 +67,28 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             set { this._context = value; }
         }
 
+        public void Add(IObjectHandler Handler)
+        {
+            this.InnerList.Add(Handler);
+        }
+
+        public IObjectHandler Find(Type HandlerType)
+        {
+            foreach (IObjectHandler handler in this)
+                if (handler.GetType() == HandlerType)
+                    return handler;
+            return null;
+        }
+
         public IObjectHandler GetHandler(object Data)
         {
             if (Data == null)
                 return NullHandler;
 
+            Type dataType = Data.GetType();
             foreach (IObjectHandler handler in this)
-                if (handler.CanHandle(Data))
+                if (handler.CanHandle(dataType))
                     return handler;
-
             return DefaultHandler;
         }
     }

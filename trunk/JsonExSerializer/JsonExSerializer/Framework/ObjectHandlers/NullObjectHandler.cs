@@ -12,9 +12,9 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return new NullExpression();
         }
 
-        public override bool CanHandle(object Data)
+        public override bool CanHandle(Type ObjectType)
         {
-            return Data == null;
+            return true;
         }
     }
 }

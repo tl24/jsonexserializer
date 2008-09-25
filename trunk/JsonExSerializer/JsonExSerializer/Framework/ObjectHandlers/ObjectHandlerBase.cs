@@ -27,6 +27,6 @@ namespace JsonExSerializer.Framework.ObjectHandlers
 
         public abstract ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer);
 
-        public abstract bool CanHandle(object Data);
+        public abstract bool CanHandle(Type ObjectType);
     }
 }

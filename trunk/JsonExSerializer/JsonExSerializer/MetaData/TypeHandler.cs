@@ -296,6 +296,7 @@ namespace JsonExSerializer.MetaData
             IJsonTypeConverter converter = CreateTypeConverter(ForType);
             if (converter == null)
                 return TypeConverterAdapter.GetAdapter(ForType);
+                //return null;
             else
                 return converter;
         }

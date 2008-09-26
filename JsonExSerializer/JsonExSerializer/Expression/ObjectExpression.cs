@@ -13,7 +13,6 @@ namespace JsonExSerializer.Expression
     /// <summary>
     /// Represents a javascript object
     /// </summary>
-    [DefaultEvaluator(typeof(ObjectEvaluator))]
     public sealed class ObjectExpression : ComplexExpressionBase {
 
         private IList<KeyValueExpression> _properties;
@@ -26,6 +25,11 @@ namespace JsonExSerializer.Expression
             _properties = new List<KeyValueExpression>();
             this.ObjectConstructed += new EventHandler<ObjectConstructedEventArgs>(ObjectExpression_ObjectConstructed);
             _resultType = typeof(Hashtable);
+        }
+
+        public override Type DefaultType
+        {
+            get { return typeof(Hashtable); }
         }
 
         void ObjectExpression_ObjectConstructed(object sender, ObjectConstructedEventArgs e)

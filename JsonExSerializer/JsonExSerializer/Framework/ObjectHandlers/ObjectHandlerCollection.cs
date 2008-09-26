@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using JsonExSerializer.Expression;
 
 namespace JsonExSerializer.Framework.ObjectHandlers
 {
     public class ObjectHandlerCollection : CollectionBase, IContextAware
     {
-        private IObjectHandler _valueHandler;
-        private IObjectHandler _numericHandler;
-        private IObjectHandler _booleanHandler;
         private IObjectHandler _nullHandler;
         private IObjectHandler _defaultHandler;
         private SerializationContext _context;
@@ -17,37 +15,20 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         public ObjectHandlerCollection(SerializationContext Context)
         {
             _context = Context;
-            //_valueHandler = new ValueObjectHandler(Context);
-            //_numericHandler = new NumericObjectHandler(Context);
-            //_booleanHandler = new BooleanObjectHandler(Context);
 
             Add(new NumericObjectHandler(Context));
             Add(new BooleanObjectHandler(Context));
             Add(new ValueObjectHandler(Context));
-
-            _defaultHandler = new JsonObjectHandler(Context);
             Add(new TypeConverterObjectHandler(Context));
             Add(new CollectionObjectHandler(Context));
             Add(new DictionaryObjectHandler(Context));
+            _nullHandler = new NullObjectHandler();
+            Add(_nullHandler);
+            Add(new CastObjectHandler(Context));
+            Add(new ReferenceObjectHandler(Context));
+            _defaultHandler = new JsonObjectHandler(Context);
         }
 
-        public IObjectHandler ValueHandler
-        {
-            get { return this._valueHandler; }
-            set { this._valueHandler = value; }
-        }
-
-        public IObjectHandler NumericHandler
-        {
-            get { return this._numericHandler; }
-            set { this._numericHandler = value; }
-        }
-
-        public IObjectHandler BooleanHandler
-        {
-            get { return this._booleanHandler; }
-            set { this._booleanHandler = value; }
-        }
 
         public IObjectHandler DefaultHandler
         {
@@ -80,12 +61,36 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return null;
         }
 
+        /// <summary>
+        /// Retrieves a handler that can serialize the specified object
+        /// </summary>
+        /// <param name="Data"></param>
+        /// <returns></returns>
         public IObjectHandler GetHandler(object Data)
         {
             if (Data == null)
                 return NullHandler;
 
             Type dataType = Data.GetType();
+            return GetHandler(dataType);
+        }
+
+        /// <summary>
+        /// Get a handler based on Expression type
+        /// </summary>
+        public IObjectHandler GetHandler(ExpressionBase Expression)
+        {
+            foreach (IObjectHandler handler in this)
+                if (handler.CanHandle(Expression))
+                    return handler;
+            return GetHandler(Expression.ResultType);
+        }
+
+        /// <summary>
+        /// Get a handler based on data type
+        /// </summary>
+        public IObjectHandler GetHandler(Type dataType)
+        {
             foreach (IObjectHandler handler in this)
                 if (handler.CanHandle(dataType))
                     return handler;

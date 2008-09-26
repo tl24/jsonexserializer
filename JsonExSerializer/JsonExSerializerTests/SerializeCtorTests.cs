@@ -5,6 +5,7 @@ using MbUnit.Framework;
 using JsonExSerializerTests.Mocks;
 using JsonExSerializer;
 using JsonExSerializer.Expression;
+using JsonExSerializer.Framework;
 
 namespace JsonExSerializerTests
 {
@@ -53,10 +54,12 @@ namespace JsonExSerializerTests
             Type[] argTypes = resolver.ResolveTypes();
             CollectionAssert.AreElementsEqual(new Type[] { typeof(int), typeof(MyObject2) }, argTypes);
 
+            Parser parser = new Parser(typeof(CtorMock2), (TokenStream) null, s.Context);
+            
             // Try to construct
             IDExpr.ResultType = typeof(int);
             objExpr.ResultType = typeof(MyObject2);
-            object result = expr.Evaluate(s.Context);
+            object result = parser.Evaluate(expr);
         }
     }
 

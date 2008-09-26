@@ -21,7 +21,6 @@ namespace JsonExSerializer.Expression
     public sealed class KeyValueExpression : ExpressionBase {
         private ExpressionBase _keyExpression;
         private ExpressionBase _valueExpression;
-        private object parentResult;
 
         public KeyValueExpression(ExpressionBase key, ExpressionBase value)
         {
@@ -50,100 +49,9 @@ namespace JsonExSerializer.Expression
             set { this._valueExpression = value; }
         }
 
-        public override ExpressionBase Parent
+        public override Type DefaultType
         {
-            get
-            {
-                return base.Parent;
-            }
-            set
-            {
-                base.Parent = value;
-                value.ObjectConstructed += new EventHandler<ObjectConstructedEventArgs>(parent_ObjectConstructed);
-            }
-        }
-
-        void parent_ObjectConstructed(object sender, ObjectConstructedEventArgs e)
-        {
-            parentResult = e.Result;
-        }
-
-        public override object Evaluate(SerializationContext context)
-        {
-            if (parentResult == null)
-                throw new InvalidOperationException("Unabled to evaluate expression, parent object has not been evaluated yet");
-            if (((ObjectExpression)Parent).IsDictionary)
-            {
-                return EvaluateDictionaryItem(context);
-            }
-            else
-            {
-                return EvaluateObjectProperty(context);
-            }
-        }
-
-        public object EvaluateDictionaryItem(SerializationContext context)
-        {
-            // if no type set, set one
-            KeyExpression.ResultType = ((ObjectExpression)Parent).DictionaryKeyType;
-            ValueExpression.ResultType = ((ObjectExpression)Parent).DictionaryValueType;
-            object keyObject = KeyExpression.Evaluate(context);
-            object result = ValueExpression.Evaluate(context);
-            ((IDictionary)parentResult)[keyObject] = result;
-            return result;
-        }
-
-        public object EvaluateObjectProperty(SerializationContext context)
-        {
-            // lookup info for the type
-            IPropertyHandler hndlr = context.GetTypeHandler(parentResult.GetType()).FindProperty(Key);
-            if (hndlr == null)
-            {
-                throw new Exception(string.Format("Could not find property {0} for type {1}", Key, parentResult.GetType()));
-            }
-            if (hndlr.Ignored)
-            {
-                switch (context.IgnoredPropertyAction)
-                {
-                    case SerializationContext.IgnoredPropertyOption.Ignore:
-                        return null;
-                    case SerializationContext.IgnoredPropertyOption.SetIfPossible:
-                        if (!hndlr.CanWrite)
-                            return null;
-                        break;
-                    case SerializationContext.IgnoredPropertyOption.ThrowException:
-                        throw new Exception(string.Format("Can not set property {0} for type {1} because it is ignored and IgnorePropertyAction is set to ThrowException", Key, parentResult.GetType()));
-                }
-            }
-            ValueExpression.ResultType = hndlr.PropertyType;
-            if (hndlr.HasConverter)
-            {
-                // find the converter and set it for the property
-                IJsonTypeConverter converter = hndlr.TypeConverter;
-                IEvaluator defaultEvaluator = EvaluatorFactory.GetEvaluator(ValueExpression, context);
-                if (defaultEvaluator is ConverterEvaluator)
-                {
-                    // override the type converter with the property converter
-                    defaultEvaluator = ((ConverterEvaluator)defaultEvaluator).DefaultEvaluator;
-                }
-                ConverterEvaluator evaluator = new ConverterEvaluator(ValueExpression, defaultEvaluator, converter);
-                evaluator.Context = context;
-                ValueExpression.Evaluator = evaluator;
-            }
-            object result = null;
-            if (!hndlr.CanWrite)
-            {
-                result = hndlr.GetValue(parentResult);
-                ValueExpression.GetEvaluator(context).SetResult(result);
-                ValueExpression.OnObjectConstructed(result);
-                ValueExpression.Evaluate(context);
-            }
-            else
-            {
-                result = ValueExpression.Evaluate(context);
-                hndlr.SetValue(parentResult, result);
-            }
-            return result;
+            get { return typeof(object); }
         }
 
     } 

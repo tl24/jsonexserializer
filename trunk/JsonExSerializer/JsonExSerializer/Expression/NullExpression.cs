@@ -11,9 +11,10 @@ namespace JsonExSerializer.Expression
 {
     sealed class NullExpression : ExpressionBase
     {
-        public override object Evaluate(SerializationContext context)
+
+        public override Type DefaultType
         {
-            return null;
+            get { return typeof(object); }
         }
     }
 }

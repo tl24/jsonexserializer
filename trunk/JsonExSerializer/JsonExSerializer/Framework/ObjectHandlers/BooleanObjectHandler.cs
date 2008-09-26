@@ -5,7 +5,7 @@ using JsonExSerializer.Expression;
 
 namespace JsonExSerializer.Framework.ObjectHandlers
 {
-    public class BooleanObjectHandler : ObjectHandlerBase
+    public class BooleanObjectHandler : ValueObjectHandler
     {
         public BooleanObjectHandler()
         {

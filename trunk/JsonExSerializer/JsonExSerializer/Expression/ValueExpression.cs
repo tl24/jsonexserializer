@@ -12,7 +12,6 @@ namespace JsonExSerializer.Expression
     /// <summary>
     /// Value types such as string, bool, or number
     /// </summary>
-    [DefaultEvaluator(typeof(ValueEvaluator))]
     public class ValueExpression: ExpressionBase
     {
         private object _value;
@@ -35,12 +34,16 @@ namespace JsonExSerializer.Expression
         {
             get { return (this._value ?? string.Empty).ToString(); }
         }
+
+        public override Type DefaultType
+        {
+            get { return typeof(string); }
+        }
     }
 
     /// <summary>
     /// distinguished types for evaluator purposes
     /// </summary>
-    [DefaultEvaluator(typeof(NumericEvaluator))]
     public sealed class NumericExpression : ValueExpression
     {
         public NumericExpression(object value)
@@ -61,17 +64,35 @@ namespace JsonExSerializer.Expression
 
             }
         }
+
+        public override Type DefaultType
+        {
+            get
+            {
+                if (StringValue.Contains("."))
+                    return typeof(double);
+                else
+                    return typeof(long);
+            }
+        }
     }
 
     /// <summary>
     /// distinguished types for evaluator purposes
     /// </summary>
-    [DefaultEvaluator(typeof(BooleanEvaluator))]
     public sealed class BooleanExpression : ValueExpression
     {
         public BooleanExpression(object value)
             : base(value)
         {
+        }
+
+        public override Type DefaultType
+        {
+            get
+            {
+                return typeof(bool);
+            }
         }
     }
 }

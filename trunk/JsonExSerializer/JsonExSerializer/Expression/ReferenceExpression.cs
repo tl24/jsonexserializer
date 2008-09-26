@@ -33,6 +33,10 @@ namespace JsonExSerializer.Expression
             get { return _path; }
         }
 
+        public override Type DefaultType
+        {
+            get { return typeof(object); }
+        }
         public ExpressionBase ReferencedExpression
         {
             get { return _reference; }
@@ -52,10 +56,13 @@ namespace JsonExSerializer.Expression
             result = e.Result;
         }
 
-        public override object Evaluate(SerializationContext context) {
-            if (result == null)
-                throw new InvalidOperationException("Attempt to reference " + Path + " before its constructed");
-            return result;
+        public object ReferencedValue {
+            get
+            {
+                if (result == null)
+                    throw new InvalidOperationException("Attempt to reference " + Path + " before its constructed");
+                return result;
+            }
         }
     }
 }

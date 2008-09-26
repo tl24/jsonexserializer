@@ -169,21 +169,6 @@ namespace JsonExSerializer.Framework
             refInfo.CanReference = true;
         }
 
-        private ExpressionBase SerializeBoolean(object o, JsonPath CurrentPath)
-        {
-            return _context.ObjectHandlers.BooleanHandler.GetExpression(o, CurrentPath, this);
-        }
-
-        private ExpressionBase SerializeValue(object o, JsonPath CurrentPath)
-        {
-            return _context.ObjectHandlers.ValueHandler.GetExpression(o, CurrentPath, this);
-        }
-
-        private ExpressionBase SerializeNumber(object o, JsonPath CurrentPath)
-        {
-            return _context.ObjectHandlers.NumericHandler.GetExpression(o, CurrentPath, this);
-        }
-
         /// <summary>
         /// Writes out the type for an object in regular C# code syntax
         /// </summary>

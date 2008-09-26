@@ -33,7 +33,6 @@ namespace JsonExSerializer.Expression
     {
 
         private ExpressionBase _parent;
-        protected IEvaluator _evaluator;  //EvaluatorBase
         protected Type _resultType; // the desired type of the result        
 
         public ExpressionBase()
@@ -51,24 +50,6 @@ namespace JsonExSerializer.Expression
             }
         }
 
-        // the result of this operation should be cached in case references are created
-        // i.e. subsequent calls to Evaluate should return the exact same object as before
-        // (when a reference type is involved)
-        public virtual object Evaluate(SerializationContext Context)
-        {
-            // allow classes to set their own evaluator if necessary, but
-            // generally the factory should be used
-            return GetEvaluator(Context).Evaluate();            
-        }
-
-        public virtual IEvaluator GetEvaluator(SerializationContext Context) {
-            if (_evaluator == null)
-            {
-                this._evaluator = EvaluatorFactory.GetEvaluator(this, Context);
-            }
-            return this._evaluator;
-        }
-
         public virtual ExpressionBase Parent
         {
             get { return this._parent; }
@@ -80,24 +61,21 @@ namespace JsonExSerializer.Expression
         /// </summary>
         public virtual Type ResultType
         {
-            get { return this._resultType; }
+            get {
+                if (this._resultType == null || _resultType == typeof(object))
+                    return DefaultType;
+                else
+                    return this._resultType; 
+            }
             set { this._resultType = value; }
         }
+
+        public abstract Type DefaultType { get; }
 
         public void SetResultTypeIfNotSet(Type newType)
         {
             if (_resultType == null || _resultType == typeof(object))
                 _resultType = newType;
-        }
-
-        /// <summary>
-        /// The evaluator for this expression, if this is null when Evaluate is called
-        /// then a default evaluator will be looked up using the EvaluatorFactory.
-        /// </summary>
-        public IEvaluator Evaluator
-        {
-            get { return this._evaluator; }
-            set { this._evaluator = value; }
         }
 
         /// <summary>

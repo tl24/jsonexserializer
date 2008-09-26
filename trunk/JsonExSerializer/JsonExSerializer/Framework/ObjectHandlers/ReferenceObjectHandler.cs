@@ -5,11 +5,21 @@ using JsonExSerializer.Expression;
 
 namespace JsonExSerializer.Framework.ObjectHandlers
 {
-    public class NullObjectHandler : ObjectHandlerBase
+    public class ReferenceObjectHandler : ObjectHandlerBase
     {
+
+        public ReferenceObjectHandler()
+        {
+        }
+
+        public ReferenceObjectHandler(SerializationContext Context)
+            : base(Context)
+        {
+        }
+
         public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer)
         {
-            return new NullExpression();
+            return Serializer.HandleReference(data, CurrentPath);
         }
 
         public override bool CanHandle(Type ObjectType)
@@ -19,18 +29,16 @@ namespace JsonExSerializer.Framework.ObjectHandlers
 
         public override bool CanHandle(ExpressionBase Expression)
         {
-            return (Expression is NullExpression);
+            return (Expression is ReferenceExpression);
         }
 
         public override object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer)
         {
-            NullExpression nullExpr = (NullExpression)Expression;
-            return null;
+            return ((ReferenceExpression)Expression).ReferencedValue;
         }
-
         public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
         {
-            return ExistingObject;
+            throw new InvalidOperationException("Cannot update a reference");
         }
     }
 }

@@ -14,10 +14,11 @@ using System.Reflection;
 using JsonExSerializer.TypeConversion;
 using System.IO;
 using JsonExSerializer.Expression;
+using JsonExSerializer.Framework.ObjectHandlers;
 
 namespace JsonExSerializer.Framework
 {
-    sealed class Parser
+    sealed class Parser : IDeserializerHandler
     {
         #region Member Variables
 
@@ -96,7 +97,19 @@ namespace JsonExSerializer.Framework
             {
                 expr = stage.Execute(expr);
             }
-            return expr.Evaluate(this._context);
+            return Evaluate(expr);
+        }
+
+        public object Evaluate(ExpressionBase Expression)
+        {
+            IObjectHandler handler = _context.ObjectHandlers.GetHandler(Expression);
+            return handler.Evaluate(Expression, this);
+        }
+
+        public object Evaluate(ExpressionBase Expression, object ExistingObject)
+        {
+            IObjectHandler handler = _context.ObjectHandlers.GetHandler(Expression);
+            return handler.Evaluate(Expression, ExistingObject, this);
         }
 
         /// <summary>
@@ -496,5 +509,6 @@ namespace JsonExSerializer.Framework
             // include null?
             return tok.type == TokenType.Identifier && tok.value == "new";
         }
+
     }
 }

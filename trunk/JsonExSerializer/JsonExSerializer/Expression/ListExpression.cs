@@ -22,6 +22,10 @@ namespace JsonExSerializer.Expression
             _resultType = typeof(ArrayList);
         }
 
+        public override Type DefaultType
+        {
+            get { return typeof(ArrayList); }
+        }
         public IList<ExpressionBase> Items
         {
             get { return this._items; }

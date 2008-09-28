@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using JsonExSerializer.Expression;
+using JsonExSerializer.Framework.ObjectHandlers.Collections;
 
 namespace JsonExSerializer.Framework.ObjectHandlers
 {
@@ -20,6 +21,8 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             Add(new BooleanObjectHandler(Context));
             Add(new ValueObjectHandler(Context));
             Add(new TypeConverterObjectHandler(Context));
+            Add(new QueueHandler(Context));
+            Add(new GenericQueueHandler(Context));
             Add(new CollectionObjectHandler(Context));
             Add(new DictionaryObjectHandler(Context));
             _nullHandler = new NullObjectHandler();
@@ -91,10 +94,17 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         /// </summary>
         public IObjectHandler GetHandler(Type dataType)
         {
-            foreach (IObjectHandler handler in this)
-                if (handler.CanHandle(dataType))
-                    return handler;
-            return DefaultHandler;
+            IObjectHandler h = null;
+            if (!_cache.TryGetValue(dataType, out h))
+            {
+                foreach (IObjectHandler handler in this)
+                    if (handler.CanHandle(dataType))
+                    {
+                        return _cache[dataType] = handler;
+                        return handler;
+                    }
+            }
+            return h ?? DefaultHandler;
         }
     }
 

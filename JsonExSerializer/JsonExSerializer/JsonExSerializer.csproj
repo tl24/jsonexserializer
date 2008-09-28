@@ -65,6 +65,8 @@
     <Compile Include="Framework\ObjectHandlers\BooleanObjectHandler.cs" />
     <Compile Include="Framework\ObjectHandlers\CastObjectHandler.cs" />
     <Compile Include="Framework\ObjectHandlers\CollectionObjectHandler.cs" />
+    <Compile Include="Framework\ObjectHandlers\Collections\CollectionObjectHandlerBase.cs" />
+    <Compile Include="Framework\ObjectHandlers\Collections\QueueHandler.cs" />
     <Compile Include="Framework\ObjectHandlers\DictionaryObjectHandler.cs" />
     <Compile Include="Framework\ObjectHandlers\IDeserializerHandler.cs" />
     <Compile Include="Framework\ObjectHandlers\IObjectHandler.cs" />

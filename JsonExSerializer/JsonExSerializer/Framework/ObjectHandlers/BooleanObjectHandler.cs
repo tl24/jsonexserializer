@@ -16,7 +16,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         {
         }
 
-        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer)
         {
             return new BooleanExpression(data);
         }

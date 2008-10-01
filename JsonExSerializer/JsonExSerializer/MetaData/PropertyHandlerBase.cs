@@ -12,13 +12,13 @@ namespace JsonExSerializer.MetaData
     public abstract class PropertyHandlerBase : AbstractPropertyHandler
     {
         protected MemberInfo _member;
-        public PropertyHandlerBase(MemberInfo member)
+        protected PropertyHandlerBase(MemberInfo member)
             : base(member.DeclaringType)
         {
             _member = member;
         }
 
-        public PropertyHandlerBase(MemberInfo member, int position)
+        protected PropertyHandlerBase(MemberInfo member, int position)
             : this(member)
         {
             _position = position;

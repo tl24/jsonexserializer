@@ -36,7 +36,7 @@ namespace JsonExSerializer.Collections
                     } 
                 }
             }
-            throw new JsonExSerializationException("No suitable constructor found for " + _finalType);
+            throw new InvalidOperationException("No suitable constructor found for " + _finalType);
         }
     }
 }

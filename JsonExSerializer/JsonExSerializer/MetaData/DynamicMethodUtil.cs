@@ -45,7 +45,6 @@ namespace JsonExSerializer.MetaData
             arguments[0] = typeof(object);
 
 
-            string mName = getMethod.Name;
             DynamicMethod getter = new DynamicMethod(
                 String.Concat("_Get", Property.Name, "_"),
                 typeof(object), arguments, DeclaringType);

@@ -17,9 +17,9 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         {
         }
 
-        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer)
         {
-            return Serializer.HandleReference(data, CurrentPath);
+            return serializer.HandleReference(data, CurrentPath);
         }
 
         public override bool CanHandle(Type ObjectType)
@@ -27,16 +27,16 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return false;
         }
 
-        public override bool CanHandle(ExpressionBase Expression)
+        public override bool CanHandle(ExpressionBase expression)
         {
-            return (Expression is ReferenceExpression);
+            return (expression is ReferenceExpression);
         }
 
-        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
         {
-            return ((ReferenceExpression)Expression).ReferencedValue;
+            return ((ReferenceExpression)expression).ReferencedValue;
         }
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
         {
             throw new InvalidOperationException("Cannot update a reference");
         }

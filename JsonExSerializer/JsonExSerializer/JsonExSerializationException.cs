@@ -6,13 +6,15 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace JsonExSerializer
 {
     /// <summary>
     /// Base class for all serialization exceptions
     /// </summary>
-    public class JsonExSerializationException : ApplicationException
+    [Serializable]
+    public class JsonExSerializationException : Exception
     {
         public JsonExSerializationException()
             : base()
@@ -26,6 +28,11 @@ namespace JsonExSerializer
 
         public JsonExSerializationException(string message, Exception innerException)
             : base(message, innerException)
+        {
+        }
+
+        protected JsonExSerializationException(SerializationInfo serializationInfo, StreamingContext context)
+            : base(serializationInfo, context)
         {
         }
     }

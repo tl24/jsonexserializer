@@ -16,7 +16,7 @@ namespace JsonExSerializer.Expression
     public sealed class JsonPath 
     {
         private string[] parts;
-        private int head = 0;
+        private int head;
 
         /// <summary>
         /// Identifier for the Root object
@@ -106,17 +106,16 @@ namespace JsonExSerializer.Expression
 
         public override string ToString()
         {
-            string result = Top;
-
+            StringBuilder result = new StringBuilder(Top);
             for (int i = head+1; i < parts.Length;i++)
             {
                 int dummy;
                 if (int.TryParse(parts[i], out dummy))
-                    result += string.Format("[{0}]", parts[i]);
+                    result.AppendFormat("[{0}]", parts[i]);
                 else
-                    result += string.Format("['{0}']", parts[i]);
+                    result.AppendFormat("['{0}']", parts[i]);
             }
-            return result;
+            return result.ToString();
         }
     }
 }

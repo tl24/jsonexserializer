@@ -32,13 +32,13 @@ namespace JsonExSerializerTests
         public void SimpleArrayTest()
         {
             jsonWriter
-                .ArrayStart()
-                    .Value(true)
-                    .Value(1)
-                    .QuotedValue("test")
-                    .Value(3.14f)
-                    .Value(345.8765)
-                .ArrayEnd();
+                .WriteArrayStart()
+                    .WriteValue(true)
+                    .WriteValue(1)
+                    .WriteQuotedValue("test")
+                    .WriteValue(3.14f)
+                    .WriteValue(345.8765)
+                .WriteArrayEnd();
             AssertMatch("[true,1,\"test\",3.14,345.8765]", "simple array test");
         }
 
@@ -46,17 +46,17 @@ namespace JsonExSerializerTests
         public void ArrayOfArraysTest()
         {
             jsonWriter
-                .ArrayStart()
-                    .ArrayStart()
-                        .QuotedValue("one")
-                    .ArrayEnd()
-                    .Value(1)
-                    .ArrayStart()
-                        .QuotedValue("two")
-                        .Value(3)
-                    .ArrayEnd()
-                    .Value(2)
-                .ArrayEnd();
+                .WriteArrayStart()
+                    .WriteArrayStart()
+                        .WriteQuotedValue("one")
+                    .WriteArrayEnd()
+                    .WriteValue(1)
+                    .WriteArrayStart()
+                        .WriteQuotedValue("two")
+                        .WriteValue(3)
+                    .WriteArrayEnd()
+                    .WriteValue(2)
+                .WriteArrayEnd();
 
             AssertMatch("[[\"one\"],1,[\"two\",3],2]", "Array of arrays test");
         }
@@ -66,18 +66,18 @@ namespace JsonExSerializerTests
         public void ValueAfterArrayIsErrorTest()
         {
             jsonWriter
-                .ArrayStart()
-                    .Value(1)
-                .ArrayEnd()
-                .Value(true);    // this should cause an error, can only write one value/object/array            
+                .WriteArrayStart()
+                    .WriteValue(1)
+                .WriteArrayEnd()
+                .WriteValue(true);    // this should cause an error, can only write one value/object/array            
         }
 
         [Test]
         public void EmptyArray()
         {
             jsonWriter
-                .ArrayStart()
-                .ArrayEnd();
+                .WriteArrayStart()
+                .WriteArrayEnd();
             AssertMatch("[]", "The empty array");
         }
 
@@ -86,18 +86,18 @@ namespace JsonExSerializerTests
         public void KeyInArrayIsErrorTest()
         {
             jsonWriter
-                .ArrayStart()
-                    .Key("invalidKey")  // key's not allowed within array
-                    .QuotedValue("myvalue")
-                .ArrayEnd();
+                .WriteArrayStart()
+                    .WriteKey("invalidKey")  // key's not allowed within array
+                    .WriteQuotedValue("myvalue")
+                .WriteArrayEnd();
         }
 
         [Test]
         public void EmptyObjectTest()
         {
             jsonWriter
-                .ObjectStart()
-                .ObjectEnd();
+                .WriteObjectStart()
+                .WriteObjectEnd();
             AssertMatch("{}", "The empty object");
         }
 
@@ -105,10 +105,10 @@ namespace JsonExSerializerTests
         public void OneItemObjectTest()
         {
             jsonWriter
-                .ObjectStart()
-                    .Key("KeyText")
-                    .QuotedValue("ValueText")
-                .ObjectEnd();
+                .WriteObjectStart()
+                    .WriteKey("KeyText")
+                    .WriteQuotedValue("ValueText")
+                .WriteObjectEnd();
 
             AssertMatch("{\"KeyText\":\"ValueText\"}", "One item object test");
         }
@@ -117,14 +117,14 @@ namespace JsonExSerializerTests
         public void MultipleItemObjectTest()
         {
             jsonWriter
-                .ObjectStart()
-                    .Key("StringValue")
-                    .QuotedValue("ValueText")
-                    .Key("LongVal")
-                    .Value(1234)
-                    .Key("BoolVal")
-                    .Value(true)
-                .ObjectEnd();
+                .WriteObjectStart()
+                    .WriteKey("StringValue")
+                    .WriteQuotedValue("ValueText")
+                    .WriteKey("LongVal")
+                    .WriteValue(1234)
+                    .WriteKey("BoolVal")
+                    .WriteValue(true)
+                .WriteObjectEnd();
 
             AssertMatch("{\"StringValue\":\"ValueText\",\"LongVal\":1234,\"BoolVal\":true}", "");
         }
@@ -133,19 +133,19 @@ namespace JsonExSerializerTests
         public void ObjectOfObjectsTest()
         {
             jsonWriter
-                .ObjectStart()
-                    .Key("StringValue")
-                    .QuotedValue("ValueText")
-                    .Key("LongVal")
-                    .Value(1234)
-                    .Key("BoolVal")
-                    .Value(true)
-                    .Key("ComplexObject")
-                    .ObjectStart()
-                        .Key("KeyText")
-                        .QuotedValue("ValueText")
-                    .ObjectEnd()
-                .ObjectEnd();
+                .WriteObjectStart()
+                    .WriteKey("StringValue")
+                    .WriteQuotedValue("ValueText")
+                    .WriteKey("LongVal")
+                    .WriteValue(1234)
+                    .WriteKey("BoolVal")
+                    .WriteValue(true)
+                    .WriteKey("ComplexObject")
+                    .WriteObjectStart()
+                        .WriteKey("KeyText")
+                        .WriteQuotedValue("ValueText")
+                    .WriteObjectEnd()
+                .WriteObjectEnd();
             AssertMatch("{\"StringValue\":\"ValueText\",\"LongVal\":1234,\"BoolVal\":true,\"ComplexObject\":{\"KeyText\":\"ValueText\"}}", "");
         }
 
@@ -154,11 +154,11 @@ namespace JsonExSerializerTests
         public void ValueAfterObjectIsErrorTest()
         {
             jsonWriter
-                .ObjectStart()
-                    .Key("test")
-                    .Value(1)
-                .ObjectEnd()
-                .Value(true);    // this should cause an error, can only write one value/object/array            
+                .WriteObjectStart()
+                    .WriteKey("test")
+                    .WriteValue(1)
+                .WriteObjectEnd()
+                .WriteValue(true);    // this should cause an error, can only write one value/object/array            
         }
 
         [Test]
@@ -166,27 +166,27 @@ namespace JsonExSerializerTests
         public void MissingKeyObjectTest()
         {
             jsonWriter
-                .ObjectStart()
+                .WriteObjectStart()
                     // key is missing
-                    .Value(123)
-                .ObjectEnd();
+                    .WriteValue(123)
+                .WriteObjectEnd();
         }
 
         [Test]
         public void ObjectInArrayTest()
         {
             jsonWriter
-                .ArrayStart()
-                    .Value(true)
-                    .Value(1)
-                    .QuotedValue("test")
-                    .Value(3.14f)
-                    .Value(345.8765)
-                    .ObjectStart()
-                        .Key("KeyText")
-                        .QuotedValue("ValueText")
-                    .ObjectEnd()
-                .ArrayEnd();
+                .WriteArrayStart()
+                    .WriteValue(true)
+                    .WriteValue(1)
+                    .WriteQuotedValue("test")
+                    .WriteValue(3.14f)
+                    .WriteValue(345.8765)
+                    .WriteObjectStart()
+                        .WriteKey("KeyText")
+                        .WriteQuotedValue("ValueText")
+                    .WriteObjectEnd()
+                .WriteArrayEnd();
             AssertMatch("[true,1,\"test\",3.14,345.8765,{\"KeyText\":\"ValueText\"}]", "object inside array test");
         }
 
@@ -194,19 +194,19 @@ namespace JsonExSerializerTests
         public void ArrayInObjectTest()
         {
             jsonWriter
-                .ObjectStart()
-                    .Key("FirstArray")
-                    .ArrayStart()
-                        .Value(123)
-                        .Value(true)
-                    .ArrayEnd()
-                    .Key("KeyText")
-                    .QuotedValue("ValueText")
-                    .Key("LastArray")
-                    .ArrayStart()
-                        .QuotedValue("last")
-                    .ArrayEnd()
-                .ObjectEnd();
+                .WriteObjectStart()
+                    .WriteKey("FirstArray")
+                    .WriteArrayStart()
+                        .WriteValue(123)
+                        .WriteValue(true)
+                    .WriteArrayEnd()
+                    .WriteKey("KeyText")
+                    .WriteQuotedValue("ValueText")
+                    .WriteKey("LastArray")
+                    .WriteArrayStart()
+                        .WriteQuotedValue("last")
+                    .WriteArrayEnd()
+                .WriteObjectEnd();
 
             AssertMatch("{\"FirstArray\":[123,true],\"KeyText\":\"ValueText\",\"LastArray\":[\"last\"]}", "One item object test");
         }

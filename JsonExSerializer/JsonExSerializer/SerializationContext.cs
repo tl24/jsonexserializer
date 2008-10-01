@@ -65,7 +65,6 @@ namespace JsonExSerializer
 
         public SerializationContext()
         {
-            _isCompact = false;
             _outputTypeComment = true;
             _outputTypeInformation = true;
             _referenceWritingType = ReferenceOption.ErrorCircularReferences;
@@ -184,9 +183,9 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="t">the type object</param>
         /// <param name="typeAlias">the type's alias</param>
-        public void AddTypeBinding(Type t, string typeAlias)
+        public void AddTypeBinding(Type type, string typeAlias)
         {
-            _typeBindings[t] = typeAlias;
+            _typeBindings[type] = typeAlias;
         }
 
         /// <summary>
@@ -201,9 +200,9 @@ namespace JsonExSerializer
         /// Removes a type binding
         /// </summary>
         /// <param name="t">the bound type to remove</param>
-        public void RemoveTypeBinding(Type t)
+        public void RemoveTypeBinding(Type type)
         {
-            _typeBindings.Remove(t);
+            _typeBindings.Remove(type);
         }
 
         /// <summary>
@@ -223,10 +222,10 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="t">the type to lookup</param>
         /// <returns>a type alias or null</returns>
-        public string GetTypeAlias(Type t)
+        public string GetTypeAlias(Type type)
         {
             string alias = null;
-            if (!_typeBindings.TryGetValue(t, out alias))
+            if (!_typeBindings.TryGetValue(type, out alias))
             {
                 alias = null;
             }
@@ -306,9 +305,9 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="forType">the property to register</param>
         /// <param name="converter">the converter</param>
-        public void RegisterTypeConverter(Type ForType, string PropertyName, IJsonTypeConverter Converter)
+        public void RegisterTypeConverter(Type forType, string propertyName, IJsonTypeConverter converter)
         {
-            TypeHandlerFactory.RegisterTypeConverter(ForType, PropertyName, Converter);
+            TypeHandlerFactory.RegisterTypeConverter(forType, propertyName, converter);
         }
 
         #endregion

@@ -16,41 +16,41 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="constructorType"></param>
         /// <returns></returns>
-        IJsonWriter ConstructorStart(Type constructorType);
+        IJsonWriter WriteConstructorStart(Type constructorType);
 
         /// <summary>
         /// Starts a constructed object with the given type information
         /// </summary>
-        /// <param name="NamespaceAndClass">The fully-qualified class name without assembly reference</param>
+        /// <param name="namespaceAndClass">The fully-qualified class name without assembly reference</param>
         /// <returns></returns>
-        IJsonWriter ConstructorStart(string NamespaceAndClass);
+        IJsonWriter WriteConstructorStart(string namespaceAndClass);
 
         /// <summary>
         /// Starts a constructed object
         /// </summary>
-        /// <param name="NamespaceAndClass">The fully-qualified class name without assembly reference</param>
-        /// <param name="Assembly">The assembly name</param>
+        /// <param name="namespaceAndClass">The fully-qualified class name without assembly reference</param>
+        /// <param name="assembly">The assembly name</param>
         /// <returns></returns>
-        IJsonWriter ConstructorStart(string NamespaceAndClass, string Assembly);
+        IJsonWriter WriteConstructorStart(string namespaceAndClass, string assembly);
 
         /// <summary>
         /// Starts the arguments for a constructed object
         /// </summary>
         /// <returns></returns>
-        IJsonWriter ConstructorArgsStart();
+        IJsonWriter WriteConstructorArgsStart();
 
         /// <summary>
         /// Ends the arguments for a constructed object
         /// </summary>
         /// <returns></returns>
-        IJsonWriter ConstructorArgsEnd();
+        IJsonWriter WriteConstructorArgsEnd();
         
 
         /// <summary>
         /// Ends the constructed object
         /// </summary>
         /// <returns></returns>
-        IJsonWriter ConstructorEnd();
+        IJsonWriter WriteConstructorEnd();
         
  
 
@@ -58,62 +58,62 @@ namespace JsonExSerializer
         /// Starts an object
         /// </summary>
         /// <returns>the writer instance for stacking</returns>
-        IJsonWriter ObjectStart();
+        IJsonWriter WriteObjectStart();
 
-        IJsonWriter Key(string key);
+        IJsonWriter WriteKey(string key);
 
         /// <summary>
         /// Ends an object definition
         /// </summary>
         /// <returns>the writer instance for stacking</returns>
-        IJsonWriter ObjectEnd();
+        IJsonWriter WriteObjectEnd();
 
         /// <summary>
         /// Starts an array sequence
         /// </summary>
         /// <returns></returns>
-        IJsonWriter ArrayStart();
+        IJsonWriter WriteArrayStart();
 
         /// <summary>
         /// Ends an array
         /// </summary>
         /// <returns></returns>
-        IJsonWriter ArrayEnd();
+        IJsonWriter WriteArrayEnd();
 
         /// <summary>
         /// Writes a boolean value
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        IJsonWriter Value(bool value);
+        IJsonWriter WriteValue(bool value);
 
         /// <summary>
         /// Writes a long value
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        IJsonWriter Value(long value);
+        IJsonWriter WriteValue(long value);
 
         /// <summary>
         /// Writes a double value
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        IJsonWriter Value(double value);
+        IJsonWriter WriteValue(double value);
 
         /// <summary>
         /// Writes a float value
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        IJsonWriter Value(float value);
+        IJsonWriter WriteValue(float value);
 
         /// <summary>
         /// Writes a quoted value
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        IJsonWriter QuotedValue(string value);
+        IJsonWriter WriteQuotedValue(string value);
 
         /// <summary>
         /// Writes a special string value that is not
@@ -121,14 +121,14 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="value">the value to write</param>
         /// <returns></returns>
-        IJsonWriter SpecialValue(string value);
+        IJsonWriter WriteSpecialValue(string value);
 
         /// <summary>
         /// Writes a comment.  The comment characters /* */ or // should be included in the comment string
         /// </summary>
         /// <param name="comment">the comment string</param>
         /// <returns></returns>
-        IJsonWriter Comment(string comment);
+        IJsonWriter WriteComment(string comment);
 
         /// <summary>
         /// Writes an object cast
@@ -136,24 +136,24 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="castedType">The type for the cast</param>
         /// <returns></returns>
-        IJsonWriter Cast(Type castedType);
+        IJsonWriter WriteCast(Type castType);
 
         /// <summary>
         /// Writes an object cast with the type name specified as a string.  The NamespaceAndClass
         /// contains the class name and possibly the Namespace but no assembly.
         /// (MyNamespace.MyClass) ...
         /// </summary>
-        /// <param name="NamespaceAndClass">The fully-qualified class name without assembly reference</param>
+        /// <param name="namespaceAndClass">The fully-qualified class name without assembly reference</param>
         /// <returns></returns>
-        IJsonWriter Cast(string NamespaceAndClass);
+        IJsonWriter WriteCast(string namespaceAndClass);
 
         /// <summary>
         /// Writes an object cast with the fully qualified type name and assemble reference
         /// ("MyNamespace.MyClass, MyAssembly") ...
         /// </summary>
-        /// <param name="NamespaceAndClass">The fully-qualified class name without assembly reference</param>
-        /// <param name="Assembly">The assembly name</param>
+        /// <param name="namespaceAndClass">The fully-qualified class name without assembly reference</param>
+        /// <param name="assembly">The assembly name</param>
         /// <returns></returns>
-        IJsonWriter Cast(string NamespaceAndClass, string Assembly);
+        IJsonWriter WriteCast(string namespaceAndClass, string assembly);
     }
 }

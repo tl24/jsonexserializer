@@ -1,8 +1,9 @@
-/*
- * Copyright (c) 2007, Ted Elliott
- * Code licensed under the New BSD License:
- * http://code.google.com/p/jsonexserializer/wiki/License
- */
+// <copyright file="ArrayBuilder.cs" company="JsonExSerializer Project Contributors">
+// Copyright (c) 2007, JsonExSerializer Project Contributors
+// Code licensed under the New BSD License:
+// http://code.google.com/p/jsonexserializer/wiki/License
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,9 +17,27 @@ namespace JsonExSerializer.Collections
     /// </summary>
     public class ArrayBuilder : ICollectionBuilder
     {
+        /// <summary>
+        /// The type for the array
+        /// </summary>
         private Type _arrayType;
+
+        /// <summary>
+        /// The final array being built
+        /// </summary>
         private Array result;
-        private int index = 0;
+
+        /// <summary>
+        /// The current index for insertion into the array
+        /// </summary>
+        private int index;
+
+        /// <summary>
+        /// Initializes an ArrayBuilder to build an array of Type <paramref name="arrayType"/> containing
+        /// <paramref name="itemCount"/> elements.
+        /// </summary>
+        /// <param name="arrayType">The type of the array to build</param>
+        /// <param name="itemCount">The number of elements in the array</param>
         public ArrayBuilder(Type arrayType, int itemCount)
         {
             _arrayType = arrayType;
@@ -33,16 +52,28 @@ namespace JsonExSerializer.Collections
         }
         #region ICollectionBuilder Members
 
+        /// <summary>
+        /// Adds an element to the array
+        /// </summary>
+        /// <param name="item">the item to add</param>
         public void Add(object item)
         {
             result.SetValue(item, index++);
         }
 
+        /// <summary>
+        /// Returns the array that was built
+        /// </summary>
+        /// <returns>an array</returns>
         public object GetResult()
         {
             return result;            
         }
 
+        /// <summary>
+        /// Returns a reference to the array being built
+        /// </summary>
+        /// <returns></returns>
         public object GetReference()
         {
             return result;

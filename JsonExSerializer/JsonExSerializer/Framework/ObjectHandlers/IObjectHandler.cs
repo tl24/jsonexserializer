@@ -7,13 +7,13 @@ namespace JsonExSerializer.Framework.ObjectHandlers
 {
     public interface IObjectHandler
     {
-        ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer);
+        ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer);
         bool CanHandle(Type ObjectType);
 
         bool CanHandle(ExpressionBase Expression);
 
-        object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer);
+        object Evaluate(ExpressionBase Expression, IDeserializerHandler deserializer);
 
-        object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer);
+        object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer);
     }
 }

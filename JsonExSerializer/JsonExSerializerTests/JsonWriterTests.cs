@@ -19,7 +19,7 @@ namespace JsonExSerializerTests
         [Row(false,"false")]
         public void TestBoolValue(bool bVal, string expected)
         {
-            jsonWriter.Value(bVal);
+            jsonWriter.WriteValue(bVal);
             AssertMatch(expected, "bool value written incorrectly");
         }
 
@@ -31,7 +31,7 @@ namespace JsonExSerializerTests
         [Row((short) 122, "122")]
         public void TestLongValue(long lVal, string expected)
         {
-            jsonWriter.Value(lVal);
+            jsonWriter.WriteValue(lVal);
             AssertMatch(expected, "long value written incorrectly");
         }
 
@@ -43,7 +43,7 @@ namespace JsonExSerializerTests
         [Row(0, "0")]
         public void TestFloatValue(float fVal, string expected)
         {
-            jsonWriter.Value(fVal);
+            jsonWriter.WriteValue(fVal);
             AssertMatch(expected, "float value written incorrectly");
         }
 
@@ -56,7 +56,7 @@ namespace JsonExSerializerTests
         [Row(0, "0")]
         public void TestDoubleValue(double dVal, string expected)
         {
-            jsonWriter.Value(dVal);
+            jsonWriter.WriteValue(dVal);
             AssertMatch(expected, "double value written incorrectly");
         }
 
@@ -67,7 +67,7 @@ namespace JsonExSerializerTests
         [Row("embedded 'single quotes'", "\"embedded 'single quotes'\"")]
         public void TestQuotedValue(string sVal, string expected)
         {
-            jsonWriter.QuotedValue(sVal);
+            jsonWriter.WriteQuotedValue(sVal);
             string actual = stringWriter.ToString().Trim();
             Assert.AreEqual(expected, actual, "string value written incorrectly");
         }
@@ -76,7 +76,7 @@ namespace JsonExSerializerTests
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestWriteValueTwiceFails()
         {
-            jsonWriter.Value(1).Value(2);
+            jsonWriter.WriteValue(1).WriteValue(2);
         }
     }
 }

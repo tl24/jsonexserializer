@@ -35,9 +35,10 @@ namespace JsonExSerializer.Collections
         }
 
         public override System.Collections.IEnumerable GetEnumerable(object collection)
-        {            
-            object[] items = new object[((ICollection)collection).Count];
-            ((ICollection)collection).CopyTo(items, 0);
+        {
+            ICollection coll = (ICollection)collection;
+            object[] items = new object[coll.Count];
+            coll.CopyTo(items, 0);
             Array.Reverse(items);
             return items;
         }

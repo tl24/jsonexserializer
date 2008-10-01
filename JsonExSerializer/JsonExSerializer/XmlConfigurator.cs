@@ -13,6 +13,7 @@ using System.Collections.Specialized;
 using System.Reflection;
 using JsonExSerializer.TypeConversion;
 using JsonExSerializer.Collections;
+using System.Globalization;
 
 namespace JsonExSerializer
 {
@@ -24,7 +25,7 @@ namespace JsonExSerializer
         private delegate void MapHandler();
         private Dictionary<string, MapHandler> handlers = new Dictionary<string, MapHandler>();
         private string sectionName;
-        private int _collectionInsertPoint = 0;
+        private int _collectionInsertPoint;
 
         private XmlConfigurator(XmlReader reader, SerializationContext context, string sectionName)
         {
@@ -46,7 +47,7 @@ namespace JsonExSerializer
         {
             XmlConfigSection section = (XmlConfigSection)ConfigurationManager.GetSection(configSection);
             if (section == null && configSection != "JsonExSerializer")
-                throw new Exception("Unable to find config section " + configSection);
+                throw new ArgumentException("Unable to find config section " + configSection);
             if (section == null)
                 return;
 
@@ -91,9 +92,9 @@ namespace JsonExSerializer
             string type = values[1];
 
             if (string.IsNullOrEmpty(alias))
-                throw new Exception("Must specify 'alias' for TypeBinding add");
+                throw new ArgumentException("Must specify 'alias' for TypeBinding add");
             if (string.IsNullOrEmpty(type))
-                throw new Exception("Must specify 'type' for TypeBinding add");
+                throw new ArgumentException("Must specify 'type' for TypeBinding add");
 
             context.AddTypeBinding(Type.GetType(type, true), alias);
         }
@@ -112,7 +113,7 @@ namespace JsonExSerializer
             else if (!string.IsNullOrEmpty(alias))
                 context.RemoveTypeBinding(alias);
             else
-                throw new Exception("Must specify either alias or type argument to remove TypeBinding");
+                throw new ArgumentException("Must specify either alias or type argument to remove TypeBinding");
         }
 
         /// <summary>
@@ -139,9 +140,9 @@ namespace JsonExSerializer
             string converter = values[2];
 
             if (string.IsNullOrEmpty(type))
-                throw new Exception("Must specify 'type' for TypeConverters add");
+                throw new ArgumentException("Must specify 'type' for TypeConverters add");
             if (string.IsNullOrEmpty(converter))
-                throw new Exception("Must specify 'converter' for TypeConverters add");
+                throw new ArgumentException("Must specify 'converter' for TypeConverters add");
 
             // load the specified types
             Type objectType = Type.GetType(type, true);
@@ -170,7 +171,7 @@ namespace JsonExSerializer
             string type = values[0];
 
             if (string.IsNullOrEmpty(type))
-                throw new Exception("Must specify 'type' for CollectionHandlers add");
+                throw new ArgumentException("Must specify 'type' for CollectionHandlers add");
 
             // load the specified types
             Type handlerType = Type.GetType(type, true);
@@ -195,9 +196,9 @@ namespace JsonExSerializer
             string property = values[1];
 
             if (string.IsNullOrEmpty(type))
-                throw new Exception("Must specify 'type' for IgnoreProperties add");
+                throw new ArgumentException("Must specify 'type' for IgnoreProperties add");
             if (string.IsNullOrEmpty(property))
-                throw new Exception("Must specify 'property' for IgnoreProperties add");
+                throw new ArgumentException("Must specify 'property' for IgnoreProperties add");
 
 
             Type classType = Type.GetType(type, true);
@@ -241,7 +242,7 @@ namespace JsonExSerializer
                 _parameters = new NameValueCollection();
                 int i = 0;
                 foreach (string s in parameters.Split(' ')) {
-                    _parameters.Add(s, i.ToString());
+                    _parameters.Add(s, i.ToString(NumberFormatInfo.CurrentInfo));
                     i++;
                 }
 
@@ -302,7 +303,7 @@ namespace JsonExSerializer
                     if (reader.IsStartElement())
                     {
                         if (!tagMap.ContainsKey(reader.Name))
-                            throw new Exception("Unrecognized element " + reader.Name + " within " + outerTag + " tag");
+                            throw new ArgumentException("Unrecognized element " + reader.Name + " within " + outerTag + " tag");
 
                         string tag = reader.Name;
 
@@ -312,9 +313,9 @@ namespace JsonExSerializer
                         while (reader.MoveToNextAttribute())
                         {
                             if (method.Parameters.Get(reader.Name) == null)
-                                throw new Exception("Unrecognized attribute " + reader.Name + " to " + tag + " tag within " + outerTag + " tag");
+                                throw new ArgumentException("Unrecognized attribute " + reader.Name + " to " + tag + " tag within " + outerTag + " tag");
 
-                            values[int.Parse(method.Parameters.Get(reader.Name))] = reader.ReadContentAsString();
+                            values[int.Parse(method.Parameters.Get(reader.Name), NumberFormatInfo.CurrentInfo)] = reader.ReadContentAsString();
                         }
                         method.Method(tag, values);
                     }

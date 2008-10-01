@@ -13,19 +13,19 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         {
         }
 
-        public CollectionObjectHandler(SerializationContext Context)
-            : base(Context)
+        public CollectionObjectHandler(SerializationContext context)
+            : base(context)
         {
         }
 
-        public override bool CanHandle(Type ObjectType)
+        public override bool CanHandle(Type objectType)
         {
-            return Context.TypeHandlerFactory[ObjectType].IsCollection();
+            return Context.TypeHandlerFactory[objectType].IsCollection();
         }
 
-        public override ExpressionBase GetExpression(object Data, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
-            TypeHandler handler = Context.GetTypeHandler(Data.GetType());
+            TypeHandler handler = Context.GetTypeHandler(data.GetType());
 
             CollectionHandler collectionHandler = handler.GetCollectionHandler();
             Type elemType = collectionHandler.GetItemType(handler.ForType);
@@ -33,9 +33,9 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             int index = 0;
 
             ListExpression expression = new ListExpression();
-            foreach (object value in collectionHandler.GetEnumerable(Data))
+            foreach (object value in collectionHandler.GetEnumerable(data))
             {
-                ExpressionBase itemExpr = Serializer.Serialize(value, CurrentPath.Append(index));
+                ExpressionBase itemExpr = serializer.Serialize(value, currentPath.Append(index));
                 if (value != null && value.GetType() != elemType)
                 {
                     itemExpr = new CastExpression(value.GetType(), itemExpr);
@@ -46,15 +46,16 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return expression;
         }
 
-        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
         {
-            return Evaluate(Expression, null, Deserializer);
+            return Evaluate(expression, null, deserializer);
         }
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
         {
             Type ItemType;
-            ICollectionBuilder builder = ConstructBuilder(ExistingObject, (ListExpression)Expression, out ItemType);
-            object result = EvaluateItems((ListExpression)Expression, builder, ItemType, Deserializer);
+            ListExpression list = (ListExpression)expression;
+            ICollectionBuilder builder = ConstructBuilder(existingObject, list, out ItemType);
+            object result = EvaluateItems(list, builder, ItemType, deserializer);
             if (result is IDeserializationCallback)
             {
                 ((IDeserializationCallback)result).OnAfterDeserialization();
@@ -62,38 +63,38 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return result;
         }
 
-        protected virtual object EvaluateItems(ListExpression Expression, ICollectionBuilder Builder, Type ItemType, IDeserializerHandler Deserializer)
+        protected virtual object EvaluateItems(ListExpression expression, ICollectionBuilder builder, Type itemType, IDeserializerHandler deserializer)
         {
             object result = null;
             bool constructedEventSent = false;
             try
             {
-                result = Builder.GetReference();
-                Expression.OnObjectConstructed(result);
+                result = builder.GetReference();
+                expression.OnObjectConstructed(result);
                 constructedEventSent = true;
             }
             catch
             {
                 // this might fail if the builder's not ready
             }
-            foreach (ExpressionBase item in Expression.Items)
+            foreach (ExpressionBase item in expression.Items)
             {
-                item.ResultType = ItemType;
-                object itemResult = Deserializer.Evaluate(item);
-                Builder.Add(itemResult);
+                item.ResultType = itemType;
+                object itemResult = deserializer.Evaluate(item);
+                builder.Add(itemResult);
             }
-            result = Builder.GetResult();
+            result = builder.GetResult();
             if (!constructedEventSent)
-                Expression.OnObjectConstructed(result);
+                expression.OnObjectConstructed(result);
             return result;
         }
 
-        protected virtual ICollectionBuilder ConstructBuilder(object collection, ListExpression list, out Type ItemType)
+        protected virtual ICollectionBuilder ConstructBuilder(object collection, ListExpression list, out Type itemType)
         {
             TypeHandler typeHandler = Context.GetTypeHandler(list.ResultType);
             CollectionHandler collHandler = typeHandler.GetCollectionHandler();
-            ItemType = collHandler.GetItemType(typeHandler.ForType);
-            if (ItemType == null)
+            itemType = collHandler.GetItemType(typeHandler.ForType);
+            if (itemType == null)
                 throw new Exception("Null item type returned from " + collHandler.GetType() + " for Collection type: " + typeHandler.ForType);
 
             if (collection != null)

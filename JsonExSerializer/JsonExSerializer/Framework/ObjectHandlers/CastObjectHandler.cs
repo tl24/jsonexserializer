@@ -16,7 +16,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         {
         }
 
-        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer)
         {
             throw new Exception("CastObjectHandler should not be called during Serialization");
         }
@@ -31,18 +31,18 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return (Expression is CastExpression);
         }
 
-        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler deserializer)
         {
             ExpressionBase innerExpression = ((CastExpression)Expression).Expression;
             innerExpression.ResultType = Expression.ResultType;
-            return Deserializer.Evaluate(innerExpression);
+            return deserializer.Evaluate(innerExpression);
         }
 
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer)
         {
             ExpressionBase innerExpression = ((CastExpression)Expression).Expression;
             innerExpression.ResultType = Expression.ResultType;
-            return Deserializer.Evaluate(innerExpression, ExistingObject);
+            return deserializer.Evaluate(innerExpression, existingObject);
         }
     }
 }

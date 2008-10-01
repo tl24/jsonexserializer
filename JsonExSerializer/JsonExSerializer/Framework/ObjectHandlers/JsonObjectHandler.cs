@@ -28,7 +28,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         {
         }
 
-        public override ExpressionBase GetExpression(object Data, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object Data, JsonPath CurrentPath, ISerializerHandler serializer)
         {
              TypeHandler handler = Context.GetTypeHandler(Data.GetType());
 
@@ -43,11 +43,11 @@ namespace JsonExSerializer.Framework.ObjectHandlers
                     // TODO: Improve reference support when constructor arguments are refactored
                     if (ctorParm.HasConverter)
                     {
-                        argExpr = Serializer.Serialize(value, new JsonPath(""), ctorParm.TypeConverter);
+                        argExpr = serializer.Serialize(value, new JsonPath(""), ctorParm.TypeConverter);
                     }
                     else
                     {
-                        argExpr = Serializer.Serialize(value, new JsonPath(""));
+                        argExpr = serializer.Serialize(value, new JsonPath(""));
                     }
                     if (value != null && value.GetType() != ctorParm.PropertyType)
                     {
@@ -64,11 +64,11 @@ namespace JsonExSerializer.Framework.ObjectHandlers
                 ExpressionBase valueExpr;
                 if (prop.HasConverter)
                 {
-                    valueExpr = Serializer.Serialize(value, CurrentPath.Append(prop.Name), prop.TypeConverter);
+                    valueExpr = serializer.Serialize(value, CurrentPath.Append(prop.Name), prop.TypeConverter);
                 }
                 else
                 {
-                    valueExpr = Serializer.Serialize(value, CurrentPath.Append(prop.Name));
+                    valueExpr = serializer.Serialize(value, CurrentPath.Append(prop.Name));
                 }
                 if (value != null && value.GetType() != prop.PropertyType)
                 {
@@ -79,18 +79,18 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return expression;
         }
 
-        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler deserializer)
         {
-            object value = ConstructObject((ObjectExpression)Expression, Deserializer);
-            value = Evaluate(Expression, value, Deserializer);
+            object value = ConstructObject((ObjectExpression)Expression, deserializer);
+            value = Evaluate(Expression, value, deserializer);
             if (value is IDeserializationCallback)
                 ((IDeserializationCallback)value).OnAfterDeserialization();
             return value;
         }
 
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer)
         {
-            TypeHandler typeHandler = Context.GetTypeHandler(ExistingObject.GetType());
+            TypeHandler typeHandler = Context.GetTypeHandler(existingObject.GetType());
             ObjectExpression objectExpression = (ObjectExpression)Expression;
             foreach (KeyValueExpression Item in objectExpression.Properties)
             {
@@ -123,49 +123,33 @@ namespace JsonExSerializer.Framework.ObjectHandlers
                 {
                     converterHandler = (TypeConverterObjectHandler) Context.ObjectHandlers.Find(typeof(TypeConverterObjectHandler));
                     converter = hndlr.TypeConverter;
-                    /*
-                    IEvaluator defaultEvaluator = EvaluatorFactory.GetEvaluator(valueExpression, Context);
-                    
-                    if (defaultEvaluator is ConverterEvaluator)
-                    {
-                        // override the type converter with the property converter
-                        defaultEvaluator = ((ConverterEvaluator)defaultEvaluator).DefaultEvaluator;
-                    }
-                    ConverterEvaluator evaluator = new ConverterEvaluator(valueExpression, defaultEvaluator, converter);
-                    evaluator.Context = Context;
-                    valueExpression.Evaluator = evaluator;
-                    */
                 }
                 
                 if (!hndlr.CanWrite)
                 {
-                    result = hndlr.GetValue(ExistingObject);
+                    result = hndlr.GetValue(existingObject);
                     if (converterHandler != null)
                     {
-                        converterHandler.Evaluate(valueExpression, result, Deserializer, converter);
-                        //TODO: Use ObjectHandler here
-                        //valueExpression.GetEvaluator(Context).SetResult(result);
-                        //valueExpression.OnObjectConstructed(result);
-                        //valueExpression.Evaluate(Context);
+                        converterHandler.Evaluate(valueExpression, result, deserializer, converter);
+
                     }
                     else
                     {
-                        Deserializer.Evaluate(valueExpression, result);
+                        deserializer.Evaluate(valueExpression, result);
                     }
                 }
                 else
                 {
-                    //TODO: Use ObjectHandler here
                     if (hndlr.HasConverter)
-                        hndlr.SetValue(ExistingObject, converterHandler.Evaluate(valueExpression,Deserializer,converter));
+                        hndlr.SetValue(existingObject, converterHandler.Evaluate(valueExpression,deserializer,converter));
                     else
-                        hndlr.SetValue(ExistingObject, Deserializer.Evaluate(valueExpression));
+                        hndlr.SetValue(existingObject, deserializer.Evaluate(valueExpression));
                 }
             }
-            return ExistingObject;
+            return existingObject;
         }
 
-        protected virtual object ConstructObject(ObjectExpression Expression, IDeserializerHandler Deserializer)
+        protected virtual object ConstructObject(ObjectExpression Expression, IDeserializerHandler deserializer)
         {
             // set the default type if none set
             if (Expression.ConstructorArguments.Count > 0)
@@ -177,7 +161,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             for (int i = 0; i < args.Length; i++)
             {
                 ExpressionBase carg = Expression.ConstructorArguments[i];
-                args[i] = Deserializer.Evaluate(carg);
+                args[i] = deserializer.Evaluate(carg);
             }
             TypeHandler handler = Context.GetTypeHandler(Expression.ResultType);
             object result = handler.CreateInstance(args);

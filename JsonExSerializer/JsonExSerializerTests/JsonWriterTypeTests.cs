@@ -33,8 +33,8 @@ namespace JsonExSerializerTests
         [Test]
         public void SingleItemCast()
         {
-            jsonWriter.Cast(typeof(sbyte))
-                .Value(33);
+            jsonWriter.WriteCast(typeof(sbyte))
+                .WriteValue(33);
 
             AssertMatch("(System.SByte)33", "Single Item Cast");
         }
@@ -42,11 +42,11 @@ namespace JsonExSerializerTests
         [Test]
         public void ArrayCast()
         {
-            jsonWriter.Cast(typeof(ArrayList))
-                .ArrayStart()
-                    .Value(1)
-                    .Value(2)
-                .ArrayEnd();
+            jsonWriter.WriteCast(typeof(ArrayList))
+                .WriteArrayStart()
+                    .WriteValue(1)
+                    .WriteValue(2)
+                .WriteArrayEnd();
 
             AssertMatch("(System.Collections.ArrayList)[1,2]", "Array Cast");
         }
@@ -54,11 +54,11 @@ namespace JsonExSerializerTests
         [Test]
         public void ObjectCast()
         {
-            jsonWriter.Cast(typeof(SimpleObject))
-                .ObjectStart()
-                    .Key("StringValue")
-                    .QuotedValue("Test")
-                .ObjectEnd();
+            jsonWriter.WriteCast(typeof(SimpleObject))
+                .WriteObjectStart()
+                    .WriteKey("StringValue")
+                    .WriteQuotedValue("Test")
+                .WriteObjectEnd();
 
             AssertMatch("(\"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"){\"StringValue\":\"Test\"}", "Object Cast");
         }
@@ -68,9 +68,9 @@ namespace JsonExSerializerTests
         {
             long x = (int)(long)3;
 
-            jsonWriter.Cast(typeof(int))
-                .Cast(typeof(long))
-                .Value(3);
+            jsonWriter.WriteCast(typeof(int))
+                .WriteCast(typeof(long))
+                .WriteValue(3);
 
             AssertMatch("(System.Int32)(System.Int64)3", "Double cast");
         }
@@ -78,11 +78,11 @@ namespace JsonExSerializerTests
         [Test]
         public void CastInsideArray()
         {
-            jsonWriter.Cast(typeof(ArrayList))
-                .ArrayStart()
-                    .Cast(typeof(int)).Value(1)
-                    .Cast(typeof(int)).Value(2)
-                .ArrayEnd();
+            jsonWriter.WriteCast(typeof(ArrayList))
+                .WriteArrayStart()
+                    .WriteCast(typeof(int)).WriteValue(1)
+                    .WriteCast(typeof(int)).WriteValue(2)
+                .WriteArrayEnd();
 
             AssertMatch("(System.Collections.ArrayList)[(System.Int32)1,(System.Int32)2]", "Array Cast");
         }
@@ -90,11 +90,11 @@ namespace JsonExSerializerTests
         [Test]
         public void CastInsideObject()
         {
-            jsonWriter.Cast(typeof(SimpleObject))
-                .ObjectStart()
-                    .Key("ByteValue")
-                    .Cast(typeof(byte)).Value(255)
-                .ObjectEnd();
+            jsonWriter.WriteCast(typeof(SimpleObject))
+                .WriteObjectStart()
+                    .WriteKey("ByteValue")
+                    .WriteCast(typeof(byte)).WriteValue(255)
+                .WriteObjectEnd();
 
             AssertMatch("(\"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"){\"ByteValue\":(System.Byte)255}", "Object Cast");
         }
@@ -103,95 +103,95 @@ namespace JsonExSerializerTests
         [Test]
         public void EmptyConstructor()
         {
-            jsonWriter.ConstructorStart(typeof(string))
-                .ConstructorArgsStart()
-                .ConstructorArgsEnd()
-                .ConstructorEnd();
+            jsonWriter.WriteConstructorStart(typeof(string))
+                .WriteConstructorArgsStart()
+                .WriteConstructorArgsEnd()
+                .WriteConstructorEnd();
             AssertMatch("new System.String()", "Empty Constructor");
         }
 
         [Test]
         public void SimpleArgsConstructor()
         {            
-            jsonWriter.ConstructorStart(typeof(string))
-                .ConstructorArgsStart()
-                .QuotedValue("mystring")
-                .ConstructorArgsEnd()
-                .ConstructorEnd();
+            jsonWriter.WriteConstructorStart(typeof(string))
+                .WriteConstructorArgsStart()
+                .WriteQuotedValue("mystring")
+                .WriteConstructorArgsEnd()
+                .WriteConstructorEnd();
             AssertMatch("new System.String(\"mystring\")", "Simple Args Constructor");
         }
 
         [Test]
         public void ArgsWithCastConstructor()
         {            
-            jsonWriter.ConstructorStart(typeof(string))
-                .ConstructorArgsStart()
-                .Cast(typeof(char))
-                .QuotedValue("a")
-                .Value(10)
-                .ConstructorArgsEnd()
-                .ConstructorEnd();
+            jsonWriter.WriteConstructorStart(typeof(string))
+                .WriteConstructorArgsStart()
+                .WriteCast(typeof(char))
+                .WriteQuotedValue("a")
+                .WriteValue(10)
+                .WriteConstructorArgsEnd()
+                .WriteConstructorEnd();
             AssertMatch("new System.String((System.Char)\"a\",10)", "Args with castConstructor");
         }
 
         [Test]
         public void ArrayInArgsConstructor()
         {            
-            jsonWriter.ConstructorStart(typeof(string))
-                .ConstructorArgsStart()
-                .Cast("char[]")
-                .ArrayStart()
-                    .QuotedValue("t")
-                    .QuotedValue("e")
-                    .QuotedValue("s")
-                    .QuotedValue("t")
-                    .QuotedValue("e")
-                    .QuotedValue("d")
-                .ArrayEnd()
-                .Value(0)
-                .Value(4)
-                .ConstructorArgsEnd()
-                .ConstructorEnd();
+            jsonWriter.WriteConstructorStart(typeof(string))
+                .WriteConstructorArgsStart()
+                .WriteCast("char[]")
+                .WriteArrayStart()
+                    .WriteQuotedValue("t")
+                    .WriteQuotedValue("e")
+                    .WriteQuotedValue("s")
+                    .WriteQuotedValue("t")
+                    .WriteQuotedValue("e")
+                    .WriteQuotedValue("d")
+                .WriteArrayEnd()
+                .WriteValue(0)
+                .WriteValue(4)
+                .WriteConstructorArgsEnd()
+                .WriteConstructorEnd();
             AssertMatch("new System.String((char[])[\"t\",\"e\",\"s\",\"t\",\"e\",\"d\"],0,4)", "Array In Args Constructor");
         }
 
         [Test]
         public void TestObjectInCtorArgs()
         {
-            jsonWriter.ConstructorStart(typeof(SimpleObject))
-                .ConstructorArgsStart()
-                .ObjectStart()
-                    .Key("x")
-                    .Value(10)
-                    .Key("y")
-                    .Value(-10)
-                .ObjectEnd()
-                .Value(0)
-                .Value(4)
-                .ConstructorArgsEnd()
-                .ConstructorEnd();
+            jsonWriter.WriteConstructorStart(typeof(SimpleObject))
+                .WriteConstructorArgsStart()
+                .WriteObjectStart()
+                    .WriteKey("x")
+                    .WriteValue(10)
+                    .WriteKey("y")
+                    .WriteValue(-10)
+                .WriteObjectEnd()
+                .WriteValue(0)
+                .WriteValue(4)
+                .WriteConstructorArgsEnd()
+                .WriteConstructorEnd();
             AssertMatch("new \"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"({\"x\":10,\"y\":-10},0,4)", "TestObjectInCtorArgs Constructor");
         }
 
         [Test]
         public void TestConstructorWithInitializer()
         {
-            jsonWriter.ConstructorStart(typeof(SimpleObject))
-                .ConstructorArgsStart()
-                .ObjectStart()
-                    .Key("x")
-                    .Value(10)
-                    .Key("y")
-                    .Value(-10)
-                .ObjectEnd()
-                .ConstructorArgsEnd()
-                .ObjectStart()
-                .Key("z")
-                .Value(-20)
-                .Key("q")
-                .Value(0)
-                .ObjectEnd()
-                .ConstructorEnd();
+            jsonWriter.WriteConstructorStart(typeof(SimpleObject))
+                .WriteConstructorArgsStart()
+                .WriteObjectStart()
+                    .WriteKey("x")
+                    .WriteValue(10)
+                    .WriteKey("y")
+                    .WriteValue(-10)
+                .WriteObjectEnd()
+                .WriteConstructorArgsEnd()
+                .WriteObjectStart()
+                .WriteKey("z")
+                .WriteValue(-20)
+                .WriteKey("q")
+                .WriteValue(0)
+                .WriteObjectEnd()
+                .WriteConstructorEnd();
             AssertMatch("new \"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"({\"x\":10,\"y\":-10}){\"z\":-20,\"q\":0}", "Test Constructor With Initializer");
         }
     }

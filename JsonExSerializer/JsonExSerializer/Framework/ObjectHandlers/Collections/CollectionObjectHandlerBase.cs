@@ -8,10 +8,11 @@ namespace JsonExSerializer.Framework.ObjectHandlers.Collections
 {
     public abstract class CollectionObjectHandlerBase : ObjectHandlerBase
     {
-        public CollectionObjectHandlerBase()
+        protected CollectionObjectHandlerBase()
         {
         }
-        public CollectionObjectHandlerBase(SerializationContext Context) : base(Context)
+        protected CollectionObjectHandlerBase(SerializationContext Context)
+            : base(Context)
         {
         }
 
@@ -20,19 +21,19 @@ namespace JsonExSerializer.Framework.ObjectHandlers.Collections
             return typeof(object);
         }
 
-        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer)
         {
-            return GetExpression((IEnumerable)data, GetItemType(data.GetType()), CurrentPath, Serializer);
+            return GetExpression((IEnumerable)data, GetItemType(data.GetType()), CurrentPath, serializer);
         }
 
-        protected virtual ExpressionBase GetExpression(IEnumerable Items, Type ItemType, JsonPath CurrentPath, ISerializerHandler Serializer)
+        protected virtual ExpressionBase GetExpression(IEnumerable Items, Type ItemType, JsonPath CurrentPath, ISerializerHandler serializer)
         {
             int index = 0;
 
             ListExpression expression = new ListExpression();
             foreach (object value in Items)
             {
-                ExpressionBase itemExpr = Serializer.Serialize(value, CurrentPath.Append(index));
+                ExpressionBase itemExpr = serializer.Serialize(value, CurrentPath.Append(index));
                 if (value != null && value.GetType() != ItemType)
                 {
                     itemExpr = new CastExpression(value.GetType(), itemExpr);
@@ -43,34 +44,34 @@ namespace JsonExSerializer.Framework.ObjectHandlers.Collections
             return expression;
         }
 
-        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler deserializer)
         {
-            object collection = ConstructCollection((ListExpression)Expression, Deserializer);
-            return Evaluate(Expression, collection, Deserializer);
+            object collection = ConstructCollection((ListExpression)Expression, deserializer);
+            return Evaluate(Expression, collection, deserializer);
         }
 
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer)
         {
-            Expression.OnObjectConstructed(ExistingObject);
-            Type itemType = GetItemType(ExistingObject.GetType());
-            EvaluateItems((ListExpression) Expression, ExistingObject, itemType, Deserializer);
-            if (ExistingObject is IDeserializationCallback)
-                ((IDeserializationCallback)ExistingObject).OnAfterDeserialization();
-            return ExistingObject;
+            Expression.OnObjectConstructed(existingObject);
+            Type itemType = GetItemType(existingObject.GetType());
+            EvaluateItems((ListExpression) Expression, existingObject, itemType, deserializer);
+            if (existingObject is IDeserializationCallback)
+                ((IDeserializationCallback)existingObject).OnAfterDeserialization();
+            return existingObject;
         }
 
-        protected virtual object ConstructCollection(ListExpression Expression, IDeserializerHandler Deserializer)
+        protected virtual object ConstructCollection(ListExpression Expression, IDeserializerHandler deserializer)
         {
             object result = Activator.CreateInstance(Expression.ResultType);
             return result;
         }
 
-        protected virtual void EvaluateItems(ListExpression Expression, object Collection, Type ItemType, IDeserializerHandler Deserializer)
+        protected virtual void EvaluateItems(ListExpression Expression, object Collection, Type ItemType, IDeserializerHandler deserializer)
         {
             foreach (ExpressionBase item in Expression.Items)
             {
                 item.ResultType = ItemType;
-                object itemResult = Deserializer.Evaluate(item);
+                object itemResult = deserializer.Evaluate(item);
                 AddItem(Collection, itemResult);
             }
         }

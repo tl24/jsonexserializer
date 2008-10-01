@@ -20,7 +20,7 @@ namespace JsonExSerializer.TypeConversion
 
         public DictionaryToListConverter()
         {
-            this.Context = "";
+            _context = "";
         }
 
         #region IJsonTypeConverter Members
@@ -45,7 +45,7 @@ namespace JsonExSerializer.TypeConversion
                 IPropertyHandler propHandler = serializationContext.GetTypeHandler(colItem.GetType()).FindProperty(Context.ToString());
                 if (propHandler == null)
                 {
-                    throw new MissingMemberException("Type: " + item.GetType().Name + " does not have an accessible property: " + _context);
+                    throw new MissingMemberException("Type: " + item.GetType().Name + " does not have an accessible property: " + Context);
                 }
 
                 dictionary[propHandler.GetValue(colItem)] = colItem;

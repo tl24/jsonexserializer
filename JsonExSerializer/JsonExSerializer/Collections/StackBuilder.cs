@@ -17,7 +17,7 @@ namespace JsonExSerializer.Collections
     /// </summary>
     public class StackBuilder : ICollectionBuilder
     {
-        protected object _stack;
+        private object _stack;
 
         public StackBuilder(Type stackType)
         {

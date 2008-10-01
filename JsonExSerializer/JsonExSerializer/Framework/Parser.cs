@@ -65,9 +65,6 @@ namespace JsonExSerializer.Framework
         /// <summary> ) </summary>
         private readonly Token RBraceToken = new Token(TokenType.Symbol, "}");
 
-        /// <summary> null </summary>
-        private readonly Token NullToken = new Token(TokenType.Identifier, "null");
-
         /// <summary> this </summary>
         private readonly Token ReferenceStartToken = new Token(TokenType.Identifier, JsonPath.Root);
         #endregion
@@ -106,10 +103,10 @@ namespace JsonExSerializer.Framework
             return handler.Evaluate(Expression, this);
         }
 
-        public object Evaluate(ExpressionBase Expression, object ExistingObject)
+        public object Evaluate(ExpressionBase Expression, object existingObject)
         {
             IObjectHandler handler = _context.ObjectHandlers.GetHandler(Expression);
-            return handler.Evaluate(Expression, ExistingObject, this);
+            return handler.Evaluate(Expression, existingObject, this);
         }
 
         /// <summary>

@@ -7,24 +7,22 @@ namespace JsonExSerializer.Framework.ObjectHandlers
 {
     public class ValueObjectHandler : ObjectHandlerBase, IObjectHandler
     {
-        private SerializationContext _context;
         public ValueObjectHandler()
         {
         }
 
-        public ValueObjectHandler(SerializationContext Context)
+        public ValueObjectHandler(SerializationContext context) : base(context)
         {
-            this.Context = Context;
         }
 
-        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
             return new ValueExpression(data);
         }
 
-        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
         {
-            ValueExpression value = (ValueExpression)Expression;
+            ValueExpression value = (ValueExpression)expression;
             if (value.ResultType.IsEnum)
                 return Enum.Parse(value.ResultType, value.StringValue);
             else if (value.ResultType == typeof(object))
@@ -35,7 +33,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
                 return Convert.ChangeType(value.StringValue, value.ResultType);
         }
 
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
         {
             throw new InvalidOperationException("Value types can not be updated");
         }

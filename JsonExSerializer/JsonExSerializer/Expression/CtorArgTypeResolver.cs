@@ -83,7 +83,7 @@ namespace JsonExSerializer.Expression
         /// <param name="TypeToMatch"></param>
         /// <param name="TypesToCheck"></param>
         /// <returns></returns>
-        private Type GetBestMatch(Type TypeToMatch, params Type[] TypesToCheck)
+        private static Type GetBestMatch(Type TypeToMatch, params Type[] TypesToCheck)
         {
             foreach (Type checkType in TypesToCheck)
             {
@@ -105,7 +105,7 @@ namespace JsonExSerializer.Expression
             return null;
         }
 
-        private bool IsTypeCompatible(Type TypeToMatch, Type checkType)
+        private static bool IsTypeCompatible(Type TypeToMatch, Type checkType)
         {
             bool matched = false;
             if (TypeToMatch == checkType)
@@ -116,7 +116,7 @@ namespace JsonExSerializer.Expression
             return matched;
         }
 
-        private Type GetValueType(ParameterInfo parameter, ValueExpression value)
+        private static Type GetValueType(ParameterInfo parameter, ValueExpression value)
         {
             Type result = null;
             if (value is BooleanExpression)
@@ -138,7 +138,7 @@ namespace JsonExSerializer.Expression
             return result;
         }
 
-        private bool IsNumericType(Type t)
+        private static bool IsNumericType(Type t)
         {
             switch (Type.GetTypeCode(t))
             {
@@ -196,7 +196,6 @@ namespace JsonExSerializer.Expression
             {
                 constructor = ctor;
                 types = new Type[ctor.GetParameters().Length];
-                score = 0;
             }
 
             public Type[] GetFinalTypes()

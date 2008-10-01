@@ -6,12 +6,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace JsonExSerializer
 {
     /// <summary>
     /// Indicates an error parsing the input stream for deserialization
     /// </summary>
+    [Serializable] 
     public class ParseException : JsonExSerializationException
     {
         public ParseException()
@@ -26,6 +28,11 @@ namespace JsonExSerializer
 
         public ParseException(string message, Exception innerException)
             : base(message, innerException)
+        {
+        }
+
+        protected ParseException(SerializationInfo serializationInfo, StreamingContext context)
+            : base(serializationInfo, context)
         {
         }
 

@@ -9,10 +9,12 @@ namespace JsonExSerializer.MetaData
     /// </summary>
     public abstract class AbstractPropertyHandler : MemberHandlerBase, IPropertyHandler
     {
-        protected bool _ignored = false;
+        protected bool _ignored;
         protected int _position = -1;
 
-        public AbstractPropertyHandler(Type ForType) : base(ForType) {
+        protected AbstractPropertyHandler(Type ForType)
+            : base(ForType)
+        {
         }
 
         public abstract string Name { get; }

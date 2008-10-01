@@ -47,15 +47,15 @@ namespace JsonExSerializer
         /// <param name="t">type</param>
         /// <returns>a serializer</returns>
         [Obsolete("Use the Serializer(Type, string) constructor")]
-        public static Serializer GetSerializer(Type t, string configSection)
+        public static Serializer GetSerializer(Type type, string configSection)
         {
-            return new Serializer(t, configSection);
+            return new Serializer(type, configSection);
         }
 
         [Obsolete("Use the Serializer(Type, SerializationContext) constructor")]
-        public static Serializer GetSerializer(Type t, SerializationContext context)
+        public static Serializer GetSerializer(Type type, SerializationContext context)
         {
-            return new Serializer(t, context);
+            return new Serializer(type, context);
         }
 
         /// <summary>
@@ -63,8 +63,8 @@ namespace JsonExSerializer
         /// default configuration section "JsonExSerializer" if it exists.
         /// </summary>
         /// <param name="t">the type to serialize/deserialize</param>
-        public Serializer(Type t)
-            : this(t, "JsonExSerializer")
+        public Serializer(Type type)
+            : this(type, "JsonExSerializer")
         {
         }
 
@@ -74,9 +74,11 @@ namespace JsonExSerializer
         /// specified configuration section.
         /// </summary>
         /// <param name="t">the type to serialize/deserialize</param>
-        public Serializer(Type t, string configSection) 
+        public Serializer(Type type, string configSection) 
         {
-            _serializedType = t;
+            if (type == null)
+                throw new ArgumentNullException("type");
+            _serializedType = type;
             _context = new SerializationContext();
             _context.SerializerInstance = this;
             XmlConfigurator.Configure(_context, configSection);
@@ -87,9 +89,14 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="t">the type to serialize/deserialize</param>
         /// <param name="context"></param>
-        public Serializer(Type t, SerializationContext context)
+        public Serializer(Type type, SerializationContext context)
         {
-            _serializedType = t;
+            if (type == null)
+                throw new ArgumentNullException("type");
+            if (context == null)
+                throw new ArgumentNullException("context");
+
+            _serializedType = type;
             _context = context;
             _context.SerializerInstance = this;
         }
@@ -102,6 +109,8 @@ namespace JsonExSerializer
         /// <param name="stream">stream for the serialized data</param>
         public void Serialize(object o, Stream stream)
         {
+            if (stream == null)
+                throw new ArgumentNullException("stream");
             using (StreamWriter sw = new StreamWriter(stream))
             {                
                 Serialize(o, sw);
@@ -115,9 +124,10 @@ namespace JsonExSerializer
         /// <param name="writer">writer for the serialized data</param>
         public void Serialize(object o, TextWriter writer)
         {
+            if (writer == null)
+                throw new ArgumentNullException("writer");
             SerializerHelper helper = new SerializerHelper(_serializedType, _context, writer);
             helper.Serialize(o);
-
         }
 
         /// <summary>
@@ -148,6 +158,8 @@ namespace JsonExSerializer
         /// <returns>the deserialized object</returns>
         public object Deserialize(Stream stream)
         {
+            if (stream == null)
+                throw new ArgumentNullException("stream");
             using (StreamReader sr = new StreamReader(stream))
             {
                 return Deserialize(sr);
@@ -160,7 +172,9 @@ namespace JsonExSerializer
         /// <param name="reader">TextReader to read the data from</param>
         /// <returns>the deserialized object</returns>
         public object Deserialize(TextReader reader)
-        {            
+        {
+            if (reader == null)
+                throw new ArgumentNullException("reader");
             Parser p = new Parser(_serializedType, reader, _context);
             return p.Parse();
         }
@@ -173,6 +187,8 @@ namespace JsonExSerializer
         /// <returns>the deserialized object</returns>
         public object Deserialize(string input)
         {
+            if (input == null)
+                throw new ArgumentNullException("input");
             StringReader rdr = new StringReader(input);
             object result = Deserialize(rdr);
             rdr.Close();

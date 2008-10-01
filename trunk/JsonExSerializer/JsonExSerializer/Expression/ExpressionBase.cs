@@ -35,7 +35,7 @@ namespace JsonExSerializer.Expression
         private ExpressionBase _parent;
         protected Type _resultType; // the desired type of the result        
 
-        public ExpressionBase()
+        protected ExpressionBase()
         {
             _resultType = typeof(object);
         }

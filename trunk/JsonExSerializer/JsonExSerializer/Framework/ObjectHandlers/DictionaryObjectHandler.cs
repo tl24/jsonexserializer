@@ -23,7 +23,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         /// </summary>
         /// <param name="dictionary">the dictionary object</param>
         /// <param name="currentPath">object's path</param>
-        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer)
         {
             IDictionary dictionary = (IDictionary)data;
             Type itemType = typeof(object);
@@ -40,7 +40,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
                 //Serialize(pair.Key, subindent, "", null);
                 //may not work in all cases
                 object value = pair.Value;
-                ExpressionBase valueExpr = Serializer.Serialize(value, CurrentPath.Append(pair.Key.ToString()));
+                ExpressionBase valueExpr = serializer.Serialize(value, CurrentPath.Append(pair.Key.ToString()));
                 if (value != null && value.GetType() != itemType)
                 {
                     valueExpr = new CastExpression(value.GetType(), valueExpr);
@@ -55,11 +55,11 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return typeof(IDictionary).IsAssignableFrom(ObjectType);
         }
 
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer)
         {
             Type _dictionaryKeyType = typeof(string);
             Type _dictionaryValueType = null;
-            Type genDict = ExistingObject.GetType().GetInterface(typeof(IDictionary<,>).Name);
+            Type genDict = existingObject.GetType().GetInterface(typeof(IDictionary<,>).Name);
             // attempt to figure out what the types of the values are, if no type is set already
             if (genDict != null)
             {
@@ -76,11 +76,11 @@ namespace JsonExSerializer.Framework.ObjectHandlers
                 if (_dictionaryValueType != null)
                     keyValue.ValueExpression.ResultType = _dictionaryValueType;
 
-                object keyObject = Deserializer.Evaluate(keyValue.KeyExpression);
-                object result = Deserializer.Evaluate(keyValue.ValueExpression);
-                ((IDictionary)ExistingObject)[keyObject] = result;
+                object keyObject = deserializer.Evaluate(keyValue.KeyExpression);
+                object result = deserializer.Evaluate(keyValue.ValueExpression);
+                ((IDictionary)existingObject)[keyObject] = result;
             }
-            return ExistingObject;
+            return existingObject;
         }
     }
 }

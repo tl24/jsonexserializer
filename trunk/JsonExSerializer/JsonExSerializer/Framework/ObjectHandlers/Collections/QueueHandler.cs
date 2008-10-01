@@ -32,29 +32,29 @@ namespace JsonExSerializer.Framework.ObjectHandlers.Collections
             return ObjectType.IsGenericType && typeof(Queue<>).IsAssignableFrom(ObjectType.GetGenericTypeDefinition());
         }
 
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer)
         {
-            Expression.OnObjectConstructed(ExistingObject);
+            Expression.OnObjectConstructed(existingObject);
             Type collectionType = null;
-            if (ExistingObject != null)
-                collectionType = ExistingObject.GetType();
+            if (existingObject != null)
+                collectionType = existingObject.GetType();
             else
                 collectionType = Expression.ResultType;
             Type itemType = GetItemType(collectionType);
             Type wrapperType = typeof(GenericQueueWrapper<>).MakeGenericType(itemType);
-            IList wrapper = (IList) Activator.CreateInstance(wrapperType, ExistingObject);
+            IList wrapper = (IList) Activator.CreateInstance(wrapperType, existingObject);
             foreach (ExpressionBase itemExpr in ((ListExpression)Expression).Items)
             {
                 itemExpr.ResultType = itemType;
-                wrapper.Add(Deserializer.Evaluate(itemExpr));
+                wrapper.Add(deserializer.Evaluate(itemExpr));
             }
-            if (ExistingObject is IDeserializationCallback)
-                ((IDeserializationCallback)ExistingObject).OnAfterDeserialization();
-            return ExistingObject;
+            if (existingObject is IDeserializationCallback)
+                ((IDeserializationCallback)existingObject).OnAfterDeserialization();
+            return existingObject;
         }
-        protected override void EvaluateItems(ListExpression Expression, object Collection, Type ItemType, IDeserializerHandler Deserializer)
+        protected override void EvaluateItems(ListExpression Expression, object Collection, Type ItemType, IDeserializerHandler deserializer)
         {
-            base.EvaluateItems(Expression, Collection, ItemType, Deserializer);
+            base.EvaluateItems(Expression, Collection, ItemType, deserializer);
         }
 
         protected override void AddItem(object Collection, object itemResult)

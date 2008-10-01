@@ -15,7 +15,7 @@ namespace JsonExSerializer.MetaData
         protected Type _forType;
         protected IJsonTypeConverter _converterInstance;
         protected bool _converterCreated;
-        public MemberHandlerBase(Type ForType)
+        protected MemberHandlerBase(Type ForType)
         {
             _forType = ForType;
         }
@@ -66,7 +66,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="attribute">the JsonConvertAttribute decorating a property or class</param>
         /// <returns>converter</returns>
-        private IJsonTypeConverter CreateTypeConverter(JsonConvertAttribute attribute)
+        private static IJsonTypeConverter CreateTypeConverter(JsonConvertAttribute attribute)
         {
             IJsonTypeConverter converter = (IJsonTypeConverter)Activator.CreateInstance(attribute.Converter);
             if (attribute.Context != null)

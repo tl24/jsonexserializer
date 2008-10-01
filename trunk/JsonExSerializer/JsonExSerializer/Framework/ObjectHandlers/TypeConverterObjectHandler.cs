@@ -21,19 +21,19 @@ namespace JsonExSerializer.Framework.ObjectHandlers
 
 
 
-        public override ExpressionBase GetExpression(object Value, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object Value, JsonPath CurrentPath, ISerializerHandler serializer)
         {
             TypeHandler handler = Context.TypeHandlerFactory[Value.GetType()];
             IJsonTypeConverter converter = (handler.HasConverter ? handler.TypeConverter : (IJsonTypeConverter)Value);
-            return GetExpression(Value, converter, CurrentPath, Serializer);
+            return GetExpression(Value, converter, CurrentPath, serializer);
         }
 
-        public ExpressionBase GetExpression(object Value, IJsonTypeConverter Converter, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public ExpressionBase GetExpression(object Value, IJsonTypeConverter Converter, JsonPath CurrentPath, ISerializerHandler serializer)
         {
             object convertedObject = Converter.ConvertFrom(Value, Context);
             // call serialize again in case the new type has a converter
-            ExpressionBase expr = Serializer.Serialize(convertedObject, CurrentPath, null);
-            Serializer.SetCanReference(Value);   // can't reference inside the object
+            ExpressionBase expr = serializer.Serialize(convertedObject, CurrentPath, null);
+            serializer.SetCanReference(Value);   // can't reference inside the object
             return expr;
         }
 
@@ -43,7 +43,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return handler.HasConverter || typeof(IJsonTypeConverter).IsAssignableFrom(ObjectType);
         }
 
-        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler deserializer)
         {
             Type sourceType = Expression.ResultType;
             TypeHandler handler = Context.TypeHandlerFactory[sourceType];
@@ -57,15 +57,15 @@ namespace JsonExSerializer.Framework.ObjectHandlers
                 converter = handler.TypeConverter;
             }
 
-            return Evaluate(Expression, Deserializer, converter);
+            return Evaluate(Expression, deserializer, converter);
         }
 
-        public object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer, IJsonTypeConverter Converter)
+        public object Evaluate(ExpressionBase Expression, IDeserializerHandler deserializer, IJsonTypeConverter Converter)
         {
             Type sourceType = Expression.ResultType;
             Type destType = Converter.GetSerializedType(sourceType);
             Expression.ResultType = destType;
-            object tempResult = Deserializer.Evaluate(Expression);
+            object tempResult = deserializer.Evaluate(Expression);
             object result = Converter.ConvertTo(tempResult, sourceType, Context);
             Expression.OnObjectConstructed(result);
             if (result is IDeserializationCallback)
@@ -75,13 +75,13 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return result;
         }
 
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer)
         {
             //TODO: possibly allow this if the type implements IJsonTypeConverter itself
             throw new Exception("Cannot convert an existing object.");
         }
 
-        public virtual object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer, IJsonTypeConverter Converter)
+        public virtual object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer, IJsonTypeConverter Converter)
         {
             //TODO: possibly allow this if the type implements IJsonTypeConverter itself
             throw new Exception("Cannot convert an existing object.");

@@ -9,6 +9,6 @@ namespace JsonExSerializer.Framework.ObjectHandlers
     {
         object Evaluate(ExpressionBase Expression);
 
-        object Evaluate(ExpressionBase Expression, object ExistingObject);
+        object Evaluate(ExpressionBase Expression, object existingObject);
     }
 }

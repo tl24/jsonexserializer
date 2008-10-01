@@ -14,19 +14,19 @@ namespace JsonExSerializer.Collections
         private Type _collectionType;
         private Type _itemType;
 
-        public CollectionHandlerWrapper(CollectionHandler Handler)
+        public CollectionHandlerWrapper(CollectionHandler handler)
         {
-            _innerHandler = Handler;
+            _innerHandler = handler;
         }
 
-        public CollectionHandlerWrapper(CollectionHandler Handler, Type CollectionType, Type ItemType)
+        public CollectionHandlerWrapper(CollectionHandler handler, Type collectionType, Type itemType)
         {
-            if (Handler == null)
-                throw new ArgumentNullException("Handler cannot be null for CollectionHandlerWrapper");
+            if (handler == null)
+                throw new ArgumentNullException("handler");
 
-            _innerHandler = Handler;
-            _collectionType = CollectionType;
-            _itemType = ItemType;
+            _innerHandler = handler;
+            _collectionType = collectionType;
+            _itemType = itemType;
         }
 
         public override bool IsCollection(Type collectionType)

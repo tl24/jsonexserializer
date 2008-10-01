@@ -34,8 +34,9 @@ namespace JsonExSerializer.Collections
 
         public override IEnumerable GetEnumerable(object collection)
         {
-            object[] items = new object[((Stack)collection).Count];
-            ((Stack)collection).CopyTo(items, 0);
+            Stack stack = (Stack)collection;
+            object[] items = new object[stack.Count];
+            stack.CopyTo(items, 0);
             Array.Reverse(items);
             return items;
         }

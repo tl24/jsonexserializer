@@ -50,7 +50,7 @@ namespace JsonExSerializer.Framework
                 comment += "  Assembly: " + value.GetType().Assembly.ToString() + "\r\n";
                 comment += "  Type: " + value.GetType().FullName + "\r\n";
                 comment += "*/" + "\r\n";
-                this.Comment(comment);
+                this.WriteComment(comment);
             }
             ExpressionBase expr = Serialize(value, new JsonPath(), null);
             if (value != null && value.GetType() != _serializedType)
@@ -83,8 +83,9 @@ namespace JsonExSerializer.Framework
                 if (expr != null)
                     return expr;
 
-                if (value is ISerializationCallback)
-                    ((ISerializationCallback)value).OnBeforeSerialization();
+                ISerializationCallback callback = value as ISerializationCallback;
+                if (callback != null)
+                    callback.OnBeforeSerialization();
 
                 try
                 {
@@ -102,8 +103,8 @@ namespace JsonExSerializer.Framework
                 }
                 finally
                 {
-                    if (value is ISerializationCallback)
-                        ((ISerializationCallback)value).OnAfterSerialization();
+                    if (callback != null)
+                        callback.OnAfterSerialization();
                 }
             }
         }
@@ -177,7 +178,7 @@ namespace JsonExSerializer.Framework
         {
             string alias = _context.GetTypeAlias(t);
             if (alias != null) {
-                _writer.Write(alias);
+                WriteTypeInfo(alias);
                 return;
             }
             base.WriteTypeInfo(t);
@@ -189,7 +190,7 @@ namespace JsonExSerializer.Framework
         private class ReferenceInfo
         {
             public JsonPath Path;
-            public bool CanReference = false;
+            public bool CanReference;
 
             public ReferenceInfo(JsonPath Path)
             {

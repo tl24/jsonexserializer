@@ -9,7 +9,7 @@ namespace JsonExSerializer
     /// handler.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class,AllowMultiple=false,Inherited=true)]
-    public class JsonExCollectionAttribute : System.Attribute
+    public sealed class JsonExCollectionAttribute : System.Attribute
     {
         private Type _collectionHandlerType;
         private string _collectionHandlerTypeName;

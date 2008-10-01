@@ -22,7 +22,7 @@ namespace JsonExSerializer.MetaData
         protected IList<IPropertyHandler> _properties;
         protected IList<IPropertyHandler> _constructorArgs;
 
-        private bool _collectionLookedUp = false;
+        private bool _collectionLookedUp;
         private CollectionHandler _collectionHandler;
         protected SerializationContext _context;
         private bool? _empty;

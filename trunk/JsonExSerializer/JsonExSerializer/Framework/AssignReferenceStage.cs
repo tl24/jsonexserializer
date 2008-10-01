@@ -11,34 +11,32 @@ namespace JsonExSerializer.Framework
     /// </summary>
     public class AssignReferenceStage : IParsingStage
     {
-        SerializationContext _context;
 
-        public AssignReferenceStage(SerializationContext Context)
+        public AssignReferenceStage(SerializationContext context)
         {
-            _context = Context;
         }
 
-        public ExpressionBase Execute(ExpressionBase Root)
+        public ExpressionBase Execute(ExpressionBase root)
         {
-            IList<ReferenceExpression> references = CollectReferences(Root);
+            IList<ReferenceExpression> references = CollectReferences(root);
             foreach (ReferenceExpression reference in references)
-                ResolveReference(reference, Root);
-            return Root;
+                ResolveReference(reference, root);
+            return root;
         }
 
-        private List<ReferenceExpression> CollectReferences(ExpressionBase Root)
+        private static List<ReferenceExpression> CollectReferences(ExpressionBase root)
         {
             CollectReferencesVisitor visitor = new CollectReferencesVisitor();
-            Root.Accept(visitor);
+            root.Accept(visitor);
             return visitor.References;
         }
 
-        private void ResolveReference(ReferenceExpression reference, ExpressionBase Root)
+        private static void ResolveReference(ReferenceExpression reference, ExpressionBase root)
         {
             ReferenceVisitor visitor = new ReferenceVisitor(reference.Path);
-            visitor.Visit(Root);
+            visitor.Visit(root);
             if (visitor.ReferencedExpression == null)
-                throw new Exception("Unable to resolve reference to " + reference.Path);
+                throw new ParseException("Unable to resolve reference to " + reference.Path);
             reference.ReferencedExpression = visitor.ReferencedExpression;
         }
 

@@ -7,30 +7,31 @@ namespace JsonExSerializer.Framework.ObjectHandlers
 {
     public class NullObjectHandler : ObjectHandlerBase
     {
-        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer)
+        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer)
         {
             return new NullExpression();
         }
 
-        public override bool CanHandle(Type ObjectType)
+        public override bool CanHandle(Type objectType)
         {
             return false;
         }
 
-        public override bool CanHandle(ExpressionBase Expression)
+        public override bool CanHandle(ExpressionBase expression)
         {
-            return (Expression is NullExpression);
+            return (expression is NullExpression);
         }
 
-        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
         {
-            NullExpression nullExpr = (NullExpression)Expression;
+            if (!(expression is NullExpression))
+                throw new ArgumentException("expression should be NullExpression");
             return null;
         }
 
-        public override object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer)
+        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
         {
-            return ExistingObject;
+            return existingObject;
         }
     }
 }

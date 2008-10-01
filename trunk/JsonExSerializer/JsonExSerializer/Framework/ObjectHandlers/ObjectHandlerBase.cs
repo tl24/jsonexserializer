@@ -9,13 +9,13 @@ namespace JsonExSerializer.Framework.ObjectHandlers
     {
         private SerializationContext _context;
 
-        public ObjectHandlerBase()
+        protected ObjectHandlerBase()
         {
         }
 
-        public ObjectHandlerBase(SerializationContext Context)
+        protected ObjectHandlerBase(SerializationContext Context)
         {
-            this.Context = Context;
+            _context = Context;
         }
 
         public virtual SerializationContext Context
@@ -25,7 +25,7 @@ namespace JsonExSerializer.Framework.ObjectHandlers
         }
 
 
-        public abstract ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler Serializer);
+        public abstract ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer);
 
         public abstract bool CanHandle(Type ObjectType);
 
@@ -34,8 +34,8 @@ namespace JsonExSerializer.Framework.ObjectHandlers
             return false;
         }
 
-        public abstract object Evaluate(ExpressionBase Expression, IDeserializerHandler Deserializer);
+        public abstract object Evaluate(ExpressionBase Expression, IDeserializerHandler deserializer);
 
-        public abstract object Evaluate(ExpressionBase Expression, object ExistingObject, IDeserializerHandler Deserializer);
+        public abstract object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer);
     }
 }

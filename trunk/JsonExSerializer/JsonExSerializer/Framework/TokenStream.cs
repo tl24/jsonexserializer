@@ -117,7 +117,7 @@ namespace JsonExSerializer.Framework
                 } else if (IsMultilineCommentStart(ch)) {
                     ReadMultilineComment(ch);
                 } else if (IsSymbolStart(ch)) {
-                    return GetSymbol(ch, buffer);
+                    return GetSymbol(ch);
                 } else {
                     throw new ParseException("Invalid character");
                 }
@@ -181,7 +181,7 @@ namespace JsonExSerializer.Framework
         /// <param name="ch">the starting character</param>
         /// <param name="buffer">a buffer to store input</param>
         /// <returns>symbol token</returns>
-        private Token GetSymbol(char ch, StringBuilder buffer)
+        private static Token GetSymbol(char ch)
         {
             // we don't have any symbols at the moment that are more than one character
             // so we can just return any symbols
@@ -404,7 +404,7 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="ch">character to test</param>
         /// <returns>true if quote start</returns>
-        private bool IsQuoteStart(char ch)
+        private static bool IsQuoteStart(char ch)
         {
             return ch == '\'' || ch == '"';
         }
@@ -427,7 +427,7 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="ch">character to test</param>
         /// <returns>true if identifier start</returns>
-        private bool IsIdentifierStart(char ch)
+        private static bool IsIdentifierStart(char ch)
         {
             return char.IsLetter(ch) || ch == '_';
         }

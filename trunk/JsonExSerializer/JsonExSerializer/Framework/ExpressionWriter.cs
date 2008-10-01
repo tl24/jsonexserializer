@@ -35,65 +35,66 @@ namespace JsonExSerializer.Framework
             _actions[typeof(CastExpression)] = WriteCast;
         }
 
-        public static void Write(IJsonWriter Writer, SerializationContext context, ExpressionBase Expression)
+        public static void Write(IJsonWriter writer, SerializationContext context, ExpressionBase expression)
         {
-            new ExpressionWriter(Writer, context).Write(Expression);
+            new ExpressionWriter(writer, context).Write(expression);
         }
 
-        public void Write(ExpressionBase Expression)
+        public void Write(ExpressionBase expression)
         {
-            _actions[Expression.GetType()](Expression);
+            _actions[expression.GetType()](expression);
         }
 
-        private void WriteBoolean(ExpressionBase Expression)
+        private void WriteBoolean(ExpressionBase expression)
         {
-            _jsonWriter.Value((bool)((BooleanExpression)Expression).Value);
+            _jsonWriter.WriteValue((bool)((BooleanExpression)expression).Value);
         }
 
-        private void WriteNumeric(ExpressionBase Expression)
+        private void WriteNumeric(ExpressionBase expression)
         {
-            NumericExpression numeric = (NumericExpression)Expression;
+            NumericExpression numeric = (NumericExpression)expression;
             object value = numeric.Value;
             switch (Type.GetTypeCode(value.GetType()))
             {
                 case TypeCode.Double:
-                    _jsonWriter.Value((double)value);
+                    _jsonWriter.WriteValue((double)value);
                     break;
                 case TypeCode.Single:
-                    _jsonWriter.Value((float)value);
+                    _jsonWriter.WriteValue((float)value);
                     break;
                 case TypeCode.Int64:
-                    _jsonWriter.Value((long)value);
+                    _jsonWriter.WriteValue((long)value);
                     break;
                 case TypeCode.Decimal:
                 case TypeCode.UInt64:
-                    _jsonWriter.SpecialValue(string.Format("{0}", value));
+                    _jsonWriter.WriteSpecialValue(string.Format("{0}", value));
                     break;
                 default:
-                    _jsonWriter.Value((long)Convert.ChangeType(value, typeof(long)));
+                    _jsonWriter.WriteValue((long)Convert.ChangeType(value, typeof(long)));
                     break;
             }
         }
 
-        private void WriteValue(ExpressionBase Expression)
+        private void WriteValue(ExpressionBase expression)
         {
-            ValueExpression value = (ValueExpression)Expression;
-            _jsonWriter.QuotedValue(value.StringValue);
+            ValueExpression value = (ValueExpression)expression;
+            _jsonWriter.WriteQuotedValue(value.StringValue);
         }
 
-        private void WriteNull(ExpressionBase Expression)
+        private void WriteNull(ExpressionBase expression)
         {
-            NullExpression n = (NullExpression)Expression;
-            _jsonWriter.SpecialValue("null");
+            if (!(expression is NullExpression))
+                throw new ArgumentException("Expression should be a NullExpression");
+            _jsonWriter.WriteSpecialValue("null");
         }
 
         private void WriteList(ExpressionBase Expression)
         {
             ListExpression list = (ListExpression)Expression;
-            _jsonWriter.ArrayStart();
+            _jsonWriter.WriteArrayStart();
             foreach (ExpressionBase item in list.Items)
                 Write(item);
-            _jsonWriter.ArrayEnd();
+            _jsonWriter.WriteArrayEnd();
         }
 
         private void WriteObject(ExpressionBase Expression)
@@ -103,39 +104,39 @@ namespace JsonExSerializer.Framework
             if (obj.ConstructorArguments.Count > 0)
             {
                 hasConstructor = true;
-                _jsonWriter.ConstructorStart(obj.ResultType);
-                _jsonWriter.ConstructorArgsStart();
+                _jsonWriter.WriteConstructorStart(obj.ResultType);
+                _jsonWriter.WriteConstructorArgsStart();
                 foreach (ExpressionBase ctorArg in obj.ConstructorArguments)
                 {
                     Write(ctorArg);
                 }
-                _jsonWriter.ConstructorArgsEnd();
+                _jsonWriter.WriteConstructorArgsEnd();
             }
             if (!hasConstructor || obj.Properties.Count > 0)
             {
-                _jsonWriter.ObjectStart();
+                _jsonWriter.WriteObjectStart();
                 foreach (KeyValueExpression keyValue in obj.Properties)
                 {
-                    _jsonWriter.Key(keyValue.Key);
+                    _jsonWriter.WriteKey(keyValue.Key);
                     Write(keyValue.ValueExpression);
                 }
-                _jsonWriter.ObjectEnd();
+                _jsonWriter.WriteObjectEnd();
             }
             if (hasConstructor)
-                _jsonWriter.ConstructorEnd();
+                _jsonWriter.WriteConstructorEnd();
         }
 
         private void WriteReference(ExpressionBase Expression)
         {
             ReferenceExpression refExpr = (ReferenceExpression)Expression;
-            _jsonWriter.SpecialValue(refExpr.Path.ToString());
+            _jsonWriter.WriteSpecialValue(refExpr.Path.ToString());
         }
 
         private void WriteCast(ExpressionBase Expression)
         {
             CastExpression cast = (CastExpression)Expression;
             if (_context.OutputTypeInformation)
-                _jsonWriter.Cast(cast.ResultType);
+                _jsonWriter.WriteCast(cast.ResultType);
             Write(cast.Expression);
         }
     }

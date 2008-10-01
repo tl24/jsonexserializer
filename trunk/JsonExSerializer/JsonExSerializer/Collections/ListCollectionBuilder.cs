@@ -16,16 +16,13 @@ namespace JsonExSerializer.Collections
     public class ListCollectionBuilder : ICollectionBuilder
     {
         private IList _list;
-        private Type _instanceType;
         public ListCollectionBuilder(Type instanceType)
         {
-            _instanceType = instanceType;
             _list = (IList)Activator.CreateInstance(instanceType);
         }
 
         public ListCollectionBuilder(IList list)
         {
-            _instanceType = list.GetType();
             _list = list;
         }
 

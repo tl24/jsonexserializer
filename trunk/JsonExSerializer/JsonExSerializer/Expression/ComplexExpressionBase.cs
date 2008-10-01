@@ -16,7 +16,7 @@ namespace JsonExSerializer.Expression
     public abstract class ComplexExpressionBase : ExpressionBase {
         private IList<ExpressionBase> _constructorArguments;
 
-        public ComplexExpressionBase()
+        protected ComplexExpressionBase()
         {
             _constructorArguments = new List<ExpressionBase>();
         }

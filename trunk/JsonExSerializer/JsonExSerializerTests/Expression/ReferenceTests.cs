@@ -24,7 +24,7 @@ namespace JsonExSerializerTests.Expression
         [Test(Description = "Resolving reference for this should return root")]
         public void RootCollectionTest()
         {
-            ListExpression rootAsList = new ListExpression();
+            ArrayExpression rootAsList = new ArrayExpression();
             ExpressionBase result = ResolveReference(rootAsList, JsonPath.Root);
 
             Assert.AreSame(rootAsList, result, "Resolve reference for this should return root");
@@ -61,7 +61,7 @@ namespace JsonExSerializerTests.Expression
         [Test]
         public void ResolveCollectionItemTest()
         {
-            ListExpression root = new ListExpression();
+            ArrayExpression root = new ArrayExpression();
             ObjectExpression child1 = new ObjectExpression();
             ObjectExpression child2 = new ObjectExpression();
             root.Add(child1);
@@ -91,9 +91,9 @@ namespace JsonExSerializerTests.Expression
         [Test]
         public void ResolveNestedCollectionTest()
         {
-            ListExpression root = new ListExpression();
-            ListExpression child1 = new ListExpression();
-            ListExpression child2 = new ListExpression();
+            ArrayExpression root = new ArrayExpression();
+            ArrayExpression child1 = new ArrayExpression();
+            ArrayExpression child2 = new ArrayExpression();
             root.Add(child1);
             root.Add(child2);
             ObjectExpression childA = new ObjectExpression();

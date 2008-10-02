@@ -5,10 +5,25 @@ using JsonExSerializer.Expression;
 
 namespace JsonExSerializer.Framework.ObjectHandlers
 {
+
+    /// <summary>
+    /// Defines methods that are used during deserialization to deserialize expressions.
+    /// </summary>
     public interface IDeserializerHandler
     {
-        object Evaluate(ExpressionBase Expression);
+        /// <summary>
+        /// Evaluates an expression converting it into an object
+        /// </summary>
+        /// <param name="expression">the expression to evaluate</param>
+        /// <returns>the object</returns>
+        object Evaluate(ExpressionBase expression);
 
-        object Evaluate(ExpressionBase Expression, object existingObject);
+        /// <summary>
+        /// Evaluates an expression and populates an existing object
+        /// </summary>
+        /// <param name="expression">the expression to evaluate</param>
+        /// <param name="existingObject">the existing object to populate</param>
+        /// <returns>the populated object</returns>
+        object Evaluate(ExpressionBase expression, object existingObject);
     }
 }

@@ -91,10 +91,10 @@ namespace JsonExSerializer.Framework
                 {
                     //TODO: this is too early for converters
                     SetCanReference(value);    // regular object, can reference at any time
-                    IObjectHandler objHandler;
+                    IExpressionHandler objHandler;
                     if (converter != null)
                     {
-                        TypeConverterObjectHandler converterHandler = (TypeConverterObjectHandler)_context.ObjectHandlers.Find(typeof(TypeConverterObjectHandler));
+                        TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)_context.ObjectHandlers.Find(typeof(TypeConverterExpressionHandler));
                         //TODO: make sure it exists
                         return converterHandler.GetExpression(value, converter, currentPath, this);
                     }

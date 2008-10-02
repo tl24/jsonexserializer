@@ -45,7 +45,7 @@ namespace JsonExSerializer
 
         private List<IParsingStage> _parsingStages;
 
-        private ObjectHandlerCollection _objectHandlers;
+        private ExpressionHandlerCollection _objectHandlers;
 
         /// <summary>
         /// Set of options for handling Ignored properties encountered upon Deserialization
@@ -103,7 +103,7 @@ namespace JsonExSerializer
             // type conversion
             _typeHandlerFactory.RegisterTypeConverter(typeof(System.Collections.BitArray), new BitArrayConverter());
 
-            _objectHandlers = new ObjectHandlerCollection(this);
+            _objectHandlers = new ExpressionHandlerCollection(this);
         }
 
         #endregion
@@ -347,7 +347,7 @@ namespace JsonExSerializer
             set { _typeHandlerFactory = value; }
         }
 
-        public ObjectHandlerCollection ObjectHandlers
+        public ExpressionHandlerCollection ObjectHandlers
         {
             get { return _objectHandlers; }
             set { _objectHandlers = value; }

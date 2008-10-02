@@ -12,7 +12,8 @@ using JsonExSerializer.Collections;
 using JsonExSerializer.MetaData;
 using System.Collections;
 using JsonExSerializer.Framework;
-using JsonExSerializer.Framework.ObjectHandlers;
+using JsonExSerializer.Framework.ExpressionHandlers;
+using JsonExSerializer.Framework.Parsing;
 
 namespace JsonExSerializer
 {
@@ -94,7 +95,7 @@ namespace JsonExSerializer
             _collectionHandlers.Add(new ListHandler());
             _collectionHandlers.Add(new StackHandler());
             _collectionHandlers.Add(new GenericStackHandler());
-            //_collectionHandlers.Add(new CollectionConstructorHandler());
+            _collectionHandlers.Add(new CollectionConstructorHandler());
 
             // type handlers
             _typeHandlerFactory = new TypeHandlerFactory(this);

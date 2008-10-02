@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using MbUnit.Framework;
 using JsonExSerializer;
-using JsonExSerializer.Expression;
+using JsonExSerializer.Framework.Expressions;
 using JsonExSerializer.Framework;
 using System.Collections;
 

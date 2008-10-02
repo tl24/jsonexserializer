@@ -4,8 +4,9 @@ using System.Text;
 using MbUnit.Framework;
 using JsonExSerializerTests.Mocks;
 using JsonExSerializer;
-using JsonExSerializer.Expression;
+using JsonExSerializer.Framework.Expressions;
 using JsonExSerializer.Framework;
+using JsonExSerializer.Framework.Parsing;
 
 namespace JsonExSerializerTests
 {

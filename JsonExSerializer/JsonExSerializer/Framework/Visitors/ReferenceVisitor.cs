@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.Framework.Visitors;
-using JsonExSerializer.Expression;
+using JsonExSerializer.Framework.Expressions;
 
 namespace JsonExSerializer.Framework.Visitors
 {

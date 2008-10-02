@@ -12,8 +12,8 @@ using JsonExSerializer.TypeConversion;
 using JsonExSerializer.Collections;
 using System.Reflection;
 using JsonExSerializer.MetaData;
-using JsonExSerializer.Expression;
-using JsonExSerializer.Framework.ObjectHandlers;
+using JsonExSerializer.Framework.Expressions;
+using JsonExSerializer.Framework.ExpressionHandlers;
 
 namespace JsonExSerializer.Framework
 {

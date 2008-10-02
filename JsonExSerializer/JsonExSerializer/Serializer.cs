@@ -9,6 +9,7 @@ using System.Text;
 using System.IO;
 using System.Globalization;
 using JsonExSerializer.Framework;
+using JsonExSerializer.Framework.Parsing;
 
 namespace JsonExSerializer
 {

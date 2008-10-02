@@ -4,6 +4,7 @@ using System.Text;
 using MbUnit.Framework;
 using JsonExSerializer.Framework;
 using System.IO;
+using JsonExSerializer.Framework.Parsing;
 
 namespace JsonExSerializerTests
 {

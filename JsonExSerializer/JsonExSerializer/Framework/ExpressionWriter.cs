@@ -29,7 +29,7 @@ namespace JsonExSerializer.Framework
             _actions[typeof(NumericExpression)] = WriteNumeric;
             _actions[typeof(ValueExpression)] = WriteValue;
             _actions[typeof(NullExpression)] = WriteNull;
-            _actions[typeof(ListExpression)] = WriteList;
+            _actions[typeof(ArrayExpression)] = WriteList;
             _actions[typeof(ObjectExpression)] = WriteObject;
             _actions[typeof(ReferenceExpression)] = WriteReference;
             _actions[typeof(CastExpression)] = WriteCast;
@@ -90,7 +90,7 @@ namespace JsonExSerializer.Framework
 
         private void WriteList(ExpressionBase Expression)
         {
-            ListExpression list = (ListExpression)Expression;
+            ArrayExpression list = (ArrayExpression)Expression;
             _jsonWriter.WriteArrayStart();
             foreach (ExpressionBase item in list.Items)
                 Write(item);

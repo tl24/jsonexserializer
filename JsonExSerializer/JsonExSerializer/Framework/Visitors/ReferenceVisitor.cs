@@ -58,7 +58,7 @@ namespace JsonExSerializer.Framework.Visitors
         /// </summary>
         /// <param name="refID">the reference to resolve</param>
         /// <returns>the referenced expression</returns>
-        public void VisitListExpression(ListExpression expression)
+        public void VisitListExpression(ArrayExpression expression)
         {
             Visit(typeof(ComplexExpressionBase), expression);
             if (_expr != null)

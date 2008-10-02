@@ -26,7 +26,7 @@ namespace JsonExSerializer.Framework.Visitors
                 Visit(expr);
         }
 
-        public void Visit(ListExpression list)
+        public void Visit(ArrayExpression list)
         {
             VisitComplex(list);
 

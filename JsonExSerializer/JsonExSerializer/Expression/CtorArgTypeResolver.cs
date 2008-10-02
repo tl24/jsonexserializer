@@ -68,7 +68,7 @@ namespace JsonExSerializer.Expression
                 Type inferredType = null;
                 if (value is ValueExpression)
                     inferredType = GetValueType(parameter, (ValueExpression)value);
-                else if (value is ListExpression)
+                else if (value is ArrayExpression)
                 {
                     if (_context.GetTypeHandler(parameter.ParameterType).IsCollection())
                         inferredType = parameter.ParameterType;

@@ -81,7 +81,7 @@ namespace JsonExSerializerTests.Expression
         [Test]
         public void WriteEmptyList()
         {
-            ListExpression list = new ListExpression();
+            ArrayExpression list = new ArrayExpression();
             _exprWriter.Write(list);
             Assert.AreEqual("[]", _stringWriter.ToString());
         }
@@ -89,7 +89,7 @@ namespace JsonExSerializerTests.Expression
         [Test]
         public void WriteSimpleList()
         {
-            ListExpression list = new ListExpression();
+            ArrayExpression list = new ArrayExpression();
             list.Items.Add(new BooleanExpression(true));
             list.Items.Add(new NumericExpression(12));
             list.Items.Add(new ValueExpression("test"));
@@ -160,7 +160,7 @@ namespace JsonExSerializerTests.Expression
         public void CastList()
         {
             CastExpression cast = new CastExpression(typeof(ArrayList));
-            cast.Expression = new ListExpression();
+            cast.Expression = new ArrayExpression();
             _exprWriter.Write(cast);
             Assert.AreEqual("(System.Collections.ArrayList)[]", _stringWriter.ToString());
         }

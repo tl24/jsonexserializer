@@ -99,13 +99,13 @@ namespace JsonExSerializer.Framework
 
         public object Evaluate(ExpressionBase Expression)
         {
-            IObjectHandler handler = _context.ObjectHandlers.GetHandler(Expression);
+            IExpressionHandler handler = _context.ObjectHandlers.GetHandler(Expression);
             return handler.Evaluate(Expression, this);
         }
 
         public object Evaluate(ExpressionBase Expression, object existingObject)
         {
-            IObjectHandler handler = _context.ObjectHandlers.GetHandler(Expression);
+            IExpressionHandler handler = _context.ObjectHandlers.GetHandler(Expression);
             return handler.Evaluate(Expression, existingObject, this);
         }
 
@@ -227,11 +227,11 @@ namespace JsonExSerializer.Framework
         /// Parses a javascript array
         /// </summary>
         /// <returns></returns>
-        private ListExpression ParseCollection()
+        private ArrayExpression ParseCollection()
         {
             Token tok = ReadToken();
             Debug.Assert(tok == LSquareToken);
-            ListExpression value = new ListExpression();
+            ArrayExpression value = new ArrayExpression();
             ExpressionBase item;
             while (ReadAhead(CommaToken, RSquareToken, new ExpressionMethod(ParseExpression), out item))
             {

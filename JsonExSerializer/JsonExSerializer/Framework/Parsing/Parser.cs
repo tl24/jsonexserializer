@@ -417,9 +417,9 @@ namespace JsonExSerializer.Framework.Parsing
 
         private Type bindType(string typeName)
         {
-            if (_context.GetTypeBinding(typeName) != null)
+            if (_context.TypeAliases[typeName] != null)
             {
-                return _context.GetTypeBinding(typeName);
+                return _context.TypeAliases[typeName];
             }
             return Type.GetType(typeName, true);
         }

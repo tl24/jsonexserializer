@@ -6,6 +6,7 @@ using System.IO;
 using JsonExSerializer;
 using System.Text.RegularExpressions;
 using JsonExSerializerTests.Mocks;
+using JsonExSerializer.Framework;
 
 namespace JsonExSerializerTests
 {

@@ -176,7 +176,7 @@ namespace JsonExSerializer.Framework
         /// <param name="t">the type to write</param>
         protected override void WriteTypeInfo(Type t)
         {
-            string alias = _context.GetTypeAlias(t);
+            string alias = _context.TypeAliases[t];
             if (alias != null) {
                 WriteTypeInfo(alias);
                 return;

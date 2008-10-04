@@ -37,7 +37,11 @@ namespace JsonExSerializer
 
         private ReferenceOption _referenceWritingType;
 
-        private TwoWayDictionary<Type, string> _typeBindings;
+        /// <summary>
+        /// Mapping of Types to aliases
+        /// </summary>
+        private TypeAliasCollection _typeAliases;
+
         private Serializer _serializerInstance;
         private List<CollectionHandler> _collectionHandlers;
         
@@ -70,23 +74,7 @@ namespace JsonExSerializer
             _outputTypeInformation = true;
             _referenceWritingType = ReferenceOption.ErrorCircularReferences;
 
-            _typeBindings = new TwoWayDictionary<Type, string>();
-            // add bindings for primitive types
-            _typeBindings[typeof(byte)] = "byte";
-            _typeBindings[typeof(sbyte)] = "sbyte";
-            _typeBindings[typeof(bool)] = "bool";
-            _typeBindings[typeof(short)] = "short";
-            _typeBindings[typeof(ushort)] = "ushort";
-            _typeBindings[typeof(int)] = "int";
-            _typeBindings[typeof(uint)] = "uint";
-            _typeBindings[typeof(long)] = "long";
-            _typeBindings[typeof(ulong)] = "ulong";
-            _typeBindings[typeof(string)] = "string";
-            _typeBindings[typeof(object)] = "object";
-            _typeBindings[typeof(char)] = "char";
-            _typeBindings[typeof(decimal)] = "decimal";
-            _typeBindings[typeof(float)] = "float";
-            _typeBindings[typeof(double)] = "double";
+            _typeAliases = new TypeAliasCollection();
 
             // collections
             _collectionHandlers = new List<CollectionHandler>();
@@ -179,58 +167,63 @@ namespace JsonExSerializer
 
         #region Type Binding
         /// <summary>
+        /// Collection of Type-Alias mappings.  When a type has a registered alias, the alias will be 
+        /// rendered in place of the type any time the type would normally be rendered.
+        /// </summary>
+        public TypeAliasCollection TypeAliases
+        {
+            get { return _typeAliases; }
+        }
+        /// <summary>
         /// Adds a different binding for a type.  When the type is encountered during serialization, the alias
         /// will be written out instead of the normal type info if a cast or type information is needed.
         /// </summary>
-        /// <param name="t">the type object</param>
+        /// <param name="type">the type object</param>
         /// <param name="typeAlias">the type's alias</param>
+        [Obsolete("AddTypeBinding is obsolete, use TypeAliases.Add(Type,string)")]
         public void AddTypeBinding(Type type, string typeAlias)
         {
-            _typeBindings[type] = typeAlias;
+            _typeAliases.Add(type, typeAlias);
         }
 
         /// <summary>
         /// Clears all type bindings
         /// </summary>
+        [Obsolete("ClearTypeBindings is obsolete, use TypeAliases.Clear()")]
         public void ClearTypeBindings()
         {
-            _typeBindings.Clear();
+            _typeAliases.Clear();
         }
 
         /// <summary>
         /// Removes a type binding
         /// </summary>
-        /// <param name="t">the bound type to remove</param>
+        /// <param name="type">the bound type to remove</param>
+        [Obsolete("RemoveTypeBinding is obsolete, use TypeAliases.Remove(Type)")]
         public void RemoveTypeBinding(Type type)
         {
-            _typeBindings.Remove(type);
+            _typeAliases.Remove(type);
         }
 
         /// <summary>
         /// Removes a type binding
         /// </summary>
         /// <param name="alias">the type alias to remove</param>
+        [Obsolete("RemoveTypeBinding is obsolete, use TypeAliases.Remove(string)")]
         public void RemoveTypeBinding(string alias)
         {
-            Type key;
-            if (_typeBindings.TryGetKey(alias, out key))
-                _typeBindings.Remove(key);
-
+            _typeAliases.Remove(alias);
         }
 
         /// <summary>
         /// Looks up an alias for a given type that was registered with AddTypeBinding.
         /// </summary>
-        /// <param name="t">the type to lookup</param>
+        /// <param name="type">the type to lookup</param>
         /// <returns>a type alias or null</returns>
+        [Obsolete("GetTypeAlias is obsolete, use TypeAliases.GetTypeAlias(Type)")]
         public string GetTypeAlias(Type type)
         {
-            string alias = null;
-            if (!_typeBindings.TryGetValue(type, out alias))
-            {
-                alias = null;
-            }
-            return alias;
+            return _typeAliases[type];
         }
 
        
@@ -239,18 +232,13 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="typeAlias">the alias to look up</param>
         /// <returns>the type representing the alias or null</returns>
+        [Obsolete("GetTypeBinding is obsolete, use TypeAliases.GetTypeBinding(string)")]
         public Type GetTypeBinding(string typeAlias)
         {
-            Type t = null;
-            if (!_typeBindings.TryGetKey(typeAlias, out t))
-            {
-                t = null;
-            }
-            return t;
+            return _typeAliases[typeAlias];
         }
 
         #endregion
-
 
         /// <summary>
         /// The current serializer instance that created and is using this

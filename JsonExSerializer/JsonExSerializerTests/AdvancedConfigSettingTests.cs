@@ -15,9 +15,9 @@ namespace JsonExSerializerTests
         public void TestAddBinding()
         {
             Serializer s = new Serializer(typeof(object), "TypeBindingAdd");
-            Assert.AreEqual("SimpleObject", s.Context.GetTypeAlias(typeof(SimpleObject)));
+            Assert.AreEqual("SimpleObject", s.Context.TypeAliases[typeof(SimpleObject)]);
             // check that defaults are still mapped
-            Assert.AreEqual("int", s.Context.GetTypeAlias(typeof(int)));
+            Assert.AreEqual("int", s.Context.TypeAliases[typeof(int)]);
         }
 
         [Test]
@@ -26,19 +26,19 @@ namespace JsonExSerializerTests
             Serializer s = new Serializer(typeof(object), "TypeBindingRemove");
             // verify int is not mapped
             // <remove type="System.Int32, mscorlib" />
-            Assert.IsNull(s.Context.GetTypeAlias(typeof(int)));
+            Assert.IsNull(s.Context.TypeAliases[typeof(int)]);
             // verify float is not mapped
             // <remove alias="float" />
-            Assert.IsNull(s.Context.GetTypeAlias(typeof(float)));
+            Assert.IsNull(s.Context.TypeAliases[typeof(float)]);
         }
 
         [Test]
         public void TestClearAddBinding()
         {
             Serializer s = new Serializer(typeof(object), "TypeBindingClearAdd");
-            Assert.AreEqual("SimpleObject", s.Context.GetTypeAlias(typeof(SimpleObject)));
+            Assert.AreEqual("SimpleObject", s.Context.TypeAliases[typeof(SimpleObject)]);
             // check that defaults are not mapped
-            Assert.IsNull(s.Context.GetTypeAlias(typeof(int)));
+            Assert.IsNull(s.Context.TypeAliases[typeof(int)]);
         }
 
         [Test]

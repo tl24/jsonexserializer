@@ -96,7 +96,7 @@ namespace JsonExSerializer
             if (string.IsNullOrEmpty(type))
                 throw new ArgumentException("Must specify 'type' for TypeBinding add");
 
-            context.AddTypeBinding(Type.GetType(type, true), alias);
+            context.TypeAliases.Add(Type.GetType(type, true), alias);
         }
 
         /// <summary>
@@ -109,9 +109,9 @@ namespace JsonExSerializer
             string alias = values[0];
             string type = values[1];
             if (!string.IsNullOrEmpty(type))
-                context.RemoveTypeBinding(Type.GetType(type, true));
+                context.TypeAliases.Remove(Type.GetType(type, true));
             else if (!string.IsNullOrEmpty(alias))
-                context.RemoveTypeBinding(alias);
+                context.TypeAliases.Remove(alias);
             else
                 throw new ArgumentException("Must specify either alias or type argument to remove TypeBinding");
         }
@@ -124,7 +124,7 @@ namespace JsonExSerializer
             SectionHandler handler = new SectionHandler(reader, "TypeBindings");
             handler.AddMethod(new MethodMap("add", "alias type", new MethodDelegate(AddTypeBinding)));
             handler.AddMethod(new MethodMap("remove", "alias type", new MethodDelegate(RemoveTypeBinding)));
-            handler.AddMethod(new MethodMap("clear", "", delegate(string t, string[] v) { context.ClearTypeBindings(); }));
+            handler.AddMethod(new MethodMap("clear", "", delegate(string t, string[] v) { context.TypeAliases.Clear(); }));
             handler.Process();            
         }
 

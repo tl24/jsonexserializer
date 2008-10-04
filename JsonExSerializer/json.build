@@ -42,70 +42,12 @@
 	 
 	  </if>                         
 	</target>
-	
+
 	<target name="assembly-info" depends="get-head-revision">
-		<asminfo output="JsonExSerializer/Properties/AssemblyInfo.cs" language="CSharp">
-		    <imports>
-		        <import namespace="System" />
-		        <import namespace="System.Reflection" />
-		        <import namespace="System.Runtime.CompilerServices" />
-		        <import namespace="System.Runtime.InteropServices" />
-		    </imports>
-		    <attributes>
-		        <attribute type="AssemblyTitleAttribute" value="${name}" />
-		        <attribute type="AssemblyDescriptionAttribute" value=".NET Serialization Framework using JSON" />
-		        <attribute type="AssemblyProductAttribute" value="${name}" />
-		        <attribute type="AssemblyCopyrightAttribute" value="Copyright (c) 2007" />
-		        <attribute type="ComVisibleAttribute" value="false" />
-				<attribute type="GuidAttribute" value="12d697c6-ebf8-479f-b78a-86fdf09307d0" />
-		        <attribute type="CLSCompliantAttribute" value="true" />
-				<attribute type="AssemblyInformationalVersionAttribute" value="${info.version}" />
-				<attribute type="AssemblyVersionAttribute" value="${full.version}" />
-				<attribute type="AssemblyFileVersionAttribute" value="${full.version}" />
-				<attribute type="InternalsVisibleTo" value="JsonExSerializerTests" />
-		    </attributes>
-		</asminfo>
-		<asminfo output="JsonExSerializerTests/Properties/AssemblyInfo.cs" language="CSharp">
-		    <imports>
-		        <import namespace="System" />
-		        <import namespace="System.Reflection" />
-		        <import namespace="System.Runtime.CompilerServices" />
-		        <import namespace="System.Runtime.InteropServices" />
-		    </imports>
-		    <attributes>
-		        <attribute type="AssemblyTitleAttribute" value="JsonExSerializerTests" />
-		        <attribute type="AssemblyDescriptionAttribute" value=".NET Serialization Framework Tests using JSON" />
-		        <attribute type="AssemblyProductAttribute" value="${name}" />
-		        <attribute type="AssemblyCopyrightAttribute" value="Copyright &#169; 2007" />
-		        <attribute type="ComVisibleAttribute" value="false" />
-				<attribute type="GuidAttribute" value="041b67d7-8bf6-4867-ba57-bc8dc556cbc6" />
-		        <attribute type="CLSCompliantAttribute" value="false" />
-				<attribute type="AssemblyInformationalVersionAttribute" value="${info.version}" />
-				<attribute type="AssemblyVersionAttribute" value="${full.version}" />
-				<attribute type="AssemblyFileVersionAttribute" value="${full.version}" />	
-		    </attributes>
-		</asminfo>
-		<asminfo output="PerformanceTests/Properties/AssemblyInfo.cs" language="CSharp">
-		    <imports>
-		        <import namespace="System" />
-		        <import namespace="System.Reflection" />
-		        <import namespace="System.Runtime.CompilerServices" />
-		        <import namespace="System.Runtime.InteropServices" />
-		    </imports>
-		    <attributes>
-		        <attribute type="AssemblyTitleAttribute" value="PerformanceTests" />
-		        <attribute type="AssemblyDescriptionAttribute" value=".NET Serialization Framework Performance Tests using JSON" />
-		        <attribute type="AssemblyProductAttribute" value="${name}" />
-		        <attribute type="AssemblyCopyrightAttribute" value="Copyright &#169; 2007" />
-		        <attribute type="ComVisibleAttribute" value="false" />
-				<attribute type="GuidAttribute" value="0464792e-0155-4baf-ba64-cb2ea4843097" />
-		        <attribute type="CLSCompliantAttribute" value="false" />
-				<attribute type="AssemblyInformationalVersionAttribute" value="${info.version}" />
-				<attribute type="AssemblyVersionAttribute" value="${full.version}" />
-				<attribute type="AssemblyFileVersionAttribute" value="${full.version}" />	
-		    </attributes>
-		</asminfo>		
+		<update-assembly-version version="${full.version}" file-version="${full.version}" info-version="${info.version}" file="JsonExSerializer/Properties/AssemblyInfo.cs" />
+		<update-assembly-version version="${full.version}" file-version="${full.version}" info-version="${info.version}" file="JsonExSerializerTests/Properties/AssemblyInfo.cs" />
 	</target>
+
     <target name="clean" description="Delete all previously compiled binaries.">
         <delete>
             <fileset>
@@ -223,4 +165,76 @@
 	</zip>
   </target>
   <target name="build" depends="compile, zip" />
+  
+  <script language="C#" prefix="json" >
+       <code>
+          <![CDATA[
+            [TaskName("update-assembly-version")]
+            public class UpdateAsmVersionTask : Task {
+
+                  private string _version;
+				  private string _fileVersion;
+				  private string _infoVersion;
+		          private string _file;	
+				  
+                  [TaskAttribute("version", Required=true)]
+                  public string Version {
+                      get { return _version; }
+                      set { _version = value; }
+                  }
+                  [TaskAttribute("file-version", Required=true)]
+                  public string FileVersion {
+                      get { return _fileVersion; }
+                      set { _fileVersion = value; }
+                  }
+                  [TaskAttribute("info-version", Required=true)]
+                  public string InfoVersion {
+                      get { return _infoVersion; }
+                      set { _infoVersion = value; }
+                  }
+                  [TaskAttribute("file", Required=true)]
+                  public string File {
+                      get { return _file; }
+                      set { _file = value; }
+                  }
+
+                  protected override void ExecuteTask() {
+                      Log(Level.Info, "UdateAsmVersionTask");
+                      Log(Level.Info, string.Format("version: {0}", Version));
+                      Log(Level.Info, string.Format("file-version: {0}", FileVersion));
+                      Log(Level.Info, string.Format("info-version: {0}", InfoVersion));
+                      Log(Level.Info, string.Format("file: {0}", File));
+					  
+					  string contents = "";
+					  using (TextReader reader = new StreamReader(File)) {
+						  contents = reader.ReadToEnd();
+						  Log(Level.Debug, "ContentsBefore=" + contents);
+  						  contents = Replace(contents, "AssemblyInformationalVersionAttribute", InfoVersion);
+   						  contents = Replace(contents, "AssemblyVersionAttribute", Version);
+						  contents = Replace(contents, "AssemblyFileVersionAttribute", FileVersion);						  
+						  Log(Level.Debug, "ContentsAfter=" + contents);
+					  }
+					  
+					  if (!string.IsNullOrEmpty(contents)) {
+					     using (TextWriter writer = new StreamWriter(File)) {
+						     writer.Write(contents);
+							 //writer.Flush();
+							 //writer.Close();
+						 }
+					  }
+                  }
+				  
+				  private string Replace(string input, string attributeName, string newVersion) {
+					  if (string.IsNullOrEmpty(newVersion))
+						  return input;
+						  						  
+				      string pattern = @"\b" + attributeName + @"\(\s*""([^""]+)""\s*\)";
+					  string replacement = string.Format("{0}(\"{1}\")", attributeName, newVersion);
+					  Regex r = new Regex(pattern);
+					  return r.Replace(input, replacement);
+				  }
+                }
+              ]]>
+            </code>
+        </script>
 </project>

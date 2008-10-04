@@ -10,6 +10,7 @@ using System.Collections;
 
 namespace JsonExSerializerTests.Expression
 {
+    
     [TestFixture]
     public class ExpressionWriterTests
     {

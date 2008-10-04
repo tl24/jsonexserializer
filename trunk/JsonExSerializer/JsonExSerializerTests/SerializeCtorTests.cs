@@ -9,7 +9,7 @@ using JsonExSerializer.Framework;
 using JsonExSerializer.Framework.Parsing;
 
 namespace JsonExSerializerTests
-{
+{    
     [TestFixture]
     public class SerializeCtorTests
     {

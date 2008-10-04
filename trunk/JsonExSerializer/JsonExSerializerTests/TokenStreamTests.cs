@@ -110,5 +110,5 @@ namespace JsonExSerializerTests
             Assert.IsTrue(stream.IsEmpty());
             CollectionAssert.AreEqual(expected, actual);
         }
-    }
+    }       
 }

@@ -6,17 +6,16 @@
 	<property name="solution" value="${name}.sln" />
 	<property name="svn.info.log" value="svn.version.txt" />
 	<property name="versionfile" value="version.txt" />
-	<property name="revision.version" value="1" />	
+	<property name="revision.version" value="${datetime::get-day-of-year(datetime::now())}" />	
 	<property name="main.output.dir" value="${name}/bin/${configuration}" />
 	<property name="test.output.dir" value="${tests}/bin/${configuration}" />
 	<property name="perf.test.output.dir" value="${perf.tests}/bin/${configuration}" />
 	<property name="run.perf.tests" value="true" />
+	<property name="info.version" value="3.0" />
+	<property name="version.tag" value="Alpha 1" />
+	<property name="version.tag.file" value="alpha1" />
 	
-	<target name="get-major-version">
-		<loadfile property="info.version" file="${versionfile}" />
-	</target>
-	
-	<target name="get-head-revision" depends="get-major-version"> 
+	<target name="get-head-revision"> 
 	  <exec
 	    program="svn.exe"
 	    commandline="info ${solution} -r HEAD"
@@ -34,8 +33,13 @@
 	  <if test="${bool::parse(int::parse(index.of.revision) != -1)}">
 	   
 	    <property name="build.version" value="${string::substring(svn.head.revision, int::parse(index.of.revision) + 10, 3)}" verbose="true"/>
+		<property name="assembly.version" value="${info.version}.${revision.version}.${build.version}" />		
 		<property name="full.version" value="${info.version}.${revision.version}.${build.version}" />
-		<property name="build.dir" value="build/${name}-${full.version}" />
+		<property name="full.version.tag" value="${full.version}" />
+		<if test="${string::get-length(version.tag.file) > 0}">
+			<property name="full.version.tag" value="${full.version}.${version.tag.file}" />
+		</if>
+		<property name="build.dir" value="build/${name}-${full.version.tag}" />
 	    <delete file="${svn.info.log}" />
 	    
 	    <echo message="Rev: ${build.version}"/>    
@@ -44,8 +48,8 @@
 	</target>
 
 	<target name="assembly-info" depends="get-head-revision">
-		<update-assembly-version version="${full.version}" file-version="${full.version}" info-version="${info.version}" file="JsonExSerializer/Properties/AssemblyInfo.cs" />
-		<update-assembly-version version="${full.version}" file-version="${full.version}" info-version="${info.version}" file="JsonExSerializerTests/Properties/AssemblyInfo.cs" />
+		<update-assembly-version version="${assembly.version}" file-version="${full.version} ${version.tag}" info-version="${info.version} ${version.tag}" file="JsonExSerializer/Properties/AssemblyInfo.cs" />
+		<update-assembly-version version="${assembly.version}" file-version="${full.version} ${version.tag}" info-version="${info.version} ${version.tag}" file="JsonExSerializerTests/Properties/AssemblyInfo.cs" />
 	</target>
 
     <target name="clean" description="Delete all previously compiled binaries.">
@@ -144,7 +148,7 @@
   <target name="unit-tests" depends="compile">
       <mbunit
          report-types="Html"
-         report-filename-format="unittests-${full.version}"
+         report-filename-format="unittests-${full.version.tag}"
          report-output-directory="${build.dir}/testresults"
          halt-on-failure="true">
          <assemblies>
@@ -154,11 +158,11 @@
   </target>
   <target name="perf-tests" depends="compile" if="${run.perf.tests}">
 	  <mkdir dir="${build.dir}/testresults/" />
-	  <exec program="PerformanceTests.exe" basedir="${perf.test.output.dir}" output="${build.dir}/testresults/perf-test-results-${full.version}.txt">
+	  <exec program="PerformanceTests.exe" basedir="${perf.test.output.dir}" output="${build.dir}/testresults/perf-test-results-${full.version.tag}.txt">
 	  </exec>
   </target>
   <target name="zip" depends="copy-outputs, documentation, copy-src, unit-tests, perf-tests">
-	<zip zipfile="${name}-${full.version}.zip">
+	<zip zipfile="${name}-${full.version.tag}.zip">
 	    <fileset basedir="${build.dir}">
 	        <include name="**/*" />
 	    </fileset>
@@ -218,8 +222,6 @@
 					  if (!string.IsNullOrEmpty(contents)) {
 					     using (TextWriter writer = new StreamWriter(File)) {
 						     writer.Write(contents);
-							 //writer.Flush();
-							 //writer.Close();
 						 }
 					  }
                   }
@@ -229,7 +231,7 @@
 						  return input;
 						  						  
 				      string pattern = @"\b" + attributeName + @"\(\s*""([^""]+)""\s*\)";
-					  string replacement = string.Format("{0}(\"{1}\")", attributeName, newVersion);
+					  string replacement = string.Format("{0}(\"{1}\")", attributeName, newVersion.Trim());
 					  Regex r = new Regex(pattern);
 					  return r.Replace(input, replacement);
 				  }

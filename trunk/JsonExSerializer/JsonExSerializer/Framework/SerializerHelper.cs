@@ -94,11 +94,11 @@ namespace JsonExSerializer.Framework
                     IExpressionHandler objHandler;
                     if (converter != null)
                     {
-                        TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)_context.ObjectHandlers.Find(typeof(TypeConverterExpressionHandler));
+                        TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)_context.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
                         //TODO: make sure it exists
                         return converterHandler.GetExpression(value, converter, currentPath, this);
                     }
-                    objHandler = _context.ObjectHandlers.GetHandler(value);
+                    objHandler = _context.ExpressionHandlers.GetHandler(value);
                     return objHandler.GetExpression(value, currentPath, this);
                 }
                 finally

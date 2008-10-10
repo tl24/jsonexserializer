@@ -38,13 +38,13 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>json object expression</returns>
         public override ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
-             TypeHandler handler = Context.GetTypeHandler(data.GetType());
+             TypeData handler = Context.GetTypeHandler(data.GetType());
 
             ObjectExpression expression = new ObjectExpression();
             if (handler.ConstructorParameters.Count > 0)
             {
                 expression.ResultType = data.GetType();
-                foreach (IPropertyHandler ctorParm in handler.ConstructorParameters)
+                foreach (IPropertyData ctorParm in handler.ConstructorParameters)
                 {
                     object value = ctorParm.GetValue(data);
                     ExpressionBase argExpr;
@@ -66,7 +66,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             }
 
 
-            foreach (IPropertyHandler prop in handler.Properties)
+            foreach (IPropertyData prop in handler.Properties)
             {
                 object value = prop.GetValue(data);
                 ExpressionBase valueExpr;
@@ -111,12 +111,12 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>deserialized object</returns>
         public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
         {
-            TypeHandler typeHandler = Context.GetTypeHandler(existingObject.GetType());
+            TypeData typeHandler = Context.GetTypeHandler(existingObject.GetType());
             ObjectExpression objectExpression = (ObjectExpression)expression;
             foreach (KeyValueExpression Item in objectExpression.Properties)
             {
                 // evaluate the item and let it assign itself?
-                IPropertyHandler hndlr = typeHandler.FindProperty(Item.Key);
+                IPropertyData hndlr = typeHandler.FindProperty(Item.Key);
                 if (hndlr == null)
                 {
                     throw new Exception(string.Format("Could not find property {0} for type {1}", Item.Key, typeHandler.ForType));
@@ -142,7 +142,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 IJsonTypeConverter converter = null;
                 if (hndlr.HasConverter)
                 {
-                    converterHandler = (TypeConverterExpressionHandler) Context.ObjectHandlers.Find(typeof(TypeConverterExpressionHandler));
+                    converterHandler = (TypeConverterExpressionHandler) Context.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
                     converter = hndlr.TypeConverter;
                 }
                 
@@ -190,7 +190,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 ExpressionBase carg = expression.ConstructorArguments[i];
                 args[i] = deserializer.Evaluate(carg);
             }
-            TypeHandler handler = Context.GetTypeHandler(expression.ResultType);
+            TypeData handler = Context.GetTypeHandler(expression.ResultType);
             object result = handler.CreateInstance(args);
             expression.OnObjectConstructed(result);
             return result;
@@ -203,7 +203,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="expression">object expression</param>
         protected static void ResolveConstructorTypes(SerializationContext context, ObjectExpression expression)
         {
-            TypeHandler handler = context.GetTypeHandler(expression.ResultType);
+            TypeData handler = context.GetTypeHandler(expression.ResultType);
             Type[] definedTypes = GetConstructorParameterTypes(handler.ConstructorParameters);
 
             CtorArgTypeResolver resolver = new CtorArgTypeResolver(expression, context, definedTypes);
@@ -220,7 +220,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         /// <param name="constructorParameters">constructor parameter list</param>
         /// <returns>default types</returns>
-        protected static Type[] GetConstructorParameterTypes(IList<IPropertyHandler> constructorParameters)
+        protected static Type[] GetConstructorParameterTypes(IList<IPropertyData> constructorParameters)
         {
             Type[] types = new Type[constructorParameters.Count];
             for (int i = 0; i < constructorParameters.Count; i++)

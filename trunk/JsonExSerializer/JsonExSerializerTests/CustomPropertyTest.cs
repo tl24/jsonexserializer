@@ -14,7 +14,7 @@ namespace JsonExSerializerTests
         public void WhenCustomMetaDataIsReturn_ItsSerializedCorrectly()
         {
             Serializer s = new Serializer(typeof(CustomClass));
-            s.Context.TypeHandlerFactory = new CustomTypeHandlerFactory(typeof(CustomClassTypeHandler), s.Context);
+            s.Context.TypeHandlerFactory = new CustomTypeDataRepository(typeof(CustomClassTypeHandler), s.Context);
             CustomClass cust = new CustomClass();
             cust.SetID(23);
             cust.SetName("Frank");
@@ -60,14 +60,14 @@ namespace JsonExSerializerTests
         }
     }
 
-    public class CustomClassTypeHandler : TypeHandler
+    public class CustomClassTypeHandler : TypeData
     {
         public CustomClassTypeHandler(Type t, SerializationContext context)
             : base(t, context)
         {
         }
 
-        protected override void ReadProperties(out IList<IPropertyHandler> Properties, out IList<IPropertyHandler> ConstructorArguments)
+        protected override void ReadProperties(out IList<IPropertyData> Properties, out IList<IPropertyData> ConstructorArguments)
         {
             base.ReadProperties(out Properties, out ConstructorArguments);
             Properties.Add(new MethodPairPropertyHandler(this.ForType, "Name"));
@@ -76,7 +76,7 @@ namespace JsonExSerializerTests
 
     }
 
-    public class MethodPairPropertyHandler : AbstractPropertyHandler
+    public class MethodPairPropertyHandler : AbstractPropertyData
     {
         private string _getMethod;
         private string _setMethod;

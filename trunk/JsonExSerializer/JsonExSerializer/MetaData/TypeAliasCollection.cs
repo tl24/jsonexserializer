@@ -13,6 +13,9 @@ namespace JsonExSerializer.MetaData
     {
         private TwoWayDictionary<Type, string> bindings;
 
+        /// <summary>
+        /// Initializes a default intance of the TypeAliasCollection with aliases for primitive types
+        /// </summary>
         public TypeAliasCollection()
         {
             this.bindings = new TwoWayDictionary<Type, string>();

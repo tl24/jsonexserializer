@@ -310,6 +310,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
             base.OnInsertComplete(index, value);
             InvalidateCache();
+            this.Context.SetContextAware(value);    
         }
 
         /// <summary>
@@ -322,6 +323,8 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
             base.OnSetComplete(index, oldValue, newValue);
             InvalidateCache();
+            if (!object.ReferenceEquals(oldValue, newValue))
+                this.Context.SetContextAware(newValue);
         }
 
         /// <summary>

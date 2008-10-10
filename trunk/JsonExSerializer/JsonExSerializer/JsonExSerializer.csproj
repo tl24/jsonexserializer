@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>JsonExSerializer.xml</DocumentationFile>
+    <NoWarn>1591,1592,1573,1571,1570,1572</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -99,17 +100,17 @@
     <Compile Include="JsonExSerializationException.cs" />
     <Compile Include="JsonExPropertyAttribute.cs" />
     <Compile Include="Framework\JsonWriter.cs" />
-    <Compile Include="MetaData\AbstractPropertyHandler.cs" />
-    <Compile Include="MetaData\CustomTypeHandlerFactory.cs" />
+    <Compile Include="MetaData\AbstractPropertyData.cs" />
+    <Compile Include="MetaData\CustomTypeDataRepository.cs" />
     <Compile Include="MetaData\DynamicMethodUtil.cs" />
-    <Compile Include="MetaData\DynamicPropertyHandler.cs" />
-    <Compile Include="MetaData\DynamicTypeHandler.cs" />
-    <Compile Include="MetaData\FieldHandler.cs" />
-    <Compile Include="MetaData\IPropertyHandler.cs" />
-    <Compile Include="MetaData\MemberHandler.cs" />
-    <Compile Include="MetaData\PropertyHandlerBase.cs" />
+    <Compile Include="MetaData\DynamicPropertyData.cs" />
+    <Compile Include="MetaData\DynamicTypeData.cs" />
+    <Compile Include="MetaData\FieldData.cs" />
+    <Compile Include="MetaData\IPropertyData.cs" />
+    <Compile Include="MetaData\MetaDataBase.cs" />
+    <Compile Include="MetaData\MemberInfoPropertyDataBase.cs" />
     <Compile Include="MetaData\TypeAliasCollection.cs" />
-    <Compile Include="MetaData\TypeHandlerFactory.cs" />
+    <Compile Include="MetaData\TypeDataRepository.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Framework\Parsing\Parser.cs" />
     <Compile Include="Framework\ReferenceEqualityComparer.cs" />
@@ -127,8 +128,8 @@
     <Compile Include="TypeConversion\IJsonTypeConverter.cs" />
     <Compile Include="TypeConversion\JsonConverterBase.cs" />
     <Compile Include="TypeConversion\TypeConverterAdapter.cs" />
-    <Compile Include="MetaData\TypeHandler.cs" />
-    <Compile Include="MetaData\PropertyHandler.cs" />
+    <Compile Include="MetaData\TypeData.cs" />
+    <Compile Include="MetaData\PropertyData.cs" />
     <Compile Include="Framework\Visitors\VisitorBase.cs" />
     <Compile Include="XmlConfigurator.cs" />
   </ItemGroup>

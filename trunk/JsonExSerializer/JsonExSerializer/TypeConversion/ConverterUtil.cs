@@ -17,7 +17,7 @@ namespace JsonExSerializer.TypeConversion
     /// </summary>
     public sealed class ConverterUtil
     {
-        private TypeHandler _handler;
+        private TypeData _handler;
         public ConverterUtil(Type forType, SerializationContext context)
         {
             _handler = context.GetTypeHandler(forType);
@@ -37,7 +37,7 @@ namespace JsonExSerializer.TypeConversion
                 foreach (object key in values.Keys)
                 {
                     string stringKey = key.ToString();
-                    IPropertyHandler prop = _handler.FindProperty(stringKey);
+                    IPropertyData prop = _handler.FindProperty(stringKey);
                     if (prop == null && !ignoreMissingProperties)
                     {
                         throw new MissingMemberException("Can't find a property for " + stringKey);
@@ -69,7 +69,7 @@ namespace JsonExSerializer.TypeConversion
             {
                 throw new ArgumentNullException("Parameter values can not be null");
             }
-            foreach (PropertyHandler prop in _handler.Properties)
+            foreach (PropertyData prop in _handler.Properties)
             {
                 values[prop.Name] = prop.GetValue(instance);
             }

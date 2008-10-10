@@ -38,7 +38,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>an expression for the value</returns>
         public override ExpressionBase GetExpression(object value, JsonPath currentPath, ISerializerHandler serializer)
         {
-            TypeHandler handler = Context.TypeHandlerFactory[value.GetType()];
+            TypeData handler = Context.TypeHandlerFactory[value.GetType()];
             IJsonTypeConverter converter = (handler.HasConverter ? handler.TypeConverter : (IJsonTypeConverter)value);
             return GetExpression(value, converter, currentPath, serializer);
         }
@@ -69,7 +69,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>true if this handler handles the type</returns>
         public override bool CanHandle(Type objectType)
         {
-            TypeHandler handler = Context.TypeHandlerFactory[objectType];
+            TypeData handler = Context.TypeHandlerFactory[objectType];
             return handler.HasConverter || typeof(IJsonTypeConverter).IsAssignableFrom(objectType);
         }
 
@@ -83,7 +83,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
         {
             Type sourceType = expression.ResultType;
-            TypeHandler handler = Context.TypeHandlerFactory[sourceType];
+            TypeData handler = Context.TypeHandlerFactory[sourceType];
             IJsonTypeConverter converter;
             if (typeof(IJsonTypeConverter).IsAssignableFrom(sourceType))
             {

@@ -45,12 +45,12 @@ namespace JsonExSerializer
         private Serializer _serializerInstance;
         private List<CollectionHandler> _collectionHandlers;
         
-        private TypeHandlerFactory _typeHandlerFactory;
+        private TypeDataRepository _typeHandlerFactory;
         private IDictionary _parameters;
 
         private List<IParsingStage> _parsingStages;
 
-        private ExpressionHandlerCollection _objectHandlers;
+        private ExpressionHandlerCollection expressionHandlers;
 
         /// <summary>
         /// Set of options for handling Ignored properties encountered upon Deserialization
@@ -86,13 +86,13 @@ namespace JsonExSerializer
             _collectionHandlers.Add(new CollectionConstructorHandler());
 
             // type handlers
-            _typeHandlerFactory = new TypeHandlerFactory(this);
+            _typeHandlerFactory = new TypeDataRepository(this);
             _parameters = new Hashtable();
 
             // type conversion
             _typeHandlerFactory.RegisterTypeConverter(typeof(System.Collections.BitArray), new BitArrayConverter());
 
-            _objectHandlers = new ExpressionHandlerCollection(this);
+            this.expressionHandlers = new ExpressionHandlerCollection(this);
         }
 
         #endregion
@@ -277,6 +277,14 @@ namespace JsonExSerializer
                 return _parsingStages;
             }
         }
+
+        public void SetContextAware(object value)
+        {
+            IContextAware contextAware = value as IContextAware;
+            if (contextAware != null)
+                contextAware.Context = this;
+        }
+
         #region TypeConverter
 
         /// <summary>
@@ -321,7 +329,7 @@ namespace JsonExSerializer
             get { return _collectionHandlers; }
         }
 
-        public TypeHandler GetTypeHandler(Type objectType)
+        public TypeData GetTypeHandler(Type objectType)
         {
             return TypeHandlerFactory[objectType];
         }
@@ -330,16 +338,16 @@ namespace JsonExSerializer
         /// Gets or sets the TypeHandlerFactory which is responsible for
         /// creating ITypeHandlers which manage type metadata
         /// </summary>
-        public TypeHandlerFactory TypeHandlerFactory
+        public TypeDataRepository TypeHandlerFactory
         {
             get { return _typeHandlerFactory; }
             set { _typeHandlerFactory = value; }
         }
 
-        public ExpressionHandlerCollection ObjectHandlers
+        public ExpressionHandlerCollection ExpressionHandlers
         {
-            get { return _objectHandlers; }
-            set { _objectHandlers = value; }
+            get { return expressionHandlers; }
+            set { expressionHandlers = value; }
         }
 
         #endregion
@@ -352,7 +360,7 @@ namespace JsonExSerializer
         /// <param name="propertyName">the name of the property</param>
         public void IgnoreProperty(Type objectType, string propertyName)
         {
-            TypeHandler handler = GetTypeHandler(objectType);
+            TypeData handler = GetTypeHandler(objectType);
             handler.IgnoreProperty(propertyName);
         }
 

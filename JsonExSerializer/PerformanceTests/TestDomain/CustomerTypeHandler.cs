@@ -6,14 +6,14 @@ using JsonExSerializer;
 
 namespace PerformanceTests.TestDomain
 {
-    public class CustTypeHandlerFactory : TypeHandlerFactory
+    public class CustTypeHandlerFactory : TypeDataRepository
     {
         public CustTypeHandlerFactory(SerializationContext Context)
             : base(Context)
         {
         }
 
-        protected override TypeHandler CreateNew(Type forType)
+        protected override TypeData CreateNew(Type forType)
         {
             if (forType == typeof(Customer))
                 return new CustomerTypeHandler(forType, this.Context);
@@ -21,26 +21,26 @@ namespace PerformanceTests.TestDomain
                 return base.CreateNew(forType);
         }
     }
-    public class CustomerTypeHandler : TypeHandler
+    public class CustomerTypeHandler : TypeData
     {
         public CustomerTypeHandler(Type t, SerializationContext ctx)
             : base(t, ctx)
         {
         }
 
-        protected override void ReadProperties(out IList<IPropertyHandler> Properties, out IList<IPropertyHandler> ConstructorArguments)
+        protected override void ReadProperties(out IList<IPropertyData> Properties, out IList<IPropertyData> ConstructorArguments)
         {
-            Properties = new List<IPropertyHandler>();
+            Properties = new List<IPropertyData>();
             Properties.Add(new FirstPH(this.ForType));
             Properties.Add(new LastPH(this.ForType));
             Properties.Add(new PhonePH(this.ForType));
             Properties.Add(new SSNPH(this.ForType));
             Properties.Add(new AgePH(this.ForType));
-            ConstructorArguments = new List<IPropertyHandler>();
+            ConstructorArguments = new List<IPropertyData>();
         }
     }
 
-    public abstract class CustomerPHBase : AbstractPropertyHandler
+    public abstract class CustomerPHBase : AbstractPropertyData
     {
         private string _name;
 

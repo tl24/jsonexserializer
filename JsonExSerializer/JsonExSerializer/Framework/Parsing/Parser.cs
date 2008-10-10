@@ -99,13 +99,13 @@ namespace JsonExSerializer.Framework.Parsing
 
         public object Evaluate(ExpressionBase Expression)
         {
-            IExpressionHandler handler = _context.ObjectHandlers.GetHandler(Expression);
+            IExpressionHandler handler = _context.ExpressionHandlers.GetHandler(Expression);
             return handler.Evaluate(Expression, this);
         }
 
         public object Evaluate(ExpressionBase Expression, object existingObject)
         {
-            IExpressionHandler handler = _context.ObjectHandlers.GetHandler(Expression);
+            IExpressionHandler handler = _context.ExpressionHandlers.GetHandler(Expression);
             return handler.Evaluate(Expression, existingObject, this);
         }
 

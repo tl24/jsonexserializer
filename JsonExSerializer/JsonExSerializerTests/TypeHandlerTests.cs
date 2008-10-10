@@ -17,7 +17,7 @@ namespace JsonExSerializerTests
         public void IsEmpty_OnEmptyClass_ReturnsTrue()
         {
             SerializationContext context = new SerializationContext();
-            TypeHandler EmptyClassHandler = new TypeHandler(typeof(EmptyClass), context);
+            TypeData EmptyClassHandler = new TypeData(typeof(EmptyClass), context);
             Assert.IsTrue(EmptyClassHandler.IsEmpty, "IsEmpty should return true on class with no properties/fields");
         }
 
@@ -25,7 +25,7 @@ namespace JsonExSerializerTests
         public void IsEmpty_OnClassWithOnlyIgnoredFields_ReturnsTrue()
         {
             SerializationContext context = new SerializationContext();
-            TypeHandler IgnoredClassHandler = new TypeHandler(typeof(IgnoredFieldClass), context);
+            TypeData IgnoredClassHandler = new TypeData(typeof(IgnoredFieldClass), context);
             Assert.IsTrue(IgnoredClassHandler.IsEmpty, "IsEmpty should return true on class with all properties/fields ignored");
         }
 
@@ -33,7 +33,7 @@ namespace JsonExSerializerTests
         public void IsEmpty_OnNonEmptyClass_ReturnsFalse()
         {
             SerializationContext context = new SerializationContext();
-            TypeHandler SimpleObjectHandler = new TypeHandler(typeof(SimpleObject), context);
+            TypeData SimpleObjectHandler = new TypeData(typeof(SimpleObject), context);
             Assert.IsFalse(SimpleObjectHandler.IsEmpty, "IsEmpty should return false on class with properties/fields");
         }
 
@@ -41,7 +41,7 @@ namespace JsonExSerializerTests
         public void IsCollection_ReturnsAttributeValueForJsonExCollection()
         {
             SerializationContext context = new SerializationContext();
-            TypeHandler CollectionTypeHandler = new TypeHandler(typeof(StronglyTypedCollection), context);
+            TypeData CollectionTypeHandler = new TypeData(typeof(StronglyTypedCollection), context);
             Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
             Assert.IsInstanceOfType(typeof(StronglyTypedCollectionHandler), CollectionTypeHandler.GetCollectionHandler(), "Wrong collection handler");
             Assert.AreSame(typeof(string), CollectionTypeHandler.GetCollectionHandler().GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
@@ -51,7 +51,7 @@ namespace JsonExSerializerTests
         public void IsCollection_ReturnsDefaultValueForJsonExCollection_WhenItemTypeOnlySpecified()
         {
             SerializationContext context = new SerializationContext();
-            TypeHandler CollectionTypeHandler = new TypeHandler(typeof(StronglyTypedCollection2), context);
+            TypeData CollectionTypeHandler = new TypeData(typeof(StronglyTypedCollection2), context);
             Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
             Assert.IsInstanceOfType(typeof(CollectionHandlerWrapper), CollectionTypeHandler.GetCollectionHandler(), "Wrong collection handler");
             Assert.AreSame(typeof(string), CollectionTypeHandler.GetCollectionHandler().GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
@@ -61,8 +61,8 @@ namespace JsonExSerializerTests
         public void FindProperty_FindsIgnoredProperties()
         {
             SerializationContext context = new SerializationContext();
-            TypeHandler handler = context.GetTypeHandler(typeof(IgnoredFieldClass));
-            IPropertyHandler fieldHandler = handler.FindProperty("IVal");
+            TypeData handler = context.GetTypeHandler(typeof(IgnoredFieldClass));
+            IPropertyData fieldHandler = handler.FindProperty("IVal");
             Assert.IsNotNull(fieldHandler, "Ignored property not found");
         }
 
@@ -70,13 +70,13 @@ namespace JsonExSerializerTests
         public void IgnoreProperty_DoesNotDeleteField()
         {
             SerializationContext context = new SerializationContext();
-            TypeHandler handler = context.GetTypeHandler(typeof(SimpleObject));
-            foreach(IPropertyHandler prop in handler.AllProperties)
+            TypeData handler = context.GetTypeHandler(typeof(SimpleObject));
+            foreach(IPropertyData prop in handler.AllProperties)
                 ;  // force properties to load
 
             handler.IgnoreProperty("IntValue");
             bool found = false;
-            foreach (IPropertyHandler prop in handler.AllProperties)
+            foreach (IPropertyData prop in handler.AllProperties)
                 if (prop.Name == "IntValue")
                     found = true;
             Assert.IsTrue(found, "Ignored property deleted");
@@ -87,7 +87,7 @@ namespace JsonExSerializerTests
         public void IgnoreProperty_WhenFieldDoesntExist_ThrowsError()
         {
             SerializationContext context = new SerializationContext();
-            TypeHandler handler = context.GetTypeHandler(typeof(SimpleObject));
+            TypeData handler = context.GetTypeHandler(typeof(SimpleObject));
                 handler.IgnoreProperty("Foo");
         }
 

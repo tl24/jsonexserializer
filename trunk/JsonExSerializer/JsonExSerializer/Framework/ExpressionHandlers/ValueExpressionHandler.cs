@@ -15,12 +15,12 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
         }
 
-        public override ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
             return new ValueExpression(data);
         }
 
-        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
             ValueExpression value = (ValueExpression)expression;
             if (value.ResultType.IsEnum)
@@ -33,7 +33,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 return Convert.ChangeType(value.StringValue, value.ResultType);
         }
 
-        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
             throw new InvalidOperationException("Value types can not be updated");
         }

@@ -134,7 +134,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         /// <param name="expression">expression to find a handler for</param>
         /// <returns>and expression handler that can deserialize the expression</returns>
-        public IExpressionHandler GetHandler(ExpressionBase expression)
+        public IExpressionHandler GetHandler(Expression expression)
         {
             foreach (IExpressionHandler handler in this)
                 if (handler.CanHandle(expression))

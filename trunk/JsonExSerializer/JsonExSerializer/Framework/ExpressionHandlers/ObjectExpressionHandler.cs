@@ -36,7 +36,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">current path to the object</param>
         /// <param name="serializer">serializer instance used to serialize key values</param>
         /// <returns>json object expression</returns>
-        public override ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
              TypeData handler = Context.GetTypeHandler(data.GetType());
 
@@ -47,7 +47,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 foreach (IPropertyData ctorParm in handler.ConstructorParameters)
                 {
                     object value = ctorParm.GetValue(data);
-                    ExpressionBase argExpr;
+                    Expression argExpr;
                     // TODO: Improve reference support when constructor arguments are refactored
                     if (ctorParm.HasConverter)
                     {
@@ -69,7 +69,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             foreach (IPropertyData prop in handler.Properties)
             {
                 object value = prop.GetValue(data);
-                ExpressionBase valueExpr;
+                Expression valueExpr;
                 if (prop.HasConverter)
                 {
                     valueExpr = serializer.Serialize(value, currentPath.Append(prop.Name), prop.TypeConverter);
@@ -93,7 +93,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="expression">json object expression</param>
         /// <param name="deserializer">deserializer for deserializing key values</param>
         /// <returns>deserialized object</returns>
-        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
             object value = ConstructObject((ObjectExpression)expression, deserializer);
             value = Evaluate(expression, value, deserializer);
@@ -109,7 +109,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="existingObject">the existing object to populate</param>
         /// <param name="deserializer">deserializer for deserializing key values</param>
         /// <returns>deserialized object</returns>
-        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
             TypeData typeHandler = Context.GetTypeHandler(existingObject.GetType());
             ObjectExpression objectExpression = (ObjectExpression)expression;
@@ -135,7 +135,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                             throw new Exception(string.Format("Can not set property {0} for type {1} because it is ignored and IgnorePropertyAction is set to ThrowException", Item.Key, typeHandler.ForType));
                     }
                 }
-                ExpressionBase valueExpression = Item.ValueExpression;
+                Expression valueExpression = Item.ValueExpression;
                 valueExpression.ResultType = hndlr.PropertyType;
                 object result = null;
                 TypeConverterExpressionHandler converterHandler = null;
@@ -187,7 +187,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
 
             for (int i = 0; i < args.Length; i++)
             {
-                ExpressionBase carg = expression.ConstructorArguments[i];
+                Expression carg = expression.ConstructorArguments[i];
                 args[i] = deserializer.Evaluate(carg);
             }
             TypeData handler = Context.GetTypeHandler(expression.ResultType);

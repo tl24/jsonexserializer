@@ -17,7 +17,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">current path</param>
         /// <param name="serializer">serializer instance</param>
         /// <returns>NullExpression</returns>
-        public override ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
             return new NullExpression();
         }
@@ -38,7 +38,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         /// <param name="expression">the expression</param>
         /// <returns>true if this handler handles the expression</returns>
-        public override bool CanHandle(ExpressionBase expression)
+        public override bool CanHandle(Expression expression)
         {
             return (expression is NullExpression);
         }
@@ -49,7 +49,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="expression">the expression</param>
         /// <param name="deserializer">the deserializer</param>
         /// <returns>null</returns>
-        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
             if (!(expression is NullExpression))
                 throw new ArgumentException("expression should be NullExpression");
@@ -63,7 +63,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="existingObject">an existing object</param>
         /// <param name="deserializer">deserializer</param>
         /// <returns>the existing object</returns>
-        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
             return existingObject;
         }

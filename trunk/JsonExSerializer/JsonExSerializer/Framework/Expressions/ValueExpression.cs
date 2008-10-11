@@ -12,7 +12,7 @@ namespace JsonExSerializer.Framework.Expressions
     /// <summary>
     /// Value types such as string, bool, or number
     /// </summary>
-    public class ValueExpression: ExpressionBase
+    public class ValueExpression: Expression
     {
         private object _value;
 

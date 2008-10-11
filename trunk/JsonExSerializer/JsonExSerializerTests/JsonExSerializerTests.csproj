@@ -44,10 +44,10 @@
     <Compile Include="ConversionTests.cs" />
     <Compile Include="CustomPropertyTest.cs" />
     <Compile Include="DeserializePrimitiveTests.cs" />
-    <Compile Include="Expression\CustomExpressionHandlerTests.cs" />
-    <Compile Include="Expression\ExpressionWriterTests.cs" />
-    <Compile Include="Expression\JsonPathTests.cs" />
-    <Compile Include="Expression\ReferenceTests.cs" />
+    <Compile Include="Expressions\CustomExpressionHandlerTests.cs" />
+    <Compile Include="Expressions\ExpressionWriterTests.cs" />
+    <Compile Include="Expressions\JsonPathTests.cs" />
+    <Compile Include="Expressions\ReferenceTests.cs" />
     <Compile Include="FieldTests.cs" />
     <Compile Include="IgnorePropertyActionTests.cs" />
     <Compile Include="JsonWriterComplexTests.cs" />

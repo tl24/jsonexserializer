@@ -22,7 +22,7 @@ namespace JsonExSerializer.Framework.Visitors
 
         public void VisitComplex(ComplexExpressionBase ComplexExpression)
         {
-            foreach (ExpressionBase expr in ComplexExpression.ConstructorArguments)
+            foreach (Expression expr in ComplexExpression.ConstructorArguments)
                 Visit(expr);
         }
 
@@ -30,7 +30,7 @@ namespace JsonExSerializer.Framework.Visitors
         {
             VisitComplex(list);
 
-            foreach (ExpressionBase item in list.Items)
+            foreach (Expression item in list.Items)
                 Visit(item);
         }
 

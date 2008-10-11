@@ -88,7 +88,7 @@ namespace JsonExSerializer.Framework.Parsing
         /// <returns>the object constructed from the stream</returns>
         public object Parse()
         {
-            ExpressionBase expr = ParseExpression();
+            Expression expr = ParseExpression();
             expr.ResultType = _deserializedType;
             foreach (IParsingStage stage in _context.ParsingStages)
             {
@@ -97,13 +97,13 @@ namespace JsonExSerializer.Framework.Parsing
             return Evaluate(expr);
         }
 
-        public object Evaluate(ExpressionBase Expression)
+        public object Evaluate(Expression Expression)
         {
             IExpressionHandler handler = _context.ExpressionHandlers.GetHandler(Expression);
             return handler.Evaluate(Expression, this);
         }
 
-        public object Evaluate(ExpressionBase Expression, object existingObject)
+        public object Evaluate(Expression Expression, object existingObject)
         {
             IExpressionHandler handler = _context.ExpressionHandlers.GetHandler(Expression);
             return handler.Evaluate(Expression, existingObject, this);
@@ -127,9 +127,9 @@ namespace JsonExSerializer.Framework.Parsing
             return _tokenStream.ReadToken();
         }
 
-        private ExpressionBase ParseExpression()
+        private Expression ParseExpression()
         {
-            ExpressionBase value;
+            Expression value;
             if (_tokenStream.IsEmpty())
             {
                 value = new NullExpression();
@@ -176,7 +176,7 @@ namespace JsonExSerializer.Framework.Parsing
         /// Parses a reference to an object
         /// </summary>
         /// <returns></returns>
-        private ExpressionBase ParseReference()
+        private Expression ParseReference()
         {
             JsonPath refID = new JsonPath();
             Token tok = ReadToken();
@@ -211,7 +211,7 @@ namespace JsonExSerializer.Framework.Parsing
         /// the type of the cast.
         /// </summary>
         /// <returns>casted expression</returns>
-        private ExpressionBase ParseCast()
+        private Expression ParseCast()
         {
             Token tok = ReadToken();
             Debug.Assert(tok == LParenToken, "Invalid starting token for ParseCast: " + tok);
@@ -232,7 +232,7 @@ namespace JsonExSerializer.Framework.Parsing
             Token tok = ReadToken();
             Debug.Assert(tok == LSquareToken);
             ArrayExpression value = new ArrayExpression();
-            ExpressionBase item;
+            Expression item;
             while (ReadAhead(CommaToken, RSquareToken, new ExpressionMethod(ParseExpression), out item))
             {
                 value.Add(item);
@@ -249,7 +249,7 @@ namespace JsonExSerializer.Framework.Parsing
             Token tok = ReadToken();
             Debug.Assert(tok == LBraceToken);
             ObjectExpression value = new ObjectExpression();
-            ExpressionBase item;
+            Expression item;
             while (ReadAhead(CommaToken, RBraceToken, new ExpressionMethod(ParseKeyValue), out item))
             {
                 value.Add((KeyValueExpression)item);
@@ -263,10 +263,10 @@ namespace JsonExSerializer.Framework.Parsing
         /// <returns></returns>
         private KeyValueExpression ParseKeyValue()
         {
-            ExpressionBase key = ParseExpression(); // should be a value
+            Expression key = ParseExpression(); // should be a value
             Token tok = ReadToken();
             RequireToken(ColonToken, tok, "Syntax error, key should be followed by :.");
-            ExpressionBase value = ParseExpression();
+            Expression value = ParseExpression();
             return new KeyValueExpression(key, value);
         }
 
@@ -275,7 +275,7 @@ namespace JsonExSerializer.Framework.Parsing
         /// each item found by the ReadAhead method.
         /// </summary>
         /// <returns></returns>
-        private delegate ExpressionBase ExpressionMethod();
+        private delegate Expression ExpressionMethod();
 
         /// <summary>
         /// Handler for 1 or more construct
@@ -285,7 +285,7 @@ namespace JsonExSerializer.Framework.Parsing
         /// <param name="meth">the method to call to parse an item</param>
         /// <param name="result">the parsed expression</param>
         /// <returns>true if match parsed, false otherwise</returns>
-        private bool ReadAhead(Token separator, Token terminal, ExpressionMethod meth, out ExpressionBase result)
+        private bool ReadAhead(Token separator, Token terminal, ExpressionMethod meth, out Expression result)
         {
             Token tok = PeekToken();
             result = null;
@@ -318,8 +318,8 @@ namespace JsonExSerializer.Framework.Parsing
 
             tok = ReadToken();
             RequireToken(LParenToken, tok, "Missing constructor arguments");
-            ExpressionBase arg;
-            List<ExpressionBase> ConstructorArgs = new List<ExpressionBase>();
+            Expression arg;
+            List<Expression> ConstructorArgs = new List<Expression>();
             while (ReadAhead(CommaToken, RParenToken, new ExpressionMethod(ParseExpression), out arg)) {
                 ConstructorArgs.Add(arg);
             }
@@ -424,7 +424,7 @@ namespace JsonExSerializer.Framework.Parsing
             return Type.GetType(typeName, true);
         }
 
-        private ExpressionBase ParsePrimitive() {
+        private Expression ParsePrimitive() {
             Token tok = ReadToken();
             // no type info, try to figure out the closest type
             switch (tok.type)
@@ -457,7 +457,7 @@ namespace JsonExSerializer.Framework.Parsing
         /// Parses a single or double quoted string, or a character
         /// </summary>
         /// <returns>the parsed string or char</returns>
-        private ExpressionBase ParseString()
+        private Expression ParseString()
         {
             return new ValueExpression(ReadToken().value);
         }

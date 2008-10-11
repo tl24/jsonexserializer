@@ -52,7 +52,7 @@ namespace JsonExSerializer.Framework
                 comment += "*/" + "\r\n";
                 this.WriteComment(comment);
             }
-            ExpressionBase expr = Serialize(value, new JsonPath(), null);
+            Expression expr = Serialize(value, new JsonPath(), null);
             if (value != null && value.GetType() != _serializedType)
             {
                 expr = new CastExpression(value.GetType(), expr);
@@ -60,7 +60,7 @@ namespace JsonExSerializer.Framework
             ExpressionWriter.Write(this, _context, expr);
         }
 
-        public ExpressionBase Serialize(object value, JsonPath currentPath)
+        public Expression Serialize(object value, JsonPath currentPath)
         {
             return Serialize(value, currentPath, null);
         }
@@ -70,7 +70,7 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="value">the object to serialize</param>
         /// <param name="currentPath">the current path for reference writing</param>
-        public ExpressionBase Serialize(object value, JsonPath currentPath, IJsonTypeConverter converter)
+        public Expression Serialize(object value, JsonPath currentPath, IJsonTypeConverter converter)
         {
             if (value == null)
             {
@@ -79,7 +79,7 @@ namespace JsonExSerializer.Framework
             else
             {
 
-                ExpressionBase expr = HandleReference(value, currentPath);
+                Expression expr = HandleReference(value, currentPath);
                 if (expr != null)
                     return expr;
 
@@ -109,7 +109,7 @@ namespace JsonExSerializer.Framework
             }
         }
 
-        public ExpressionBase HandleReference(object value, JsonPath CurrentPath)
+        public Expression HandleReference(object value, JsonPath CurrentPath)
         {
             if (!value.GetType().IsClass)
                 return null;

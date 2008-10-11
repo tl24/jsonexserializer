@@ -60,7 +60,7 @@ namespace JsonExSerializer.Framework.Expressions
             for (int i = 0; i < constructor.types.Length; i++)
             {
                 ParameterInfo parameter = parms[i];
-                ExpressionBase value = _expression.ConstructorArguments[i];
+                Expression value = _expression.ConstructorArguments[i];
                 Type definedType = null;
                 if (_definedParameters.Length > i)
                     definedType = _definedParameters[i];

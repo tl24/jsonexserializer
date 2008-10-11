@@ -48,7 +48,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">the current path to the data</param>
         /// <param name="serializer">serializer instance to use to serialize list items</param>
         /// <returns>a json array expression representation</returns>
-        public override ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
             TypeData handler = Context.GetTypeHandler(data.GetType());
 
@@ -60,7 +60,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             ArrayExpression expression = new ArrayExpression();
             foreach (object value in collectionHandler.GetEnumerable(data))
             {
-                ExpressionBase itemExpr = serializer.Serialize(value, currentPath.Append(index));
+                Expression itemExpr = serializer.Serialize(value, currentPath.Append(index));
                 if (value != null && value.GetType() != elemType)
                 {
                     itemExpr = new CastExpression(value.GetType(), itemExpr);
@@ -77,7 +77,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="expression">the expression to deserialize</param>
         /// <param name="deserializer">deserializer to deserialize list items</param>
         /// <returns>deserialized object</returns>
-        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
             return Evaluate(expression, null, deserializer);
         }
@@ -89,7 +89,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="existingObject">the collection to populate</param>
         /// <param name="deserializer">deserializer to deserialize list items</param>
         /// <returns>deserialized object</returns>
-        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
             Type ItemType;
             ArrayExpression list = (ArrayExpression)expression;
@@ -124,7 +124,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             {
                 // this might fail if the builder's not ready
             }
-            foreach (ExpressionBase item in expression.Items)
+            foreach (Expression item in expression.Items)
             {
                 item.ResultType = itemType;
                 object itemResult = deserializer.Evaluate(item);

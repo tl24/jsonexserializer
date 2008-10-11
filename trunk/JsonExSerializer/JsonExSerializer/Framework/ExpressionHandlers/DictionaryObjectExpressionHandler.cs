@@ -35,7 +35,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="data">the dictionary object</param>
         /// <param name="currentPath">object's path</param>
         /// <param name="serializer">the serializer instance, used to serialize keys and values</param>
-        public override ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
             IDictionary dictionary = (IDictionary)data;
             Type itemType = typeof(object);
@@ -51,7 +51,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             {
                 //may not work in all cases
                 object value = pair.Value;
-                ExpressionBase valueExpr = serializer.Serialize(value, currentPath.Append(pair.Key.ToString()));
+                Expression valueExpr = serializer.Serialize(value, currentPath.Append(pair.Key.ToString()));
                 if (value != null && value.GetType() != itemType)
                 {
                     valueExpr = new CastExpression(value.GetType(), valueExpr);
@@ -79,7 +79,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="existingObject">the existing object to populate</param>
         /// <param name="deserializer">the deserializer instance to use to deserialize other expressions</param>
         /// <returns>a populated object</returns>
-        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
             Type _dictionaryKeyType = typeof(string);
             Type _dictionaryValueType = null;

@@ -4,16 +4,16 @@ using System.Text;
 
 namespace JsonExSerializer.Framework.Expressions
 {
-    public class CastExpression : ExpressionBase
+    public class CastExpression : Expression
     {
-        private ExpressionBase _expression;
+        private Expression _expression;
 
         public CastExpression(Type CastedType)
         {
             _resultType = CastedType;
         }
 
-        public CastExpression(Type CastedType, ExpressionBase Expression)
+        public CastExpression(Type CastedType, Expression Expression)
             : this(CastedType)
         {
             _expression = Expression;
@@ -32,13 +32,13 @@ namespace JsonExSerializer.Framework.Expressions
         {
             get { return typeof(object); }
         }
-        public ExpressionBase Expression
+        public Expression Expression
         {
             get { return this._expression; }
             set { this._expression = value; }
         }
 
-        public override ExpressionBase Parent
+        public override Expression Parent
         {
             get { return base.Parent; }
             set

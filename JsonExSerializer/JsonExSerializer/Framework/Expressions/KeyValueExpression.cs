@@ -18,11 +18,11 @@ namespace JsonExSerializer.Framework.Expressions
     /// This class will alter the normal evaluation of the value by loading the propertyinfo
     /// for this key, from the parent and checking for a property converter.
     /// </summary>
-    public sealed class KeyValueExpression : ExpressionBase {
-        private ExpressionBase _keyExpression;
-        private ExpressionBase _valueExpression;
+    public sealed class KeyValueExpression : Expression {
+        private Expression _keyExpression;
+        private Expression _valueExpression;
 
-        public KeyValueExpression(ExpressionBase key, ExpressionBase value)
+        public KeyValueExpression(Expression key, Expression value)
         {
             _keyExpression = key;
             _valueExpression = value;
@@ -37,13 +37,13 @@ namespace JsonExSerializer.Framework.Expressions
             }
         }
 
-        public ExpressionBase KeyExpression
+        public Expression KeyExpression
         {
             get { return this._keyExpression; }
             set { this._keyExpression = value; }
         }
 
-        public ExpressionBase ValueExpression
+        public Expression ValueExpression
         {
             get { return this._valueExpression; }
             set { this._valueExpression = value; }

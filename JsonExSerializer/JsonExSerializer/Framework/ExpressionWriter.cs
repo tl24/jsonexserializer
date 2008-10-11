@@ -11,7 +11,7 @@ namespace JsonExSerializer.Framework
     public class ExpressionWriter
     {
         private Dictionary<Type, WriteMethod> _actions;
-        private delegate void WriteMethod(ExpressionBase Expression);
+        private delegate void WriteMethod(Expression Expression);
         private IJsonWriter _jsonWriter;
         private SerializationContext _context;
 
@@ -35,22 +35,22 @@ namespace JsonExSerializer.Framework
             _actions[typeof(CastExpression)] = WriteCast;
         }
 
-        public static void Write(IJsonWriter writer, SerializationContext context, ExpressionBase expression)
+        public static void Write(IJsonWriter writer, SerializationContext context, Expression expression)
         {
             new ExpressionWriter(writer, context).Write(expression);
         }
 
-        public void Write(ExpressionBase expression)
+        public void Write(Expression expression)
         {
             _actions[expression.GetType()](expression);
         }
 
-        private void WriteBoolean(ExpressionBase expression)
+        private void WriteBoolean(Expression expression)
         {
             _jsonWriter.WriteValue((bool)((BooleanExpression)expression).Value);
         }
 
-        private void WriteNumeric(ExpressionBase expression)
+        private void WriteNumeric(Expression expression)
         {
             NumericExpression numeric = (NumericExpression)expression;
             object value = numeric.Value;
@@ -75,29 +75,29 @@ namespace JsonExSerializer.Framework
             }
         }
 
-        private void WriteValue(ExpressionBase expression)
+        private void WriteValue(Expression expression)
         {
             ValueExpression value = (ValueExpression)expression;
             _jsonWriter.WriteQuotedValue(value.StringValue);
         }
 
-        private void WriteNull(ExpressionBase expression)
+        private void WriteNull(Expression expression)
         {
             if (!(expression is NullExpression))
                 throw new ArgumentException("Expression should be a NullExpression");
             _jsonWriter.WriteSpecialValue("null");
         }
 
-        private void WriteList(ExpressionBase Expression)
+        private void WriteList(Expression Expression)
         {
             ArrayExpression list = (ArrayExpression)Expression;
             _jsonWriter.WriteArrayStart();
-            foreach (ExpressionBase item in list.Items)
+            foreach (Expression item in list.Items)
                 Write(item);
             _jsonWriter.WriteArrayEnd();
         }
 
-        private void WriteObject(ExpressionBase Expression)
+        private void WriteObject(Expression Expression)
         {
             ObjectExpression obj = (ObjectExpression)Expression;
             bool hasConstructor = false;
@@ -106,7 +106,7 @@ namespace JsonExSerializer.Framework
                 hasConstructor = true;
                 _jsonWriter.WriteConstructorStart(obj.ResultType);
                 _jsonWriter.WriteConstructorArgsStart();
-                foreach (ExpressionBase ctorArg in obj.ConstructorArguments)
+                foreach (Expression ctorArg in obj.ConstructorArguments)
                 {
                     Write(ctorArg);
                 }
@@ -126,13 +126,13 @@ namespace JsonExSerializer.Framework
                 _jsonWriter.WriteConstructorEnd();
         }
 
-        private void WriteReference(ExpressionBase Expression)
+        private void WriteReference(Expression Expression)
         {
             ReferenceExpression refExpr = (ReferenceExpression)Expression;
             _jsonWriter.WriteSpecialValue(refExpr.Path.ToString());
         }
 
-        private void WriteCast(ExpressionBase Expression)
+        private void WriteCast(Expression Expression)
         {
             CastExpression cast = (CastExpression)Expression;
             if (_context.OutputTypeInformation)

@@ -32,7 +32,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers.Collections
             return ObjectType.IsGenericType && typeof(Queue<>).IsAssignableFrom(ObjectType.GetGenericTypeDefinition());
         }
 
-        public override object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression Expression, object existingObject, IDeserializerHandler deserializer)
         {
             Expression.OnObjectConstructed(existingObject);
             Type collectionType = null;
@@ -43,7 +43,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers.Collections
             Type itemType = GetItemType(collectionType);
             Type wrapperType = typeof(GenericQueueWrapper<>).MakeGenericType(itemType);
             IList wrapper = (IList) Activator.CreateInstance(wrapperType, existingObject);
-            foreach (ExpressionBase itemExpr in ((ArrayExpression)Expression).Items)
+            foreach (Expression itemExpr in ((ArrayExpression)Expression).Items)
             {
                 itemExpr.ResultType = itemType;
                 wrapper.Add(deserializer.Evaluate(itemExpr));

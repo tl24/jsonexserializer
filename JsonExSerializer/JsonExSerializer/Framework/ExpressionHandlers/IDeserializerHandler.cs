@@ -16,7 +16,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         /// <param name="expression">the expression to evaluate</param>
         /// <returns>the object</returns>
-        object Evaluate(ExpressionBase expression);
+        object Evaluate(Expression expression);
 
         /// <summary>
         /// Evaluates an expression and populates an existing object
@@ -24,6 +24,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="expression">the expression to evaluate</param>
         /// <param name="existingObject">the existing object to populate</param>
         /// <returns>the populated object</returns>
-        object Evaluate(ExpressionBase expression, object existingObject);
+        object Evaluate(Expression expression, object existingObject);
     }
 }

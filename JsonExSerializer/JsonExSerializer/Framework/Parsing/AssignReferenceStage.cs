@@ -16,7 +16,7 @@ namespace JsonExSerializer.Framework.Parsing
         {
         }
 
-        public ExpressionBase Execute(ExpressionBase root)
+        public Expression Execute(Expression root)
         {
             IList<ReferenceExpression> references = CollectReferences(root);
             foreach (ReferenceExpression reference in references)
@@ -24,14 +24,14 @@ namespace JsonExSerializer.Framework.Parsing
             return root;
         }
 
-        private static List<ReferenceExpression> CollectReferences(ExpressionBase root)
+        private static List<ReferenceExpression> CollectReferences(Expression root)
         {
             CollectReferencesVisitor visitor = new CollectReferencesVisitor();
             root.Accept(visitor);
             return visitor.References;
         }
 
-        private static void ResolveReference(ReferenceExpression reference, ExpressionBase root)
+        private static void ResolveReference(ReferenceExpression reference, Expression root)
         {
             ReferenceVisitor visitor = new ReferenceVisitor(reference.Path);
             visitor.Visit(root);

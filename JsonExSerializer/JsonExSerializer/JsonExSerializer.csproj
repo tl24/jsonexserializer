@@ -57,7 +57,7 @@
     <Compile Include="Framework\Expressions\CastExpression.cs" />
     <Compile Include="Framework\Expressions\ComplexExpressionBase.cs" />
     <Compile Include="Framework\Expressions\CtorArgTypeResolver.cs" />
-    <Compile Include="Framework\Expressions\ExpressionBase.cs" />
+    <Compile Include="Framework\Expressions\Expression.cs" />
     <Compile Include="Framework\Expressions\KeyValueExpression.cs" />
     <Compile Include="Framework\Expressions\ArrayExpression.cs" />
     <Compile Include="Framework\Expressions\NullExpression.cs" />

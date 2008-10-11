@@ -35,7 +35,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="serializer">serializer instance</param>
         /// <returns>expression</returns>
         /// <exception cref="InvalidOperationException">This will throw an exception if called</exception>
-        public override ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
             throw new InvalidOperationException("CastObjectHandler should not be called during Serialization");
         }
@@ -57,7 +57,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         /// <param name="expression">the expression to check</param>
         /// <returns>true if this handler handles the expression</returns>
-        public override bool CanHandle(ExpressionBase expression)
+        public override bool CanHandle(Expression expression)
         {
             return (expression is CastExpression);
         }
@@ -68,9 +68,9 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="expression">the epxression to evaluate</param>
         /// <param name="deserializer">the deserializer instance</param>
         /// <returns>constructed object</returns>
-        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
-            ExpressionBase innerExpression = ((CastExpression)expression).Expression;
+            Expression innerExpression = ((CastExpression)expression).Expression;
             innerExpression.ResultType = expression.ResultType;
             return deserializer.Evaluate(innerExpression);
         }
@@ -82,9 +82,9 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="existingObject">the object to populate</param>
         /// <param name="deserializer">the deserializer instance</param>
         /// <returns>constructed object</returns>
-        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
-            ExpressionBase innerExpression = ((CastExpression)expression).Expression;
+            Expression innerExpression = ((CastExpression)expression).Expression;
             innerExpression.ResultType = expression.ResultType;
             return deserializer.Evaluate(innerExpression, existingObject);
         }

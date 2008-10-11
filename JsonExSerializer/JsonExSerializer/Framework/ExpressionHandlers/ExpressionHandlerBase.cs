@@ -45,7 +45,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="CurrentPath">the current path to this object from the root, used for tracking references</param>
         /// <param name="serializer">serializer instance for serializing child objects</param>
         /// <returns>an expression which represents a json structure</returns>
-        public abstract ExpressionBase GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer);
+        public abstract Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer);
 
         /// <summary>
         /// Checks to see if this handler is able to convert an this object type to an expression
@@ -59,7 +59,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         /// <param name="expression">the expression that will be deserialized</param>
         /// <returns>true if this handler can handle the expression</returns>
-        public virtual bool CanHandle(ExpressionBase expression)
+        public virtual bool CanHandle(Expression expression)
         {
             return false;
         }
@@ -71,7 +71,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="expression">the epxression to deserialize</param>
         /// <param name="deserializer">deserializer instance to use to deserialize any child expressions</param>
         /// <returns>a fully deserialized object</returns>
-        public abstract object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer);
+        public abstract object Evaluate(Expression expression, IDeserializerHandler deserializer);
 
         /// <summary>
         /// Convert the expression into an object by populating an existing object with any necessary values.
@@ -82,6 +82,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="existingObject">an existing object to populate</param>
         /// <param name="deserializer">deserializer instance to use to deserialize any child expressions</param>
         /// <returns>a fully deserialized object</returns>
-        public abstract object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer);
+        public abstract object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer);
     }
 }

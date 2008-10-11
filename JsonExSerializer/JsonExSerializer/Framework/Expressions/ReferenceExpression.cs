@@ -12,9 +12,9 @@ namespace JsonExSerializer.Framework.Expressions
     /// <summary>
     /// A reference to another object
     /// </summary>
-    public sealed class ReferenceExpression : ExpressionBase
+    public sealed class ReferenceExpression : Expression
     {
-        private ExpressionBase _reference;   // the expression that is referenced
+        private Expression _reference;   // the expression that is referenced
         private JsonPath _path; // path to the referenced expression
         private object result;
 
@@ -37,7 +37,7 @@ namespace JsonExSerializer.Framework.Expressions
         {
             get { return typeof(object); }
         }
-        public ExpressionBase ReferencedExpression
+        public Expression ReferencedExpression
         {
             get { return _reference; }
             set

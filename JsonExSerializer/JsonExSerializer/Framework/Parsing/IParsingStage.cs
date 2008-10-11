@@ -7,6 +7,6 @@ namespace JsonExSerializer.Framework.Parsing
 {
     public interface IParsingStage
     {
-        ExpressionBase Execute(ExpressionBase root);
+        Expression Execute(Expression root);
     }
 }

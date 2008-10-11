@@ -9,14 +9,14 @@ namespace JsonExSerializer.Framework.Visitors
     public class ReferenceVisitor : VisitorBase
     {
         JsonPath _refID;
-        ExpressionBase _expr;
+        Expression _expr;
 
         public ReferenceVisitor(JsonPath RefID)
         {
             _refID = RefID;
         }
 
-        public ExpressionBase ReferencedExpression
+        public Expression ReferencedExpression
         {
             get { return _expr; }
         }
@@ -69,7 +69,7 @@ namespace JsonExSerializer.Framework.Visitors
             {
                 throw new ArgumentOutOfRangeException("Reference to collection item out of range: " + _refID);
             }
-            ExpressionBase expr = expression.Items[index];
+            Expression expr = expression.Items[index];
             Visit(expr);
         }
 

@@ -36,7 +36,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">the current path to the value</param>
         /// <param name="serializer">serializer instance</param>
         /// <returns>an expression for the value</returns>
-        public override ExpressionBase GetExpression(object value, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object value, JsonPath currentPath, ISerializerHandler serializer)
         {
             TypeData handler = Context.TypeHandlerFactory[value.GetType()];
             IJsonTypeConverter converter = (handler.HasConverter ? handler.TypeConverter : (IJsonTypeConverter)value);
@@ -52,11 +52,11 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">the current path to the value</param>
         /// <param name="serializer">serializer instance</param>
         /// <returns>an expression for the value</returns>
-        public ExpressionBase GetExpression(object value, IJsonTypeConverter converter, JsonPath currentPath, ISerializerHandler serializer)
+        public Expression GetExpression(object value, IJsonTypeConverter converter, JsonPath currentPath, ISerializerHandler serializer)
         {
             object convertedObject = converter.ConvertFrom(value, Context);
             // call serialize again in case the new type has a converter
-            ExpressionBase expr = serializer.Serialize(convertedObject, currentPath, null);
+            Expression expr = serializer.Serialize(convertedObject, currentPath, null);
             serializer.SetCanReference(value);   // can't reference inside the object
             return expr;
         }
@@ -80,7 +80,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="expression">the expression to convert</param>
         /// <param name="deserializer">deserializer instance</param>
         /// <returns>an object created from the expression</returns>
-        public override object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
             Type sourceType = expression.ResultType;
             TypeData handler = Context.TypeHandlerFactory[sourceType];
@@ -106,7 +106,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="deserializer">deserializer instance</param>
         /// <param name="converter">the converter to use to convert the object</param>
         /// <returns>an object created from the expression</returns>
-        public object Evaluate(ExpressionBase expression, IDeserializerHandler deserializer, IJsonTypeConverter converter)
+        public object Evaluate(Expression expression, IDeserializerHandler deserializer, IJsonTypeConverter converter)
         {
             Type sourceType = expression.ResultType;
             Type destType = converter.GetSerializedType(sourceType);
@@ -125,7 +125,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// This method is invalid for TypeConverterExpressionHandler
         /// </summary>
         /// <exception cref="NotSupportedException">Evaluating an existing object is not supported by TypeConverterExpressionHandler</exception>
-        public override object Evaluate(ExpressionBase expression, object existingObject, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
             //TODO: possibly allow this if the type implements IJsonTypeConverter itself
             throw new NotSupportedException("Cannot convert an existing object.");
@@ -135,7 +135,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// This method is invalid for TypeConverterExpressionHandler
         /// </summary>
         /// <exception cref="NotSupportedException">Evaluating an existing object is not supported by TypeConverterExpressionHandler</exception>
-        public void Evaluate(ExpressionBase valueExpression, object result, IDeserializerHandler deserializer, IJsonTypeConverter converter)
+        public void Evaluate(Expression valueExpression, object result, IDeserializerHandler deserializer, IJsonTypeConverter converter)
         {
             //TODO: possibly allow this if the type implements IJsonTypeConverter itself
             throw new NotSupportedException("Cannot convert an existing object.");

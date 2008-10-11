@@ -21,19 +21,19 @@ namespace JsonExSerializer.Framework.ExpressionHandlers.Collections
             return typeof(object);
         }
 
-        public override ExpressionBase GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer)
         {
             return GetExpression((IEnumerable)data, GetItemType(data.GetType()), CurrentPath, serializer);
         }
 
-        protected virtual ExpressionBase GetExpression(IEnumerable Items, Type ItemType, JsonPath CurrentPath, ISerializerHandler serializer)
+        protected virtual Expression GetExpression(IEnumerable Items, Type ItemType, JsonPath CurrentPath, ISerializerHandler serializer)
         {
             int index = 0;
 
             ArrayExpression expression = new ArrayExpression();
             foreach (object value in Items)
             {
-                ExpressionBase itemExpr = serializer.Serialize(value, CurrentPath.Append(index));
+                Expression itemExpr = serializer.Serialize(value, CurrentPath.Append(index));
                 if (value != null && value.GetType() != ItemType)
                 {
                     itemExpr = new CastExpression(value.GetType(), itemExpr);
@@ -44,13 +44,13 @@ namespace JsonExSerializer.Framework.ExpressionHandlers.Collections
             return expression;
         }
 
-        public override object Evaluate(ExpressionBase Expression, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression Expression, IDeserializerHandler deserializer)
         {
             object collection = ConstructCollection((ArrayExpression)Expression, deserializer);
             return Evaluate(Expression, collection, deserializer);
         }
 
-        public override object Evaluate(ExpressionBase Expression, object existingObject, IDeserializerHandler deserializer)
+        public override object Evaluate(Expression Expression, object existingObject, IDeserializerHandler deserializer)
         {
             Expression.OnObjectConstructed(existingObject);
             Type itemType = GetItemType(existingObject.GetType());
@@ -68,7 +68,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers.Collections
 
         protected virtual void EvaluateItems(ArrayExpression Expression, object Collection, Type ItemType, IDeserializerHandler deserializer)
         {
-            foreach (ExpressionBase item in Expression.Items)
+            foreach (Expression item in Expression.Items)
             {
                 item.ResultType = ItemType;
                 object itemResult = deserializer.Evaluate(item);

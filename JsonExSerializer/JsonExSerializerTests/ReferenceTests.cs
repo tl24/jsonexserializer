@@ -4,6 +4,7 @@ using System.Text;
 using MbUnit.Framework;
 using JsonExSerializerTests.Mocks;
 using JsonExSerializer;
+using System.Collections;
 
 namespace JsonExSerializerTests
 {
@@ -119,7 +120,19 @@ namespace JsonExSerializerTests
             string result = s.Serialize(mockArray);
             MockReferenceObject[] actual = (MockReferenceObject[]) s.Deserialize(result);
             Assert.AreSame(actual[0], actual[0].Reference.Reference, "reference inside collection not equal");
+        }
 
+        [Test]
+        public void WhenSameString_ShouldNotBeReference()
+        {
+            string refString = "foo";
+            ArrayList al = new ArrayList();
+            al.Add(refString);
+            al.Add(refString);
+            Serializer s = new Serializer(typeof(ArrayList));
+            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            string result = s.Serialize(al);
+            StringAssert.NotLike(result, "this");
         }
     }
 }

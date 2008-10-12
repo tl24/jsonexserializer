@@ -111,7 +111,7 @@ namespace JsonExSerializer.Framework
 
         public Expression HandleReference(object value, JsonPath CurrentPath)
         {
-            if (!value.GetType().IsClass)
+            if (!IsReferenceable(value))
                 return null;
 
             ReferenceInfo refInfo = null;
@@ -154,13 +154,18 @@ namespace JsonExSerializer.Framework
             return null;
         }
 
+        private static bool IsReferenceable(object value)
+        {
+            return value.GetType().IsClass && !(value is string);
+        }
+
         /// <summary>
         /// Indicates that the object can now be referenced.  Any attempts to build a reference to the current object before
         /// this method is called will result in an exception.
         /// </summary>
         /// <param name="value">the object being referenced</param>
         public void SetCanReference(object value) {
-            if (!value.GetType().IsClass)
+            if (!IsReferenceable(value))
                 return;
 
             ReferenceInfo refInfo;

@@ -35,7 +35,17 @@ namespace JsonExSerializer.Framework.Visitors
                 return;
             }
             if (_methodCache.ContainsKey(t))
-                _methodCache[t].Invoke(this, new object[] { o });
+                try
+                {
+                    _methodCache[t].Invoke(this, new object[] { o });
+                }
+                catch (TargetInvocationException e)
+                {
+                    if (e.InnerException != null)
+                        throw e.InnerException;
+                    else
+                        throw;
+                }
             else
                 Visit(t.BaseType, o);
         }

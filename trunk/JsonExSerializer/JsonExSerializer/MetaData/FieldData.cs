@@ -36,11 +36,7 @@ namespace JsonExSerializer.MetaData
 
         private void Initialize()
         {
-            if (Field.IsDefined(typeof(ConstructorParameterAttribute), false))
-            {
-                ConstructorParameterAttribute ctorAttr = (ConstructorParameterAttribute)Field.GetCustomAttributes(typeof(ConstructorParameterAttribute), false)[0];
-                position = ctorAttr.Position;
-            }
+            Initialize(Field);
             if (Field.IsDefined(typeof(JsonExIgnoreAttribute), false))
                 this.Ignored = true;
 

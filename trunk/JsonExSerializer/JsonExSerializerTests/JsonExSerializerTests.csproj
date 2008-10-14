@@ -49,13 +49,16 @@
     <Compile Include="Expressions\JsonPathTests.cs" />
     <Compile Include="Expressions\ReferenceTests.cs" />
     <Compile Include="FieldTests.cs" />
+    <Compile Include="Framework\ReflectionUtilTests.cs" />
     <Compile Include="IgnorePropertyActionTests.cs" />
     <Compile Include="JsonWriterComplexTests.cs" />
     <Compile Include="JsonWriterTestBase.cs" />
     <Compile Include="JsonWriterTests.cs" />
     <Compile Include="JsonWriterTypeTests.cs" />
+    <Compile Include="MetaData\ConstructorParameterTests.cs" />
     <Compile Include="MetaData\DynamicMethodUtilTests.cs" />
     <Compile Include="Mocks\ChainedConversion.cs" />
+    <Compile Include="Mocks\Constructors.cs" />
     <Compile Include="Mocks\ConvertedObject.cs" />
     <Compile Include="Mocks\MockCallbackObject.cs" />
     <Compile Include="Mocks\MockCollectionConverter.cs" />

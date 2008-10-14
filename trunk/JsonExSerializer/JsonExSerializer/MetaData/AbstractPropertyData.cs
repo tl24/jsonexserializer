@@ -21,6 +21,11 @@ namespace JsonExSerializer.MetaData
         protected int position = -1;
 
         /// <summary>
+        /// The name of the parameter corresponding to this property in the type's constructor parameter list
+        /// </summary>
+        protected string constructorParameterName;
+
+        /// <summary>
         /// Initializes an instance for the specific declaring type
         /// </summary>
         /// <param name="forType">the declaring type for this property</param>
@@ -37,8 +42,13 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Returns the 0-based index in the constructor arguments for a constructor parameter
         /// </summary>
+        [Obsolete("Named constructor parameters should be used instead of Position")]
         public virtual int Position {
-            get { return position; }
+            get {
+                if (!IsConstructorArgument)
+                    throw new InvalidOperationException("Position is invalid when the property is not a constructor argument");
+                return position; 
+            }
         }
 
         /// <summary>
@@ -65,7 +75,20 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         public virtual bool IsConstructorArgument
         {
-            get { return this.Position != -1; }
+            get { return this.position != -1 || !string.IsNullOrEmpty(this.constructorParameterName); }
+        }
+
+        /// <summary>
+        /// Gets the name of this property in the type's constructor parameter list, if this property is a
+        /// constructor argument.
+        /// </summary>
+        public virtual string ConstructorParameterName
+        {
+            get {
+                if (!IsConstructorArgument)
+                    throw new InvalidOperationException("ConstructorParameterName is invalid when the property is not a constructor argument");
+                return this.constructorParameterName; 
+            }
         }
 
         /// <summary>

@@ -45,11 +45,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         private void Initialize()
         {
-            if (Property.IsDefined(typeof(ConstructorParameterAttribute), false))
-            {
-                ConstructorParameterAttribute ctorAttr = (ConstructorParameterAttribute)Property.GetCustomAttributes(typeof(ConstructorParameterAttribute), false)[0];
-                position = ctorAttr.Position;
-            }
+            Initialize(Property);
             if (Property.IsDefined(typeof(JsonExIgnoreAttribute), false)
                 || !(Property.GetGetMethod().GetParameters().Length == 0 && Property.CanRead)
                 || (!Property.CanWrite && position == -1))

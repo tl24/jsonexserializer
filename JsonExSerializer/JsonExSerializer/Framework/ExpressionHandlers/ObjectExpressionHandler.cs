@@ -41,30 +41,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
              TypeData handler = Context.GetTypeHandler(data.GetType());
 
             ObjectExpression expression = new ObjectExpression();
-            if (handler.ConstructorParameters.Count > 0)
-            {
-                expression.ResultType = data.GetType();
-                foreach (IPropertyData ctorParm in handler.ConstructorParameters)
-                {
-                    object value = ctorParm.GetValue(data);
-                    Expression argExpr;
-                    // TODO: Improve reference support when constructor arguments are refactored
-                    if (ctorParm.HasConverter)
-                    {
-                        argExpr = serializer.Serialize(value, new JsonPath(""), ctorParm.TypeConverter);
-                    }
-                    else
-                    {
-                        argExpr = serializer.Serialize(value, new JsonPath(""));
-                    }
-                    if (value != null && value.GetType() != ctorParm.PropertyType)
-                    {
-                        argExpr = new CastExpression(value.GetType(), argExpr);
-                    }
-                    expression.ConstructorArguments.Add(argExpr);
-                }
-            }
-
 
             foreach (IPropertyData prop in handler.Properties)
             {
@@ -178,11 +154,32 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>constructed, but unpopulated object</returns>
         protected virtual object ConstructObject(ObjectExpression expression, IDeserializerHandler deserializer)
         {
+            TypeData handler = Context.GetTypeHandler(expression.ResultType);
             // set the default type if none set
             if (expression.ConstructorArguments.Count > 0)
             {
+                // old way expects parameters in the constructor list
                 ResolveConstructorTypes(Context, expression);
             }
+            else
+            {
+                foreach (IPropertyData parameter in handler.ConstructorParameters)
+                {
+                    int propLocation = expression.IndexOf(parameter.Name);
+                    if (propLocation >= 0)
+                    {
+                        Expression arg = expression.Properties[propLocation].ValueExpression;
+                        arg.ResultType = parameter.PropertyType;
+                        expression.ConstructorArguments.Add(arg);
+                        expression.Properties.RemoveAt(propLocation);
+                    }
+                    else
+                    {
+                        expression.ConstructorArguments.Add(new NullExpression());
+                    }
+                }
+            }
+
             object[] args = new object[expression.ConstructorArguments.Count];
 
             for (int i = 0; i < args.Length; i++)
@@ -190,7 +187,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 Expression carg = expression.ConstructorArguments[i];
                 args[i] = deserializer.Evaluate(carg);
             }
-            TypeData handler = Context.GetTypeHandler(expression.ResultType);
             object result = handler.CreateInstance(args);
             expression.OnObjectConstructed(result);
             return result;

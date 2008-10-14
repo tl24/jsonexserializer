@@ -28,15 +28,15 @@ namespace PerformanceTests.TestDomain
         {
         }
 
-        protected override void ReadProperties(out IList<IPropertyData> Properties, out IList<IPropertyData> ConstructorArguments)
+        protected override IList<IPropertyData> ReadProperties()
         {
-            Properties = new List<IPropertyData>();
-            Properties.Add(new FirstPH(this.ForType));
-            Properties.Add(new LastPH(this.ForType));
-            Properties.Add(new PhonePH(this.ForType));
-            Properties.Add(new SSNPH(this.ForType));
-            Properties.Add(new AgePH(this.ForType));
-            ConstructorArguments = new List<IPropertyData>();
+            IList<IPropertyData> properties = new List<IPropertyData>();
+            properties.Add(new FirstPH(this.ForType));
+            properties.Add(new LastPH(this.ForType));
+            properties.Add(new PhonePH(this.ForType));
+            properties.Add(new SSNPH(this.ForType));
+            properties.Add(new AgePH(this.ForType));
+            return properties;
         }
     }
 

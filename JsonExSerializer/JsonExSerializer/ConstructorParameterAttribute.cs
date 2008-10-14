@@ -16,17 +16,37 @@ namespace JsonExSerializer
     [global::System.AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     public sealed class ConstructorParameterAttribute : Attribute
     {
-        readonly int _position;
-        
+        readonly int position;
+        private readonly string name;
+
         /// <summary>
-        /// Indicates that this property will be passed to the constructor.  The position property
-        /// specifies where the property occurs in the constructor's arguments, e.g. position=0 is the first
-        /// constructor argument, position=1 is the second argument, etc.
+        /// Indicates that this property will be passed to the constructor.
         /// </summary>
-        /// <param name="index">the position of the property within the constructor's arguments</param>
+        /// <param name="index">the 0-based position of the property within the constructor's arguments</param>
+        [Obsolete("ConstructorParameters should be specified by name")]
         public ConstructorParameterAttribute(int position)
         {
-            this._position = position;
+            this.position = position;
+        }
+
+        /// <summary>
+        /// Indicates that this property will be passed to the constructor with a constructor argument with the same name as
+        /// the property
+        /// </summary>
+        public ConstructorParameterAttribute()
+        {
+            this.position = -1;
+        }
+
+        /// <summary>
+        /// Indicates that this property will be passed to the constructor with a constructor argument with the 
+        /// specified <param name="name" />
+        /// </summary>
+        /// <param name="name">The name of the constructor argument</param>
+        public ConstructorParameterAttribute(string name)
+        {
+            this.position = -1;
+            this.name = name;
         }
 
         /// <summary>
@@ -36,8 +56,16 @@ namespace JsonExSerializer
         {
             get
             {
-                return this._position;
+                return this.position;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Name
+        {
+            get { return this.name; }
         }
     }
 

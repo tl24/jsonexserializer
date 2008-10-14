@@ -67,11 +67,12 @@ namespace JsonExSerializerTests
         {
         }
 
-        protected override void ReadProperties(out IList<IPropertyData> Properties, out IList<IPropertyData> ConstructorArguments)
+        protected override IList<IPropertyData> ReadProperties()
         {
-            base.ReadProperties(out Properties, out ConstructorArguments);
-            Properties.Add(new MethodPairPropertyHandler(this.ForType, "Name"));
-            Properties.Add(new MethodPairPropertyHandler(this.ForType, "ID"));
+            IList<IPropertyData> properties = base.ReadProperties();
+            properties.Add(new MethodPairPropertyHandler(this.ForType, "Name"));
+            properties.Add(new MethodPairPropertyHandler(this.ForType, "ID"));
+            return properties;
         }
 
     }

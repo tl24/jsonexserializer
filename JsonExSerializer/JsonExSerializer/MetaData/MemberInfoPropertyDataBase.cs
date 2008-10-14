@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using JsonExSerializer.TypeConversion;
+using JsonExSerializer.Framework;
 
 namespace JsonExSerializer.MetaData
 {
@@ -22,6 +23,34 @@ namespace JsonExSerializer.MetaData
             : this(member)
         {
             this.position = position;
+        }
+
+        protected MemberInfoPropertyDataBase(MemberInfo member, string constructorParameterName)
+            : this(member)
+        {
+            this.constructorParameterName = constructorParameterName;
+        }
+
+        protected MemberInfoPropertyDataBase(MemberInfo member, bool isConstructorParameter)
+            : base(member.DeclaringType)
+        {
+            this.member = member;
+            if (isConstructorParameter)
+                this.constructorParameterName = member.Name;
+        }
+
+        protected void Initialize(ICustomAttributeProvider member)
+        {
+            ConstructorParameterAttribute ctorAttr = ReflectionUtils.GetAttribute<ConstructorParameterAttribute>(member, false);
+            if (ctorAttr != null)
+            {
+                if (ctorAttr.Position >= 0)
+                    position = ctorAttr.Position;
+                else if (!string.IsNullOrEmpty(ctorAttr.Name))
+                    this.constructorParameterName = ctorAttr.Name;
+                else
+                    this.constructorParameterName = this.Name;
+            }
         }
 
         /// <summary>

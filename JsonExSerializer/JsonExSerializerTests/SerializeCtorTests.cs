@@ -50,17 +50,20 @@ namespace JsonExSerializerTests
             objExpr.ConstructorArguments.Add(new ValueExpression("name"));
             expr.ConstructorArguments.Add(IDExpr);
             expr.ConstructorArguments.Add(objExpr);
-            Type[] definedTypes = new Type[] { typeof(long), typeof(MyObject2) };
+            Type[] definedTypes = new Type[] { typeof(int), typeof(MyObject2) };
             CtorArgTypeResolver resolver = new CtorArgTypeResolver(expr, s.Context, definedTypes);
             Type[] argTypes = resolver.ResolveTypes();
-            CollectionAssert.AreElementsEqual(new Type[] { typeof(int), typeof(MyObject2) }, argTypes);
+            CollectionAssert.AreElementsEqual(new Type[] { typeof(long), typeof(MyObject2) }, argTypes);
 
             Parser parser = new Parser(typeof(CtorMock2), (TokenStream) null, s.Context);
-            
+
+
             // Try to construct
-            IDExpr.ResultType = typeof(int);
+            IDExpr.ResultType = typeof(long);
             objExpr.ResultType = typeof(MyObject2);
             object result = parser.Evaluate(expr);
+
+            
         }
     }
 
@@ -117,21 +120,21 @@ namespace JsonExSerializerTests
 
     public class CtorMock2 : CtorMock
     {
-        public CtorMock2(int id, MyObject objectName)
-            : base(id, objectName)
+        public CtorMock2(long id, MyObject objectName)
+            : base((int) id, objectName)
         {
         }
 
-        public CtorMock2(int id, string objectName)
+        public CtorMock2(long id, string objectName)
             :
-            base(id, objectName)
+            base((int) id, objectName)
         {
         }
 
         [ConstructorParameter(0)]
-        public long LongID
+        public int IntID
         {
-            get { return (long)Id; }
+            get { return Id; }
         }
 
         [ConstructorParameter(1)]

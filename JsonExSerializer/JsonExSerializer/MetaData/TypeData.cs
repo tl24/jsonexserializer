@@ -11,6 +11,7 @@ using System.Collections;
 using JsonExSerializer.Collections;
 using JsonExSerializer.MetaData;
 using JsonExSerializer.TypeConversion;
+using JsonExSerializer.Framework;
 
 namespace JsonExSerializer.MetaData
 {
@@ -72,6 +73,14 @@ namespace JsonExSerializer.MetaData
                 if (constructorArgs.Count > 0)
                 {
                     constructorArgs = SortConstructorParameters(constructorArgs);
+                }
+                else
+                {
+                    if (ForType.GetConstructor(System.Type.EmptyTypes) == null)
+                    {
+                        // if no default constructor, try to set constructor parameters
+                        this.constructorArgs = ConstructorAutoWireUp.WireUpConstructor(this, properties);
+                    }
                 }
             }
         }
@@ -158,7 +167,7 @@ namespace JsonExSerializer.MetaData
                         }
                         else
                         {
-                            // something else occupies this spot already, so there's a conflict with this constructor to try another
+                            // something else occupies this spot already, so there's a conflict with this constructor so try another
                             // most likely none of them will work in this situation, but we'll let the outer method determine that
                             break;
                         }
@@ -169,7 +178,11 @@ namespace JsonExSerializer.MetaData
                         int i;
                         for (i = 0; i < ctorParms.Length; i++)
                         {
-                            if (ctorParms[i].Name.Equals(property.ConstructorParameterName, comparison)
+                            string parmName = ctorParms[i].Name;
+                            if (ctorParms[i].IsDefined(typeof(ConstructorParameterAttribute), false))
+                                parmName = ReflectionUtils.GetAttribute<ConstructorParameterAttribute>(ctorParms[i], false).Name;
+
+                            if (parmName.Equals(property.ConstructorParameterName, comparison)
                                 && ((exactMatch && ctorParms[i].ParameterType == property.PropertyType)
                                     || (!exactMatch/* && ctorParms[i].ParameterType.IsAssignableFrom(property.PropertyType)*/)))
                                 break;
@@ -189,14 +202,20 @@ namespace JsonExSerializer.MetaData
                     if (exactMatch)
                         return result;
 
-                    if (IsLooseMatch(constructor, ctorParms, result))
+                    if (IsLooseMatch(constructor, result))
                         return result;
                 }
             }
             return null;
         }
 
-        private bool IsLooseMatch(ConstructorInfo constructor, ParameterInfo[] parameters, IPropertyData[] properties)
+        /// <summary>
+        /// Checks that the constructor matches the constructor parameters by doing type conversion if necessary
+        /// </summary>
+        /// <param name="constructor">the constructor</param>
+        /// <param name="properties">constructor parameter fields</param>
+        /// <returns>true if this constructor matches the types in the constructor parameters</returns>
+        private bool IsLooseMatch(ConstructorInfo constructor, IPropertyData[] properties)
         {
             Type[] types = new Type[properties.Length];
             for(int i = 0; i < properties.Length; i++)
@@ -212,6 +231,7 @@ namespace JsonExSerializer.MetaData
                 return false;
             }
         }
+
         /// <summary>
         /// Constructs a PropertyHandler instance from the PropertyInfo
         /// </summary>
@@ -232,18 +252,11 @@ namespace JsonExSerializer.MetaData
             return new FieldData(Field);
         }
 
-        protected int PropertyHandlerComparison(IPropertyData a, IPropertyData b)
-        {
-            if (a.Position != -1 && b.Position != -1)
-                return a.Position.CompareTo(b.Position);
-            if (a.Position >= 0)
-                return -1;
-            else if (b.Position >= 0)
-                return 1;
-            else
-                return a.ConstructorParameterName.CompareTo(b.ConstructorParameterName);
-        }
-
+        /// <summary>
+        /// Creates an instance of this Type with the specified arguments
+        /// </summary>
+        /// <param name="args">the arguments passed to the constructor if any</param>
+        /// <returns>the created object</returns>
         public virtual object CreateInstance(object[] args)
         {
             return Activator.CreateInstance(this.ForType, args);
@@ -262,7 +275,7 @@ namespace JsonExSerializer.MetaData
         }
 
         /// <summary>
-        /// 
+        /// Indicates whether there are any properties for this object that are not ignored.
         /// </summary>
         public virtual bool IsEmpty
         {
@@ -293,7 +306,6 @@ namespace JsonExSerializer.MetaData
                 {
                     if (!prop.Ignored)
                         yield return prop;
-
                 }
             }
         }

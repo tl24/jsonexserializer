@@ -23,7 +23,7 @@ namespace JsonExSerializer.MetaData
         /// Gets the name of this property in the type's constructor parameter list, if this property is a
         /// constructor argument.
         /// </summary>
-        string ConstructorParameterName { get; }
+        string ConstructorParameterName { get; set;}
 
         /// <summary>
         /// Gets the name of the property

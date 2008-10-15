@@ -89,6 +89,11 @@ namespace JsonExSerializer.MetaData
                     throw new InvalidOperationException("ConstructorParameterName is invalid when the property is not a constructor argument");
                 return this.constructorParameterName; 
             }
+            set
+            {
+                this.constructorParameterName = value;
+                this.Ignored = false;
+            }
         }
 
         /// <summary>

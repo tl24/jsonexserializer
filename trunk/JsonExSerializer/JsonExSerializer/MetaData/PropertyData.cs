@@ -48,11 +48,11 @@ namespace JsonExSerializer.MetaData
             Initialize(Property);
             if (Property.IsDefined(typeof(JsonExIgnoreAttribute), false)
                 || !(Property.GetGetMethod().GetParameters().Length == 0 && Property.CanRead)
-                || (!Property.CanWrite && position == -1))
+                || (!Property.CanWrite))
             {
                 this.Ignored = true;
             }
-            if (Property.IsDefined(typeof(JsonExPropertyAttribute), false))
+            if (Property.IsDefined(typeof(JsonExPropertyAttribute), false) || IsConstructorArgument)
                 this.Ignored = false;
         }
 

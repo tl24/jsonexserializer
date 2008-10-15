@@ -86,4 +86,58 @@ namespace JsonExSerializerTests.Mocks
             get { return intProp; }
         }
     }
+
+    public class AliasedConstructor
+    {
+        private int intProp;
+
+        public AliasedConstructor([ConstructorParameter("IntProp")] int foo)
+        {
+            this.intProp = foo;
+        }
+
+        [ConstructorParameter("IntProp")]
+        public int IntProp
+        {
+            get { return intProp; }
+        }
+    }
+
+    public class AutoConstructor
+    {
+        private int x;
+        private string y;
+        private bool z;
+
+        public AutoConstructor(int x, string y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
+        public AutoConstructor(int x, string y, bool z)
+            : this(x, y)
+        {
+            this.z = z;
+        }
+
+        public int X
+        {
+            get { return this.x; }
+        }
+
+        public string Y
+        {
+            get { return this.y; }
+        }
+
+        public bool Z
+        {
+            get { return this.z; }
+            set { this.z = value; }
+        }
+
+
+    
+    }
 }

@@ -24,17 +24,13 @@ namespace PerformanceTests
             TestObjectFactory factory = new TestObjectFactory(_objectCount);
             _testData = factory.ProduceObjects();
         }
-        public List<TestResult> RunTests()
+        public List<TestResult> RunTests(bool serializeTests, bool deserializeTests)
         {
             List<TestResult> results = new List<TestResult>();
-            //results.Add(SerializeTest(_objectCount, 1000));
-            //results.Add(DeserializeTest(_objectCount, 1000));
-
-            //results.Add(SerializeTest(_objectCount, 10000));
-            results.Add(SerializeTest(_objectCount, _iterations));
-
-            //results.Add(DeserializeTest(_objectCount, 10000));
-            results.Add(DeserializeTest(_objectCount, _iterations));
+            if (serializeTests)
+                results.Add(SerializeTest(_objectCount, _iterations));
+            if (deserializeTests)
+                results.Add(DeserializeTest(_objectCount, _iterations));
             return results;
         }
 

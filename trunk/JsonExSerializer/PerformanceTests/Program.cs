@@ -11,6 +11,8 @@ namespace PerformanceTests
         private static bool RunJson = false;
         private static int ObjectCount = 100;
         private static int Iterations = 2500;
+        private static bool Serialize = false;
+        private static bool Deserialize = false;
 
         public static void Main(string[] args)
         {
@@ -23,11 +25,11 @@ namespace PerformanceTests
             }
 
             if (RunBinary)
-                new BinarySerializerTest(ObjectCount,Iterations).RunTests();
+                new BinarySerializerTest(ObjectCount,Iterations).RunTests(Serialize, Deserialize);
             if (RunXml)
-                new XmlSerializerTest(ObjectCount, Iterations).RunTests();
+                new XmlSerializerTest(ObjectCount, Iterations).RunTests(Serialize, Deserialize);
             if (RunJson)
-                new JsonSerializerTest(ObjectCount, Iterations).RunTests();
+                new JsonSerializerTest(ObjectCount, Iterations).RunTests(Serialize, Deserialize);
             //new JsonDynamicTests().RunTests();
             //CreateTests.RunCreateTests(10000000);
             //CreateTests.RunCreateTests(10000000);
@@ -61,6 +63,11 @@ namespace PerformanceTests
                     IsHelp = true;
                     break;
                 }
+                else if (arg.StartsWith("-s"))
+                    Serialize = true;
+                else if (arg.StartsWith("-d"))
+                    Deserialize = true;
+
                 i++;
             }
 
@@ -68,6 +75,8 @@ namespace PerformanceTests
             {
                 RunBinary = RunJson = RunXml = true;
             }
+            if (!Serialize && !Deserialize)
+                Serialize = Deserialize = true;
         }
 
         public static void ShowHelp()
@@ -78,6 +87,8 @@ namespace PerformanceTests
             Console.WriteLine("-bin[ary]      : Run the BinarySerializer Test");
             Console.WriteLine("-i[terations]  : Number of test iterations");
             Console.WriteLine("-o[bjectcount] : Number of objects to use for the tests");
+            Console.WriteLine("-s[erialize]   : Run serializer tests");
+            Console.WriteLine("-d[eserialize] : Run deserializer tests");
         }
     }
 }

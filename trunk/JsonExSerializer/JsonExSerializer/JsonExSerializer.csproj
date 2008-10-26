@@ -102,7 +102,6 @@
     <Compile Include="JsonExPropertyAttribute.cs" />
     <Compile Include="Framework\JsonWriter.cs" />
     <Compile Include="MetaData\AbstractPropertyData.cs" />
-    <Compile Include="MetaData\ConstructorAutoWireUp.cs" />
     <Compile Include="MetaData\CustomTypeDataRepository.cs" />
     <Compile Include="MetaData\DynamicMethodUtil.cs" />
     <Compile Include="MetaData\DynamicPropertyData.cs" />

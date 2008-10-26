@@ -12,6 +12,7 @@ using JsonExSerializer.Collections;
 using JsonExSerializer.MetaData;
 using JsonExSerializer.TypeConversion;
 using JsonExSerializer.Framework;
+using System.Diagnostics;
 
 namespace JsonExSerializer.MetaData
 {
@@ -65,23 +66,20 @@ namespace JsonExSerializer.MetaData
         /// Loads the properties for the type if they haven't already been loaded
         /// </summary>
         protected virtual void LoadProperties()
-        {   
+        {
             if (properties == null)
             {
                 this.properties = ReadProperties();
-                this.constructorArgs = new List<IPropertyData>(GetConstructorParameters(properties));
-                if (constructorArgs.Count > 0)
-                {
-                    constructorArgs = SortConstructorParameters(constructorArgs);
-                }
-                else
-                {
-                    if (ForType.GetConstructor(System.Type.EmptyTypes) == null)
-                    {
-                        // if no default constructor, try to set constructor parameters
-                        this.constructorArgs = ConstructorAutoWireUp.WireUpConstructor(this, properties);
-                    }
-                }
+                LoadConstructorParameters();
+            }
+        }
+
+        private void LoadConstructorParameters()
+        {
+            this.constructorArgs = new List<IPropertyData>(GetConstructorParameters(properties));
+            if (constructorArgs.Count > 0)
+            {
+                constructorArgs = SortConstructorParameters(constructorArgs);
             }
         }
 

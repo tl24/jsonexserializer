@@ -66,7 +66,8 @@ namespace JsonExSerializer.Framework.Parsing
         private readonly Token RBraceToken = new Token(TokenType.Symbol, "}");
 
         /// <summary> this </summary>
-        private readonly Token ReferenceStartToken = new Token(TokenType.Identifier, JsonPath.Root);
+        private readonly Token ReferenceStartToken = new Token(TokenType.Symbol, JsonPath.Root);
+        private readonly Token OldReferenceStartToken = new Token(TokenType.Identifier, "this");
         #endregion
 
         public Parser(Type t, TextReader reader, SerializationContext context)
@@ -137,7 +138,7 @@ namespace JsonExSerializer.Framework.Parsing
             else
             {
                 Token tok = PeekToken();
-                if (tok == ReferenceStartToken)
+                if (tok == ReferenceStartToken || tok == OldReferenceStartToken)
                     value = ParseReference();
                 else if (tok.type == TokenType.Number
                     || (IsIdentifier(tok) && !IsKeyword(tok)))
@@ -180,8 +181,8 @@ namespace JsonExSerializer.Framework.Parsing
         {
             JsonPath refID = new JsonPath();
             Token tok = ReadToken();
-            RequireToken(ReferenceStartToken, tok, "Invalid starting token for ParseReference");
-
+            if (tok != ReferenceStartToken && tok != OldReferenceStartToken)
+                throw new ParseException(string.Format("Invalid starting token for ParseReference, Expected: {0} or {1}, got: {2}", ReferenceStartToken, OldReferenceStartToken,tok));            
             while (PeekToken() == PeriodToken || PeekToken() == LSquareToken)
             {
                 tok = ReadToken(); // separator "."

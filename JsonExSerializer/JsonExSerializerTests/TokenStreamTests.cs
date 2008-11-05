@@ -48,6 +48,7 @@ namespace JsonExSerializerTests
         [Row(":", Description = "Colon")]
         [Row(",", Description = "Comma")]
         [Row(".", Description = "Period")]
+        [Row("$", Description = "Dollar Sign")]
         public void SymbolTests(string symbol)
         {
             TestTokens(symbol, new Token(TokenType.Symbol, symbol));  

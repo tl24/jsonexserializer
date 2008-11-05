@@ -66,8 +66,6 @@ namespace JsonExSerializerTests
         [Test]
         public void DoubleCast()
         {
-            long x = (int)(long)3;
-
             jsonWriter.WriteCast(typeof(int))
                 .WriteCast(typeof(long))
                 .WriteValue(3);

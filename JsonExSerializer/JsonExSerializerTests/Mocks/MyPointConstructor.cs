@@ -47,5 +47,10 @@ namespace JsonExSerializerTests.Mocks
                 }
                 return false;
             }
+
+            public override int GetHashCode()
+            {
+                return (X << 4 | Y);
+            }
         }
 }

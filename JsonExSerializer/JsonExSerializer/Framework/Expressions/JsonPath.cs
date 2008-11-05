@@ -21,7 +21,7 @@ namespace JsonExSerializer.Framework.Expressions
         /// <summary>
         /// Identifier for the Root object
         /// </summary>
-        public const string Root = "this";
+        public const string Root = "$";
 
         public JsonPath()
         {

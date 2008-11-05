@@ -55,7 +55,7 @@ namespace JsonExSerializerTests
             {
                 SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
             }
-            catch (Exception e)
+            catch
             {
                 exception = true;
             }

@@ -102,11 +102,37 @@ namespace JsonExSerializerTests
         }
 
         [Test]
+        public void TestBackwardsCompatibleReference()
+        {
+            Serializer s = new Serializer(typeof(MockReferenceObject));
+            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            string result = s.Serialize(simple);
+            result = result.Replace("$", "this");
+            MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
+            Assert.AreSame(simple, simple.Reference.Reference, "References not equal");
+        }
+
+        [Test]
         public void DeepCircularReferenceWrite()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
             string result = s.Serialize(deep);
+            MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
+            Assert.AreSame(deep.Reference, deep.Reference.Reference.Reference.Reference, "References not equal");
+        }
+
+        [Test]
+        public void BackwardsCompatibleDeepWrite()
+        {
+            Serializer s = new Serializer(typeof(MockReferenceObject));
+            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            string result = s.Serialize(deep);
+            result = result.Replace("$['Reference']", "this.Reference");
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
             Assert.AreSame(deep.Reference, deep.Reference.Reference.Reference.Reference, "References not equal");
         }

@@ -14,23 +14,23 @@ namespace JsonExSerializerTests.Mocks
     [JsonConvert(typeof(MyImmutablePointConverter))]
     public class MyImmutablePoint
     {
-        private int _x;
-        private int _y;
+        private int x;
+        private int y;
 
         public MyImmutablePoint(int x, int y)
         {
-            this._x = x;
-            this._y = y;
+            this.x = x;
+            this.y = y;
         }
 
         public int X
         {
-            get { return _x; }
+            get { return x; }
         }
 
         public int Y
         {
-            get { return _y; }
+            get { return y; }
         }
 
         public override bool Equals(object obj)
@@ -48,6 +48,11 @@ namespace JsonExSerializerTests.Mocks
                 }
             }
             return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return (X << 4 | Y);
         }
     }
 
@@ -67,7 +72,6 @@ namespace JsonExSerializerTests.Mocks
         public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             string data = (string)item;
-            int x = 0, y = 0;
             if (data.IndexOf(',') != -1)
             {
                 string[] splitData = data.Split(',');

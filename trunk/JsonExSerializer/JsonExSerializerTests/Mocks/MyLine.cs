@@ -57,7 +57,6 @@ namespace JsonExSerializerTests.Mocks
         {
             _convertToCount++;
             string data = (string)item;
-            int x = 0, y = 0;
             if (data.IndexOf(_separator) != -1)
             {
                 string[] splitData = data.Replace("(", "").Replace(")", "").Split(_separator.ToCharArray());

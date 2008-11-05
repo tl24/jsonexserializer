@@ -33,7 +33,7 @@ namespace JsonExSerializer.Framework.Parsing
             _reader = reader;
             _capacity = 16;
             _tokens = new Queue<Token>(_capacity);
-            _symbols = "[]<>():,{}.".ToCharArray();
+            _symbols = "[]<>():,{}.$".ToCharArray();
             Array.Sort<char>(_symbols);
             _buffer = new StringBuilder();
             //Fill();

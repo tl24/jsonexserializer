@@ -54,7 +54,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 {
                     valueExpr = serializer.Serialize(value, currentPath.Append(prop.Name));
                 }
-                if (value != null && value.GetType() != prop.PropertyType)
+                if (value != null && !ReflectionUtils.AreEquivalentTypes(value.GetType(), prop.PropertyType))
                 {
                     valueExpr = new CastExpression(value.GetType(), valueExpr);
                 }

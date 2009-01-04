@@ -28,7 +28,7 @@ namespace PerformanceTests.TestDomain
         {
         }
 
-        protected override IList<IPropertyData> ReadProperties()
+        protected override IList<IPropertyData> ReadDeclaredProperties()
         {
             IList<IPropertyData> properties = new List<IPropertyData>();
             properties.Add(new FirstPH(this.ForType));

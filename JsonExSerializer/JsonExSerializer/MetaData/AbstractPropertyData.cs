@@ -114,5 +114,9 @@ namespace JsonExSerializer.MetaData
         {
             get { return true; }
         }
+        public override string ToString()
+        {
+            return PropertyType.ToString() + " " + Name;
+        }
     }
 }

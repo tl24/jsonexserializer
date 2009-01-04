@@ -34,7 +34,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers.Collections
             foreach (object value in Items)
             {
                 Expression itemExpr = serializer.Serialize(value, CurrentPath.Append(index));
-                if (value != null && value.GetType() != ItemType)
+                if (value != null && !ReflectionUtils.AreEquivalentTypes(value.GetType(), ItemType))
                 {
                     itemExpr = new CastExpression(value.GetType(), itemExpr);
                 }

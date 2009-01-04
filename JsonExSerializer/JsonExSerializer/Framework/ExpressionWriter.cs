@@ -135,7 +135,7 @@ namespace JsonExSerializer.Framework
         private void WriteCast(Expression Expression)
         {
             CastExpression cast = (CastExpression)Expression;
-            if (_context.OutputTypeInformation)
+            if (_context.OutputTypeInformation && !(cast.Expression is ReferenceExpression))
                 _jsonWriter.WriteCast(cast.ResultType);
             Write(cast.Expression);
         }

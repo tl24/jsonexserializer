@@ -154,7 +154,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                     if (handler.CanHandle(dataType))
                     {
                         return _cache[dataType] = handler;
-                        return handler;
                     }
             }
             return h ?? DefaultHandler;

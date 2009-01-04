@@ -123,7 +123,7 @@ namespace JsonExSerializer.MetaData
                 return;
 
             TypeData baseTypeData = this.context.TypeHandlerFactory[this.forType.BaseType];
-            List<IPropertyData> baseProps = new List<IPropertyData>(baseTypeData.Properties);
+            List<IPropertyData> baseProps = new List<IPropertyData>(baseTypeData.AllProperties);
             foreach (IPropertyData baseProp in baseProps)
             {
                 bool found = false;

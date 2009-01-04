@@ -145,16 +145,17 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>collection builder</returns>
         protected virtual ICollectionBuilder ConstructBuilder(object collection, ArrayExpression list, out Type itemType)
         {
-            TypeData typeHandler = Context.GetTypeHandler(list.ResultType);
+            Type listType = collection != null ? collection.GetType() : list.ResultType;
+            TypeData typeHandler = Context.GetTypeHandler(listType);
             CollectionHandler collHandler = typeHandler.GetCollectionHandler();
-            itemType = collHandler.GetItemType(typeHandler.ForType);
+            itemType = collHandler.GetItemType(listType);
             if (itemType == null)
-                throw new Exception("Null item type returned from " + collHandler.GetType() + " for Collection type: " + typeHandler.ForType);
+                throw new Exception("Null item type returned from " + collHandler.GetType() + " for Collection type: " + listType);
 
             if (collection != null)
                 return collHandler.ConstructBuilder(collection);
             else
-                return collHandler.ConstructBuilder(typeHandler.ForType, list.Items.Count);
+                return collHandler.ConstructBuilder(listType, list.Items.Count);
         }
     }
 }

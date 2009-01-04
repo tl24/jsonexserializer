@@ -49,6 +49,16 @@ namespace JsonExSerializerTests.MetaData
             Assert.AreNotSame(baseClass.FindProperty("NewProperty"), child.FindProperty("NewProperty"), "child NewProperty");
         }
 
+        [Test]
+        public void IgnoredBaseProperty_SharedByChildren()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData child = context.TypeHandlerFactory[typeof(ChildClass)];
+            TypeData baseClass = context.TypeHandlerFactory[typeof(BaseClass)];
+
+            Assert.AreSame(baseClass.FindProperty("IgnoredProperty"), child.FindProperty("IgnoredProperty"), "child IgnoredProperty");
+        }
+
         public class BaseClass
         {
             public BaseClass(string BaseConstructorProperty)
@@ -76,6 +86,13 @@ namespace JsonExSerializerTests.MetaData
             public int NewProperty
             {
                 get { return 0; }
+                set { }
+            }
+
+            [JsonExIgnore]
+            public float IgnoredProperty
+            {
+                get { return 0f; }
                 set { }
             }
         }

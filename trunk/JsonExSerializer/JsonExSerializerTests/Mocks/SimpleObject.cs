@@ -26,7 +26,6 @@ namespace JsonExSerializerTests.Mocks
         private string _stringValue;
         private char _charValue;
         private SimpleEnum _enumValue;
-
         public byte ByteValue
         {
             get { return this._byteValue; }

@@ -226,6 +226,7 @@ namespace JsonExSerializerTests
             Assert.AreEqual(expected, actual, "decimal did not deserialize correctly");
         }
 
+        [Test]
         public void SerializeStringEscapesTest()
         {
             Serializer s = new Serializer(typeof(string));
@@ -233,6 +234,34 @@ namespace JsonExSerializerTests
             string result = s.Serialize(data);
             string actual = (string)s.Deserialize(result);
             Assert.AreEqual(data, actual, "Escaped strings don't match");
+        }
+
+        [Row("00000000-0000-0000-0000-000000000000", false, "\"{0}\"")]
+        [Row("94208f5f-bc84-414c-b6c6-36d8b701f1ee", false, "\"{0}\"")]
+        [Row(null, false, "null")]
+        [Row("00000000-0000-0000-0000-000000000000", true, "(System.Guid)\"{0}\"")]
+        [Row("94208f5f-bc84-414c-b6c6-36d8b701f1ee", true, "(System.Guid)\"{0}\"")]
+        [Row(null, true, "null")]
+        [RowTest]
+        public void NullableGuid(string guidString, bool useObjectType, string resultFormat)
+        {
+            Guid? value;
+            if (guidString == null)
+                value = null;
+            else
+                value = new Guid(guidString);
+
+            Serializer s;
+            if (useObjectType)
+                s = new Serializer(typeof(object));
+            else
+                s = new Serializer(typeof(Guid?));
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            string result = s.Serialize(value);
+            Assert.AreEqual(string.Format(resultFormat, guidString), result, "Expected serialization output");
+            Guid? r = (Guid?)s.Deserialize(result);
+            Assert.AreEqual(value, r);
         }
     }
 }

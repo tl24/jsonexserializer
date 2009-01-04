@@ -27,6 +27,33 @@ namespace JsonExSerializerTests.Framework
             Assert.IsNull(ta, "Wrong attribute returned");
         }
 
+        [Test]
+        public void AreEquivalentTypes_WhenTypesSame_ReturnTrue()
+        {
+            Type t = typeof(int);
+            Type b = typeof(int);
+
+            Assert.IsTrue(ReflectionUtils.AreEquivalentTypes(t, b));
+        }
+
+        [Test]
+        public void AreEquivalentTypes_WhenTypesDifferent_ReturnFalse()
+        {
+            Type t = typeof(int);
+            Type b = typeof(string);
+
+            Assert.IsFalse(ReflectionUtils.AreEquivalentTypes(t, b));
+        }
+
+        [Test]
+        public void AreEquivalentTypes_WhenNullableTypeAndUnderlyingType_ReturnTrue()
+        {
+            Type t = typeof(int);
+            Type b = typeof(int?);
+
+            Assert.IsTrue(ReflectionUtils.AreEquivalentTypes(t, b));
+        }
+
         public void NoAttributes() { }
     }
 }

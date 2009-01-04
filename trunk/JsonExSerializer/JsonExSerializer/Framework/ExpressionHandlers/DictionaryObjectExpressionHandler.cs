@@ -52,7 +52,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 //may not work in all cases
                 object value = pair.Value;
                 Expression valueExpr = serializer.Serialize(value, currentPath.Append(pair.Key.ToString()));
-                if (value != null && value.GetType() != itemType)
+                if (value != null && !ReflectionUtils.AreEquivalentTypes(value.GetType(), itemType))
                 {
                     valueExpr = new CastExpression(value.GetType(), valueExpr);
                 }

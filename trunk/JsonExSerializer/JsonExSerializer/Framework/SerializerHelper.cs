@@ -53,7 +53,7 @@ namespace JsonExSerializer.Framework
                 this.WriteComment(comment);
             }
             Expression expr = Serialize(value, new JsonPath(), null);
-            if (value != null && value.GetType() != _serializedType)
+            if (value != null && !ReflectionUtils.AreEquivalentTypes(value.GetType(), _serializedType))
             {
                 expr = new CastExpression(value.GetType(), expr);
             }

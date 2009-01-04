@@ -69,34 +69,36 @@ namespace JsonExSerializer.MetaData
         {
             if (properties == null)
             {
-                this.properties = ReadProperties();
-                LoadConstructorParameters();
+                this.properties = ReadDeclaredProperties();
+                MergeBaseProperties(this.properties);
             }
         }
 
         private void LoadConstructorParameters()
         {
-            this.constructorArgs = new List<IPropertyData>(GetConstructorParameters(properties));
-            if (constructorArgs.Count > 0)
+            if (this.constructorArgs == null)
             {
-                constructorArgs = SortConstructorParameters(constructorArgs);
+                this.constructorArgs = new List<IPropertyData>(GetConstructorParameters(properties));
+                if (constructorArgs.Count > 0)
+                {
+                    constructorArgs = SortConstructorParameters(constructorArgs);
+                }
             }
         }
 
         /// <summary>
-        /// Reads the properties and constructor arguments from type metadata
+        /// Reads the properties and constructor arguments from type metadata declared on this type
         /// </summary>
         /// <param name="Properties">properties collection</param>
         /// <param name="ConstructorArguments">constructor arguments</param>
-        protected virtual IList<IPropertyData> ReadProperties()
+        protected virtual IList<IPropertyData> ReadDeclaredProperties()
         {
             IList<IPropertyData> properties = new List<IPropertyData>();
 
-            MemberInfo[] members = ForType.GetMembers(BindingFlags.Public | BindingFlags.Instance);
+            MemberInfo[] members = ForType.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
             foreach (MemberInfo member in members)
             {
                 IPropertyData property = null;
-                // must be able to read and write the prop, otherwise its not 2-way 
                 if (member is PropertyInfo)
                 {
                     property = CreatePropertyHandler((PropertyInfo) member);
@@ -110,6 +112,32 @@ namespace JsonExSerializer.MetaData
                 }
             }
             return properties;
+        }
+
+        /// <summary>
+        /// Merges in the properties from the base class to the property list
+        /// </summary>
+        /// <param name="properties">property list to merge into</param>
+        protected virtual void MergeBaseProperties(IList<IPropertyData> properties) {
+            if (this.forType.BaseType == typeof(object) || this.forType.BaseType == null)
+                return;
+
+            TypeData baseTypeData = this.context.TypeHandlerFactory[this.forType.BaseType];
+            List<IPropertyData> baseProps = new List<IPropertyData>(baseTypeData.Properties);
+            foreach (IPropertyData baseProp in baseProps)
+            {
+                bool found = false;
+                foreach (IPropertyData localProp in properties)
+                {
+                    if (localProp.Name == baseProp.Name)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                    properties.Add(baseProp);
+            }
         }
 
         /// <summary>
@@ -268,7 +296,8 @@ namespace JsonExSerializer.MetaData
             get
             {
                 LoadProperties();
-                return constructorArgs;
+                LoadConstructorParameters();
+                return this.constructorArgs;
             }
         }
 

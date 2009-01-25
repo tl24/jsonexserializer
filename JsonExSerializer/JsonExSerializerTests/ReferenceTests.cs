@@ -160,5 +160,18 @@ namespace JsonExSerializerTests
             string result = s.Serialize(al);
             StringAssert.NotLike(result, "this");
         }
+
+        [Test]
+        public void ReferenceShouldNotWriteCast()
+        {
+            MockSubReferenceObject msr = new MockSubReferenceObject();
+            msr.Reference = msr;
+            Serializer s = new Serializer(typeof(MockSubReferenceObject));
+            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            string result = s.Serialize(msr);
+            StringAssert.NotLike(result, "MockSubReferenceObject");
+        }
     }
 }

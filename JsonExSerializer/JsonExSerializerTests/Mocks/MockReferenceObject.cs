@@ -38,4 +38,8 @@ namespace JsonExSerializerTests.Mocks
             return _name.GetHashCode();
         }
     }
+
+    public class MockSubReferenceObject : MockReferenceObject
+    {
+    }
 }

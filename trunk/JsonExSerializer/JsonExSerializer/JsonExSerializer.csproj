@@ -54,6 +54,7 @@
     <Compile Include="Collections\StackHandler.cs" />
     <Compile Include="Collections\ICollectionBuilder.cs" />
     <Compile Include="ConstructorParameterAttribute.cs" />
+    <Compile Include="Framework\ExpressionHandlers\DateTimeExpressionHandler.cs" />
     <Compile Include="Framework\Expressions\CastExpression.cs" />
     <Compile Include="Framework\Expressions\ComplexExpressionBase.cs" />
     <Compile Include="Framework\Expressions\CtorArgTypeResolver.cs" />

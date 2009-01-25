@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
 
 namespace JsonExSerializer.Framework.Expressions
 {
@@ -32,7 +33,12 @@ namespace JsonExSerializer.Framework.Expressions
         /// </summary>
         public virtual string StringValue
         {
-            get { return (this._value ?? string.Empty).ToString(); }
+            get {
+                if (this._value == null)
+                    return string.Empty;
+                else
+                    return Convert.ToString(this._value, CultureInfo.InvariantCulture);
+            }
         }
 
         public override Type DefaultType
@@ -61,7 +67,6 @@ namespace JsonExSerializer.Framework.Expressions
                     return true;
                 default:
                     return StringValue.Contains(".");
-
             }
         }
 

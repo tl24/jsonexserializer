@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.Framework.Expressions;
+using System.Globalization;
 
 namespace JsonExSerializer.Framework
 {
@@ -70,7 +71,7 @@ namespace JsonExSerializer.Framework
                     _jsonWriter.WriteSpecialValue(string.Format("{0}", value));
                     break;
                 default:
-                    _jsonWriter.WriteValue((long)Convert.ChangeType(value, typeof(long)));
+                    _jsonWriter.WriteValue((long)Convert.ChangeType(value, typeof(long), CultureInfo.InvariantCulture));
                     break;
             }
         }

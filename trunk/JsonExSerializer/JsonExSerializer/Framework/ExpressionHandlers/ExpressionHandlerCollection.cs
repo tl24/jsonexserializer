@@ -48,6 +48,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         private void InitializeDefaultHandlers()
         {
+            Add(new DateTimeExpressionHandler());
             Add(new NumericExpressionHandler(Context));
             Add(new BooleanExpressionHandler(Context));
             Add(new ValueExpressionHandler(Context));

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.Framework.Expressions;
+using System.Globalization;
 
 namespace JsonExSerializer.Framework.ExpressionHandlers
 {
@@ -30,7 +31,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             else if (value.ResultType == typeof(string))
                 return value.StringValue;
             else
-                return Convert.ChangeType(value.StringValue, value.ResultType);
+                return Convert.ChangeType(value.Value, value.ResultType, CultureInfo.InvariantCulture);
         }
 
         public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)

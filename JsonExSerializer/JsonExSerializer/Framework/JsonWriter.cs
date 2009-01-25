@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Reflection;
+using System.Globalization;
 
 namespace JsonExSerializer.Framework
 {
@@ -35,14 +36,33 @@ namespace JsonExSerializer.Framework
         private short indentLevel;
         private short indentSize = 4;
         private IState _currentState;
+        private CultureInfo culture;
 
-        public JsonWriter(TextWriter writer, bool indent) {
+        /// <summary>
+        /// Creates a json writer that writes to the <paramref name="writer"/> and uses
+        /// the InvariantCulture for any formatting.
+        /// </summary>
+        /// <param name="writer">the text writer that will be written to</param>
+        /// <param name="indent">setting that specifies whether to indent</param>
+        public JsonWriter(TextWriter writer, bool indent) 
+            : this(writer, indent, CultureInfo.InvariantCulture)
+        {
+        }
+
+        /// <summary>
+        /// Creates a json writer that writes to the <paramref name="writer"/> and uses
+        /// the InvariantCulture for any formatting.
+        /// </summary>
+        /// <param name="writer">the text writer that will be written to</param>
+        /// <param name="indent">setting that specifies whether to indent</param>
+        /// <param name="culture">The culture to use for formatting</param>
+        public JsonWriter(TextWriter writer, bool indent, CultureInfo culture)
+        {
             this._writer = writer;
             _currentState = new InitialState(this);
             if (!indent)
                 indentSize = 0;
         }
-
         private void PreWrite(OpType operation) {
             _currentState.PreWrite(operation);
             return;
@@ -160,14 +180,14 @@ namespace JsonExSerializer.Framework
         public IJsonWriter WriteValue(double value)
         {
             PreWrite(OpType.OpValue);
-            _writer.Write(value.ToString("R"));
+            _writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
             return this;
         }
 
         public IJsonWriter WriteValue(float value)
         {
             PreWrite(OpType.OpValue);
-            _writer.Write(value.ToString("R"));
+            _writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
             return this;
         }
 

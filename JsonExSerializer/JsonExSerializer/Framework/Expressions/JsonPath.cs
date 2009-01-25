@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
 
 namespace JsonExSerializer.Framework.Expressions
 {    
@@ -77,7 +78,7 @@ namespace JsonExSerializer.Framework.Expressions
         public int TopAsInt {
             get
             {
-                return int.Parse(Top);
+                return int.Parse(Top, CultureInfo.InvariantCulture);
             }
         }
 

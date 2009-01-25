@@ -242,7 +242,7 @@ namespace JsonExSerializer
                 _parameters = new NameValueCollection();
                 int i = 0;
                 foreach (string s in parameters.Split(' ')) {
-                    _parameters.Add(s, i.ToString(NumberFormatInfo.CurrentInfo));
+                    _parameters.Add(s, i.ToString());
                     i++;
                 }
 
@@ -315,7 +315,7 @@ namespace JsonExSerializer
                             if (method.Parameters.Get(reader.Name) == null)
                                 throw new ArgumentException("Unrecognized attribute " + reader.Name + " to " + tag + " tag within " + outerTag + " tag");
 
-                            values[int.Parse(method.Parameters.Get(reader.Name), NumberFormatInfo.CurrentInfo)] = reader.ReadContentAsString();
+                            values[int.Parse(method.Parameters.Get(reader.Name))] = reader.ReadContentAsString();
                         }
                         method.Method(tag, values);
                     }

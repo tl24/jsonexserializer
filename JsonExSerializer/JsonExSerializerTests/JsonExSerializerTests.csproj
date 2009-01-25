@@ -55,6 +55,7 @@
     <Compile Include="JsonWriterTestBase.cs" />
     <Compile Include="JsonWriterTests.cs" />
     <Compile Include="JsonWriterTypeTests.cs" />
+    <Compile Include="LocalizationTests.cs" />
     <Compile Include="MetaData\ConstructorParameterTests.cs" />
     <Compile Include="MetaData\DynamicMethodUtilTests.cs" />
     <Compile Include="MetaData\PropertyInheritanceTests.cs" />

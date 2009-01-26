@@ -1,8 +1,0 @@
-#summary Version 3.0 Alpha Features List
-
-== Alpha 1 (Oct 9 2008) ==
-
-  * Issue 30 - Advanced Customization options via Expressions/ExpressionHandlers.  (Blog post coming soon!)
-  * Issue 29 - Altered reference expressions to support/use JsonPath notation
-  * Assembly is now strongly-named
-  * Renamed classes and restructured framework-level code for better clarity and separation

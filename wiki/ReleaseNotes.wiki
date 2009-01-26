@@ -1,5 +1,18 @@
 #summary Release Notes
 
+== Release 2.1.1  (Jan 25 2009) ==
+  * Issue 24 - Bug: Something wrong in DictionaryToListConverter
+  * Issue 25 - Enhancement: Better Support for constructor-less classes
+  * Issue 28 - Enhancement:Make GetTypeBinding and GetTypeAlias virtual
+  * Issue 29 - Enhancement:Reference syntax now uses a subset of [http://goessner.net/articles/JsonPath/ JsonPATH]. e.g. $['foo']['bar'] 
+  * Issue 30 - Enhancement:Rewrote much of the internals to allow for more customization
+  * Issue 32 - Bug: Nullable values serialized with casting prefix unnecessarily
+  * Issue 33 - Bug: Serializing dates depends on current culture
+  * Issue 34 - Bug: Cast prefix on references
+  * Issue 35 - Enhancement: Metadata for properties is now shared between base class and child classes, mimicking how reflection works
+  * Issue 37 - Bug: Deserialisation of Double is CultureSpecific
+
+
 == Release 2.1.1  (Jul 19 2008) ==
   * Issue 16 - Enhancement: Allow you to insert CollectionHandlers before the end of the list
   * Issue 18 - Bug: Boolean properties serialized with Proper Case (True/False)

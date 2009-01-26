@@ -1,6 +1,6 @@
 #summary Release Notes
 
-== Release 2.1.1  (Jan 25 2009) ==
+== Release 3.0  (Jan 25 2009) ==
   * Issue 24 - Bug: Something wrong in DictionaryToListConverter
   * Issue 25 - Enhancement: Better Support for constructor-less classes
   * Issue 28 - Enhancement: Make GetTypeBinding and GetTypeAlias virtual

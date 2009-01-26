@@ -173,6 +173,7 @@ namespace JsonExSerializer
         public TypeAliasCollection TypeAliases
         {
             get { return _typeAliases; }
+            set { _typeAliases = value; }
         }
         /// <summary>
         /// Adds a different binding for a type.  When the type is encountered during serialization, the alias

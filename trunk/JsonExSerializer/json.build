@@ -12,8 +12,8 @@
 	<property name="perf.test.output.dir" value="${perf.tests}/bin/${configuration}" />
 	<property name="run.perf.tests" value="true" />
 	<property name="info.version" value="3.0" />
-	<property name="version.tag" value="Alpha 1" />
-	<property name="version.tag.file" value="alpha1" />
+	<property name="version.tag" value="" />
+	<property name="version.tag.file" value="" />
 	
 	<target name="get-head-revision"> 
 	  <exec

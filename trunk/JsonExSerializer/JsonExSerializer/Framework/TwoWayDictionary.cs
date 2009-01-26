@@ -15,7 +15,7 @@ namespace JsonExSerializer.Framework
     /// </summary>
     /// <typeparam name="K">the type of the key</typeparam>
     /// <typeparam name="V">the type of the value</typeparam>
-    class TwoWayDictionary<K, V> : IDictionary<K, V> 
+    public class TwoWayDictionary<K, V> : IDictionary<K, V> 
     {
         private IDictionary<K, V> _impl;
         private IDictionary<V, K> _reverseImpl;

@@ -11,7 +11,8 @@
   * Issue 34 - Bug: Cast prefix on references
   * Issue 35 - Enhancement: Metadata for properties is now shared between base class and child classes, mimicking how reflection works
   * Issue 37 - Bug: Deserialisation of Double is CultureSpecific
-
+  * Assembly is now strongly-named
+  * Renamed classes and restructured framework-level code for better clarity and separation
 
 == Release 2.1.1  (Jul 19 2008) ==
   * Issue 16 - Enhancement: Allow you to insert CollectionHandlers before the end of the list

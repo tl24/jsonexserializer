@@ -11,7 +11,7 @@ namespace JsonExSerializer.MetaData
     /// </summary>
     public class TypeAliasCollection
     {
-        private TwoWayDictionary<Type, string> bindings;
+        protected TwoWayDictionary<Type, string> bindings;
 
         /// <summary>
         /// Initializes a default intance of the TypeAliasCollection with aliases for primitive types
@@ -90,7 +90,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="type">the type to lookup</param>
         /// <returns>a type alias or null if not found</returns>
-        public string GetTypeAlias(Type type)
+        public virtual string GetTypeAlias(Type type)
         {
             string alias = null;
             if (!bindings.TryGetValue(type, out alias))
@@ -115,7 +115,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="alias">the alias to look up</param>
         /// <returns>the type representing the alias or null</returns>
-        public Type GetTypeBinding(string alias)
+        public virtual Type GetTypeBinding(string alias)
         {
             Type t = null;
             if (!bindings.TryGetKey(alias, out t))

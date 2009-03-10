@@ -35,10 +35,14 @@ namespace JsonExSerializer.Framework
                 return true;
 
             if (IsNullableType(a))
-                return Nullable.GetUnderlyingType(a) == b;
+                return AreEquivalentTypes(Nullable.GetUnderlyingType(a), b);
 
             if (IsNullableType(b))
-                return Nullable.GetUnderlyingType(b) == a;
+                return AreEquivalentTypes(Nullable.GetUnderlyingType(b), a);
+
+            // GetType() returns System.RuntimeType whereas typeof(T) returns System.Type
+            if (a.GetType() == b || a == b.GetType())
+                return true;
 
             return false;
         }

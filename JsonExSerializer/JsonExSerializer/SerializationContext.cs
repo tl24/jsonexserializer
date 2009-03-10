@@ -143,7 +143,7 @@ namespace JsonExSerializer
         /// Controls how references to previously serialized objects are written out.
         /// If the option is set to WriteIdentifier a reference identifier is written.
         /// The reference identifier is the path from the root to the first reference to the object.
-        /// Example: this.SomeProp.1.MyClassVar;
+        /// Example: $['SomeProp'][1]['MyClassVar'];
         /// Otherwise a copy of the object is written unless a circular reference is detected, then
         /// this option controls how the circular reference is handled.  If IgnoreCircularReferences
         /// is set, then null is written when a circular reference is detected.  If ErrorCircularReferences

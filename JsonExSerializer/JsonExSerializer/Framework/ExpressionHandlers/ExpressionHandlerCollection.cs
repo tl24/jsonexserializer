@@ -70,7 +70,11 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         public IExpressionHandler DefaultHandler
         {
             get { return this._defaultHandler; }
-            set { this._defaultHandler = value; }
+            set
+            {
+                this._defaultHandler = value;
+                this.Context.SetContextAware(_defaultHandler);
+            }
         }
 
         /// <summary>
@@ -79,7 +83,11 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         public IExpressionHandler NullHandler
         {
             get { return this._nullHandler; }
-            set { this._nullHandler = value; }
+            set
+            {
+                this._nullHandler = value;
+                this.Context.SetContextAware(_nullHandler);
+            }
         }
 
         /// <summary>

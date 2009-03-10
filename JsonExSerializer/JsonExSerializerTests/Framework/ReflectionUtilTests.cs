@@ -4,6 +4,7 @@ using System.Text;
 using MbUnit.Framework;
 using System.Reflection;
 using JsonExSerializer.Framework;
+using JsonExSerializer.Framework.Expressions;
 
 namespace JsonExSerializerTests.Framework
 {
@@ -52,6 +53,14 @@ namespace JsonExSerializerTests.Framework
             Type b = typeof(int?);
 
             Assert.IsTrue(ReflectionUtils.AreEquivalentTypes(t, b));
+        }
+
+        [Test]
+        public void AreEquivalentTypes_WhenTypeAndRunTimeType_ReturnTrue()
+        {
+            Type t = typeof(Type);
+            Type x = t.GetType();    // will actually be of type RuntimeType
+            Assert.IsTrue(ReflectionUtils.AreEquivalentTypes(t, x));
         }
 
         public void NoAttributes() { }

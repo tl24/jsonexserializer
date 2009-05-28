@@ -59,7 +59,7 @@
     <Compile Include="MetaData\ConstructorParameterTests.cs" />
     <Compile Include="MetaData\DynamicMethodUtilTests.cs" />
     <Compile Include="MetaData\PropertyInheritanceTests.cs" />
-    <Compile Include="Mocks\ChainedConversion.cs" />
+    <Compile Include="Mocks\BoolToIntConverter.cs" />
     <Compile Include="Mocks\Constructors.cs" />
     <Compile Include="Mocks\ConvertedObject.cs" />
     <Compile Include="Mocks\MockCallbackObject.cs" />

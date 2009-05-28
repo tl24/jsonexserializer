@@ -13,11 +13,8 @@ namespace JsonExSerializer.TypeConversion
     /// An interface for converting from one type to another for serialization/deserialization.  The resulting
     /// type is left unspecified.
     /// </summary>
-    /// <typeparam name="SrcT">The type of the object before serialization or after deserialization</typeparam>
     public interface IJsonTypeConverter
     {
-
-
         Type GetSerializedType(Type sourceType);
 
         /// <summary>
@@ -42,5 +39,11 @@ namespace JsonExSerializer.TypeConversion
         /// </summary>
         object Context { set; }
 
+        /// <summary>
+        /// Checks to see if references should be checked
+        /// </summary>
+        /// <param name="sourceType"></param>
+        /// <returns></returns>
+        bool SupportsReferences(Type sourceType);
     }
 }

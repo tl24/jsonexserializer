@@ -124,7 +124,6 @@
     <Compile Include="Framework\Parsing\TokenStream.cs" />
     <Compile Include="Framework\TwoWayDictionary.cs" />
     <Compile Include="TypeConversion\BitArrayConverter.cs" />
-    <Compile Include="TypeConversion\ChainedConverter.cs" />
     <Compile Include="TypeConversion\ConverterUtil.cs" />
     <Compile Include="TypeConversion\DictionaryToListConverter.cs" />
     <Compile Include="TypeConversion\IJsonTypeConverter.cs" />
@@ -133,6 +132,7 @@
     <Compile Include="MetaData\TypeData.cs" />
     <Compile Include="MetaData\PropertyData.cs" />
     <Compile Include="Framework\Visitors\VisitorBase.cs" />
+    <Compile Include="TypeConversion\TypeToStringConverter.cs" />
     <Compile Include="XmlConfigurator.cs" />
   </ItemGroup>
   <ItemGroup>

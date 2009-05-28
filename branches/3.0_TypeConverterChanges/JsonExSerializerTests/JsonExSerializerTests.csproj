@@ -1,0 +1,111 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{726BE6B3-1D44-453D-9039-B181D0D22F9C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JsonExSerializerTests</RootNamespace>
+    <AssemblyName>JsonExSerializerTests</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\JsonExSerializer.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MbUnit.Framework, Version=1.0.2700.29885, Culture=neutral, PublicKeyToken=5e72ecd30bc408d5">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\MbUnit.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArrayTests.cs" />
+    <Compile Include="CollectionsTests.cs" />
+    <Compile Include="ConversionTests.cs" />
+    <Compile Include="CustomPropertyTest.cs" />
+    <Compile Include="DeserializePrimitiveTests.cs" />
+    <Compile Include="Expressions\CustomExpressionHandlerTests.cs" />
+    <Compile Include="Expressions\ExpressionWriterTests.cs" />
+    <Compile Include="Expressions\JsonPathTests.cs" />
+    <Compile Include="Expressions\ReferenceTests.cs" />
+    <Compile Include="FieldTests.cs" />
+    <Compile Include="Framework\ReflectionUtilTests.cs" />
+    <Compile Include="IgnorePropertyActionTests.cs" />
+    <Compile Include="JsonWriterComplexTests.cs" />
+    <Compile Include="JsonWriterTestBase.cs" />
+    <Compile Include="JsonWriterTests.cs" />
+    <Compile Include="JsonWriterTypeTests.cs" />
+    <Compile Include="LocalizationTests.cs" />
+    <Compile Include="MetaData\ConstructorParameterTests.cs" />
+    <Compile Include="MetaData\DynamicMethodUtilTests.cs" />
+    <Compile Include="MetaData\PropertyInheritanceTests.cs" />
+    <Compile Include="Mocks\ChainedConversion.cs" />
+    <Compile Include="Mocks\Constructors.cs" />
+    <Compile Include="Mocks\ConvertedObject.cs" />
+    <Compile Include="Mocks\MockCallbackObject.cs" />
+    <Compile Include="Mocks\MockCollectionConverter.cs" />
+    <Compile Include="Mocks\MockFields.cs" />
+    <Compile Include="Mocks\MockFlagsEnum.cs" />
+    <Compile Include="Mocks\MockReferenceObject.cs" />
+    <Compile Include="Mocks\MockValueType.cs" />
+    <Compile Include="Mocks\MyLine.cs" />
+    <Compile Include="Mocks\MyPointConstructor.cs" />
+    <Compile Include="Mocks\SelfConverter.cs" />
+    <Compile Include="Mocks\SemiComplexObject.cs" />
+    <Compile Include="Mocks\SpecializedMock.cs" />
+    <Compile Include="Mocks\StronglyTypedCollection.cs" />
+    <Compile Include="Mocks\SubClassMock.cs" />
+    <Compile Include="ReadOnlyPropertyTests\ArrayParent.cs" />
+    <Compile Include="ReadOnlyPropertyTests\CollectionItem.cs" />
+    <Compile Include="ReadOnlyPropertyTests\CollectionParent.cs" />
+    <Compile Include="ReadOnlyPropertyTests\ObjectParent.cs" />
+    <Compile Include="ReadOnlyPropertyTests\ReadOnlyProperty.cs" />
+    <Compile Include="ReferenceTests.cs" />
+    <Compile Include="SerializeCtorTests.cs" />
+    <Compile Include="SerializeObjectTests.cs" />
+    <Compile Include="SerializePrimitiveTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Mocks\SimpleObject.cs" />
+    <Compile Include="SimpleConfigSettingsTests.cs" />
+    <Compile Include="AdvancedConfigSettingTests.cs" />
+    <Compile Include="TokenStreamTests.cs" />
+    <Compile Include="TypeHandlerTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JsonExSerializer\JsonExSerializer.csproj">
+      <Project>{D0C83979-A672-4C06-99BC-B82D81749405}</Project>
+      <Name>JsonExSerializer</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

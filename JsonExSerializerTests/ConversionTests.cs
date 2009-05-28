@@ -106,24 +106,6 @@ namespace JsonExSerializerTests
             Assert.AreEqual(1, MyLinePointConverter.ConvertToCount, "Property ConvertTo not called correct amount of times");
         }
 
-        /// <summary>
-        /// Test property that has multiple convert attributes on it
-        /// </summary>
-        [Test]
-        public void ChainedConversionTest()
-        {
-            ChainedConversionMock mock = new ChainedConversionMock();
-            mock.StringProp = new StringHolder("True");
-            Serializer s = new Serializer(typeof(ChainedConversionMock));
-            ChainedConverter converter = new ChainedConverter();
-            converter.Converters.Add(new StringToBoolConverter());
-            converter.Converters.Add(new BoolToIntConverter());
-            s.Context.RegisterTypeConverter(mock.GetType(), "StringProp", converter);
-            string result = s.Serialize(mock);
-            ChainedConversionMock actual = (ChainedConversionMock)s.Deserialize(result);
-            Assert.AreEqual(mock.StringProp.StringProp, actual.StringProp.StringProp, "Chained conversion failed");
-        }
-
         [Test]
         public void IgnorePropertyTest()
         {
@@ -178,6 +160,36 @@ namespace JsonExSerializerTests
 
             Assert.AreEqual(1, targetDictionary["One"].IntValue, "One Value wrong");
             Assert.AreEqual(2, targetDictionary["Two"].IntValue, "Two Value wrong");
+        }
+
+        [Test]
+        public void TypeToStringTest_NotAliased()
+        {
+            Serializer s = new Serializer(typeof(Type));
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            s.Context.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            string result = s.Serialize(typeof(SimpleObject));
+
+            Assert.AreEqual("\"" + typeof(SimpleObject).AssemblyQualifiedName + "\"", result, "Type serialized improperly");
+
+            Type typeResult = (Type) s.Deserialize(result);
+            Assert.AreEqual(typeof(SimpleObject), typeResult, "Type deserialized improperly");
+        }
+
+        [Test]
+        public void TypeToStringTest_Aliased()
+        {
+            Serializer s = new Serializer(typeof(Type));
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            s.Context.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            string result = s.Serialize(typeof(int));
+
+            Assert.AreEqual("\"int\"", result, "Type serialized improperly");
+
+            Type typeResult = (Type)s.Deserialize(result);
+            Assert.AreEqual(typeof(int), typeResult, "Type deserialized improperly");
         }
     }
 }

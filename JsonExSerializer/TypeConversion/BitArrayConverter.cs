@@ -13,14 +13,12 @@ namespace JsonExSerializer.TypeConversion
     /// <summary>
     /// Converter for the System.Collections.BitArray type
     /// </summary>
-    public class BitArrayConverter : IJsonTypeConverter
+    public class BitArrayConverter : JsonConverterBase, IJsonTypeConverter
     {
-
-        #region IJsonTypeConverter Members
         
         /// converts a bit array into a string of the format:  "63,FFEF10002EFA"
         /// length,HexEncodedBits
-        public object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, SerializationContext serializationContext)
         {
             BitArray ba = (BitArray) item;
             int len = ba.Count;
@@ -61,7 +59,7 @@ namespace JsonExSerializer.TypeConversion
             return result;
         }
 
-        public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             string bits = (string)((Hashtable)item)["Bits"];
             int count = (int)((Hashtable)item)["Count"];
@@ -81,30 +79,15 @@ namespace JsonExSerializer.TypeConversion
             return result;
         }
 
-        public object Context
-        {
-            set { return; }
-        }
-
-        #endregion
-
-        #region IJsonTypeConverter Members
-
-        public Type GetSerializedType(Type sourceType)
+        public override Type GetSerializedType(Type sourceType)
         {
             return typeof(Hashtable);
         }
-
-        #endregion
-
-        #region IJsonTypeConverter Members
-
 
         public SerializationContext SerializationContext
         {
             set { return; }
         }
 
-        #endregion
     }
 }

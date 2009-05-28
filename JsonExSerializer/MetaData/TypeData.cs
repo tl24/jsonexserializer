@@ -480,7 +480,16 @@ namespace JsonExSerializer.MetaData
                     return null;
                 }
                 else
-                    return base.TypeConverter;
+                {
+                    bool tempCreated = converterCreated;
+                    IJsonTypeConverter converterResult = base.TypeConverter;
+                    // if no converter registered, try to use the base converter if applicable
+                    if (!tempCreated && converterResult == null && this.ForType.BaseType != null)
+                    {
+                        converterResult = converterInstance = this.context.TypeHandlerFactory[this.forType.BaseType].TypeConverter;
+                    }
+                    return converterResult;
+                }
             }
             set
             {

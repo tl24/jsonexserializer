@@ -156,7 +156,12 @@ namespace JsonExSerializer.Framework
 
         private static bool IsReferenceable(object value)
         {
-            return value.GetType().IsClass && !(value is string);
+            return IsReferenceable(value.GetType());
+        }
+
+        internal static bool IsReferenceable(Type type)
+        {
+            return type.IsClass && !(type == typeof(string));
         }
 
         /// <summary>

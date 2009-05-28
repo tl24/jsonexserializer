@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using JsonExSerializer.Framework;
 
 namespace JsonExSerializer.TypeConversion
 {
@@ -8,7 +9,7 @@ namespace JsonExSerializer.TypeConversion
     {
         protected object _context;
 
-        #region IJsonTypeConverter Members
+        
 
         public abstract Type GetSerializedType(Type sourceType);
 
@@ -26,6 +27,9 @@ namespace JsonExSerializer.TypeConversion
             set { _context = value; }
         }
 
-        #endregion
+        public virtual bool SupportsReferences(Type sourceType)
+        {
+            return SerializerHelper.IsReferenceable(sourceType);
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace JsonExSerializerTests.Mocks
     /// <summary>
     /// An object that implements its own type converter
     /// </summary>
-    public class SelfConverter : IJsonTypeConverter
+    public class SelfConverter : JsonConverterBase, IJsonTypeConverter
     {
         private int num;
         public SelfConverter()
@@ -34,29 +34,20 @@ namespace JsonExSerializerTests.Mocks
             return num.GetHashCode();
         }
 
-        #region IJsonTypeConverter Members
-
-        public Type GetSerializedType(Type sourceType)
+        public override Type GetSerializedType(Type sourceType)
         {
             return typeof(int);
         }
 
-        public object ConvertFrom(object item, JsonExSerializer.SerializationContext serializationContext)
+        public override object ConvertFrom(object item, JsonExSerializer.SerializationContext serializationContext)
         {
             return num;
         }
 
-        public object ConvertTo(object item, Type sourceType, JsonExSerializer.SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, JsonExSerializer.SerializationContext serializationContext)
         {
             this.num = (int)item;
             return this;
         }
-
-        public object Context
-        {
-            set { throw new Exception("The method or operation is not implemented."); }
-        }
-
-        #endregion
     }
 }

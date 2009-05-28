@@ -59,17 +59,15 @@ namespace JsonExSerializerTests.Mocks
     /// <summary>
     /// A converter for MyImmutablePoint
     /// </summary>
-    public class MyImmutablePointConverter : IJsonTypeConverter
+    public class MyImmutablePointConverter : JsonConverterBase, IJsonTypeConverter
     {
-        #region IJsonTypeConverter Members
-
-        public object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, SerializationContext serializationContext)
         {
             MyImmutablePoint pt = (MyImmutablePoint) item;
             return pt.X + "," + pt.Y;
         }
 
-        public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             string data = (string)item;
             if (data.IndexOf(',') != -1)
@@ -83,31 +81,11 @@ namespace JsonExSerializerTests.Mocks
             }
         }
 
-        public object Context
-        {
-            set { throw new Exception("The method or operation is not implemented."); }
-        }
-
-        #endregion
-
-        #region IJsonTypeConverter Members
-
-        public Type GetSerializedType(Type sourceType)
+        public override Type GetSerializedType(Type sourceType)
         {
             return typeof(string);
         }
 
-        #endregion
-
-        #region IJsonTypeConverter Members
-
-
-        public SerializationContext SerializationContext
-        {
-            set { return; }
-        }
-
-        #endregion
     }
 
 

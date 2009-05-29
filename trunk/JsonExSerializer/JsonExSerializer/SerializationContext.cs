@@ -266,7 +266,7 @@ namespace JsonExSerializer
             get { return _parameters; }
         }
 
-        internal IList<IParsingStage> ParsingStages
+        public IList<IParsingStage> ParsingStages
         {
             get
             {

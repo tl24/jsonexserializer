@@ -55,13 +55,11 @@ namespace JsonExSerializerTests
             Type[] argTypes = resolver.ResolveTypes();
             CollectionAssert.AreElementsEqual(new Type[] { typeof(long), typeof(MyObject2) }, argTypes);
 
-            Parser parser = new Parser(typeof(CtorMock2), (TokenStream) null, s.Context);
-
-
             // Try to construct
             IDExpr.ResultType = typeof(long);
             objExpr.ResultType = typeof(MyObject2);
-            object result = parser.Evaluate(expr);
+            Evaluator eval = new Evaluator(s.Context);
+            object result = eval.Evaluate(expr);
 
             
         }

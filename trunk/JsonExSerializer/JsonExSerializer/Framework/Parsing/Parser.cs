@@ -18,7 +18,7 @@ using JsonExSerializer.Framework.ExpressionHandlers;
 
 namespace JsonExSerializer.Framework.Parsing
 {
-    sealed class Parser : IDeserializerHandler
+    public class Parser
     {
         #region Member Variables
 
@@ -87,7 +87,7 @@ namespace JsonExSerializer.Framework.Parsing
         /// Parses the stream and returns the object result
         /// </summary>
         /// <returns>the object constructed from the stream</returns>
-        public object Parse()
+        public virtual Expression Parse()
         {
             Expression expr = ParseExpression();
             expr.ResultType = _deserializedType;
@@ -95,19 +95,7 @@ namespace JsonExSerializer.Framework.Parsing
             {
                 expr = stage.Execute(expr);
             }
-            return Evaluate(expr);
-        }
-
-        public object Evaluate(Expression Expression)
-        {
-            IExpressionHandler handler = _context.ExpressionHandlers.GetHandler(Expression);
-            return handler.Evaluate(Expression, this);
-        }
-
-        public object Evaluate(Expression Expression, object existingObject)
-        {
-            IExpressionHandler handler = _context.ExpressionHandlers.GetHandler(Expression);
-            return handler.Evaluate(Expression, existingObject, this);
+            return expr;
         }
 
         /// <summary>

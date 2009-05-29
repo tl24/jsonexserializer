@@ -13,7 +13,7 @@ namespace JsonExSerializer.Framework.Parsing
     /// <summary>
     /// Tokenizes input from the specified reader and returns tokens for the parser to parse.
     /// </summary>
-    sealed class TokenStream
+    public class TokenStream
     {
         #region Member Variables
 

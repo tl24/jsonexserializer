@@ -4,9 +4,27 @@
 An Expression object is an in memory representation of the JSON structure.  The Expression classes reside in the JsonExSerializer.Framework.Expressions namespace.  An object graph is converted into an Expression during serialization before being written to the stream.  JSON text is also parsed into an Expression during deserialization before being converted back into an object instance.  This allows possibilities for customizing serialization or deserialization without having to know about parsing or writing JSON text.  The different expression classes represent the available JSON constructs.
 
 = Expression Types =
+== Expression ==
+This is the base class for all expressions.  It contains common properties for expressions such as Parent, DefaultType, and ResultType.
+
+{{{
+Expression expr;
+
+// get the parent expression
+Expression parent = expr.Parent;
+
+// Default type is used when no ResultType has been set
+Type defaultType = expr.DefaultType;
+
+// Result type is used to deserialize the object if it is set
+Type resultType = expr.ResultType;
+}}}
 
 == ObjectExpression ==
-The ObjectExpression class represents a JSON object.  The ObjectExpression contains a Properties collection of KeyValueExpression object which represent the key-value pairs that is has.
+The ObjectExpression class represents a JSON object. 
+{ "key": "value" }
+
+ The ObjectExpression contains a Properties collection of KeyValueExpression object which represent the key-value pairs that is has.
 
 {{{
 ObjectExpression obj;
@@ -17,3 +35,6 @@ Expression value = obj["keyName"];
 // retrieve a property by index
 KeyValueExpression keyValue = obj.Properties[obj.IndexOf("keyName")];
 }}}
+
+== ArrayExpression ==
+The ArrayExpression class represents a JSON array.

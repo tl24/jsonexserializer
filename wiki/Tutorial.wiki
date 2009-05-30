@@ -169,4 +169,51 @@ Now the output should look like this:
 
 }}}
 
+Now we realize that during processing we need to know the Customer's Login information so someone adds the Login info to the Customer class like so:
+{{{
+   public class Customer {
+
+     /* Other properties omitted ... */
+
+     private ILogin _loginInfo;
+     public ILogin LoginInfo
+     {
+         get { return this. _loginInfo; }
+         set { this. _loginInfo = value; }
+     }
+   }
+
+   public interface ILogin {
+      public string UserName { get; set; }
+      public string Password { get; set; }
+   }
+}}}
+
+Now suddenly we get this in serialized text:
+{{{
+    "Id":1,
+    "FirstName":"Bob",
+    "LastName":"Smith",
+    "PhoneNumber":"(222)444-9987",
+    "LoginInfo":
+    {
+        "UserName": "bob",
+        "Password": "secret"
+    }
+    /* rest of the text */
+}}}
+
+We probably don't want the login information to be serialized.  So we add the JsonExIgnore attribute to suppress it.
+
+{{{
+   [JsonExIgnore]
+     public ILogin LoginInfo
+     {
+         get { return this. _loginInfo; }
+         set { this. _loginInfo = value; }
+     }
+}}}
+
+Now the LoginInfo will no longer show up in the file.
+
 There's the basics of using the Serializer.  In later installments we'll look at more advanced scenarios.

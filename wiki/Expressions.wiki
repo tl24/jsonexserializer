@@ -7,18 +7,10 @@ An Expression object is an in memory representation of the JSON structure.  The 
 == Expression ==
 This is the base class for all expressions.  It contains common properties for expressions such as Parent, DefaultType, and ResultType.
 
-{{{
-Expression expr;
-
-// get the parent expression
-Expression parent = expr.Parent;
-
-// Default type is used when no ResultType has been set
-Type defaultType = expr.DefaultType;
-
-// Result type is used to deserialize the object if it is set
-Type resultType = expr.ResultType;
-}}}
+|| *Property or Method* || *Description* ||
+|| Parent || Returns the parent of the expression if it has one ||
+|| DefaultType || Returns the type to be used if no ResultType is set ||
+|| ResultType || The corresponding type to be used when deserializing the expression ||
 
 == ObjectExpression ==
 The ObjectExpression class represents a JSON object. 

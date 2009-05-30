@@ -32,4 +32,25 @@ The KeyValueExpression represents the key-value pairs contained in an ObjectExpr
 || ValueExpression || The expression representing the value ||
 
 == ArrayExpression ==
-The ArrayExpression class represents a JSON array.
+The ArrayExpression class represents a JSON array.  The Items collection contains the items within the array.
+|| *Property or Method* || *Description* ||
+|| Items || A collection of Expression objects representing the items in the array ||
+|| Add || Adds an item to the Items collection ||
+
+== ValueExpression ==
+Represents a string, number, boolean JSON value.  Number and Boolean types have specific sub-classes of ValueExpression: NumberExpression and BooleanExpression respectively.
+|| *Property or Method* || *Description* ||
+|| Value || The value of the expression ||
+|| StringValue || Returns the value as a string ||
+
+== NumericExpression ==
+A subclass of ValueExpression for representing numeric types including int, long, double and float.
+
+== BooleanExpression ==
+A subclass of ValueExpression for representing boolean values.
+
+== CastExpression ==
+The CastExpression does not correspond to a JSON construct but represents the added type information that JsonExSerializer adds when extra type information is needed.  It wraps other expressions which is contained in its Expression property.
+
+== ReferenceExpression ==
+The ReferenceExpression does not correspond to a JSON construct but represents a reference to another part of the JSON expression.  References appear in the serialized text as "$.parent.child" using JSONPath syntax.

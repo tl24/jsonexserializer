@@ -18,15 +18,11 @@ The ObjectExpression class represents a JSON object.
 
  The ObjectExpression contains a Properties collection of KeyValueExpression object which represent the key-value pairs that is has.
 
-{{{
-ObjectExpression obj;
-
-// retrieve the value expression for a given key
-Expression value = obj["keyName"]; 
-
-// retrieve a property by index
-KeyValueExpression keyValue = obj.Properties[obj.IndexOf("keyName")];
-}}}
+|| *Property or Method* || *Description* ||
+|| Item[string] || Retrieve the value expression for a given key ||
+|| Properties || List of KeyValueExpression ||
+|| IndexOf || Returns the index of a KeyValueExpression in the Properties by key or -1 if it doesn't exist ||
+|| Add || Adds a KeyValueExpression to the Properties collection ||
 
 == KeyValueExpression ==
 The KeyValueExpression represents the key-value pairs contained in an ObjectExpression.

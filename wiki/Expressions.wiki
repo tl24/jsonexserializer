@@ -36,5 +36,12 @@ Expression value = obj["keyName"];
 KeyValueExpression keyValue = obj.Properties[obj.IndexOf("keyName")];
 }}}
 
+== KeyValueExpression ==
+The KeyValueExpression represents the key-value pairs contained in an ObjectExpression.
+|| *Property or Method* || *Description* ||
+|| KeyExpression || Contains the expression representing the key. For Dictionary objects this does not have to be a string ||
+|| Key || Returns the KeyExpression as a string.  This will fail if the KeyExpression is not a ValueExpression ||
+|| ValueExpression || The expression representing the value ||
+
 == ArrayExpression ==
 The ArrayExpression class represents a JSON array.

@@ -7,7 +7,34 @@ In Part1 of the Tutorial we covered the basic scenarios for using the serializer
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+At the end of the first part of the Tutorial we suppressed the login information completely.  But let's say we want to store the UserName and retrieve the rest of the login information from the database when we deserialize.  For that we can use a converter.  We extend the JsonConverterBase which is an abstract class implementing IJsonTypeConverter interface.  
+{{{
+
+  public class LoginConverter : JsonConverterBase {
+
+      private UserStore _userStore;
+
+      public LoginConverter(UserStore userStore) {
+         this._userStore = userStore;
+      }
+
+      public Type GetSerializedType(Type sourceType)
+      {
+         return typeof(string);
+      }
+
+      public object ConvertFrom(object item, SerializationContext serializationContext)
+      {
+          ILoginInfo login = (ILoginInfo) item;
+          return login.UserName;
+      }
+
+      public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+      {
+            string userName = (string)item;
+            return _userStore.GetLoginInfo(userName);
+      }
+  }
+}}}
+
+The GetSerializedType method tells the serializer what type of object we will be converting to.  In this case we are converting ILoginInfo to string.  ConvertFrom is called during serialization.  We will take the ILoginInfo instance and store the UserName in the file.  The ConvertTo is called during deserialization.  We will be passed back the user name string that we serialized.  We pass that into our UserStore object which retrieves the user information.

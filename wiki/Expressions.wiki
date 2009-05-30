@@ -1,0 +1,3 @@
+= Expresssions =
+
+An Expression object is an in memory representation of the JSON structure.  The Expression classes reside in the JsonExSerializer.Framework.Expressions namespace.  An object graph is converted into an Expression during serialization before being written to the stream.  JSON text is also parsed into an Expression during deserialization before being converted back into an object instance.  This allows possibilities for customizing serialization or deserialization without having to know about parsing or writing JSON text.  The different expression classes represent the available JSON constructs.

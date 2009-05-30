@@ -1,0 +1,13 @@
+#summary Part 2 of the tutorial
+
+= Introduction =
+
+In Part1 of the Tutorial we covered the basic scenarios for using the serializer.  Now we'll cover some more advanced scenarios.  We will refer to the classes we're working with in the first part  So refer to the first part of the [Tutorial] if you need to.
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages

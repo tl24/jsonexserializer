@@ -38,9 +38,15 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>an expression for the value</returns>
         public override Expression GetExpression(object value, JsonPath currentPath, ISerializerHandler serializer)
         {
+            IJsonTypeConverter converter = GetConverter(value);
+            return GetExpression(value, converter, currentPath, serializer);
+        }
+
+        private IJsonTypeConverter GetConverter(object value)
+        {
             TypeData handler = Context.TypeHandlerFactory[value.GetType()];
             IJsonTypeConverter converter = (handler.HasConverter ? handler.TypeConverter : (IJsonTypeConverter)value);
-            return GetExpression(value, converter, currentPath, serializer);
+            return converter;
         }
 
         /// <summary>
@@ -139,6 +145,16 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
             //TODO: possibly allow this if the type implements IJsonTypeConverter itself
             throw new NotSupportedException("Cannot convert an existing object.");
+        }
+
+        public override bool IsReferenceable(object value)
+        {
+            return IsReferenceable(value, GetConverter(value));
+        }
+
+        public virtual bool IsReferenceable(object value, IJsonTypeConverter converter)
+        {
+            return converter.SupportsReferences(value.GetType(), this.Context);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>reference expression</returns>
         public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
         {
-            return serializer.HandleReference(data, currentPath);
+            return new ReferenceExpression(currentPath);
         }
 
         /// <summary>

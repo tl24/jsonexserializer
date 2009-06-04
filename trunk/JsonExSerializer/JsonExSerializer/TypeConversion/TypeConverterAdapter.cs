@@ -15,7 +15,7 @@ namespace JsonExSerializer.TypeConversion
     /// TypeConverter that utilizes the System.ComponentModel.TypeConverter for
     /// a given type.
     /// </summary>
-    public class TypeConverterAdapter : IJsonTypeConverter
+    public class TypeConverterAdapter : JsonConverterBase, IJsonTypeConverter
     {
         private TypeConverter _converter;
 
@@ -38,28 +38,19 @@ namespace JsonExSerializer.TypeConversion
             _converter = converter;
         }
 
-        public object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, SerializationContext serializationContext)
         {
             return _converter.ConvertToString(item);
         }
 
-        public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             return _converter.ConvertFromString((string) item);
         }
 
-        public object Context
-        {
-            set { return; }
-        }
-
-        #region IJsonTypeConverter Members
-
-        public Type GetSerializedType(Type sourceType)
+        public override Type GetSerializedType(Type sourceType)
         {
             return typeof(string);
         }
-
-        #endregion
     }
 }

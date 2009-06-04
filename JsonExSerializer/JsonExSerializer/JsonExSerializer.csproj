@@ -126,7 +126,6 @@
     <Compile Include="Framework\Parsing\TokenStream.cs" />
     <Compile Include="Framework\TwoWayDictionary.cs" />
     <Compile Include="TypeConversion\BitArrayConverter.cs" />
-    <Compile Include="TypeConversion\ChainedConverter.cs" />
     <Compile Include="TypeConversion\ConverterUtil.cs" />
     <Compile Include="TypeConversion\DictionaryToListConverter.cs" />
     <Compile Include="TypeConversion\IJsonTypeConverter.cs" />
@@ -135,12 +134,16 @@
     <Compile Include="MetaData\TypeData.cs" />
     <Compile Include="MetaData\PropertyData.cs" />
     <Compile Include="Framework\Visitors\VisitorBase.cs" />
+    <Compile Include="TypeConversion\TypeToStringConverter.cs" />
     <Compile Include="XmlConfigurator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\JsonExSerializer.snk">
       <Link>JsonExSerializer.snk</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />

@@ -5,6 +5,7 @@ using MbUnit.Framework;
 using JsonExSerializerTests.Mocks;
 using JsonExSerializer;
 using System.Collections;
+using JsonExSerializer.TypeConversion;
 
 namespace JsonExSerializerTests
 {
@@ -159,6 +160,7 @@ namespace JsonExSerializerTests
             s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
             string result = s.Serialize(al);
             StringAssert.NotLike(result, "this");
+            StringAssert.NotLike(result, @"\$");
         }
 
         [Test]
@@ -172,6 +174,22 @@ namespace JsonExSerializerTests
             s.Context.OutputTypeComment = false;
             string result = s.Serialize(msr);
             StringAssert.NotLike(result, "MockSubReferenceObject");
+        }
+
+        [Test]
+        public void TypeConverterControlsHowReferencesWritten()
+        {
+            Type intType = typeof(int);
+            ArrayList list = new ArrayList();
+            list.Add(intType);
+            list.Add(intType);
+            Serializer s = new Serializer(typeof(ArrayList));
+            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Context.OutputTypeComment = false;
+            s.Context.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            string result = s.Serialize(list);
+            StringAssert.NotLike(result, @"\$");
+            StringAssert.NotLike(result, "this");
         }
     }
 }

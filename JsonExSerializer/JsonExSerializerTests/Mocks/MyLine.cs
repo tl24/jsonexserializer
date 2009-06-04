@@ -32,20 +32,18 @@ namespace JsonExSerializerTests.Mocks
         }
     }
 
-    public class MyLinePointConverter : IJsonTypeConverter
+    public class MyLinePointConverter : JsonConverterBase, IJsonTypeConverter
     {
         private static int _convertFromCount;
         private static int _convertToCount;
         private string _separator;
 
-        #region IJsonTypeConverter Members
-
-        public Type GetSerializedType(Type sourceType)
+        public override Type GetSerializedType(Type sourceType)
         {
             return typeof(string);
         }
 
-        public object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, SerializationContext serializationContext)
         {
             _convertFromCount++;
             // seperate with ":" and surround with () this time
@@ -53,7 +51,7 @@ namespace JsonExSerializerTests.Mocks
             return "(" + pt.X + _separator + pt.Y + ")";
         }
 
-        public object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
             _convertToCount++;
             string data = (string)item;
@@ -68,12 +66,10 @@ namespace JsonExSerializerTests.Mocks
             }
         }
 
-        public object Context
+        public override object Context
         {
             set { _separator = value != null ? value.ToString() : ":"; }
         }
-
-        #endregion
 
         public static int ConvertFromCount
         {

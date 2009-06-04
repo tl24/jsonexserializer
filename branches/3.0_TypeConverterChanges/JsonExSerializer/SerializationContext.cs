@@ -286,6 +286,15 @@ namespace JsonExSerializer
                 contextAware.Context = this;
         }
 
+        /// <summary>
+        /// Checks to see if by default this is a referencable type
+        /// </summary>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public virtual bool IsReferenceableType(Type objectType)
+        {
+            return objectType.IsClass && objectType != typeof(string);
+        }
         #region TypeConverter
 
         /// <summary>

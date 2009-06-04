@@ -44,6 +44,6 @@ namespace JsonExSerializer.TypeConversion
         /// </summary>
         /// <param name="sourceType"></param>
         /// <returns></returns>
-        bool SupportsReferences(Type sourceType);
+        bool SupportsReferences(Type sourceType, SerializationContext serializationContext);
     }
 }

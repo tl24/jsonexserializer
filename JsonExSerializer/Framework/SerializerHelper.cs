@@ -20,7 +20,7 @@ namespace JsonExSerializer.Framework
     /// <summary>
     /// Class to do the work of serializing an object
     /// </summary>
-    sealed class SerializerHelper : JsonWriter, ISerializerHandler
+    class SerializerHelper : JsonWriter, ISerializerHandler
     {
         private Type _serializedType;
         private SerializationContext _context;
@@ -78,10 +78,26 @@ namespace JsonExSerializer.Framework
             }
             else
             {
+                IExpressionHandler objHandler;
+                bool isReferencable = _context.IsReferenceableType(value.GetType());
+                if (converter != null)
+                {
+                    TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)_context.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
+                    isReferencable = converterHandler.IsReferenceable(value, converter);
+                    objHandler = converterHandler;
+                }
+                else
+                {
+                    objHandler = _context.ExpressionHandlers.GetHandler(value);
+                    isReferencable = objHandler.IsReferenceable(value);
+                }
 
-                Expression expr = HandleReference(value, currentPath);
-                if (expr != null)
-                    return expr;
+                if (isReferencable)
+                {
+                    Expression expr = HandleReference(value, currentPath);
+                    if (expr != null)
+                        return expr;
+                }
 
                 ISerializationCallback callback = value as ISerializationCallback;
                 if (callback != null)
@@ -89,17 +105,15 @@ namespace JsonExSerializer.Framework
 
                 try
                 {
-                    //TODO: this is too early for converters
-                    SetCanReference(value);    // regular object, can reference at any time
-                    IExpressionHandler objHandler;
                     if (converter != null)
                     {
-                        TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)_context.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
-                        //TODO: make sure it exists
-                        return converterHandler.GetExpression(value, converter, currentPath, this);
+                        return ((TypeConverterExpressionHandler)objHandler).GetExpression(value, converter, currentPath, this);
                     }
-                    objHandler = _context.ExpressionHandlers.GetHandler(value);
-                    return objHandler.GetExpression(value, currentPath, this);
+                    else
+                    {
+                        SetCanReference(value);
+                        return objHandler.GetExpression(value, currentPath, this);
+                    }
                 }
                 finally
                 {
@@ -109,11 +123,8 @@ namespace JsonExSerializer.Framework
             }
         }
 
-        public Expression HandleReference(object value, JsonPath CurrentPath)
+        protected virtual Expression HandleReference(object value, JsonPath CurrentPath)
         {
-            if (!IsReferenceable(value))
-                return null;
-
             ReferenceInfo refInfo = null;
             if (_refs.ContainsKey(value))
             {
@@ -154,15 +165,6 @@ namespace JsonExSerializer.Framework
             return null;
         }
 
-        private static bool IsReferenceable(object value)
-        {
-            return IsReferenceable(value.GetType());
-        }
-
-        internal static bool IsReferenceable(Type type)
-        {
-            return type.IsClass && !(type == typeof(string));
-        }
 
         /// <summary>
         /// Indicates that the object can now be referenced.  Any attempts to build a reference to the current object before
@@ -170,14 +172,11 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="value">the object being referenced</param>
         public void SetCanReference(object value) {
-            if (!IsReferenceable(value))
-                return;
-
             ReferenceInfo refInfo;
-            if (!_refs.TryGetValue(value, out refInfo))
-                throw new ArgumentException(string.Format("No reference information available for {0}.  HandleReference must be called before calling SetCanReference", value), "value");
-
-            refInfo.CanReference = true;
+            if (_refs.TryGetValue(value, out refInfo))
+            {
+                refInfo.CanReference = true;
+            }
         }
 
         /// <summary>

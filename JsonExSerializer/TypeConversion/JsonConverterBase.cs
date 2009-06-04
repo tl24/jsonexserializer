@@ -27,9 +27,10 @@ namespace JsonExSerializer.TypeConversion
             set { _context = value; }
         }
 
-        public virtual bool SupportsReferences(Type sourceType)
+        public virtual bool SupportsReferences(Type sourceType, SerializationContext serializationContext)
         {
-            return SerializerHelper.IsReferenceable(sourceType);
+            Type targetType = GetSerializedType(sourceType);
+            return serializationContext.IsReferenceableType(targetType);
         }
     }
 }

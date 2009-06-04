@@ -83,5 +83,20 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="deserializer">deserializer instance to use to deserialize any child expressions</param>
         /// <returns>a fully deserialized object</returns>
         public abstract object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer);
+
+
+        /// <summary>
+        /// Check to see if the value to be handled by this handler should be treated as a reference type.  This method
+        /// will only be called for this handler if it returns true from CanHandle.  If this is a referenceable type,
+        /// then reference-handling logic will occur based on the ReferenceOption settings.
+        /// </summary>
+        /// <param name="value">the value to check</param>
+        /// <returns>true if the value is a type that should be treated as a reference type by the serializer</returns>
+        public virtual bool IsReferenceable(object value)
+        {
+            if (value == null)
+                return false;
+            return this.Context.IsReferenceableType(value.GetType());
+        }
     }
 }

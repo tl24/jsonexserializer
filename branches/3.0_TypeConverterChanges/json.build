@@ -11,7 +11,7 @@
 	<property name="test.output.dir" value="${tests}/bin/${configuration}" />
 	<property name="perf.test.output.dir" value="${perf.tests}/bin/${configuration}" />
 	<property name="run.perf.tests" value="true" />
-	<property name="info.version" value="3.0" />
+	<property name="info.version" value="3.01" />
 	<property name="version.tag" value="" />
 	<property name="version.tag.file" value="" />
 	

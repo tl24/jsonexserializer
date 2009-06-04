@@ -12,7 +12,7 @@ namespace JsonExSerializer.Framework.Parsing
     /// <summary>
     /// The type for a given token
     /// </summary>
-    enum TokenType
+    public enum TokenType
     {
         Number,
         Identifier,
@@ -24,7 +24,7 @@ namespace JsonExSerializer.Framework.Parsing
     /// <summary>
     /// Structure to represent a token from the input stream
     /// </summary>
-    struct Token
+    public struct Token
     {
         public static Token Empty = new Token();
 

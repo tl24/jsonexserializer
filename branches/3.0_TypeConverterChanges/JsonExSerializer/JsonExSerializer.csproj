@@ -83,7 +83,9 @@
     <Compile Include="Framework\ExpressionHandlers\TypeConverterExpressionHandler.cs" />
     <Compile Include="Framework\ExpressionHandlers\ValueExpressionHandler.cs" />
     <Compile Include="Framework\ExpressionHandlers\ExpressionHandlerCollection.cs" />
+    <Compile Include="Framework\Parsing\Evaluator.cs" />
     <Compile Include="Framework\ReflectionUtils.cs" />
+    <Compile Include="Framework\Visitors\DefaultVisitor.cs" />
     <Compile Include="Framework\Visitors\ReferenceVisitor.cs" />
     <Compile Include="Framework\Expressions\ValueExpression.cs" />
     <Compile Include="Framework\Parsing\AssignReferenceStage.cs" />

@@ -10,6 +10,7 @@ using System.IO;
 using System.Globalization;
 using JsonExSerializer.Framework;
 using JsonExSerializer.Framework.Parsing;
+using JsonExSerializer.Framework.Expressions;
 
 namespace JsonExSerializer
 {
@@ -123,11 +124,11 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="o">the object to serialize</param>
         /// <param name="writer">writer for the serialized data</param>
-        public void Serialize(object o, TextWriter writer)
+        public virtual void Serialize(object o, TextWriter writer)
         {
             if (writer == null)
                 throw new ArgumentNullException("writer");
-            SerializerHelper helper = new SerializerHelper(_serializedType, _context, writer);
+            SerializerHelper helper = new SerializerHelper(this.SerializedType, _context, writer);
             helper.Serialize(o);
         }
 
@@ -172,12 +173,24 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="reader">TextReader to read the data from</param>
         /// <returns>the deserialized object</returns>
-        public object Deserialize(TextReader reader)
+        public virtual object Deserialize(TextReader reader)
+        {
+            Expression expr = Parse(reader);
+            return Evaluate(expr);
+        }
+
+        protected virtual Expression Parse(TextReader reader)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
-            Parser p = new Parser(_serializedType, reader, _context);
+            Parser p = new Parser(this.SerializedType, reader, this.Context);
             return p.Parse();
+        }
+
+        protected virtual object Evaluate(Expression expression)
+        {
+            Evaluator eval = new Evaluator(this.Context);
+            return eval.Evaluate(expression);
         }
 
         /// <summary>
@@ -208,5 +221,13 @@ namespace JsonExSerializer
             get { return this._context; }
         }
 
+        /// <summary>
+        /// The expected type of object to be serailized or deserialized.  This may be a base
+        /// class of the actual type, including System.Object.
+        /// </summary>
+        public Type SerializedType
+        {
+            get { return this._serializedType; }
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace JsonExSerializer.Framework.Expressions
     /// <summary>
     /// The base class for all expressions
     /// </summary>
-    public abstract class Expression
+    public abstract class Expression : IVisitable
     {
 
         private Expression _parent;
@@ -81,7 +81,7 @@ namespace JsonExSerializer.Framework.Expressions
         /// <summary>
         /// Accept a visitor to this node
         /// </summary>
-        public void Accept(VisitorBase visitor)
+        public void Accept(IVisitor visitor)
         {
             visitor.Visit(this);
         }

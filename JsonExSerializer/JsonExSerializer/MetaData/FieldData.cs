@@ -18,30 +18,6 @@ namespace JsonExSerializer.MetaData
         public FieldData(FieldInfo field)
             : base(field)
         {
-            Initialize();
-        }
-
-        /// <summary>
-        /// Constructs a FieldHandler for a field on a type that is also a constructor
-        /// parameter at the specified position in the constructor arguments.
-        /// </summary>
-        /// <param name="field">field info</param>
-        /// <param name="position">its position in the constructor</param>
-        public FieldData(FieldInfo field, int position)
-            : base(field, position)
-        {
-            Initialize();
-            this.position = position;
-        }
-
-        private void Initialize()
-        {
-            Initialize(Field);
-            if (Field.IsDefined(typeof(JsonExIgnoreAttribute), false))
-                this.Ignored = true;
-
-            if (Field.IsDefined(typeof(JsonExPropertyAttribute), false) || IsConstructorArgument)
-                this.Ignored = false;
         }
 
         /// <summary>

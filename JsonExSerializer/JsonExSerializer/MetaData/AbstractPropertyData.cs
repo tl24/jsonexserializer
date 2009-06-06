@@ -49,6 +49,12 @@ namespace JsonExSerializer.MetaData
                     throw new InvalidOperationException("Position is invalid when the property is not a constructor argument");
                 return position; 
             }
+            set
+            {
+                this.position = value;
+                if (this.position >= 0)
+                    this.Ignored = false;
+            }
         }
 
         /// <summary>
@@ -92,7 +98,8 @@ namespace JsonExSerializer.MetaData
             set
             {
                 this.constructorParameterName = value;
-                this.Ignored = false;
+                if (!string.IsNullOrEmpty(this.constructorParameterName))
+                    this.Ignored = false;
             }
         }
 

@@ -265,7 +265,9 @@ namespace JsonExSerializer.MetaData
         /// <returns></returns>
         protected virtual PropertyData CreatePropertyHandler(PropertyInfo Property)
         {
-            return new PropertyData(Property);
+            PropertyData propData = new PropertyData(Property);
+            context.TypeHandlerFactory.ProcessAttributes(propData, Property);
+            return propData;
         }
 
         /// <summary>
@@ -275,7 +277,9 @@ namespace JsonExSerializer.MetaData
         /// <returns></returns>
         protected virtual FieldData CreateFieldHandler(FieldInfo Field)
         {
-            return new FieldData(Field);
+            FieldData fieldData = new FieldData(Field);
+            context.TypeHandlerFactory.ProcessAttributes(fieldData, Field);
+            return fieldData;
         }
 
         /// <summary>
@@ -462,12 +466,7 @@ namespace JsonExSerializer.MetaData
 
         protected override IJsonTypeConverter CreateTypeConverter()
         {
-            IJsonTypeConverter converter = CreateTypeConverter(ForType);
-            if (converter == null)
-                return TypeConverterAdapter.GetAdapter(ForType);
-                //return null;
-            else
-                return converter;
+            return TypeConverterAdapter.GetAdapter(ForType);
         }
 
         public override IJsonTypeConverter TypeConverter

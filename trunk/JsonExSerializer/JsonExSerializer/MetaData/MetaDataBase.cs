@@ -75,35 +75,9 @@ namespace JsonExSerializer.MetaData
         /// Constructs the type converter instance for this instance, if applicable
         /// </summary>
         /// <returns>constructed type converter, or null if no converter defined</returns>
-        protected abstract IJsonTypeConverter CreateTypeConverter();
-
-        /// <summary>
-        /// Constructs a type converter defined by the custom attributes of this member
-        /// </summary>
-        /// <param name="provider">Customer attribute provider to read custom attributes from</param>
-        /// <returns>constructed type converter or null if no converter defined</returns>
-        protected IJsonTypeConverter CreateTypeConverter(ICustomAttributeProvider provider)
+        protected virtual IJsonTypeConverter CreateTypeConverter()
         {
-            if (provider.IsDefined(typeof(JsonConvertAttribute), false)) {
-                JsonConvertAttribute convAttr = (JsonConvertAttribute)provider.GetCustomAttributes(typeof(JsonConvertAttribute), false)[0];
-                return CreateTypeConverter(convAttr);
-            }
             return null;
-        }
-
-        /// <summary>
-        /// Constructs a converter from the convert attribute
-        /// </summary>
-        /// <param name="attribute">the JsonConvertAttribute decorating a property or class</param>
-        /// <returns>converter</returns>
-        private static IJsonTypeConverter CreateTypeConverter(JsonConvertAttribute attribute)
-        {
-            IJsonTypeConverter converter = (IJsonTypeConverter)Activator.CreateInstance(attribute.Converter);
-            if (attribute.Context != null)
-            {
-                converter.Context = attribute.Context;
-            }            
-            return converter;
         }
     }
 }

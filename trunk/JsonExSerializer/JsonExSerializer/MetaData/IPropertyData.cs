@@ -34,7 +34,7 @@ namespace JsonExSerializer.MetaData
         /// Returns the 0-based index in the constructor arguments for a constructor parameter
         /// </summary>
         [Obsolete("Named constructor parameters should be used instead of Position")]
-        int Position { get; }
+        int Position { get; set; }
 
 
         /// <summary>

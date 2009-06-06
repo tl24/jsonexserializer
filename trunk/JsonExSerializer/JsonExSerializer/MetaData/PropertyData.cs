@@ -45,14 +45,12 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         private void Initialize()
         {
-            Initialize(Property);
-            if (Property.IsDefined(typeof(JsonExIgnoreAttribute), false)
-                || !(Property.GetGetMethod().GetParameters().Length == 0 && Property.CanRead)
+            if (!(Property.GetGetMethod().GetParameters().Length == 0 && Property.CanRead)
                 || (!Property.CanWrite))
             {
                 this.Ignored = true;
             }
-            if (Property.IsDefined(typeof(JsonExPropertyAttribute), false) || IsConstructorArgument)
+            if (IsConstructorArgument)
                 this.Ignored = false;
         }
 

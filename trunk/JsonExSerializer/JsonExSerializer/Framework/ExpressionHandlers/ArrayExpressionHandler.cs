@@ -52,7 +52,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
             TypeData handler = Context.GetTypeHandler(data.GetType());
 
-            CollectionHandler collectionHandler = handler.GetCollectionHandler();
+            CollectionHandler collectionHandler = handler.CollectionHandler;
             Type elemType = collectionHandler.GetItemType(handler.ForType);
 
             int index = 0;
@@ -147,7 +147,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
             Type listType = collection != null ? collection.GetType() : list.ResultType;
             TypeData typeHandler = Context.GetTypeHandler(listType);
-            CollectionHandler collHandler = typeHandler.GetCollectionHandler();
+            CollectionHandler collHandler = typeHandler.CollectionHandler;
             itemType = collHandler.GetItemType(listType);
             if (itemType == null)
                 throw new Exception("Null item type returned from " + collHandler.GetType() + " for Collection type: " + listType);

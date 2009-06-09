@@ -76,6 +76,7 @@
     <Compile Include="Mocks\SpecializedMock.cs" />
     <Compile Include="Mocks\StronglyTypedCollection.cs" />
     <Compile Include="Mocks\SubClassMock.cs" />
+    <Compile Include="Mocks\XmlIgnoreMock.cs" />
     <Compile Include="ReadOnlyPropertyTests\ArrayParent.cs" />
     <Compile Include="ReadOnlyPropertyTests\CollectionItem.cs" />
     <Compile Include="ReadOnlyPropertyTests\CollectionParent.cs" />

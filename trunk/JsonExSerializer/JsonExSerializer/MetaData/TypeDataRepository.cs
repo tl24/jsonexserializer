@@ -25,6 +25,7 @@ namespace JsonExSerializer.MetaData
             _attributeProcessors.Add(new JsonPropertyAttributeProcessor());
             _attributeProcessors.Add(new ConstructorParameterAttributeProcessor());
             _attributeProcessors.Add(new TypeConverterAttributeProcessor());
+            _attributeProcessors.Add(new JsonCollectionAttributeProcessor());
         }
 
         public SerializationContext Context

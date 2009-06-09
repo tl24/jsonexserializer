@@ -107,9 +107,11 @@
     <Compile Include="MetaData\AbstractPropertyData.cs" />
     <Compile Include="MetaData\Attributes\AttributeProcessor.cs" />
     <Compile Include="MetaData\Attributes\ConstructorParameterAttributeProcessor.cs" />
+    <Compile Include="MetaData\Attributes\JsonCollectionAttributeProcessor.cs" />
     <Compile Include="MetaData\Attributes\TypeConverterAttributeProcessor.cs" />
     <Compile Include="MetaData\Attributes\JsonPropertyAttributeProcessor.cs" />
     <Compile Include="MetaData\Attributes\JsonIgnoreAttributeProcessor.cs" />
+    <Compile Include="MetaData\Attributes\XmlIgnoreAttributeProcessor.cs" />
     <Compile Include="MetaData\CustomTypeDataRepository.cs" />
     <Compile Include="MetaData\DynamicMethodUtil.cs" />
     <Compile Include="MetaData\DynamicPropertyData.cs" />

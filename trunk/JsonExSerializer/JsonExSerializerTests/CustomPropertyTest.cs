@@ -120,7 +120,8 @@ namespace JsonExSerializerTests
 
         protected override JsonExSerializer.TypeConversion.IJsonTypeConverter CreateTypeConverter()
         {
-            return CreateTypeConverter(PropertyType);
+            //return CreateTypeConverter(PropertyType);
+            return null;
         }
 
         public override bool Ignored

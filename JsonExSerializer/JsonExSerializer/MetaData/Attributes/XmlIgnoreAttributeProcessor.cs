@@ -1,0 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Reflection;
+using JsonExSerializer.Framework;
+using System.Xml.Serialization;
+
+namespace JsonExSerializer.MetaData.Attributes
+{
+    public class XmlIgnoreAttributeProcessor : AttributeProcessor
+    {
+        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, SerializationContext serializationContext)
+        {
+            if (metaData is IPropertyData)
+            {
+                IPropertyData property = (IPropertyData)metaData;
+                if (attributeProvider.IsDefined(typeof(XmlIgnoreAttribute), false))
+                    property.Ignored = true;
+            }
+        }
+    }
+}

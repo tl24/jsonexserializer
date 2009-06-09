@@ -389,16 +389,13 @@ namespace JsonExSerializer.MetaData
         {
             if (!collectionLookedUp)
             {
-                if (this.ForType.IsDefined(typeof(JsonExCollectionAttribute), true))
-                    collectionHandler = GetCollectionHandlerFromAttribute();
-                else
-                    collectionHandler = FindCollectionHandler();
+                collectionHandler = FindCollectionHandler();
                 collectionLookedUp = true;
             }
             return collectionHandler != null;
         }
 
-        private CollectionHandler FindCollectionHandler()
+        public CollectionHandler FindCollectionHandler()
         {
             foreach (CollectionHandler handler in context.CollectionHandlers)
             {
@@ -409,52 +406,13 @@ namespace JsonExSerializer.MetaData
             }
             return null;
         }
-
-        /// <summary>
-        /// Reads the JsonExCollection attribute for the class and loads the collection handler from that.  It first
-        /// checks the list of collectionhandlers to see if its already been loaded.
-        /// </summary>
-        /// <returns>CollectionHandler specified by the JsonExCollection attribute</returns>
-        protected virtual CollectionHandler GetCollectionHandlerFromAttribute() {
-            JsonExCollectionAttribute attr = ((JsonExCollectionAttribute[])this.ForType.GetCustomAttributes(typeof(JsonExCollectionAttribute), true))[0];
-            if (!attr.IsValid())
-                throw new Exception("Invalid JsonExCollectionAttribute specified for " + this.ForType + ", either CollectionHandlerType or ItemType or both must be specified");
-
-            Type collHandlerType = attr.GetCollectionHandlerType();
-            Type itemType = attr.GetItemType();
-
-            // Try exact type match first
-            CollectionHandler handler = null;
-
-            if (collHandlerType == null) {
-                handler = FindCollectionHandler();
-                handler = new CollectionHandlerWrapper(handler, this.ForType, itemType);
-            }
-
-            if (handler == null)
-            {
-                handler = context.CollectionHandlers.Find(delegate(CollectionHandler h) { return h.GetType() == collHandlerType; });
-                if (handler != null)
-                    return handler;
-
-                // try inherited type next
-                handler = context.CollectionHandlers.Find(delegate(CollectionHandler h) { return collHandlerType.IsInstanceOfType(h); });
-                if (handler != null)
-                    return handler;
-
-                // create the handler
-                handler = (CollectionHandler)Activator.CreateInstance(collHandlerType);
-            }
-
-            // install the handler
-            context.RegisterCollectionHandler(handler);
-            return handler;
-        }
+        
         /// <summary>
         /// Returns a collection handler if this object is a collection
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
+        [Obsolete("Use the CollectionHandler property instead")]
         public virtual CollectionHandler GetCollectionHandler()
         {
             if (IsCollection()) {
@@ -462,6 +420,16 @@ namespace JsonExSerializer.MetaData
             } else {
                 throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
             }            
+        }
+
+        public virtual CollectionHandler CollectionHandler
+        {
+            get { return GetCollectionHandler(); }
+            set
+            {
+                this.collectionHandler = value;
+                collectionLookedUp = true;
+            }
         }
 
         protected override IJsonTypeConverter CreateTypeConverter()

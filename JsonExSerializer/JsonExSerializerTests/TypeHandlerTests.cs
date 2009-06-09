@@ -7,6 +7,7 @@ using JsonExSerializer.MetaData;
 using JsonExSerializerTests.Mocks;
 using JsonExSerializer.Collections;
 using MbUnit.Core.Exceptions;
+using JsonExSerializer.MetaData.Attributes;
 
 namespace JsonExSerializerTests
 {
@@ -41,20 +42,20 @@ namespace JsonExSerializerTests
         public void IsCollection_ReturnsAttributeValueForJsonExCollection()
         {
             SerializationContext context = new SerializationContext();
-            TypeData CollectionTypeHandler = new TypeData(typeof(StronglyTypedCollection), context);
+            TypeData CollectionTypeHandler = context.TypeHandlerFactory[typeof(StronglyTypedCollection)];
             Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
-            Assert.IsInstanceOfType(typeof(StronglyTypedCollectionHandler), CollectionTypeHandler.GetCollectionHandler(), "Wrong collection handler");
-            Assert.AreSame(typeof(string), CollectionTypeHandler.GetCollectionHandler().GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
+            Assert.IsInstanceOfType(typeof(StronglyTypedCollectionHandler), CollectionTypeHandler.CollectionHandler, "Wrong collection handler");
+            Assert.AreSame(typeof(string), CollectionTypeHandler.CollectionHandler.GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
         }
 
         [Test]
         public void IsCollection_ReturnsDefaultValueForJsonExCollection_WhenItemTypeOnlySpecified()
         {
             SerializationContext context = new SerializationContext();
-            TypeData CollectionTypeHandler = new TypeData(typeof(StronglyTypedCollection2), context);
+            TypeData CollectionTypeHandler = context.TypeHandlerFactory[typeof(StronglyTypedCollection2)];
             Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
-            Assert.IsInstanceOfType(typeof(CollectionHandlerWrapper), CollectionTypeHandler.GetCollectionHandler(), "Wrong collection handler");
-            Assert.AreSame(typeof(string), CollectionTypeHandler.GetCollectionHandler().GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
+            Assert.IsInstanceOfType(typeof(CollectionHandlerWrapper), CollectionTypeHandler.CollectionHandler, "Wrong collection handler");
+            Assert.AreSame(typeof(string), CollectionTypeHandler.CollectionHandler.GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
         }
 
         [Test]
@@ -89,6 +90,15 @@ namespace JsonExSerializerTests
             SerializationContext context = new SerializationContext();
             TypeData handler = context.GetTypeHandler(typeof(SimpleObject));
                 handler.IgnoreProperty("Foo");
+        }
+
+        [Test]
+        public void AttributeProcessors_CustomProcessor_XmlIgnore()
+        {
+            SerializationContext context = new SerializationContext();
+            context.TypeHandlerFactory.AttributeProcessors.Add(new XmlIgnoreAttributeProcessor());
+            TypeData handler = context.GetTypeHandler(typeof(XmlIgnoreMock));
+            Assert.IsTrue(handler.FindProperty("Salary").Ignored, "XmlIgnore attribute not ignored");
         }
 
         public class EmptyClass

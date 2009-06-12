@@ -11,17 +11,19 @@ namespace JsonExSerializer.MetaData
         private DynamicMethodUtil.GenericGetter _getter;
         private DynamicMethodUtil.GenericSetter _setter;
 
-        public DynamicPropertyData(PropertyInfo PropertyInfo)
-            : base(PropertyInfo)
+        public DynamicPropertyData(PropertyInfo PropertyInfo, TypeData parent)
+            : base(PropertyInfo, parent)
         {
             Initialize();
         }
 
+        /*
         public DynamicPropertyData(PropertyInfo PropertyInfo, int Position)
             : base(PropertyInfo, Position)
         {
             Initialize();
         }
+        */
 
         private void Initialize()
         {

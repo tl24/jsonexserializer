@@ -76,5 +76,15 @@ namespace JsonExSerializer.MetaData
         ///<param name="value">the value to set the property to</param>
         void SetValue(object instance, object value);
 
+        /// <summary>
+        /// Check to see if this property should be written to the stream for the given value
+        /// </summary>
+        /// <param name="value">the value to be written</param>
+        /// <returns>true if the value should be written, false otherwise</returns>
+        bool ShouldWriteValue(SerializationContext context, object value);
+
+        DefaultValueOption DefaultValueSetting { get; set; }
+
+        object DefaultValue { get; set; }
     }
 }

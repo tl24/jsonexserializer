@@ -18,7 +18,7 @@ namespace JsonExSerializer.MetaData
 
         protected override PropertyData CreatePropertyHandler(PropertyInfo Property)
         {
-            return new DynamicPropertyData(Property);
+            return new DynamicPropertyData(Property, this);
         }
 
         public override object CreateInstance(object[] args)

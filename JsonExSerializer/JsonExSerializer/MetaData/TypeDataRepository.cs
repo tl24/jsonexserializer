@@ -23,6 +23,7 @@ namespace JsonExSerializer.MetaData
             _attributeProcessors = new List<AttributeProcessor>();
             _attributeProcessors.Add(new JsonIgnoreAttributeProcessor());
             _attributeProcessors.Add(new JsonPropertyAttributeProcessor());
+            _attributeProcessors.Add(new JsonDefaultAttributeProcessor());
             _attributeProcessors.Add(new ConstructorParameterAttributeProcessor());
             _attributeProcessors.Add(new TypeConverterAttributeProcessor());
             _attributeProcessors.Add(new JsonCollectionAttributeProcessor());

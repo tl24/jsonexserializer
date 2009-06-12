@@ -28,6 +28,7 @@ namespace JsonExSerializer
         private bool _isCompact;
         private bool _outputTypeComment;
         private bool _outputTypeInformation;
+
         public enum ReferenceOption
         {
             WriteIdentifier,
@@ -51,6 +52,7 @@ namespace JsonExSerializer
         private List<IParsingStage> _parsingStages;
 
         private ExpressionHandlerCollection expressionHandlers;
+        private DefaultValueCollection defaultValues;
 
         /// <summary>
         /// Set of options for handling Ignored properties encountered upon Deserialization
@@ -93,6 +95,7 @@ namespace JsonExSerializer
             _typeHandlerFactory.RegisterTypeConverter(typeof(System.Collections.BitArray), new BitArrayConverter());
 
             this.expressionHandlers = new ExpressionHandlerCollection(this);
+            this.defaultValues = new DefaultValueCollection();
         }
 
         #endregion
@@ -279,6 +282,15 @@ namespace JsonExSerializer
             }
         }
 
+        /// <summary>
+        /// Gets or sets the default value for a specified type
+        /// </summary>
+        public DefaultValueCollection DefaultValues
+        {
+            get { return this.defaultValues; }
+            set { this.defaultValues = value; }
+        }
+
         public void SetContextAware(object value)
         {
             IContextAware contextAware = value as IContextAware;
@@ -375,6 +387,23 @@ namespace JsonExSerializer
         }
 
         #endregion
+    }
 
+    public enum DefaultValueOption
+    {
+        /// <summary>
+        /// The default value setting, which is usually inherited from the parent
+        /// </summary>
+        Default = 0,
+
+        /// <summary>
+        /// Default values are suppress for this item
+        /// </summary>
+        SuppressDefaultValues = 1,
+
+        /// <summary>
+        /// All values are written for this item, default values are not suppressed
+        /// </summary>
+        WriteAllValues = 2
     }
 }

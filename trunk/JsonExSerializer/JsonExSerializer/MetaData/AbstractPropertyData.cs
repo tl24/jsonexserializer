@@ -10,6 +10,9 @@ namespace JsonExSerializer.MetaData
     /// </summary>
     public abstract class AbstractPropertyData : MetaDataBase, IPropertyData
     {
+        protected object defaultValue;
+        protected TypeData parent;
+        protected bool defaultValueSet;
         /// <summary>
         /// Ignored flag
         /// </summary>
@@ -29,9 +32,10 @@ namespace JsonExSerializer.MetaData
         /// Initializes an instance for the specific declaring type
         /// </summary>
         /// <param name="forType">the declaring type for this property</param>
-        protected AbstractPropertyData(Type forType)
+        protected AbstractPropertyData(Type forType, TypeData parent)
             : base(forType)
         {
+            this.parent = parent;
         }
 
         /// <summary>
@@ -121,9 +125,38 @@ namespace JsonExSerializer.MetaData
         {
             get { return true; }
         }
+
         public override string ToString()
         {
             return PropertyType.ToString() + " " + Name;
+        }
+
+        public bool ShouldWriteValue(SerializationContext context, object value)
+        {
+            if (GetEffectiveDefaultValueSetting() == DefaultValueOption.SuppressDefaultValues)
+            {
+                return !object.Equals(DefaultValue, value);
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public object DefaultValue
+        {
+            get
+            {
+                if (defaultValueSet)
+                    return this.defaultValue;
+                else
+                    return parent.Context.DefaultValues[this.PropertyType];
+            }
+            set
+            {
+                this.defaultValue = value;
+                this.defaultValueSet = true;
+            }
         }
     }
 }

@@ -265,7 +265,7 @@ namespace JsonExSerializer.MetaData
         /// <returns></returns>
         protected virtual PropertyData CreatePropertyHandler(PropertyInfo Property)
         {
-            PropertyData propData = new PropertyData(Property);
+            PropertyData propData = new PropertyData(Property, this);
             context.TypeHandlerFactory.ProcessAttributes(propData, Property);
             return propData;
         }
@@ -277,7 +277,7 @@ namespace JsonExSerializer.MetaData
         /// <returns></returns>
         protected virtual FieldData CreateFieldHandler(FieldInfo Field)
         {
-            FieldData fieldData = new FieldData(Field);
+            FieldData fieldData = new FieldData(Field, this);
             context.TypeHandlerFactory.ProcessAttributes(fieldData, Field);
             return fieldData;
         }
@@ -290,6 +290,11 @@ namespace JsonExSerializer.MetaData
         public virtual object CreateInstance(object[] args)
         {
             return Activator.CreateInstance(this.ForType, args);
+        }
+
+        public virtual SerializationContext Context
+        {
+            get { return this.context; }
         }
 
         /// <summary>
@@ -464,5 +469,4 @@ namespace JsonExSerializer.MetaData
             }
         }
     }
-
 }

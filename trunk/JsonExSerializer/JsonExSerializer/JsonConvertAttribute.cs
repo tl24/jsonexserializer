@@ -9,7 +9,7 @@ using System.Text;
 
 namespace JsonExSerializer
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Enum | AttributeTargets.Struct,AllowMultiple=false,Inherited=false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Enum | AttributeTargets.Struct,AllowMultiple=false,Inherited=false)]
     public sealed class JsonConvertAttribute : System.Attribute
     {
         private Type _converter;

@@ -22,23 +22,11 @@ namespace JsonExSerializer.MetaData
         /// not a constructor argument.
         /// </summary>
         /// <param name="property">the backing property object</param>
-        public PropertyData(PropertyInfo property) : base(property)
+        public PropertyData(PropertyInfo property, TypeData parent) : base(property, parent)
         {
             Initialize();
         }
 
-        /// <summary>
-        /// Initializes an instance of PropertyData with the specified PropertyInfo object that is also
-        /// a Constructor Parameter at the specified <paramref name="position"/>.
-        /// </summary>
-        /// <param name="property">the backing property object</param>
-        /// <param name="position">the property's 0-based index in the constructor arguments</param>
-        public PropertyData(PropertyInfo property, int position)
-            : base(property, position)
-        {
-            Initialize();
-            this.position = position;
-        }
 
         /// <summary>
         /// Initializes the object

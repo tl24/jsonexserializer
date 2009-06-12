@@ -44,23 +44,38 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
 
             foreach (IPropertyData prop in handler.Properties)
             {
-                object value = prop.GetValue(data);
-                Expression valueExpr;
-                if (prop.HasConverter)
-                {
-                    valueExpr = serializer.Serialize(value, currentPath.Append(prop.Name), prop.TypeConverter);
-                }
-                else
-                {
-                    valueExpr = serializer.Serialize(value, currentPath.Append(prop.Name));
-                }
-                if (value != null && !ReflectionUtils.AreEquivalentTypes(value.GetType(), prop.PropertyType))
-                {
-                    valueExpr = new CastExpression(value.GetType(), valueExpr);
-                }
-                expression.Add(prop.Name, valueExpr);
+                GenerateItemExpression(data, currentPath, serializer, expression, prop);
             }
             return expression;
+        }
+
+        /// <summary>
+        /// Generates an expression for an item and adds it to the object
+        /// </summary>
+        /// <param name="data">the item being serialized</param>
+        /// <param name="currentPath">the current path to the object</param>
+        /// <param name="serializer">serializer instance</param>
+        /// <param name="expression">the object expression</param>
+        /// <param name="prop">the property being serialized</param>
+        protected virtual void GenerateItemExpression(object data, JsonPath currentPath, ISerializerHandler serializer, ObjectExpression expression, IPropertyData prop)
+        {
+            object value = prop.GetValue(data);
+            if (!prop.ShouldWriteValue(this.Context, value))
+                return;
+            Expression valueExpr;
+            if (prop.HasConverter)
+            {
+                valueExpr = serializer.Serialize(value, currentPath.Append(prop.Name), prop.TypeConverter);
+            }
+            else
+            {
+                valueExpr = serializer.Serialize(value, currentPath.Append(prop.Name));
+            }
+            if (value != null && !ReflectionUtils.AreEquivalentTypes(value.GetType(), prop.PropertyType))
+            {
+                valueExpr = new CastExpression(value.GetType(), valueExpr);
+            }
+            expression.Add(prop.Name, valueExpr);
         }
 
         /// <summary>

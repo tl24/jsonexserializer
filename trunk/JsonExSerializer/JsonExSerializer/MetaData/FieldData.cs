@@ -15,8 +15,8 @@ namespace JsonExSerializer.MetaData
         /// parameter
         /// </summary>
         /// <param name="field">field info</param>
-        public FieldData(FieldInfo field)
-            : base(field)
+        public FieldData(FieldInfo field, TypeData parent)
+            : base(field, parent)
         {
         }
 

@@ -43,6 +43,7 @@
     <Compile Include="CollectionsTests.cs" />
     <Compile Include="ConversionTests.cs" />
     <Compile Include="CustomPropertyTest.cs" />
+    <Compile Include="DefaultValuesTests.cs" />
     <Compile Include="DeserializePrimitiveTests.cs" />
     <Compile Include="Expressions\CustomExpressionHandlerTests.cs" />
     <Compile Include="Expressions\CustomParsingStageTests.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Mocks\ConvertedObject.cs" />
     <Compile Include="Mocks\MockCallbackObject.cs" />
     <Compile Include="Mocks\MockCollectionConverter.cs" />
+    <Compile Include="Mocks\MockDefaultValues.cs" />
     <Compile Include="Mocks\MockFields.cs" />
     <Compile Include="Mocks\MockFlagsEnum.cs" />
     <Compile Include="Mocks\MockReferenceObject.cs" />

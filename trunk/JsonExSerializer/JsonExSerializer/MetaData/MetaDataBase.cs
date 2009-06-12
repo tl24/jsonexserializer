@@ -12,6 +12,8 @@ namespace JsonExSerializer.MetaData
     /// </summary>
     public abstract class MetaDataBase
     {
+        protected DefaultValueOption defaultValueSetting;
+
         /// <summary>
         /// The declaring type for this member
         /// </summary>
@@ -78,6 +80,23 @@ namespace JsonExSerializer.MetaData
         protected virtual IJsonTypeConverter CreateTypeConverter()
         {
             return null;
+        }
+
+        public virtual DefaultValueOption DefaultValueSetting
+        {
+            get
+            {
+                return this.defaultValueSetting;
+            }
+            set
+            {
+                this.defaultValueSetting = value;
+            }
+        }
+
+        public virtual DefaultValueOption GetEffectiveDefaultValueSetting()
+        {
+            return this.DefaultValueSetting;
         }
     }
 }

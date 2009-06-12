@@ -31,11 +31,11 @@ namespace PerformanceTests.TestDomain
         protected override IList<IPropertyData> ReadDeclaredProperties()
         {
             IList<IPropertyData> properties = new List<IPropertyData>();
-            properties.Add(new FirstPH(this.ForType));
-            properties.Add(new LastPH(this.ForType));
-            properties.Add(new PhonePH(this.ForType));
-            properties.Add(new SSNPH(this.ForType));
-            properties.Add(new AgePH(this.ForType));
+            properties.Add(new FirstPH(this.ForType, this));
+            properties.Add(new LastPH(this.ForType, this));
+            properties.Add(new PhonePH(this.ForType, this));
+            properties.Add(new SSNPH(this.ForType, this));
+            properties.Add(new AgePH(this.ForType, this));
             return properties;
         }
     }
@@ -44,7 +44,7 @@ namespace PerformanceTests.TestDomain
     {
         private string _name;
 
-        public CustomerPHBase(Type forType, string name) : base(forType) {
+        public CustomerPHBase(Type forType, TypeData parent, string name) : base(forType, parent) {
             _name = name;
         }
 
@@ -63,8 +63,8 @@ namespace PerformanceTests.TestDomain
 
     public class FirstPH : CustomerPHBase
     {
-        public FirstPH(Type forType)
-            : base(forType, "FirstName")
+        public FirstPH(Type forType, TypeData parent)
+            : base(forType, parent, "FirstName")
         {
         }
 
@@ -83,8 +83,8 @@ namespace PerformanceTests.TestDomain
     }
     public class LastPH : CustomerPHBase
     {
-        public LastPH(Type forType)
-            : base(forType, "LastName")
+        public LastPH(Type forType, TypeData parent)
+            : base(forType, parent, "LastName")
         {
         }
 
@@ -103,8 +103,8 @@ namespace PerformanceTests.TestDomain
     }
     public class PhonePH : CustomerPHBase
     {
-        public PhonePH(Type forType)
-            : base(forType, "Phone")
+        public PhonePH(Type forType, TypeData parent)
+            : base(forType, parent, "Phone")
         {
         }
 
@@ -123,8 +123,8 @@ namespace PerformanceTests.TestDomain
     }
     public class SSNPH : CustomerPHBase
     {
-        public SSNPH(Type forType)
-            : base(forType, "Ssn")
+        public SSNPH(Type forType, TypeData parent)
+            : base(forType, parent, "Ssn")
         {
         }
 
@@ -143,8 +143,8 @@ namespace PerformanceTests.TestDomain
     }
     public class AgePH : CustomerPHBase
     {
-        public AgePH(Type forType)
-            : base(forType, "Age")
+        public AgePH(Type forType, TypeData parent)
+            : base(forType, parent, "Age")
         {
         }
 

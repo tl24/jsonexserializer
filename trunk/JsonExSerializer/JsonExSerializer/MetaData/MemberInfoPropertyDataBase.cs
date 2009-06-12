@@ -13,32 +13,12 @@ namespace JsonExSerializer.MetaData
     public abstract class MemberInfoPropertyDataBase : AbstractPropertyData
     {
         protected MemberInfo member;
-        protected MemberInfoPropertyDataBase(MemberInfo member)
-            : base(member.DeclaringType)
+        protected MemberInfoPropertyDataBase(MemberInfo member, TypeData parent)
+            : base(member.DeclaringType, parent)
         {
             this.member = member;
         }
-
-        protected MemberInfoPropertyDataBase(MemberInfo member, int position)
-            : this(member)
-        {
-            this.position = position;
-        }
-
-        protected MemberInfoPropertyDataBase(MemberInfo member, string constructorParameterName)
-            : this(member)
-        {
-            this.constructorParameterName = constructorParameterName;
-        }
-
-        protected MemberInfoPropertyDataBase(MemberInfo member, bool isConstructorParameter)
-            : base(member.DeclaringType)
-        {
-            this.member = member;
-            if (isConstructorParameter)
-                this.constructorParameterName = member.Name;
-        }
-
+        
         /// <summary>
         ///  The name of the property
         /// </summary>

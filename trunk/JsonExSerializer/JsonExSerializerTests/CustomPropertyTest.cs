@@ -70,8 +70,8 @@ namespace JsonExSerializerTests
         protected override IList<IPropertyData> ReadDeclaredProperties()
         {
             IList<IPropertyData> properties = base.ReadDeclaredProperties();
-            properties.Add(new MethodPairPropertyHandler(this.ForType, "Name"));
-            properties.Add(new MethodPairPropertyHandler(this.ForType, "ID"));
+            properties.Add(new MethodPairPropertyHandler(this.ForType, this, "Name"));
+            properties.Add(new MethodPairPropertyHandler(this.ForType, this, "ID"));
             return properties;
         }
 
@@ -83,13 +83,13 @@ namespace JsonExSerializerTests
         private string _setMethod;
         private string _propertyName;
 
-        public MethodPairPropertyHandler(Type DeclaringType, string Name)
-            : this(DeclaringType, "Get" + Name, "Set" + Name, Name)
+        public MethodPairPropertyHandler(Type DeclaringType, TypeData parent, string Name)
+            : this(DeclaringType, parent, "Get" + Name, "Set" + Name, Name)
         {
         }
 
-        public MethodPairPropertyHandler(Type DeclaringType, string GetMethod, string SetMethod, string PropertyName)
-            : base(DeclaringType)
+        public MethodPairPropertyHandler(Type DeclaringType, TypeData parent, string GetMethod, string SetMethod, string PropertyName)
+            : base(DeclaringType, parent)
         {
             _getMethod = GetMethod;
             _setMethod = SetMethod;

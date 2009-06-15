@@ -10,6 +10,7 @@ namespace JsonExSerializerTests.Mocks
         private int intDefault;
         private int intCustomDefault = 10;
         private string stringDefaultDisabled;
+        private short convertedValue = 32;
 
         [JsonExDefault]
         public int IntDefault
@@ -32,6 +33,33 @@ namespace JsonExSerializerTests.Mocks
             set { this.stringDefaultDisabled = value; }
         }
 
-        
+        [JsonExDefault(32)]
+        public short ConvertedValue
+        {
+            get { return this.convertedValue; }
+            set { this.convertedValue = value; }
+        }     
+   
+
+    }
+
+    [JsonExDefaultValues(typeof(string), "")]
+    [JsonExDefaultValues(typeof(short), 32)]
+    public class MockDefaultValuesCascade
+    {
+        private string emptyString = "";
+        private short convertedDefault = 32;
+
+        public string EmptyString
+        {
+            get { return this.emptyString; }
+            set { this.emptyString = value; }
+        }
+
+        public short ConvertedDefault
+        {
+            get { return this.convertedDefault; }
+            set { this.convertedDefault = value; }
+        }
     }
 }

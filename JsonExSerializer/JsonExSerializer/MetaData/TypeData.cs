@@ -52,6 +52,11 @@ namespace JsonExSerializer.MetaData
         private bool? empty;
 
         /// <summary>
+        /// Holds default values based on type
+        /// </summary>
+        private DefaultValueCollection _defaultValues;
+
+        /// <summary>
         /// Initializes an instance with the specific <paramref name="type"/> and
         /// <paramref name="context" />.
         /// </summary>
@@ -467,6 +472,37 @@ namespace JsonExSerializer.MetaData
             {
                 base.TypeConverter = value;
             }
+        }
+
+        public override DefaultValueOption GetEffectiveDefaultValueSetting()
+        {
+            DefaultValueOption option = base.GetEffectiveDefaultValueSetting();
+            if (option == DefaultValueOption.Default)
+                return Context.GetEffectiveDefaultValueSetting();
+            else
+                return option;
+        }
+
+        public virtual DefaultValueCollection DefaultValues
+        {
+            get
+            {
+                if (_defaultValues == null)
+                    _defaultValues = new DefaultValueCollection(Context.DefaultValues);
+                return _defaultValues;
+            }
+            set
+            {
+                _defaultValues = value;
+            }
+        }
+
+        public virtual object GetDefaultValue(Type forType)
+        {
+            if (_defaultValues == null)
+                return Context.DefaultValues[forType];
+            else
+                return _defaultValues[forType];
         }
     }
 }

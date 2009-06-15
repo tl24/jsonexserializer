@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
 
 namespace JsonExSerializer.MetaData
 {
@@ -150,13 +151,34 @@ namespace JsonExSerializer.MetaData
                 if (defaultValueSet)
                     return this.defaultValue;
                 else
-                    return parent.Context.DefaultValues[this.PropertyType];
+                    return parent.GetDefaultValue(this.PropertyType);
             }
             set
             {
-                this.defaultValue = value;
+                object newValue = value;
+                if (newValue != null && newValue.GetType() != this.PropertyType)
+                {
+                    try
+                    {
+                        newValue = Convert.ChangeType(newValue, this.PropertyType, CultureInfo.InvariantCulture);
+                    }
+                    catch
+                    {
+                    }
+                }
+                this.defaultValue = newValue;
                 this.defaultValueSet = true;
             }
         }
+
+        public override DefaultValueOption GetEffectiveDefaultValueSetting()
+        {
+            DefaultValueOption option = base.GetEffectiveDefaultValueSetting();
+            if (option == DefaultValueOption.Default)
+                return parent.GetEffectiveDefaultValueSetting();
+            else
+                return option;
+        }
+
     }
 }

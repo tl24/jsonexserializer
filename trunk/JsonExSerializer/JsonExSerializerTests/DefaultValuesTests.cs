@@ -75,7 +75,7 @@ namespace JsonExSerializerTests
         [Row("IntValue", -1)]
         [Row("LongValue", -20L)]
         [Row("FloatValue", -1f)]
-        [Row("DoubleValue", -100)]
+        [Row("DoubleValue", -100.0)]
         [Row("BoolValue", true)]
         [Row("StringValue", "none")]
         [Row("CharValue", ' ')]
@@ -118,6 +118,81 @@ namespace JsonExSerializerTests
             serializer.Context.OutputTypeComment = false;            
             string result = serializer.Serialize(mock);
             Assert.AreEqual(@"{""StringDefaultDisabled"":""test""}", result.Trim());
+        }
+
+        [Test]
+        public void WhenSuppressDefaultValuesOnType_CascadesToProperty()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData typeData = context.TypeHandlerFactory[typeof(SimpleObject)];
+            typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
+            IPropertyData property = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("IntValue");
+            Assert.IsFalse(property.ShouldWriteValue(context, 0));
+        }
+
+        [Test]
+        public void WhenDefaultValuesSetOnType_PropertyInheritsIt()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData typeData = context.TypeHandlerFactory[typeof(SimpleObject)];
+            typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
+            typeData.DefaultValues[typeof(string)] = "FromType";
+            IPropertyData property = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("StringValue");
+            Assert.IsFalse(property.ShouldWriteValue(context, "FromType"));
+            Assert.IsTrue(property.ShouldWriteValue(context, ""));
+        }
+
+        [Test]
+        public void WhenDefaultValuesSetOnContext_PropertyInheritsFromContextIfNotSetOnType()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData typeData = context.TypeHandlerFactory[typeof(SimpleObject)];
+            typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
+            context.DefaultValues[typeof(string)] = "FromType";
+            typeData.DefaultValues[typeof(int)] = 22;
+
+            IPropertyData stringProperty = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("StringValue");
+            Assert.IsFalse(stringProperty.ShouldWriteValue(context, "FromType"));
+            Assert.IsTrue(stringProperty.ShouldWriteValue(context, ""));
+
+            IPropertyData intProperty = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("IntValue");
+            Assert.IsFalse(intProperty.ShouldWriteValue(context, 22));
+            Assert.IsTrue(intProperty.ShouldWriteValue(context, 0));
+
+            IPropertyData shortProperty = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("ShortValue");
+            shortProperty.DefaultValue = (short)9;
+            Assert.IsFalse(shortProperty.ShouldWriteValue(context, (short)9));
+            Assert.IsTrue(shortProperty.ShouldWriteValue(context, 0));
+        }
+
+        [Test]
+        public void WhenDefaultValuesSetByAttributeOnType_PropertyInheritsIt()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData typeData = context.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
+            IPropertyData property = typeData.FindProperty("EmptyString");
+            Assert.IsFalse(property.ShouldWriteValue(context, ""));
+            Assert.IsTrue(property.ShouldWriteValue(context, null));
+        }
+
+        [Test]
+        public void DefaultValuesOnTypeAreConvertedIfNotSameType()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData typeData = context.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
+            IPropertyData property = typeData.FindProperty("ConvertedDefault");
+            Assert.IsFalse(property.ShouldWriteValue(context, (short)32));
+            Assert.IsTrue(property.ShouldWriteValue(context, 0));
+        }
+
+        [Test]
+        public void DefaultValuesOnPropertyAreConvertedIfNotSameType()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData typeData = context.TypeHandlerFactory[typeof(MockDefaultValues)];
+            IPropertyData property = typeData.FindProperty("ConvertedValue");
+            Assert.IsFalse(property.ShouldWriteValue(context, (short)32));
+            Assert.IsTrue(property.ShouldWriteValue(context, 0));
         }
     }
 }

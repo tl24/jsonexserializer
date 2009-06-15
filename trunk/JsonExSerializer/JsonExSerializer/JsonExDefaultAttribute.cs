@@ -4,6 +4,9 @@ using System.Text;
 
 namespace JsonExSerializer
 {
+    /// <summary>
+    /// This attribute can be applied to a property or field to suppress or enable default values being serialized.
+    /// </summary>
     [global::System.AttributeUsage(AttributeTargets.Property|AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
     public class JsonExDefaultAttribute : System.Attribute
     {

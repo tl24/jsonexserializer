@@ -53,6 +53,7 @@ namespace JsonExSerializer
 
         private ExpressionHandlerCollection expressionHandlers;
         private DefaultValueCollection defaultValues;
+        private DefaultValueOption defaultValueSetting = DefaultValueOption.WriteAllValues;
 
         /// <summary>
         /// Set of options for handling Ignored properties encountered upon Deserialization
@@ -161,11 +162,35 @@ namespace JsonExSerializer
         /// <summary>
         /// Controls the action taken when an ignored property is encountered upon deserialization
         /// </summary>
-        public IgnoredPropertyOption IgnoredPropertyAction
+        public virtual IgnoredPropertyOption IgnoredPropertyAction
         {
             get { return this._ignoredPropertyAction; }
             set { _ignoredPropertyAction = value; }
         }
+
+        /// <summary>
+        /// Controls whether properties of an object with the default value set are suppressed when being
+        /// serialized.  The default is to write all values during serialization.
+        /// </summary>
+        public virtual DefaultValueOption DefaultValueSetting
+        {
+            get { return this.defaultValueSetting; }
+            set { this.defaultValueSetting = value; }
+        }
+
+        /// <summary>
+        /// Gets the effective DefaultValueSetting in use
+        /// </summary>
+        /// <returns>DefaultValueSetting</returns>
+        public virtual DefaultValueOption GetEffectiveDefaultValueSetting()
+        {
+            //NOTE: We don't ever return Default, because the buck stops here
+            if (this.DefaultValueSetting == DefaultValueOption.SuppressDefaultValues)
+                return DefaultValueOption.SuppressDefaultValues;
+            else
+                return DefaultValueOption.WriteAllValues;
+        }
+
         #endregion
 
         #region Type Binding

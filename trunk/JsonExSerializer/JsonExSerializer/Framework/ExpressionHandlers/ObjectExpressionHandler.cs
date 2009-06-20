@@ -24,8 +24,8 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <summary>
         /// Initializes an instance with a Serialization Context
         /// </summary>
-        public ObjectExpressionHandler(SerializationContext context)
-            : base(context)
+        public ObjectExpressionHandler(IConfiguration config)
+            : base(config)
         {
         }
 
@@ -38,7 +38,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>json object expression</returns>
         public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
-             TypeData handler = Context.GetTypeHandler(data.GetType());
+             TypeData handler = Config.GetTypeHandler(data.GetType());
 
             ObjectExpression expression = new ObjectExpression();
 
@@ -60,7 +60,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         protected virtual void GenerateItemExpression(object data, JsonPath currentPath, IExpressionBuilder serializer, ObjectExpression expression, IPropertyData prop)
         {
             object value = prop.GetValue(data);
-            if (!prop.ShouldWriteValue(this.Context, value))
+            if (!prop.ShouldWriteValue(this.Config, value))
                 return;
             Expression valueExpr;
             if (prop.HasConverter)
@@ -102,7 +102,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>deserialized object</returns>
         public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
-            TypeData typeHandler = Context.GetTypeHandler(existingObject.GetType());
+            TypeData typeHandler = Config.GetTypeHandler(existingObject.GetType());
             ObjectExpression objectExpression = (ObjectExpression)expression;
             foreach (KeyValueExpression Item in objectExpression.Properties)
             {
@@ -114,7 +114,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 }
                 if (hndlr.Ignored)
                 {
-                    switch (Context.IgnoredPropertyAction)
+                    switch (Config.IgnoredPropertyAction)
                     {
                         case SerializationContext.IgnoredPropertyOption.Ignore:
                             continue;
@@ -133,7 +133,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 IJsonTypeConverter converter = null;
                 if (hndlr.HasConverter)
                 {
-                    converterHandler = (TypeConverterExpressionHandler) Context.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
+                    converterHandler = (TypeConverterExpressionHandler) Config.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
                     converter = hndlr.TypeConverter;
                 }
                 
@@ -169,12 +169,12 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>constructed, but unpopulated object</returns>
         protected virtual object ConstructObject(ObjectExpression expression, IDeserializerHandler deserializer)
         {
-            TypeData handler = Context.GetTypeHandler(expression.ResultType);
+            TypeData handler = Config.GetTypeHandler(expression.ResultType);
             // set the default type if none set
             if (expression.ConstructorArguments.Count > 0)
             {
                 // old way expects parameters in the constructor list
-                ResolveConstructorTypes(Context, expression);
+                ResolveConstructorTypes(Config, expression);
             }
             else
             {
@@ -212,12 +212,12 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         /// <param name="context">serialization context</param>
         /// <param name="expression">object expression</param>
-        protected static void ResolveConstructorTypes(SerializationContext context, ObjectExpression expression)
+        protected static void ResolveConstructorTypes(IConfiguration config, ObjectExpression expression)
         {
-            TypeData handler = context.GetTypeHandler(expression.ResultType);
+            TypeData handler = config.GetTypeHandler(expression.ResultType);
             Type[] definedTypes = GetConstructorParameterTypes(handler.ConstructorParameters);
 
-            CtorArgTypeResolver resolver = new CtorArgTypeResolver(expression, context, definedTypes);
+            CtorArgTypeResolver resolver = new CtorArgTypeResolver(expression, config, definedTypes);
             Type[] resolvedTypes = resolver.ResolveTypes();
             for (int i = 0; i < resolvedTypes.Length; i++)
             {

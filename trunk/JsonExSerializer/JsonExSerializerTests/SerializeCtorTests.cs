@@ -34,7 +34,7 @@ namespace JsonExSerializerTests
             ValueExpression StrExpr = new ValueExpression("name");
             expr.ConstructorArguments.Add(IDExpr);
             expr.ConstructorArguments.Add(StrExpr);
-            CtorArgTypeResolver resolver = new CtorArgTypeResolver(expr,s.Context);
+            CtorArgTypeResolver resolver = new CtorArgTypeResolver(expr,s.Config);
             Type[] argTypes = resolver.ResolveTypes();            
             CollectionAssert.AreElementsEqual(new Type[] { typeof(int), typeof(string) }, argTypes);
         }
@@ -51,14 +51,14 @@ namespace JsonExSerializerTests
             expr.ConstructorArguments.Add(IDExpr);
             expr.ConstructorArguments.Add(objExpr);
             Type[] definedTypes = new Type[] { typeof(int), typeof(MyObject2) };
-            CtorArgTypeResolver resolver = new CtorArgTypeResolver(expr, s.Context, definedTypes);
+            CtorArgTypeResolver resolver = new CtorArgTypeResolver(expr, s.Config, definedTypes);
             Type[] argTypes = resolver.ResolveTypes();
             CollectionAssert.AreElementsEqual(new Type[] { typeof(long), typeof(MyObject2) }, argTypes);
 
             // Try to construct
             IDExpr.ResultType = typeof(long);
             objExpr.ResultType = typeof(MyObject2);
-            Evaluator eval = new Evaluator(s.Context);
+            Evaluator eval = new Evaluator(s.Config);
             object result = eval.Evaluate(expr);
 
             

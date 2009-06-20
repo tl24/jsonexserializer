@@ -8,9 +8,7 @@ namespace JsonExSerializer.TypeConversion
     public abstract class JsonConverterBase : IJsonTypeConverter
     {
         protected object _context;
-
-        
-
+       
         public abstract Type GetSerializedType(Type sourceType);
 
         public abstract object ConvertFrom(object item, SerializationContext serializationContext);

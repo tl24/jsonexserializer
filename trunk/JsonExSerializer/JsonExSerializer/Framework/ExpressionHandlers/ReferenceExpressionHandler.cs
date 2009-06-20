@@ -19,14 +19,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         }
 
         /// <summary>
-        /// Initializes an instance with a Serialization Context
-        /// </summary>
-        public ReferenceExpressionHandler(SerializationContext Context)
-            : base(Context)
-        {
-        }
-
-        /// <summary>
         /// Returns a reference expression to the current data
         /// </summary>
         /// <param name="data">the object data</param>

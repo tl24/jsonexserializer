@@ -25,11 +25,11 @@ namespace JsonExSerializerTests
         public void WhenSuppressDefaultValuesOnProperty_ValueIsDefault_PropertyNotWritten(string propertyName)
         {
             Serializer serializer = new Serializer(typeof(SimpleObject));
-            SerializationContext context = serializer.Context;
-            IPropertyData property = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
+            IConfiguration config = serializer.Config;
+            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
             SimpleObject testObject = new SimpleObject();
             property.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
-            Assert.IsFalse(property.ShouldWriteValue(context, property.GetValue(testObject)));
+            Assert.IsFalse(property.ShouldWriteValue(config, property.GetValue(testObject)));
         }
 
         [RowTest]
@@ -46,11 +46,11 @@ namespace JsonExSerializerTests
         public void WhenWriteAllValuesOnProperty_ValueIsDefault_PropertyWritten(string propertyName)
         {
             Serializer serializer = new Serializer(typeof(SimpleObject));
-            SerializationContext context = serializer.Context;
-            IPropertyData property = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
+            IConfiguration config = serializer.Config;
+            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
             SimpleObject testObject = new SimpleObject();
             property.DefaultValueSetting = DefaultValueOption.WriteAllValues;
-            Assert.IsTrue(property.ShouldWriteValue(context, property.GetValue(testObject)));
+            Assert.IsTrue(property.ShouldWriteValue(config, property.GetValue(testObject)));
         }
 
         [RowTest]
@@ -65,10 +65,10 @@ namespace JsonExSerializerTests
         public void WhenSuppressDefaultValuesOnProperty_ValueIsNotDefault_PropertyIsWritten(string propertyName, object value)
         {
             Serializer serializer = new Serializer(typeof(SimpleObject));
-            SerializationContext context = serializer.Context;
-            IPropertyData property = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
+            IConfiguration config = serializer.Config;
+            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
             property.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
-            Assert.IsTrue(property.ShouldWriteValue(context, value));
+            Assert.IsTrue(property.ShouldWriteValue(config, value));
         }
 
         [RowTest]
@@ -83,29 +83,29 @@ namespace JsonExSerializerTests
         public void WhenSuppressDefaultValuesOnPropertyWithCustomDefault_ValueIsCustomDefault_PropertyIsNotWritten(string propertyName, object defaultValue)
         {
             Serializer serializer = new Serializer(typeof(SimpleObject));
-            SerializationContext context = serializer.Context;
-            IPropertyData property = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
+            IConfiguration config = serializer.Config;
+            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
             property.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             property.DefaultValue = defaultValue;
-            Assert.IsFalse(property.ShouldWriteValue(context, defaultValue));
+            Assert.IsFalse(property.ShouldWriteValue(config, defaultValue));
         }
 
         [Test]
         public void TestDefaultPropertyAttributes()
         {
-            SerializationContext context = new SerializationContext();
-            TypeData typeData = context.TypeHandlerFactory[typeof(MockDefaultValues)];
+            IConfiguration config = new SerializationContext();
+            TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValues)];
             IPropertyData intDefault = typeData.FindProperty("IntDefault");
             Assert.AreEqual(DefaultValueOption.SuppressDefaultValues, intDefault.DefaultValueSetting, "IntDefault DefaultValueSetting");
-            Assert.IsFalse(intDefault.ShouldWriteValue(context, 0));
+            Assert.IsFalse(intDefault.ShouldWriteValue(config, 0));
 
             IPropertyData intCustomDefault = typeData.FindProperty("IntCustomDefault");
             Assert.AreEqual(DefaultValueOption.SuppressDefaultValues, intCustomDefault.DefaultValueSetting, "IntCustomDefault DefaultValueSetting");
-            Assert.IsFalse(intCustomDefault.ShouldWriteValue(context, 10));
+            Assert.IsFalse(intCustomDefault.ShouldWriteValue(config, 10));
 
             IPropertyData stringDefaultDisabled = typeData.FindProperty("StringDefaultDisabled");
             Assert.AreEqual(DefaultValueOption.WriteAllValues, stringDefaultDisabled.DefaultValueSetting, "StringDefaultDisabled DefaultValueSetting");
-            Assert.IsTrue(stringDefaultDisabled.ShouldWriteValue(context, null));
+            Assert.IsTrue(stringDefaultDisabled.ShouldWriteValue(config, null));
         }
 
         [Test]
@@ -114,8 +114,8 @@ namespace JsonExSerializerTests
             Serializer serializer = new Serializer(typeof(MockDefaultValues));
             MockDefaultValues mock = new MockDefaultValues();
             mock.StringDefaultDisabled = "test";
-            serializer.Context.IsCompact = true;
-            serializer.Context.OutputTypeComment = false;            
+            serializer.Config.IsCompact = true;
+            serializer.Config.OutputTypeComment = false;            
             string result = serializer.Serialize(mock);
             Assert.AreEqual(@"{""StringDefaultDisabled"":""test""}", result.Trim());
         }
@@ -123,76 +123,76 @@ namespace JsonExSerializerTests
         [Test]
         public void WhenSuppressDefaultValuesOnType_CascadesToProperty()
         {
-            SerializationContext context = new SerializationContext();
-            TypeData typeData = context.TypeHandlerFactory[typeof(SimpleObject)];
+            IConfiguration config = new SerializationContext();
+            TypeData typeData = config.TypeHandlerFactory[typeof(SimpleObject)];
             typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
-            IPropertyData property = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("IntValue");
-            Assert.IsFalse(property.ShouldWriteValue(context, 0));
+            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("IntValue");
+            Assert.IsFalse(property.ShouldWriteValue(config, 0));
         }
 
         [Test]
         public void WhenDefaultValuesSetOnType_PropertyInheritsIt()
         {
-            SerializationContext context = new SerializationContext();
-            TypeData typeData = context.TypeHandlerFactory[typeof(SimpleObject)];
+            IConfiguration config = new SerializationContext();
+            TypeData typeData = config.TypeHandlerFactory[typeof(SimpleObject)];
             typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             typeData.DefaultValues[typeof(string)] = "FromType";
-            IPropertyData property = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("StringValue");
-            Assert.IsFalse(property.ShouldWriteValue(context, "FromType"));
-            Assert.IsTrue(property.ShouldWriteValue(context, ""));
+            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("StringValue");
+            Assert.IsFalse(property.ShouldWriteValue(config, "FromType"));
+            Assert.IsTrue(property.ShouldWriteValue(config, ""));
         }
 
         [Test]
         public void WhenDefaultValuesSetOnContext_PropertyInheritsFromContextIfNotSetOnType()
         {
-            SerializationContext context = new SerializationContext();
-            TypeData typeData = context.TypeHandlerFactory[typeof(SimpleObject)];
+            IConfiguration config = new SerializationContext();
+            TypeData typeData = config.TypeHandlerFactory[typeof(SimpleObject)];
             typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
-            context.DefaultValues[typeof(string)] = "FromType";
+            config.DefaultValues[typeof(string)] = "FromType";
             typeData.DefaultValues[typeof(int)] = 22;
 
-            IPropertyData stringProperty = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("StringValue");
-            Assert.IsFalse(stringProperty.ShouldWriteValue(context, "FromType"));
-            Assert.IsTrue(stringProperty.ShouldWriteValue(context, ""));
+            IPropertyData stringProperty = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("StringValue");
+            Assert.IsFalse(stringProperty.ShouldWriteValue(config, "FromType"));
+            Assert.IsTrue(stringProperty.ShouldWriteValue(config, ""));
 
-            IPropertyData intProperty = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("IntValue");
-            Assert.IsFalse(intProperty.ShouldWriteValue(context, 22));
-            Assert.IsTrue(intProperty.ShouldWriteValue(context, 0));
+            IPropertyData intProperty = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("IntValue");
+            Assert.IsFalse(intProperty.ShouldWriteValue(config, 22));
+            Assert.IsTrue(intProperty.ShouldWriteValue(config, 0));
 
-            IPropertyData shortProperty = context.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("ShortValue");
+            IPropertyData shortProperty = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("ShortValue");
             shortProperty.DefaultValue = (short)9;
-            Assert.IsFalse(shortProperty.ShouldWriteValue(context, (short)9));
-            Assert.IsTrue(shortProperty.ShouldWriteValue(context, 0));
+            Assert.IsFalse(shortProperty.ShouldWriteValue(config, (short)9));
+            Assert.IsTrue(shortProperty.ShouldWriteValue(config, 0));
         }
 
         [Test]
         public void WhenDefaultValuesSetByAttributeOnType_PropertyInheritsIt()
         {
-            SerializationContext context = new SerializationContext();
-            TypeData typeData = context.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
+            IConfiguration config = new SerializationContext();
+            TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
             IPropertyData property = typeData.FindProperty("EmptyString");
-            Assert.IsFalse(property.ShouldWriteValue(context, ""));
-            Assert.IsTrue(property.ShouldWriteValue(context, null));
+            Assert.IsFalse(property.ShouldWriteValue(config, ""));
+            Assert.IsTrue(property.ShouldWriteValue(config, null));
         }
 
         [Test]
         public void DefaultValuesOnTypeAreConvertedIfNotSameType()
         {
-            SerializationContext context = new SerializationContext();
-            TypeData typeData = context.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
+            IConfiguration config = new SerializationContext();
+            TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
             IPropertyData property = typeData.FindProperty("ConvertedDefault");
-            Assert.IsFalse(property.ShouldWriteValue(context, (short)32));
-            Assert.IsTrue(property.ShouldWriteValue(context, 0));
+            Assert.IsFalse(property.ShouldWriteValue(config, (short)32));
+            Assert.IsTrue(property.ShouldWriteValue(config, 0));
         }
 
         [Test]
         public void DefaultValuesOnPropertyAreConvertedIfNotSameType()
         {
-            SerializationContext context = new SerializationContext();
-            TypeData typeData = context.TypeHandlerFactory[typeof(MockDefaultValues)];
+            IConfiguration config = new SerializationContext();
+            TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValues)];
             IPropertyData property = typeData.FindProperty("ConvertedValue");
-            Assert.IsFalse(property.ShouldWriteValue(context, (short)32));
-            Assert.IsTrue(property.ShouldWriteValue(context, 0));
+            Assert.IsFalse(property.ShouldWriteValue(config, (short)32));
+            Assert.IsTrue(property.ShouldWriteValue(config, 0));
         }
     }
 }

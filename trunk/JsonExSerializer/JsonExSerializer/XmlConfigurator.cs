@@ -19,23 +19,22 @@ namespace JsonExSerializer
 {
     public class XmlConfigurator
     {
-        //private XmlNode configXml;
-        private SerializationContext context;
+        private IConfiguration serializationConfig;
         private XmlReader reader;
         private delegate void MapHandler();
         private Dictionary<string, MapHandler> handlers = new Dictionary<string, MapHandler>();
         private string sectionName;
         private int _collectionInsertPoint;
 
-        private XmlConfigurator(XmlReader reader, SerializationContext context, string sectionName)
+        private XmlConfigurator(XmlReader reader, IConfiguration serializationConfig, string sectionName)
         {
             this.reader = reader;
-            this.context = context;
+            this.serializationConfig = serializationConfig;
             this.sectionName = sectionName;
 
-            handlers["IsCompact"] = delegate() { context.IsCompact = reader.ReadElementContentAsBoolean(); };
-            handlers["OutputTypeComment"] = delegate() { context.OutputTypeComment = reader.ReadElementContentAsBoolean(); };
-            handlers["OutputTypeInformation"] = delegate() { context.OutputTypeInformation = reader.ReadElementContentAsBoolean(); };
+            handlers["IsCompact"] = delegate() { serializationConfig.IsCompact = reader.ReadElementContentAsBoolean(); };
+            handlers["OutputTypeComment"] = delegate() { serializationConfig.OutputTypeComment = reader.ReadElementContentAsBoolean(); };
+            handlers["OutputTypeInformation"] = delegate() { serializationConfig.OutputTypeInformation = reader.ReadElementContentAsBoolean(); };
             handlers["ReferenceWritingType"] = new MapHandler(HandleReferenceWritingType);
             handlers["TypeBindings"] = new MapHandler(HandleTypeBindings);
             handlers["TypeConverters"] = new MapHandler(HandleTypeConverters);
@@ -43,7 +42,7 @@ namespace JsonExSerializer
             handlers["IgnoreProperties"] = new MapHandler(HandleIgnoreProperties);
         }
 
-        public static void Configure(SerializationContext context, string configSection)
+        public static void Configure(IConfiguration serializationConfig, string configSection)
         {
             XmlConfigSection section = (XmlConfigSection)ConfigurationManager.GetSection(configSection);
             if (section == null && configSection != "JsonExSerializer")
@@ -54,12 +53,12 @@ namespace JsonExSerializer
             string xml = section.RawXml;
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(xml);
-            Configure(context, XmlReader.Create(new StringReader(xml)), configSection);
+            Configure(serializationConfig, XmlReader.Create(new StringReader(xml)), configSection);
         }
 
-        public static void Configure(SerializationContext context, XmlReader reader, string sectionName)
+        public static void Configure(IConfiguration serializationConfig, XmlReader reader, string sectionName)
         {
-            new XmlConfigurator(reader, context, sectionName).Configure();
+            new XmlConfigurator(reader, serializationConfig, sectionName).Configure();
         }
 
         private void Configure()
@@ -96,7 +95,7 @@ namespace JsonExSerializer
             if (string.IsNullOrEmpty(type))
                 throw new ArgumentException("Must specify 'type' for TypeBinding add");
 
-            context.TypeAliases.Add(Type.GetType(type, true), alias);
+            serializationConfig.TypeAliases.Add(Type.GetType(type, true), alias);
         }
 
         /// <summary>
@@ -109,9 +108,9 @@ namespace JsonExSerializer
             string alias = values[0];
             string type = values[1];
             if (!string.IsNullOrEmpty(type))
-                context.TypeAliases.Remove(Type.GetType(type, true));
+                serializationConfig.TypeAliases.Remove(Type.GetType(type, true));
             else if (!string.IsNullOrEmpty(alias))
-                context.TypeAliases.Remove(alias);
+                serializationConfig.TypeAliases.Remove(alias);
             else
                 throw new ArgumentException("Must specify either alias or type argument to remove TypeBinding");
         }
@@ -124,7 +123,7 @@ namespace JsonExSerializer
             SectionHandler handler = new SectionHandler(reader, "TypeBindings");
             handler.AddMethod(new MethodMap("add", "alias type", new MethodDelegate(AddTypeBinding)));
             handler.AddMethod(new MethodMap("remove", "alias type", new MethodDelegate(RemoveTypeBinding)));
-            handler.AddMethod(new MethodMap("clear", "", delegate(string t, string[] v) { context.TypeAliases.Clear(); }));
+            handler.AddMethod(new MethodMap("clear", "", delegate(string t, string[] v) { serializationConfig.TypeAliases.Clear(); }));
             handler.Process();            
         }
 
@@ -151,9 +150,9 @@ namespace JsonExSerializer
             // check for the property element, if it exists, the converter is for a property on the type
             IJsonTypeConverter converterObj = (IJsonTypeConverter)Activator.CreateInstance(converterType);
             if (!string.IsNullOrEmpty(property))
-                context.RegisterTypeConverter(objectType, property, converterObj);
+                serializationConfig.RegisterTypeConverter(objectType, property, converterObj);
             else
-                context.RegisterTypeConverter(objectType, converterObj);
+                serializationConfig.RegisterTypeConverter(objectType, converterObj);
 
         }
         /// <summary>
@@ -177,7 +176,7 @@ namespace JsonExSerializer
             Type handlerType = Type.GetType(type, true);
 
             CollectionHandler collHandler = (CollectionHandler)Activator.CreateInstance(handlerType);
-            context.CollectionHandlers.Insert(_collectionInsertPoint++, collHandler);
+            serializationConfig.CollectionHandlers.Insert(_collectionInsertPoint++, collHandler);
         }
 
         /// <summary>
@@ -202,7 +201,7 @@ namespace JsonExSerializer
 
 
             Type classType = Type.GetType(type, true);
-            context.IgnoreProperty(classType, property);
+            serializationConfig.IgnoreProperty(classType, property);
         }
 
         private void HandleIgnoreProperties()
@@ -215,7 +214,7 @@ namespace JsonExSerializer
         private void HandleReferenceWritingType()
         {
             string value = reader.ReadElementContentAsString();
-            context.ReferenceWritingType = (SerializationContext.ReferenceOption) Enum.Parse(context.ReferenceWritingType.GetType(), value);
+            serializationConfig.ReferenceWritingType = (SerializationContext.ReferenceOption) Enum.Parse(serializationConfig.ReferenceWritingType.GetType(), value);
         }
 
         private delegate void MethodDelegate(string tagName, params string[] values);

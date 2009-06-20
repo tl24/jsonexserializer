@@ -70,8 +70,6 @@
     <Compile Include="Framework\ExpressionHandlers\BooleanExpressionHandler.cs" />
     <Compile Include="Framework\ExpressionHandlers\CastExpressionHandler.cs" />
     <Compile Include="Framework\ExpressionHandlers\ArrayExpressionHandler.cs" />
-    <Compile Include="Framework\ExpressionHandlers\Collections\CollectionObjectHandlerBase.cs" />
-    <Compile Include="Framework\ExpressionHandlers\Collections\QueueHandler.cs" />
     <Compile Include="Framework\ExpressionHandlers\DictionaryObjectExpressionHandler.cs" />
     <Compile Include="Framework\ExpressionHandlers\IDeserializerHandler.cs" />
     <Compile Include="Framework\ExpressionHandlers\IExpressionHandler.cs" />
@@ -93,7 +91,7 @@
     <Compile Include="Framework\Parsing\IParsingStage.cs" />
     <Compile Include="Framework\Visitors\CollectReferencesVisitor.cs" />
     <Compile Include="IConfiguration.cs" />
-    <Compile Include="IContextAware.cs" />
+    <Compile Include="IConfigurationAware.cs" />
     <Compile Include="IDeserializationCallback.cs" />
     <Compile Include="Framework\IJsonWriter.cs" />
     <Compile Include="ISerializationCallback.cs" />

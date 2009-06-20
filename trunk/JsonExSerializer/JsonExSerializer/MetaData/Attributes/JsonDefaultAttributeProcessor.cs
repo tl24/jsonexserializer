@@ -9,7 +9,7 @@ namespace JsonExSerializer.MetaData.Attributes
     public class JsonDefaultAttributeProcessor : AttributeProcessor
     {
         private Dictionary<Assembly, AssemblyCache> _assemblyCache;
-        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, SerializationContext serializationContext)
+        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
         {
             if (metaData is IPropertyData)
             {
@@ -36,7 +36,7 @@ namespace JsonExSerializer.MetaData.Attributes
                 Type classType = metaData.ForType;
                 TypeData typeData = (TypeData)metaData;
                 // apply assembly defaults first
-                AssemblyCache cache = GetAssemblyCache(classType, serializationContext);
+                AssemblyCache cache = GetAssemblyCache(classType, config);
                 if (cache.defaultValues != null)
                 {
                     typeData.DefaultValues = new DefaultValueCollection(cache.defaultValues);
@@ -60,7 +60,7 @@ namespace JsonExSerializer.MetaData.Attributes
             }
         }
 
-        private AssemblyCache GetAssemblyCache(Type classType, SerializationContext context)
+        private AssemblyCache GetAssemblyCache(Type classType, IConfiguration config)
         {
             if (_assemblyCache == null)
             {
@@ -77,7 +77,7 @@ namespace JsonExSerializer.MetaData.Attributes
                     if (attr.Type != null)
                     {
                         if (cache.defaultValues == null)
-                            cache.defaultValues = new DefaultValueCollection(context.DefaultValues);
+                            cache.defaultValues = new DefaultValueCollection(config.DefaultValues);
                         cache.defaultValues[attr.Type] = attr.DefaultValue;
                     }
                 }

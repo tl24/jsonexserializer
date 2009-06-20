@@ -19,14 +19,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         }
 
         /// <summary>
-        /// Initializes an instance with a Serialization Context
-        /// </summary>
-        public NumericExpressionHandler(SerializationContext Context)
-            : base(Context)
-        {
-        }
-
-        /// <summary>
         /// Creates a numeric expression from the data
         /// </summary>
         /// <param name="data">the data, should be a number type</param>

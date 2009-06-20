@@ -9,13 +9,13 @@ namespace JsonExSerializer.Framework.Parsing
     /// <summary>
     /// Evaluates an expression tree to construct the object
     /// </summary>
-    public class Evaluator : IDeserializerHandler, IContextAware
+    public class Evaluator : IDeserializerHandler, IConfigurationAware
     {
-        private SerializationContext _context;
+        private IConfiguration _config;
 
-        public Evaluator(SerializationContext context)
+        public Evaluator(IConfiguration config)
         {
-            this.Context = context;
+            this.Config = config;
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace JsonExSerializer.Framework.Parsing
         /// <returns>the constructed object</returns>
         public object Evaluate(Expression Expression)
         {
-            IExpressionHandler handler = Context.ExpressionHandlers.GetHandler(Expression);
+            IExpressionHandler handler = Config.ExpressionHandlers.GetHandler(Expression);
             return handler.Evaluate(Expression, this);
         }
 
@@ -37,19 +37,19 @@ namespace JsonExSerializer.Framework.Parsing
         /// <returns>the evaluated object</returns>
         public object Evaluate(Expression Expression, object existingObject)
         {
-            IExpressionHandler handler = Context.ExpressionHandlers.GetHandler(Expression);
+            IExpressionHandler handler = Config.ExpressionHandlers.GetHandler(Expression);
             return handler.Evaluate(Expression, existingObject, this);
         }
 
-        public SerializationContext Context
+        public IConfiguration Config
         {
             get
             {
-                return this._context;
+                return this._config;
             }
             set
             {
-                this._context = value;
+                this._config = value;
             }
         }
     }

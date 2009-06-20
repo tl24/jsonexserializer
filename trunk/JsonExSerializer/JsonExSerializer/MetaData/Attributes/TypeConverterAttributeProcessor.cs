@@ -8,7 +8,7 @@ namespace JsonExSerializer.MetaData.Attributes
 {
     public class TypeConverterAttributeProcessor : AttributeProcessor
     {
-        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, SerializationContext serializationContext)
+        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
         {
             IJsonTypeConverter converter = CreateTypeConverter(attributeProvider);
             if (converter != null)

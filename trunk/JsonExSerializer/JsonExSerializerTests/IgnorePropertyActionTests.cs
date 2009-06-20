@@ -21,7 +21,7 @@ namespace JsonExSerializerTests
         [Test]
         public void IgnoredPropertyAction_WhenIgnored_PropertyNotSet()
         {
-            serializer.Context.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.Ignore;
+            serializer.Config.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.Ignore;
             string result = @" { IgnoredProp: 'NotIgnored' }";
             SpecializedMock mock = (SpecializedMock) serializer.Deserialize(result);
             Assert.AreNotEqual("NotIgnored", mock.IgnoredProp, "IgnoredProp not ignored");
@@ -30,7 +30,7 @@ namespace JsonExSerializerTests
         [Test]
         public void IgnoredPropertyAction_WhenSetIfPossible_WriteablePropertyIsSet()
         {
-            serializer.Context.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.SetIfPossible;
+            serializer.Config.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.SetIfPossible;
             string result = @" { IgnoredProp: 'NotIgnored' }";
             SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
             Assert.AreEqual("NotIgnored", mock.IgnoredProp, "IgnoredProp not set");
@@ -39,7 +39,7 @@ namespace JsonExSerializerTests
         [Test]
         public void IgnoredPropertyAction_WhenSetIfPossible_ReadonlyPropertyNotSet()
         {
-            serializer.Context.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.SetIfPossible;
+            serializer.Config.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.SetIfPossible;
             string result = @" { Count: 22 }";
             SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
             Assert.AreNotEqual(22, mock.Count, "Readonly property set");
@@ -48,7 +48,7 @@ namespace JsonExSerializerTests
         [Test]
         public void IgnoredPropertyAction_WhenThrowException_IgnoredPropertyThrowsException()
         {
-            serializer.Context.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.ThrowException;
+            serializer.Config.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.ThrowException;
             string result = @" { IgnoredProp: 'NotIgnored' }";
             bool exception = false;
             try

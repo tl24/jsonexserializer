@@ -162,8 +162,8 @@ namespace JsonExSerializerTests
         {
             Dictionary<string, int> source = new Dictionary<string, int>();
             Serializer s = new Serializer(typeof(Dictionary<string, int>));
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
             string result = s.Serialize(source);
             StringAssert.FullMatch(result, @"\s*\{\s*\}\s*");
             Dictionary<string, int> target = (Dictionary<string, int>)s.Deserialize(result);
@@ -175,8 +175,8 @@ namespace JsonExSerializerTests
         {
             Dictionary<string, int> source = new Dictionary<string, int>();
             Serializer s = new Serializer(typeof(Dictionary<string, int>));
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
             source["first"] = 1;
             string result = s.Serialize(source);
             StringAssert.FullMatch(result, @"\s*\{\s*""first""\s*:\s*1\s*\}\s*");

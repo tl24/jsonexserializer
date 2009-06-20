@@ -23,8 +23,8 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <summary>
         /// Initializes an instance with a Serialization Context
         /// </summary>
-        public ArrayExpressionHandler(SerializationContext context)
-            : base(context)
+        public ArrayExpressionHandler(IConfiguration config)
+            : base(config)
         {
         }
 
@@ -38,7 +38,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <seealso cref="JsonExSerializer.Collections.ICollectionBuilder"/>
         public override bool CanHandle(Type objectType)
         {
-            return Context.TypeHandlerFactory[objectType].IsCollection();
+            return Config.TypeHandlerFactory[objectType].IsCollection();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>a json array expression representation</returns>
         public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
-            TypeData handler = Context.GetTypeHandler(data.GetType());
+            TypeData handler = Config.GetTypeHandler(data.GetType());
 
             CollectionHandler collectionHandler = handler.CollectionHandler;
             Type elemType = collectionHandler.GetItemType(handler.ForType);
@@ -146,7 +146,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         protected virtual ICollectionBuilder ConstructBuilder(object collection, ArrayExpression list, out Type itemType)
         {
             Type listType = collection != null ? collection.GetType() : list.ResultType;
-            TypeData typeHandler = Context.GetTypeHandler(listType);
+            TypeData typeHandler = Config.GetTypeHandler(listType);
             CollectionHandler collHandler = typeHandler.CollectionHandler;
             itemType = collHandler.GetItemType(listType);
             if (itemType == null)

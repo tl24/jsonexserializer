@@ -16,17 +16,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
         }
 
-        public DateTimeExpressionHandler(SerializationContext context)
-            : base(context)
-        {
-        }
-
-        public DateTimeExpressionHandler(SerializationContext context, string dateFormat)
-            : base(context)
-        {
-            this.dateFormat = dateFormat;
-        }
-
         public DateTimeExpressionHandler(string dateFormat)
         {
             this.dateFormat = dateFormat;

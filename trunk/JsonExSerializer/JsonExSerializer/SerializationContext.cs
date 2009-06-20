@@ -301,7 +301,7 @@ namespace JsonExSerializer
                 if (_parsingStages == null)
                 {
                     _parsingStages = new List<IParsingStage>();
-                    _parsingStages.Add(new AssignReferenceStage(this));
+                    _parsingStages.Add(new AssignReferenceStage());
                 }
                 return _parsingStages;
             }
@@ -316,11 +316,11 @@ namespace JsonExSerializer
             set { this.defaultValues = value; }
         }
 
-        public void SetContextAware(object value)
+        public static void SetConfigurationAware(object value, IConfiguration config)
         {
-            IContextAware contextAware = value as IContextAware;
+            IConfigurationAware contextAware = value as IConfigurationAware;
             if (contextAware != null)
-                contextAware.Context = this;
+                contextAware.Config = config;
         }
 
         /// <summary>

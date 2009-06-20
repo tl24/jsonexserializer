@@ -13,12 +13,12 @@ namespace JsonExSerializer.MetaData
     public class TypeDataRepository
     {
    
-        private SerializationContext _context;
+        private IConfiguration _config;
         private IDictionary<Type, TypeData> _cache;
         private List<AttributeProcessor> _attributeProcessors;
-        public TypeDataRepository(SerializationContext context)
+        public TypeDataRepository(IConfiguration config)
         {
-            _context = context;
+            _config = config;
             _cache = new Dictionary<Type, TypeData>();
             _attributeProcessors = new List<AttributeProcessor>();
             _attributeProcessors.Add(new JsonIgnoreAttributeProcessor());
@@ -29,9 +29,9 @@ namespace JsonExSerializer.MetaData
             _attributeProcessors.Add(new JsonCollectionAttributeProcessor());
         }
 
-        public SerializationContext Context
+        public IConfiguration Config
         {
-            get { return this._context; }
+            get { return this._config; }
         }
 
         public virtual TypeData this[Type forType]
@@ -61,7 +61,7 @@ namespace JsonExSerializer.MetaData
 
         protected virtual TypeData CreateNew(Type forType)
         {
-            return new TypeData(forType, _context);            
+            return new TypeData(forType, _config);            
         }
 
         public virtual void RegisterTypeConverter(Type forType, IJsonTypeConverter converter)
@@ -80,7 +80,7 @@ namespace JsonExSerializer.MetaData
         {
             foreach(AttributeProcessor processor in AttributeProcessors)
             {
-                processor.Process(metaData, attributeProvider, this.Context);
+                processor.Process(metaData, attributeProvider, this.Config);
             }
         }
     }

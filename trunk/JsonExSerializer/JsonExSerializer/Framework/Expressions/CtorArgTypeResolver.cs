@@ -11,19 +11,19 @@ namespace JsonExSerializer.Framework.Expressions
     {
         private ComplexExpressionBase _expression;
         private Type[] _definedParameters;
-        private SerializationContext _context;
+        private IConfiguration _config;
 
-        public CtorArgTypeResolver(ComplexExpressionBase Expression, SerializationContext Context, Type[] DefinedParameters)
+        public CtorArgTypeResolver(ComplexExpressionBase expression, IConfiguration config, Type[] definedParameters)
         {
-            if (Expression == null)
+            if (expression == null)
                 throw new ArgumentNullException("Expression");
-            _expression = Expression;
-            _definedParameters = DefinedParameters ?? new Type[0];
-            _context = Context;
+            _expression = expression;
+            _definedParameters = definedParameters ?? new Type[0];
+            _config = config;
         }
 
-        public CtorArgTypeResolver(ComplexExpressionBase Expression, SerializationContext Context)
-            : this(Expression, Context, new Type[0])
+        public CtorArgTypeResolver(ComplexExpressionBase expression, IConfiguration config)
+            : this(expression, config, new Type[0])
         {
         }
 
@@ -70,7 +70,7 @@ namespace JsonExSerializer.Framework.Expressions
                     inferredType = GetValueType(parameter, (ValueExpression)value);
                 else if (value is ArrayExpression)
                 {
-                    if (_context.GetTypeHandler(parameter.ParameterType).IsCollection())
+                    if (_config.GetTypeHandler(parameter.ParameterType).IsCollection())
                         inferredType = parameter.ParameterType;
                 }
                 constructor.types[i] = GetBestMatch(parameter.ParameterType, definedType, inferredType);

@@ -135,21 +135,21 @@ namespace JsonExSerializer
         protected virtual void WriteExpression(object o, TextWriter writer, Expression expr)
         {
             // NOTE: we don't dispose of the JsonWriter because we didn't create the text writer
-            JsonWriter jsonWriter = new JsonWriter(writer, !this.Context.IsCompact, this.Context.TypeAliases);
+            JsonWriter jsonWriter = new JsonWriter(writer, !this.Config.IsCompact, this.Config.TypeAliases);
             WriteComment(jsonWriter, o);
-            ExpressionWriter.Write(jsonWriter, this.Context, expr);
+            ExpressionWriter.Write(jsonWriter, this.Config.OutputTypeInformation, expr);
         }
 
         protected virtual Expression CreateExpressionFromObject(object o)
         {
-            ExpressionBuilder builder = new ExpressionBuilder(this.SerializedType, this.Context);
+            ExpressionBuilder builder = new ExpressionBuilder(this.SerializedType, this.Config);
             Expression expr = builder.Serialize(o);
             return expr;
         }
 
         protected virtual void WriteComment(IJsonWriter writer, object value)
         {
-            if (value != null && this.Context.OutputTypeComment)
+            if (value != null && this.Config.OutputTypeComment)
             {
                 string comment = "";
                 comment += "/*" + "\r\n";
@@ -211,13 +211,19 @@ namespace JsonExSerializer
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
-            Parser p = new Parser(this.SerializedType, reader, this.Context);
-            return p.Parse();
+            Parser p = new Parser(reader, this.Config.TypeAliases);
+            Expression parsedExpression = p.Parse();
+            parsedExpression.ResultType = this.SerializedType;
+            foreach (IParsingStage stage in this.Config.ParsingStages)
+            {
+                parsedExpression = stage.Execute(parsedExpression);
+            }
+            return parsedExpression;
         }
 
         protected virtual object Evaluate(Expression expression)
         {
-            Evaluator eval = new Evaluator(this.Context);
+            Evaluator eval = new Evaluator(this.Config);
             return eval.Evaluate(expression);
         }
 
@@ -244,7 +250,18 @@ namespace JsonExSerializer
         /// options for serializing as well as serializer helper classes such as TypeConverters
         /// and CollectionHandlers.
         /// </summary>
+        [Obsolete("This property is obsolete, please use the Config property")]
         public SerializationContext Context
+        {
+            get { return this._context; }
+        }
+
+        /// <summary>
+        /// The configuration options for this serializer.  The Config contains
+        /// options for serializing as well as serializer helper classes such as TypeConverters
+        /// and CollectionHandlers.
+        /// </summary>
+        public IConfiguration Config
         {
             get { return this._context; }
         }

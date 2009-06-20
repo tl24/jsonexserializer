@@ -115,8 +115,8 @@ namespace JsonExSerializerTests
 
             Serializer s = new Serializer(typeof(MyLine));
             // ignore properties (Use both methods)
-            s.Context.IgnoreProperty(typeof(MyLine), "Start");
-            s.Context.IgnoreProperty(typeof(MyLine), "End");
+            s.Config.IgnoreProperty(typeof(MyLine), "Start");
+            s.Config.IgnoreProperty(typeof(MyLine), "End");
             string result = s.Serialize(line);
             MyLine actual = (MyLine)s.Deserialize(result);
             Assert.IsNull(actual.Start, "Line start should be ignored");
@@ -131,7 +131,7 @@ namespace JsonExSerializerTests
         public void TestRegisterPrimitiveTypeConverter()
         {
             Serializer s = new Serializer(typeof(object));
-            s.Context.RegisterTypeConverter(typeof(int), new MyImmutablePointConverter());
+            s.Config.RegisterTypeConverter(typeof(int), new MyImmutablePointConverter());
         }
 
         [Test]
@@ -140,7 +140,7 @@ namespace JsonExSerializerTests
             Serializer s = new Serializer(typeof(Dictionary<string, SimpleObject>));
             DictionaryToListConverter converter = new DictionaryToListConverter();
             converter.Context = "StringValue";
-            s.Context.RegisterTypeConverter(typeof(Dictionary<string, SimpleObject>), converter);
+            s.Config.RegisterTypeConverter(typeof(Dictionary<string, SimpleObject>), converter);
             Dictionary<string, SimpleObject> dictionary = new Dictionary<string, SimpleObject>();
             dictionary["One"] = new SimpleObject();
             dictionary["One"].StringValue = "One";
@@ -151,7 +151,7 @@ namespace JsonExSerializerTests
             dictionary["Two"].IntValue = 2;
 
             object list = converter.ConvertFrom(dictionary, s.Context);
-            Assert.IsTrue(s.Context.TypeHandlerFactory[list.GetType()].IsCollection(), "Converted list is not a collection");
+            Assert.IsTrue(s.Config.TypeHandlerFactory[list.GetType()].IsCollection(), "Converted list is not a collection");
 
             Dictionary<string, SimpleObject> targetDictionary = (Dictionary<string, SimpleObject>) converter.ConvertTo(list, dictionary.GetType(), s.Context);
             Assert.AreEqual(2, targetDictionary.Count, "Wrong number of items");
@@ -166,9 +166,9 @@ namespace JsonExSerializerTests
         public void TypeToStringTest_NotAliased()
         {
             Serializer s = new Serializer(typeof(Type));
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
-            s.Context.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
+            s.Config.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
             string result = s.Serialize(typeof(SimpleObject));
 
             Assert.AreEqual("\"" + typeof(SimpleObject).AssemblyQualifiedName + "\"", result, "Type serialized improperly");
@@ -181,9 +181,9 @@ namespace JsonExSerializerTests
         public void TypeToStringTest_Aliased()
         {
             Serializer s = new Serializer(typeof(Type));
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
-            s.Context.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
+            s.Config.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
             string result = s.Serialize(typeof(int));
 
             Assert.AreEqual("\"int\"", result, "Type serialized improperly");

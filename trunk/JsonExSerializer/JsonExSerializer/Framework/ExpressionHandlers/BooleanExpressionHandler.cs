@@ -19,14 +19,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         }
 
         /// <summary>
-        /// Initializes an instance of a BooleanExpressionHandler with a SerializationContext object
-        /// </summary>
-        public BooleanExpressionHandler(SerializationContext Context)
-            : base(Context)
-        {
-        }
-
-        /// <summary>
         /// Converts a boolean value into a BooleanExpression
         /// </summary>
         /// <param name="data">the data to convert to an expression</param>

@@ -18,15 +18,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         }
 
         /// <summary>
-        /// Initializes an instance of the class with a Serialization Context
-        /// </summary>
-        /// <param name="Context">the Serialization Context</param>
-        public CastExpressionHandler(SerializationContext Context)
-            : base(Context)
-        {
-        }
-
-        /// <summary>
         /// GetExpression is not valid for a CastExpression.  CastExpressions should be created directly
         /// during serialization whenever type information is needed.
         /// </summary>

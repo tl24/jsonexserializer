@@ -4,8 +4,8 @@ using System.Text;
 
 namespace JsonExSerializer
 {
-    public interface IContextAware 
+    public interface IConfigurationAware 
     {
-        SerializationContext Context { get; set; }
+        IConfiguration Config { get; set; }
     }
 }

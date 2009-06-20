@@ -20,7 +20,7 @@ namespace JsonExSerializer
     /// <summary>
     /// Provides options controlling Serializing and Deserializing of objects.
     /// </summary>
-    public class SerializationContext
+    public class SerializationContext : IConfiguration
     {
 
         #region Member variables

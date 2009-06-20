@@ -33,7 +33,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">current path to this object</param>
         /// <param name="serializer">serializer instance</param>
         /// <returns>reference expression</returns>
-        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
             return new ReferenceExpression(currentPath);
         }

@@ -101,5 +101,10 @@ namespace JsonExSerializer.Framework.Expressions
         {
             return Add(new ValueExpression(key), value);
         }
+
+        public override string ToString()
+        {
+            return "{Object(" + Properties.Count + ")}";
+        }
     } 
 }

@@ -48,5 +48,10 @@ namespace JsonExSerializer.Framework.Expressions
                     Expression.Parent = value;
             }
         }
+
+        public override string ToString()
+        {
+            return "(" + ResultType.GetType().FullName + ") " + Expression.ToString();
+        }
     }
 }

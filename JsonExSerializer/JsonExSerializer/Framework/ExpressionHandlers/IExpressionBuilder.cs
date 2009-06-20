@@ -9,7 +9,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
     /// <summary>
     /// Defines methods to serialize objects into json expressions
     /// </summary>
-    public interface ISerializerHandler
+    public interface IExpressionBuilder
     {
 
         /// <summary>

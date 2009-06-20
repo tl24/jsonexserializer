@@ -35,7 +35,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="data">the dictionary object</param>
         /// <param name="currentPath">object's path</param>
         /// <param name="serializer">the serializer instance, used to serialize keys and values</param>
-        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
             IDictionary dictionary = (IDictionary)data;
             Type itemType = typeof(object);

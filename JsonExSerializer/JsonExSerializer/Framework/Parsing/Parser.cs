@@ -222,7 +222,8 @@ namespace JsonExSerializer.Framework.Parsing
             Debug.Assert(tok == LSquareToken);
             ArrayExpression value = new ArrayExpression();
             Expression item;
-            while (ReadAhead(CommaToken, RSquareToken, new ExpressionMethod(ParseExpression), out item))
+            bool first = true;
+            while (ReadAhead(CommaToken, RSquareToken, new ExpressionMethod(ParseExpression), out item, ref first))
             {
                 value.Add(item);
             }
@@ -239,7 +240,8 @@ namespace JsonExSerializer.Framework.Parsing
             Debug.Assert(tok == LBraceToken);
             ObjectExpression value = new ObjectExpression();
             Expression item;
-            while (ReadAhead(CommaToken, RBraceToken, new ExpressionMethod(ParseKeyValue), out item))
+            bool first = true;
+            while (ReadAhead(CommaToken, RBraceToken, new ExpressionMethod(ParseKeyValue), out item, ref first))
             {
                 value.Add((KeyValueExpression)item);
             }
@@ -273,8 +275,9 @@ namespace JsonExSerializer.Framework.Parsing
         /// <param name="terminal">the ending token</param>
         /// <param name="meth">the method to call to parse an item</param>
         /// <param name="result">the parsed expression</param>
+        /// <param name="first">flag indicating whether this is the first item</param>
         /// <returns>true if match parsed, false otherwise</returns>
-        private bool ReadAhead(Token separator, Token terminal, ExpressionMethod meth, out Expression result)
+        private bool ReadAhead(Token separator, Token terminal, ExpressionMethod meth, out Expression result, ref bool first)
         {
             Token tok = PeekToken();
             result = null;
@@ -283,11 +286,16 @@ namespace JsonExSerializer.Framework.Parsing
                 ReadToken();
                 return false;
             }
-            else if (tok == separator)
+            if (!first)
             {
+                RequireToken(separator, tok, "Items should be separated by " + separator);
                 ReadToken();
             }
+            else if (first && tok == separator)
+                throw new ParseException("Error unexpected token " + tok);
+
             result = meth();
+            first = false;
             return true;
         }
 
@@ -309,7 +317,8 @@ namespace JsonExSerializer.Framework.Parsing
             RequireToken(LParenToken, tok, "Missing constructor arguments");
             Expression arg;
             List<Expression> ConstructorArgs = new List<Expression>();
-            while (ReadAhead(CommaToken, RParenToken, new ExpressionMethod(ParseExpression), out arg)) {
+            bool first = true;
+            while (ReadAhead(CommaToken, RParenToken, new ExpressionMethod(ParseExpression), out arg, ref first)) {
                 ConstructorArgs.Add(arg);
             }
             ComplexExpressionBase value = null;
@@ -385,13 +394,13 @@ namespace JsonExSerializer.Framework.Parsing
                     typeSpec.Append(genericTypes.Count);
                 }
                 //builtType = Type.GetType(typeSpec.ToString(), true);
-                builtType = bindType(typeSpec.ToString());
+                builtType = BindType(typeSpec.ToString());
                 builtType = builtType.MakeGenericType(genericTypes.ToArray());
             }
             else
             {
                 //builtType = Type.GetType(typeSpec.ToString(), true);
-                builtType = bindType(typeSpec.ToString());
+                builtType = BindType(typeSpec.ToString());
             }
             // array spec
             if (PeekToken() == LSquareToken)
@@ -404,11 +413,35 @@ namespace JsonExSerializer.Framework.Parsing
             return builtType;
         }
 
-        private Type bindType(string typeName)
+        private Type BindType(string typeName)
         {
             if (_context.TypeAliases[typeName] != null)
             {
                 return _context.TypeAliases[typeName];
+            }
+            if (!typeName.Contains(","))
+            {
+                bool found = false;
+                Type boundType = null;
+                // assume assembly name is subset of the namespace for the type (usually the case)
+                foreach (Assembly assembly in _context.TypeAliases.Assemblies)
+                {
+                    if (typeName.StartsWith(assembly.GetName().Name))
+                    {
+                        boundType = assembly.GetType(typeName, false);
+                        break;
+                    }
+                }
+                if (boundType != null)
+                    return boundType;
+                // didn't match on name, try each assembly, if it doesn't find a match, we'll just fall through below
+                // and let Type.GetType try and find it
+                foreach (Assembly assembly in _context.TypeAliases.Assemblies)
+                {
+                    boundType = assembly.GetType(typeName, false);
+                    if (boundType != null)
+                        return boundType;
+                }
             }
             return Type.GetType(typeName, true);
         }

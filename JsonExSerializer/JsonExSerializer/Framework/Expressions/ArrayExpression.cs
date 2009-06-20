@@ -37,5 +37,10 @@ namespace JsonExSerializer.Framework.Expressions
             _items.Add(item);
             item.Parent = this;
         }
+
+        public override string ToString()
+        {
+            return "[Array(" + Items.Count + ")]";
+        }
     }
 }

@@ -62,6 +62,53 @@ namespace JsonExSerializerTests
             Assert.AreEqual(uivalue, actual[8]);
         }
 
+        [Test]
+        public void EmptyArrayTest()
+        {
+            List<int> source = new List<int>();
+            Serializer s = new Serializer(typeof(List<int>));
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            string result = s.Serialize(source);
+            StringAssert.FullMatch(result, @"\s*\[\s*\]\s*");
+            List<int> target = (List<int>) s.Deserialize(result);
+            Assert.AreEqual(0, target.Count, "List count");
+        }
+
+        [Test]
+        public void SingleItemArrayTest()
+        {
+            List<int> source = new List<int>();
+            Serializer s = new Serializer(typeof(List<int>));
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            source.Add(5);
+            string result = s.Serialize(source);
+            StringAssert.FullMatch(result, @"\s*\[\s*5\s*\]\s*");
+            List<int> target = (List<int>)s.Deserialize(result);
+            Assert.AreEqual(1, target.Count, "List count");
+            Assert.AreEqual(5, target[0], "single item");
+        }
+
+        [Test]
+        public void MissingCommaBetweenArrayItemsThrowsException()
+        {
+            Serializer s = new Serializer(typeof(List<int>));
+            string result = @"[1 2]";
+            try
+            {
+                object obj = s.Deserialize(result);
+                Assert.Fail("No exception thrown for object with missing comma");
+            }
+            catch (ParseException e)
+            {
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Wrong exception type thrown: " + e);
+            }
+        }
+
         protected void CompareArrays<T>(T[] a1, T[] a2)
         {
             int max = Math.Max(a1.Length, a2.Length);

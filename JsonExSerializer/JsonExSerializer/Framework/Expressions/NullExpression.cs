@@ -16,5 +16,10 @@ namespace JsonExSerializer.Framework.Expressions
         {
             get { return typeof(object); }
         }
+
+        public override string ToString()
+        {
+            return "null";
+        }
     }
 }

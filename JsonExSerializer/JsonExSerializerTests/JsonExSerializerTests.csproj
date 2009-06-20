@@ -93,6 +93,7 @@
     <Compile Include="SimpleConfigSettingsTests.cs" />
     <Compile Include="AdvancedConfigSettingTests.cs" />
     <Compile Include="TokenStreamTests.cs" />
+    <Compile Include="TypeAliasTests.cs" />
     <Compile Include="TypeHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>

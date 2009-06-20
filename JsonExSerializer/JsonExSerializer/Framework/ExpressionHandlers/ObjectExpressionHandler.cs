@@ -36,7 +36,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">current path to the object</param>
         /// <param name="serializer">serializer instance used to serialize key values</param>
         /// <returns>json object expression</returns>
-        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
              TypeData handler = Context.GetTypeHandler(data.GetType());
 
@@ -57,7 +57,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="serializer">serializer instance</param>
         /// <param name="expression">the object expression</param>
         /// <param name="prop">the property being serialized</param>
-        protected virtual void GenerateItemExpression(object data, JsonPath currentPath, ISerializerHandler serializer, ObjectExpression expression, IPropertyData prop)
+        protected virtual void GenerateItemExpression(object data, JsonPath currentPath, IExpressionBuilder serializer, ObjectExpression expression, IPropertyData prop)
         {
             object value = prop.GetValue(data);
             if (!prop.ShouldWriteValue(this.Context, value))

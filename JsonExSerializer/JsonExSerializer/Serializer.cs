@@ -109,7 +109,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="o">the object to serialize</param>
         /// <param name="stream">stream for the serialized data</param>
-        public void Serialize(object o, Stream stream)
+        public virtual void Serialize(object o, Stream stream)
         {
             if (stream == null)
                 throw new ArgumentNullException("stream");
@@ -128,16 +128,44 @@ namespace JsonExSerializer
         {
             if (writer == null)
                 throw new ArgumentNullException("writer");
-            SerializerHelper helper = new SerializerHelper(this.SerializedType, _context, writer);
-            helper.Serialize(o);
+            Expression expr = CreateExpressionFromObject(o);
+            WriteExpression(o, writer, expr);
         }
 
+        protected virtual void WriteExpression(object o, TextWriter writer, Expression expr)
+        {
+            // NOTE: we don't dispose of the JsonWriter because we didn't create the text writer
+            JsonWriter jsonWriter = new JsonWriter(writer, !this.Context.IsCompact, this.Context.TypeAliases);
+            WriteComment(jsonWriter, o);
+            ExpressionWriter.Write(jsonWriter, this.Context, expr);
+        }
+
+        protected virtual Expression CreateExpressionFromObject(object o)
+        {
+            ExpressionBuilder builder = new ExpressionBuilder(this.SerializedType, this.Context);
+            Expression expr = builder.Serialize(o);
+            return expr;
+        }
+
+        protected virtual void WriteComment(IJsonWriter writer, object value)
+        {
+            if (value != null && this.Context.OutputTypeComment)
+            {
+                string comment = "";
+                comment += "/*" + "\r\n";
+                comment += "  Created by JsonExSerializer" + "\r\n";
+                comment += "  Assembly: " + value.GetType().Assembly.ToString() + "\r\n";
+                comment += "  Type: " + value.GetType().FullName + "\r\n";
+                comment += "*/" + "\r\n";
+                writer.WriteComment(comment);
+            }
+        }
         /// <summary>
         /// Serialize the object and return the serialized data as a string.
         /// </summary>
         /// <param name="o">the object to serialize</param>
         /// <returns>serialized data string</returns>
-        public string Serialize(object o)
+        public virtual string Serialize(object o)
         {
             using (TextWriter writer = new StringWriter())
             {
@@ -158,7 +186,7 @@ namespace JsonExSerializer
         /// </summary>
         /// <param name="stream">stream to read the data from</param>
         /// <returns>the deserialized object</returns>
-        public object Deserialize(Stream stream)
+        public virtual object Deserialize(Stream stream)
         {
             if (stream == null)
                 throw new ArgumentNullException("stream");

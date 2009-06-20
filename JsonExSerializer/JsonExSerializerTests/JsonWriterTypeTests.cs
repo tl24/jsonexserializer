@@ -36,7 +36,7 @@ namespace JsonExSerializerTests
             jsonWriter.WriteCast(typeof(sbyte))
                 .WriteValue(33);
 
-            AssertMatch("(System.SByte)33", "Single Item Cast");
+            AssertMatch("(sbyte)33", "Single Item Cast");
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace JsonExSerializerTests
                 .WriteCast(typeof(long))
                 .WriteValue(3);
 
-            AssertMatch("(System.Int32)(System.Int64)3", "Double cast");
+            AssertMatch("(int)(long)3", "Double cast");
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace JsonExSerializerTests
                     .WriteCast(typeof(int)).WriteValue(2)
                 .WriteArrayEnd();
 
-            AssertMatch("(System.Collections.ArrayList)[(System.Int32)1,(System.Int32)2]", "Array Cast");
+            AssertMatch("(System.Collections.ArrayList)[(int)1,(int)2]", "Array Cast");
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace JsonExSerializerTests
                     .WriteCast(typeof(byte)).WriteValue(255)
                 .WriteObjectEnd();
 
-            AssertMatch("(\"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"){\"ByteValue\":(System.Byte)255}", "Object Cast");
+            AssertMatch("(\"JsonExSerializerTests.Mocks.SimpleObject,JsonExSerializerTests\"){\"ByteValue\":(byte)255}", "Object Cast");
         }
 
         
@@ -105,7 +105,7 @@ namespace JsonExSerializerTests
                 .WriteConstructorArgsStart()
                 .WriteConstructorArgsEnd()
                 .WriteConstructorEnd();
-            AssertMatch("new System.String()", "Empty Constructor");
+            AssertMatch("new string()", "Empty Constructor");
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace JsonExSerializerTests
                 .WriteQuotedValue("mystring")
                 .WriteConstructorArgsEnd()
                 .WriteConstructorEnd();
-            AssertMatch("new System.String(\"mystring\")", "Simple Args Constructor");
+            AssertMatch("new string(\"mystring\")", "Simple Args Constructor");
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace JsonExSerializerTests
                 .WriteValue(10)
                 .WriteConstructorArgsEnd()
                 .WriteConstructorEnd();
-            AssertMatch("new System.String((System.Char)\"a\",10)", "Args with castConstructor");
+            AssertMatch("new string((char)\"a\",10)", "Args with castConstructor");
         }
 
         [Test]
@@ -150,7 +150,7 @@ namespace JsonExSerializerTests
                 .WriteValue(4)
                 .WriteConstructorArgsEnd()
                 .WriteConstructorEnd();
-            AssertMatch("new System.String((char[])[\"t\",\"e\",\"s\",\"t\",\"e\",\"d\"],0,4)", "Array In Args Constructor");
+            AssertMatch("new string((char[])[\"t\",\"e\",\"s\",\"t\",\"e\",\"d\"],0,4)", "Array In Args Constructor");
         }
 
         [Test]

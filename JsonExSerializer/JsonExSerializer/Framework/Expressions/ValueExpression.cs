@@ -45,6 +45,11 @@ namespace JsonExSerializer.Framework.Expressions
         {
             get { return typeof(string); }
         }
+
+        public override string ToString()
+        {
+            return StringValue;
+        }
     }
 
     /// <summary>

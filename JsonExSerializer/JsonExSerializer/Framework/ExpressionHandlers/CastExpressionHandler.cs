@@ -35,7 +35,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="serializer">serializer instance</param>
         /// <returns>expression</returns>
         /// <exception cref="InvalidOperationException">This will throw an exception if called</exception>
-        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
             throw new InvalidOperationException("CastObjectHandler should not be called during Serialization");
         }

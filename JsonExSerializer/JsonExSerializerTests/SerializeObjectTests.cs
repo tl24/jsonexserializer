@@ -31,6 +31,7 @@ namespace JsonExSerializerTests
             ValidateSimpleObjects(src, dst);
         }
 
+        [Test]
         public void SemiComplexObjectTest()
         {
             SimpleObject src = new SimpleObject();
@@ -133,6 +134,55 @@ namespace JsonExSerializerTests
             // make sure concrete type is correct
             Dictionary<SimpleEnum, string> actual = (Dictionary<SimpleEnum, string>)s.Deserialize(result);
             AssertDictionariesEqual<SimpleEnum, string>(actual, dict, "Enum keyed dictionaries not equal");
+        }
+
+        [Test]
+        public void MissingCommaBetweenKeyValuesThrowsException()
+        {
+            Serializer s = new Serializer(typeof(Dictionary<string, string>));
+            string result = @"{""a"":""1"" ""b"":""2""}";
+            try
+            {
+                object obj = s.Deserialize(result);
+                Assert.Fail("No exception thrown for object with missing comma");
+            }
+            catch (ParseException e)
+            {
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Wrong exception type thrown: " + e);
+            }
+        }
+
+
+
+        [Test]
+        public void EmptyObjectTest()
+        {
+            Dictionary<string, int> source = new Dictionary<string, int>();
+            Serializer s = new Serializer(typeof(Dictionary<string, int>));
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            string result = s.Serialize(source);
+            StringAssert.FullMatch(result, @"\s*\{\s*\}\s*");
+            Dictionary<string, int> target = (Dictionary<string, int>)s.Deserialize(result);
+            Assert.AreEqual(0, target.Count, "Dictionary count");
+        }
+
+        [Test]
+        public void SingleItemObjectTest()
+        {
+            Dictionary<string, int> source = new Dictionary<string, int>();
+            Serializer s = new Serializer(typeof(Dictionary<string, int>));
+            s.Context.IsCompact = true;
+            s.Context.OutputTypeComment = false;
+            source["first"] = 1;
+            string result = s.Serialize(source);
+            StringAssert.FullMatch(result, @"\s*\{\s*""first""\s*:\s*1\s*\}\s*");
+            Dictionary<string, int> target = (Dictionary<string, int>)s.Deserialize(result);
+            Assert.AreEqual(1, target.Count, "Dictionary count");
+            Assert.AreEqual(1, target["first"], "Dictionary item");
         }
 
         [Test]

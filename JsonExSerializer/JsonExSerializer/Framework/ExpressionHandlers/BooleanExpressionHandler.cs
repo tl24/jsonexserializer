@@ -33,7 +33,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">the current path to the object, ignored for BooleanExpression</param>
         /// <param name="serializer">serializer instance, ignored</param>
         /// <returns>a BooleanExpression</returns>
-        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
             return new BooleanExpression(data);
         }

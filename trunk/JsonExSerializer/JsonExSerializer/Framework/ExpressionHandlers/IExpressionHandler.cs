@@ -18,7 +18,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="CurrentPath">the current path to this object from the root, used for tracking references</param>
         /// <param name="serializer">serializer instance for serializing child objects</param>
         /// <returns>an expression which represents a json structure</returns>
-        Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer);
+        Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer);
 
         /// <summary>
         /// Determines whether this handler is able to convert an this object type to an expression

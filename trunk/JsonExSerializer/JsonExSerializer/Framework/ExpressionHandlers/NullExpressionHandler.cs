@@ -17,7 +17,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">current path</param>
         /// <param name="serializer">serializer instance</param>
         /// <returns>NullExpression</returns>
-        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
             return new NullExpression();
         }

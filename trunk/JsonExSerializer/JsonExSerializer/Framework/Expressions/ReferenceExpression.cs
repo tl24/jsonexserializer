@@ -64,5 +64,10 @@ namespace JsonExSerializer.Framework.Expressions
                 return result;
             }
         }
+
+        public override string ToString()
+        {
+            return Path.ToString(); 
+        }
     }
 }

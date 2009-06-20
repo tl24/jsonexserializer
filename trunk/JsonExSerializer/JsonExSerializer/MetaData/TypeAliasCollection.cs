@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.Framework;
+using System.Reflection;
 
 namespace JsonExSerializer.MetaData
 {
@@ -12,20 +13,27 @@ namespace JsonExSerializer.MetaData
     public class TypeAliasCollection
     {
         protected TwoWayDictionary<Type, string> bindings;
-
+        protected List<Assembly> assemblyList;
         /// <summary>
         /// Initializes a default intance of the TypeAliasCollection with aliases for primitive types
         /// </summary>
         public TypeAliasCollection()
         {
             this.bindings = new TwoWayDictionary<Type, string>();
+            this.assemblyList = new List<Assembly>();
             AddDefaultAliases();
+            AddDefaultAssemblies();
+        }
+
+        protected virtual void AddDefaultAssemblies()
+        {
+            Assemblies.Add(typeof(int).Assembly);
         }
 
         /// <summary>
         /// Adds default aliases for primitive types
         /// </summary>
-        public void AddDefaultAliases()
+        protected virtual void AddDefaultAliases()
         {
             // add bindings for primitive types
             bindings[typeof(byte)] = "byte";
@@ -51,7 +59,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="type">the type object</param>
         /// <param name="alias">the type's alias</param>
-        public void Add(Type type, string alias)
+        public virtual void Add(Type type, string alias)
         {
             bindings[type] = alias;
         }
@@ -59,7 +67,7 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Clears all aliases
         /// </summary>
-        public void Clear()
+        public virtual void Clear()
         {
             bindings.Clear();
         }
@@ -68,7 +76,7 @@ namespace JsonExSerializer.MetaData
         /// Removes an alias for a specific type
         /// </summary>
         /// <param name="type">the type to remove</param>
-        public void Remove(Type type)
+        public virtual void Remove(Type type)
         {
             bindings.Remove(type);
         }
@@ -77,7 +85,7 @@ namespace JsonExSerializer.MetaData
         /// Removes an alias for a specific type by alias
         /// </summary>
         /// <param name="alias">the alias to remove</param>
-        public void Remove(string alias)
+        public virtual void Remove(string alias)
         {
             Type key;
             if (bindings.TryGetKey(alias, out key))
@@ -133,6 +141,16 @@ namespace JsonExSerializer.MetaData
         public Type this[string alias]
         {
             get { return GetTypeBinding(alias); }
+        }
+
+        public virtual IList<Assembly> Assemblies
+        {
+            get { return this.assemblyList; }
+        }
+
+        public virtual bool ShouldWriteAssembly(Assembly assembly)
+        {
+            return !Assemblies.Contains(assembly);
         }
     }
 }

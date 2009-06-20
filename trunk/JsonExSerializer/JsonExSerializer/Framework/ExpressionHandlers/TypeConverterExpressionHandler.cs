@@ -36,7 +36,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">the current path to the value</param>
         /// <param name="serializer">serializer instance</param>
         /// <returns>an expression for the value</returns>
-        public override Expression GetExpression(object value, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object value, JsonPath currentPath, IExpressionBuilder serializer)
         {
             IJsonTypeConverter converter = GetConverter(value);
             return GetExpression(value, converter, currentPath, serializer);
@@ -58,7 +58,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">the current path to the value</param>
         /// <param name="serializer">serializer instance</param>
         /// <returns>an expression for the value</returns>
-        public Expression GetExpression(object value, IJsonTypeConverter converter, JsonPath currentPath, ISerializerHandler serializer)
+        public Expression GetExpression(object value, IJsonTypeConverter converter, JsonPath currentPath, IExpressionBuilder serializer)
         {
             object convertedObject = converter.ConvertFrom(value, Context);
             // call serialize again in case the new type has a converter

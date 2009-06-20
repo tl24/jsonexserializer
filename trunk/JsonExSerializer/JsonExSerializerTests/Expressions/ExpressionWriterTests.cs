@@ -127,7 +127,7 @@ namespace JsonExSerializerTests.Expressions
             obj.ConstructorArguments.Add(new NumericExpression(12));
             obj.Add("keyname", new ValueExpression("valuename"));
             _exprWriter.Write(obj);
-            Assert.AreEqual("new System.String(12){\"keyname\":\"valuename\"}",_stringWriter.ToString());
+            Assert.AreEqual("new string(12){\"keyname\":\"valuename\"}",_stringWriter.ToString());
         }
 
         [Test]
@@ -144,7 +144,7 @@ namespace JsonExSerializerTests.Expressions
             CastExpression cast = new CastExpression(typeof(byte));
             cast.Expression = new NumericExpression(255);
             _exprWriter.Write(cast);
-            Assert.AreEqual("(System.Byte)255", _stringWriter.ToString());
+            Assert.AreEqual("(byte)255", _stringWriter.ToString());
         }
 
         [Test]

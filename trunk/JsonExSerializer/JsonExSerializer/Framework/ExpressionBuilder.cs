@@ -20,19 +20,17 @@ namespace JsonExSerializer.Framework
     /// <summary>
     /// Class to do the work of serializing an object
     /// </summary>
-    class SerializerHelper : JsonWriter, ISerializerHandler
+    public class ExpressionBuilder : IExpressionBuilder
     {
         private Type _serializedType;
         private SerializationContext _context;
-        //private TextWriter _writer;
         private const int indentStep = 3;
         private IDictionary<object, ReferenceInfo> _refs;
 
-        internal SerializerHelper(Type t, SerializationContext context, TextWriter writer) : base(writer, !context.IsCompact)
+        internal ExpressionBuilder(Type t, SerializationContext context)
         {
             _serializedType = t;
             _context = context;
-            //_writer = writer;
             _refs = new Dictionary<object, ReferenceInfo>(new ReferenceEqualityComparer<object>());
         }
 
@@ -40,24 +38,14 @@ namespace JsonExSerializer.Framework
         /// Serialize the given object
         /// </summary>
         /// <param name="value">object to serialize</param>
-        public void Serialize(object value)
+        public Expression Serialize(object value)
         {
-            if (value != null && _context.OutputTypeComment)
-            {
-                string comment = "";
-                comment += "/*" + "\r\n";
-                comment += "  Created by JsonExSerializer" + "\r\n";
-                comment += "  Assembly: " + value.GetType().Assembly.ToString() + "\r\n";
-                comment += "  Type: " + value.GetType().FullName + "\r\n";
-                comment += "*/" + "\r\n";
-                this.WriteComment(comment);
-            }
             Expression expr = Serialize(value, new JsonPath(), null);
             if (value != null && !ReflectionUtils.AreEquivalentTypes(value.GetType(), _serializedType))
             {
                 expr = new CastExpression(value.GetType(), expr);
             }
-            ExpressionWriter.Write(this, _context, expr);
+            return expr;
         }
 
         public Expression Serialize(object value, JsonPath currentPath)
@@ -177,20 +165,6 @@ namespace JsonExSerializer.Framework
             {
                 refInfo.CanReference = true;
             }
-        }
-
-        /// <summary>
-        /// Writes out the type for an object in regular C# code syntax
-        /// </summary>
-        /// <param name="t">the type to write</param>
-        protected override void WriteTypeInfo(Type t)
-        {
-            string alias = _context.TypeAliases[t];
-            if (alias != null) {
-                WriteTypeInfo(alias);
-                return;
-            }
-            base.WriteTypeInfo(t);
         }
 
         /// <summary>

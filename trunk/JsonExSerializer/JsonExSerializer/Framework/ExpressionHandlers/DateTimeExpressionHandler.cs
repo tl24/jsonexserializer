@@ -64,7 +64,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             return typeof(DateTime).IsAssignableFrom(ObjectType);
         }
 
-        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
             string value = ((DateTime)data).ToString(dateFormat, Culture);
             return new ValueExpression(value);

@@ -9,6 +9,7 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Globalization;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.Framework
 {
@@ -37,6 +38,7 @@ namespace JsonExSerializer.Framework
         private short indentSize = 4;
         private IState _currentState;
         private CultureInfo culture;
+        private TypeAliasCollection typeAliases;
 
         /// <summary>
         /// Creates a json writer that writes to the <paramref name="writer"/> and uses
@@ -44,8 +46,21 @@ namespace JsonExSerializer.Framework
         /// </summary>
         /// <param name="writer">the text writer that will be written to</param>
         /// <param name="indent">setting that specifies whether to indent</param>
-        public JsonWriter(TextWriter writer, bool indent) 
-            : this(writer, indent, CultureInfo.InvariantCulture)
+        /// <param name="typeAliases">type aliases</param>
+        public JsonWriter(TextWriter writer, bool indent)
+            : this(writer, indent, CultureInfo.InvariantCulture, null)
+        {
+        }
+
+        /// <summary>
+        /// Creates a json writer that writes to the <paramref name="writer"/> and uses
+        /// the InvariantCulture for any formatting.
+        /// </summary>
+        /// <param name="writer">the text writer that will be written to</param>
+        /// <param name="indent">setting that specifies whether to indent</param>
+        /// <param name="typeAliases">type aliases</param>
+        public JsonWriter(TextWriter writer, bool indent, TypeAliasCollection typeAliases) 
+            : this(writer, indent, CultureInfo.InvariantCulture, typeAliases)
         {
         }
 
@@ -56,31 +71,37 @@ namespace JsonExSerializer.Framework
         /// <param name="writer">the text writer that will be written to</param>
         /// <param name="indent">setting that specifies whether to indent</param>
         /// <param name="culture">The culture to use for formatting</param>
-        public JsonWriter(TextWriter writer, bool indent, CultureInfo culture)
+        public JsonWriter(TextWriter writer, bool indent, CultureInfo culture, TypeAliasCollection typeAliases)
         {
+            if (writer == null)
+                throw new ArgumentNullException("writer");
             this._writer = writer;
+            this.typeAliases = typeAliases ?? new TypeAliasCollection();
+            this.culture = culture ?? CultureInfo.InvariantCulture;
+
             _currentState = new InitialState(this);
             if (!indent)
                 indentSize = 0;
         }
+
         private void PreWrite(OpType operation) {
             _currentState.PreWrite(operation);
             return;
         }
 
-        protected void WriteIndent()
+        protected virtual void WriteIndent()
         {
             if (indentSize > 0)
                 _writer.Write("".PadRight(indentSize * indentLevel));
         }
 
-        protected void WriteLineBreak()
+        protected virtual void WriteLineBreak()
         {
             if (indentSize > 0)
                 _writer.Write("\r\n");
         }
 
-        public IJsonWriter WriteConstructorStart(string namespaceAndClass)
+        public virtual IJsonWriter WriteConstructorStart(string namespaceAndClass)
         {
             PreWrite(OpType.CtorStart);
             _writer.Write("new ");
@@ -89,7 +110,7 @@ namespace JsonExSerializer.Framework
             return this;
         }
 
-        public IJsonWriter WriteConstructorStart(string namespaceAndClass, string assembly)
+        public virtual IJsonWriter WriteConstructorStart(string namespaceAndClass, string assembly)
         {
             PreWrite(OpType.CtorStart);
             _writer.Write("new ");
@@ -98,7 +119,7 @@ namespace JsonExSerializer.Framework
             return this;
         }
 
-        public IJsonWriter WriteConstructorStart(Type constructorType)
+        public virtual IJsonWriter WriteConstructorStart(Type constructorType)
         {
             PreWrite(OpType.CtorStart);
             _writer.Write("new ");
@@ -107,34 +128,34 @@ namespace JsonExSerializer.Framework
             return this;
         }
 
-        public IJsonWriter WriteConstructorArgsStart()
+        public virtual IJsonWriter WriteConstructorArgsStart()
         {
             PreWrite(OpType.CtorArgStart);
             _writer.Write("(");
             return this;
         }
 
-        public IJsonWriter WriteConstructorArgsEnd()
+        public virtual IJsonWriter WriteConstructorArgsEnd()
         {
             PreWrite(OpType.CtorArgEnd);
             _writer.Write(")");
             return this;
         }
 
-        public IJsonWriter WriteConstructorEnd()
+        public virtual IJsonWriter WriteConstructorEnd()
         {
             PreWrite(OpType.CtorEnd);
             return this;
         }
 
-        public IJsonWriter WriteObjectStart()
+        public virtual IJsonWriter WriteObjectStart()
         {
             PreWrite(OpType.ObjStart);
             _writer.Write('{');
             return this;
         }
 
-        public IJsonWriter WriteKey(string key)
+        public virtual IJsonWriter WriteKey(string key)
         {
             PreWrite(OpType.OpKey);
             WriteQuotedString(key);
@@ -142,70 +163,70 @@ namespace JsonExSerializer.Framework
             return this;
         }
 
-        public IJsonWriter WriteObjectEnd()
+        public virtual IJsonWriter WriteObjectEnd()
         {
             PreWrite(OpType.ObjEnd);
             _writer.Write('}');
             return this;
         }
 
-        public IJsonWriter WriteArrayStart()
+        public virtual IJsonWriter WriteArrayStart()
         {
             PreWrite(OpType.ArrStart);
             _writer.Write('[');
             return this;
         }
 
-        public IJsonWriter WriteArrayEnd()
+        public virtual IJsonWriter WriteArrayEnd()
         {
             PreWrite(OpType.ArrEnd);
             _writer.Write(']');
             return this;
         }
 
-        public IJsonWriter WriteValue(bool value)
+        public virtual IJsonWriter WriteValue(bool value)
         {
             PreWrite(OpType.OpValue);
             _writer.Write(value.ToString().ToLower());
             return this;
         }
 
-        public IJsonWriter WriteValue(long value)
+        public virtual IJsonWriter WriteValue(long value)
         {
             PreWrite(OpType.OpValue);
             _writer.Write(value);
             return this;
         }
 
-        public IJsonWriter WriteValue(double value)
+        public virtual IJsonWriter WriteValue(double value)
         {
             PreWrite(OpType.OpValue);
-            _writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
+            _writer.Write(value.ToString("R", culture));
             return this;
         }
 
-        public IJsonWriter WriteValue(float value)
+        public virtual IJsonWriter WriteValue(float value)
         {
             PreWrite(OpType.OpValue);
-            _writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
+            _writer.Write(value.ToString("R", culture));
             return this;
         }
 
-        public IJsonWriter WriteQuotedValue(string value)
+        public virtual IJsonWriter WriteQuotedValue(string value)
         {
             PreWrite(OpType.OpValue);
             WriteQuotedString(value);
             return this;
         }
 
-        public IJsonWriter WriteSpecialValue(string value)
+        public virtual IJsonWriter WriteSpecialValue(string value)
         {
             PreWrite(OpType.OpValue);
             _writer.Write(value);
             return this;
         }
 
-        public IJsonWriter WriteComment(string comment)
+        public virtual IJsonWriter WriteComment(string comment)
         {
             // no prewrite, a comment is valid anywhere at any time
             // and does not alter the state
@@ -213,14 +234,14 @@ namespace JsonExSerializer.Framework
             return this;
         }
 
-        protected void WriteQuotedString(string value)
+        protected virtual void WriteQuotedString(string value)
         {
             _writer.Write('"');
             WriteEscapedString(value);
             _writer.Write('"');
         }
 
-        protected void WriteEscapedString(string value)
+        protected virtual void WriteEscapedString(string value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -273,14 +294,18 @@ namespace JsonExSerializer.Framework
         /// <param name="t">the type to write</param>
         protected virtual void WriteTypeInfo(Type type)
         {
+            string alias = typeAliases[type];
+            if (alias != null)
+            {
+                WriteTypeInfo(alias);
+                return;
+            }
             if (type.IsArray)
             {
                 WriteTypeInfo(type.GetElementType());
                 _writer.Write("[]");
                 return;
             }
-
-            Assembly core = typeof(object).Assembly;
 
             if (type.IsGenericType && !type.IsGenericTypeDefinition)
             {
@@ -297,8 +322,8 @@ namespace JsonExSerializer.Framework
                 _writer.Write('>');
             }
             else
-            {                
-                if (type.Assembly == core)
+            {
+                if (!ShouldWriteAssembly(type.Assembly))
                 {
                     string typeName = type.FullName;
                     if (type.IsGenericTypeDefinition)
@@ -323,6 +348,11 @@ namespace JsonExSerializer.Framework
             }        
         }
 
+        protected virtual bool ShouldWriteAssembly(Assembly assembly)
+        {
+            return typeAliases.ShouldWriteAssembly(assembly);
+        }
+
         /// <summary>
         /// Writes out the type info specified by the NamespaceAndClass string.
         /// </summary>
@@ -343,7 +373,7 @@ namespace JsonExSerializer.Framework
             WriteQuotedString(fullTypeName);
         }
 
-        public IJsonWriter WriteCast(Type castType)
+        public virtual IJsonWriter WriteCast(Type castType)
         {
             if (castType != typeof(string))
             {
@@ -355,7 +385,7 @@ namespace JsonExSerializer.Framework
             return this;
         }
 
-        public IJsonWriter WriteCast(string namespaceAndClass)
+        public virtual IJsonWriter WriteCast(string namespaceAndClass)
         {
             PreWrite(OpType.OpCast);
             _writer.Write('(');
@@ -364,7 +394,7 @@ namespace JsonExSerializer.Framework
             return this;
         }
 
-        public IJsonWriter WriteCast(string namespaceAndClass, string assembly)
+        public virtual IJsonWriter WriteCast(string namespaceAndClass, string assembly)
         {
             string fullTypeName = namespaceAndClass + ", " + assembly;
             PreWrite(OpType.OpCast);

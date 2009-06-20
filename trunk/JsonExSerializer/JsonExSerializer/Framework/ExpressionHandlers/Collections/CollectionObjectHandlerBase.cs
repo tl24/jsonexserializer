@@ -21,12 +21,12 @@ namespace JsonExSerializer.Framework.ExpressionHandlers.Collections
             return typeof(object);
         }
 
-        public override Expression GetExpression(object data, JsonPath CurrentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath CurrentPath, IExpressionBuilder serializer)
         {
             return GetExpression((IEnumerable)data, GetItemType(data.GetType()), CurrentPath, serializer);
         }
 
-        protected virtual Expression GetExpression(IEnumerable Items, Type ItemType, JsonPath CurrentPath, ISerializerHandler serializer)
+        protected virtual Expression GetExpression(IEnumerable Items, Type ItemType, JsonPath CurrentPath, IExpressionBuilder serializer)
         {
             int index = 0;
 

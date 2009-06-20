@@ -48,7 +48,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="currentPath">the current path to the data</param>
         /// <param name="serializer">serializer instance to use to serialize list items</param>
         /// <returns>a json array expression representation</returns>
-        public override Expression GetExpression(object data, JsonPath currentPath, ISerializerHandler serializer)
+        public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
             TypeData handler = Context.GetTypeHandler(data.GetType());
 

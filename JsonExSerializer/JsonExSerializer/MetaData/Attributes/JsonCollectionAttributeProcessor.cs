@@ -9,7 +9,7 @@ namespace JsonExSerializer.MetaData.Attributes
 {
     public class JsonCollectionAttributeProcessor : AttributeProcessor
     {
-        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, SerializationContext serializationContext)
+        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
         {
             TypeData typeData = metaData as TypeData;
             if (typeData == null)
@@ -39,25 +39,25 @@ namespace JsonExSerializer.MetaData.Attributes
             bool registerHandler = false;
             if (handler == null)
             {
-                handler = ConstructOrFindHandler(serializationContext, collHandlerType, ref registerHandler);
+                handler = ConstructOrFindHandler(config, collHandlerType, ref registerHandler);
             }
 
             typeData.CollectionHandler = handler;
             // install the handler
             if (registerHandler)
-                serializationContext.RegisterCollectionHandler(handler);
+                config.RegisterCollectionHandler(handler);
             
         }
 
-        protected virtual CollectionHandler ConstructOrFindHandler(SerializationContext serializationContext, Type collHandlerType, ref bool handlerConstructed)
+        protected virtual CollectionHandler ConstructOrFindHandler(IConfiguration config, Type collHandlerType, ref bool handlerConstructed)
         {
             handlerConstructed = false;
-            CollectionHandler handler = serializationContext.CollectionHandlers.Find(delegate(CollectionHandler h) { return h.GetType() == collHandlerType; });
+            CollectionHandler handler = config.CollectionHandlers.Find(delegate(CollectionHandler h) { return h.GetType() == collHandlerType; });
             if (handler != null)
                 return handler;
 
             // try inherited type next
-            handler = serializationContext.CollectionHandlers.Find(delegate(CollectionHandler h) { return collHandlerType.IsInstanceOfType(h); });
+            handler = config.CollectionHandlers.Find(delegate(CollectionHandler h) { return collHandlerType.IsInstanceOfType(h); });
             if (handler != null)
                 return handler;
 

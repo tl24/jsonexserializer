@@ -15,9 +15,9 @@ namespace JsonExSerializerTests
         public void TestAddBinding()
         {
             Serializer s = new Serializer(typeof(object), "TypeBindingAdd");
-            Assert.AreEqual("SimpleObject", s.Context.TypeAliases[typeof(SimpleObject)]);
+            Assert.AreEqual("SimpleObject", s.Config.TypeAliases[typeof(SimpleObject)]);
             // check that defaults are still mapped
-            Assert.AreEqual("int", s.Context.TypeAliases[typeof(int)]);
+            Assert.AreEqual("int", s.Config.TypeAliases[typeof(int)]);
         }
 
         [Test]
@@ -26,27 +26,27 @@ namespace JsonExSerializerTests
             Serializer s = new Serializer(typeof(object), "TypeBindingRemove");
             // verify int is not mapped
             // <remove type="System.Int32, mscorlib" />
-            Assert.IsNull(s.Context.TypeAliases[typeof(int)]);
+            Assert.IsNull(s.Config.TypeAliases[typeof(int)]);
             // verify float is not mapped
             // <remove alias="float" />
-            Assert.IsNull(s.Context.TypeAliases[typeof(float)]);
+            Assert.IsNull(s.Config.TypeAliases[typeof(float)]);
         }
 
         [Test]
         public void TestClearAddBinding()
         {
             Serializer s = new Serializer(typeof(object), "TypeBindingClearAdd");
-            Assert.AreEqual("SimpleObject", s.Context.TypeAliases[typeof(SimpleObject)]);
+            Assert.AreEqual("SimpleObject", s.Config.TypeAliases[typeof(SimpleObject)]);
             // check that defaults are not mapped
-            Assert.IsNull(s.Context.TypeAliases[typeof(int)]);
+            Assert.IsNull(s.Config.TypeAliases[typeof(int)]);
         }
 
         [Test]
         public void TestRegisterTypeConverter()
         {
             Serializer s = new Serializer(typeof(object), "TestRegisterTypeConverter");
-            IJsonTypeConverter typeConverter = s.Context.GetTypeHandler(typeof(SimpleObject)).TypeConverter;
-            IJsonTypeConverter propConverter = s.Context.GetTypeHandler(typeof(SimpleObject)).FindProperty("BoolValue").TypeConverter;
+            IJsonTypeConverter typeConverter = s.Config.GetTypeHandler(typeof(SimpleObject)).TypeConverter;
+            IJsonTypeConverter propConverter = s.Config.GetTypeHandler(typeof(SimpleObject)).FindProperty("BoolValue").TypeConverter;
             Assert.IsNotNull(typeConverter, "No converter for simple object registered");
             Assert.IsNotNull(propConverter, "No converter for simple object, BoolValue property registered");
         }

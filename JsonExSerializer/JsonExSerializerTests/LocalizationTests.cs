@@ -57,8 +57,8 @@ namespace JsonExSerializerTests
                 {
                     Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo(startingCulture);
                     Serializer s = new Serializer(typeof(T));
-                    s.Context.IsCompact = true;
-                    s.Context.OutputTypeComment = false;
+                    s.Config.IsCompact = true;
+                    s.Config.OutputTypeComment = false;
                     string result = s.Serialize(sourceValue);
                     if (!string.IsNullOrEmpty(expectedValue))
                         Assert.AreEqual(result, expectedValue);

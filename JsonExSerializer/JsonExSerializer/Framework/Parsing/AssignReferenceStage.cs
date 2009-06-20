@@ -12,7 +12,7 @@ namespace JsonExSerializer.Framework.Parsing
     public class AssignReferenceStage : IParsingStage
     {
 
-        public AssignReferenceStage(SerializationContext context)
+        public AssignReferenceStage()
         {
         }
 

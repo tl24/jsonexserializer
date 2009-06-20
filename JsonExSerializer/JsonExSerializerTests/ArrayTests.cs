@@ -67,8 +67,8 @@ namespace JsonExSerializerTests
         {
             List<int> source = new List<int>();
             Serializer s = new Serializer(typeof(List<int>));
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
             string result = s.Serialize(source);
             StringAssert.FullMatch(result, @"\s*\[\s*\]\s*");
             List<int> target = (List<int>) s.Deserialize(result);
@@ -80,8 +80,8 @@ namespace JsonExSerializerTests
         {
             List<int> source = new List<int>();
             Serializer s = new Serializer(typeof(List<int>));
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
             source.Add(5);
             string result = s.Serialize(source);
             StringAssert.FullMatch(result, @"\s*\[\s*5\s*\]\s*");

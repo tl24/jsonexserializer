@@ -16,7 +16,6 @@ namespace JsonExSerializerTests.Expressions
     {
         private StringWriter _stringWriter;
         private JsonWriter _jsonWriter;
-        private SerializationContext _context;
         private ExpressionWriter _exprWriter;
 
         [SetUp]
@@ -24,8 +23,7 @@ namespace JsonExSerializerTests.Expressions
         {
             _stringWriter = new StringWriter();
             _jsonWriter = new JsonWriter(_stringWriter, false);
-            _context = new SerializationContext();
-            _exprWriter = new ExpressionWriter(_jsonWriter, _context);
+            _exprWriter = new ExpressionWriter(_jsonWriter, true);
         }
 
         [RowTest]
@@ -152,7 +150,7 @@ namespace JsonExSerializerTests.Expressions
         {
             CastExpression cast = new CastExpression(typeof(byte));
             cast.Expression = new NumericExpression(255);
-            _context.OutputTypeInformation = false;
+            _exprWriter.OutputTypeInfo = false;
             _exprWriter.Write(cast);
             Assert.AreEqual("255", _stringWriter.ToString());
         }

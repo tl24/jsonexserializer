@@ -81,7 +81,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="value">the value to be written</param>
         /// <returns>true if the value should be written, false otherwise</returns>
-        bool ShouldWriteValue(SerializationContext context, object value);
+        bool ShouldWriteValue(IConfiguration config, object value);
 
         DefaultValueOption DefaultValueSetting { get; set; }
 

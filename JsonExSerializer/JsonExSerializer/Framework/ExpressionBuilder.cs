@@ -23,14 +23,14 @@ namespace JsonExSerializer.Framework
     public class ExpressionBuilder : IExpressionBuilder
     {
         private Type _serializedType;
-        private SerializationContext _context;
+        private IConfiguration _config;
         private const int indentStep = 3;
         private IDictionary<object, ReferenceInfo> _refs;
 
-        internal ExpressionBuilder(Type t, SerializationContext context)
+        internal ExpressionBuilder(Type t, IConfiguration config)
         {
             _serializedType = t;
-            _context = context;
+            _config = config;
             _refs = new Dictionary<object, ReferenceInfo>(new ReferenceEqualityComparer<object>());
         }
 
@@ -67,16 +67,16 @@ namespace JsonExSerializer.Framework
             else
             {
                 IExpressionHandler objHandler;
-                bool isReferencable = _context.IsReferenceableType(value.GetType());
+                bool isReferencable = _config.IsReferenceableType(value.GetType());
                 if (converter != null)
                 {
-                    TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)_context.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
+                    TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)_config.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
                     isReferencable = converterHandler.IsReferenceable(value, converter);
                     objHandler = converterHandler;
                 }
                 else
                 {
-                    objHandler = _context.ExpressionHandlers.GetHandler(value);
+                    objHandler = _config.ExpressionHandlers.GetHandler(value);
                     isReferencable = objHandler.IsReferenceable(value);
                 }
 
@@ -124,7 +124,7 @@ namespace JsonExSerializer.Framework
                  */
                 refInfo = _refs[value];
                 JsonPath refPath = refInfo.Path;
-                switch (_context.ReferenceWritingType)
+                switch (_config.ReferenceWritingType)
                 {
                     case SerializationContext.ReferenceOption.WriteIdentifier:
                         if (!refInfo.CanReference)

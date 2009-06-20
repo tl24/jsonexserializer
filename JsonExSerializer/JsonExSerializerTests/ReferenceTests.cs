@@ -55,7 +55,7 @@ namespace JsonExSerializerTests
         public void CircularReferenceError()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.ErrorCircularReferences;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.ErrorCircularReferences;
             string result = s.Serialize(simple);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
         }
@@ -66,7 +66,7 @@ namespace JsonExSerializerTests
         public void DeepCircularReferenceError()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.ErrorCircularReferences;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.ErrorCircularReferences;
             string result = s.Serialize(deep);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
         }
@@ -75,7 +75,7 @@ namespace JsonExSerializerTests
         public void CircularReferenceIgnore()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.IgnoreCircularReferences;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.IgnoreCircularReferences;
             string result = s.Serialize(simple);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
             Assert.IsNull(actual.Reference.Reference);
@@ -85,7 +85,7 @@ namespace JsonExSerializerTests
         public void DeepCircularReferenceIgnore()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.IgnoreCircularReferences;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.IgnoreCircularReferences;
             string result = s.Serialize(deep);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
             Assert.IsNull(actual.Reference.Reference.Reference.Reference);
@@ -96,7 +96,7 @@ namespace JsonExSerializerTests
         public void CircularReferenceWrite()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
             string result = s.Serialize(simple);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
             Assert.AreSame(simple, simple.Reference.Reference, "References not equal");
@@ -106,9 +106,9 @@ namespace JsonExSerializerTests
         public void TestBackwardsCompatibleReference()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
             string result = s.Serialize(simple);
             result = result.Replace("$", "this");
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
@@ -119,7 +119,7 @@ namespace JsonExSerializerTests
         public void DeepCircularReferenceWrite()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
             string result = s.Serialize(deep);
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
             Assert.AreSame(deep.Reference, deep.Reference.Reference.Reference.Reference, "References not equal");
@@ -129,9 +129,9 @@ namespace JsonExSerializerTests
         public void BackwardsCompatibleDeepWrite()
         {
             Serializer s = new Serializer(typeof(MockReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
             string result = s.Serialize(deep);
             result = result.Replace("$['Reference']", "this.Reference");
             MockReferenceObject actual = (MockReferenceObject)s.Deserialize(result);
@@ -143,7 +143,7 @@ namespace JsonExSerializerTests
         {
             MockReferenceObject[] mockArray = new MockReferenceObject[] { simple };
             Serializer s = new Serializer(typeof(MockReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
             string result = s.Serialize(mockArray);
             MockReferenceObject[] actual = (MockReferenceObject[]) s.Deserialize(result);
             Assert.AreSame(actual[0], actual[0].Reference.Reference, "reference inside collection not equal");
@@ -157,7 +157,7 @@ namespace JsonExSerializerTests
             al.Add(refString);
             al.Add(refString);
             Serializer s = new Serializer(typeof(ArrayList));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
             string result = s.Serialize(al);
             StringAssert.NotLike(result, "this");
             StringAssert.NotLike(result, @"\$");
@@ -169,9 +169,9 @@ namespace JsonExSerializerTests
             MockSubReferenceObject msr = new MockSubReferenceObject();
             msr.Reference = msr;
             Serializer s = new Serializer(typeof(MockSubReferenceObject));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
             string result = s.Serialize(msr);
             StringAssert.NotLike(result, "MockSubReferenceObject");
         }
@@ -184,9 +184,9 @@ namespace JsonExSerializerTests
             list.Add(intType);
             list.Add(intType);
             Serializer s = new Serializer(typeof(ArrayList));
-            s.Context.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
-            s.Context.OutputTypeComment = false;
-            s.Context.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            s.Config.ReferenceWritingType = SerializationContext.ReferenceOption.WriteIdentifier;
+            s.Config.OutputTypeComment = false;
+            s.Config.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
             string result = s.Serialize(list);
             StringAssert.NotLike(result, @"\$");
             StringAssert.NotLike(result, "this");

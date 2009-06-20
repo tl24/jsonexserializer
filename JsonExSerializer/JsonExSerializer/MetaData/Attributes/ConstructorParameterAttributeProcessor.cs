@@ -8,7 +8,7 @@ namespace JsonExSerializer.MetaData.Attributes
 {
     public class ConstructorParameterAttributeProcessor : AttributeProcessor
     {
-        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, SerializationContext serializationContext)
+        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
         {
             if (metaData is IPropertyData)
             {

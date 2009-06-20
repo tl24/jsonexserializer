@@ -15,6 +15,7 @@ using JsonExSerializer.TypeConversion;
 using System.IO;
 using JsonExSerializer.Framework.Expressions;
 using JsonExSerializer.Framework.ExpressionHandlers;
+using JsonExSerializer.MetaData;
 
 namespace JsonExSerializer.Framework.Parsing
 {
@@ -24,7 +25,7 @@ namespace JsonExSerializer.Framework.Parsing
 
         private Type _deserializedType;
         private TokenStream _tokenStream;
-        private SerializationContext _context;
+        private TypeAliasCollection typeAliases;
         #endregion
 
         #region Token Constants
@@ -70,17 +71,16 @@ namespace JsonExSerializer.Framework.Parsing
         private readonly Token OldReferenceStartToken = new Token(TokenType.Identifier, "this");
         #endregion
 
-        public Parser(Type t, TextReader reader, SerializationContext context)
-            : this(t, new TokenStream(reader), context)
+        public Parser(TextReader reader, TypeAliasCollection typeAliases)
+            : this(new TokenStream(reader), typeAliases)
         {
         }
 
 
-        public Parser(Type t, TokenStream tokenStream, SerializationContext context)
+        public Parser(TokenStream tokenStream, TypeAliasCollection typeAliases)
         {
-            _deserializedType = t;
             _tokenStream = tokenStream;
-            _context = context;
+            this.typeAliases = typeAliases ?? new TypeAliasCollection();
         }
 
         /// <summary>
@@ -90,11 +90,6 @@ namespace JsonExSerializer.Framework.Parsing
         public virtual Expression Parse()
         {
             Expression expr = ParseExpression();
-            expr.ResultType = _deserializedType;
-            foreach (IParsingStage stage in _context.ParsingStages)
-            {
-                expr = stage.Execute(expr);
-            }
             return expr;
         }
 
@@ -415,16 +410,16 @@ namespace JsonExSerializer.Framework.Parsing
 
         private Type BindType(string typeName)
         {
-            if (_context.TypeAliases[typeName] != null)
+            if (typeAliases[typeName] != null)
             {
-                return _context.TypeAliases[typeName];
+                return typeAliases[typeName];
             }
             if (!typeName.Contains(","))
             {
                 bool found = false;
                 Type boundType = null;
                 // assume assembly name is subset of the namespace for the type (usually the case)
-                foreach (Assembly assembly in _context.TypeAliases.Assemblies)
+                foreach (Assembly assembly in typeAliases.Assemblies)
                 {
                     if (typeName.StartsWith(assembly.GetName().Name))
                     {
@@ -436,7 +431,7 @@ namespace JsonExSerializer.Framework.Parsing
                     return boundType;
                 // didn't match on name, try each assembly, if it doesn't find a match, we'll just fall through below
                 // and let Type.GetType try and find it
-                foreach (Assembly assembly in _context.TypeAliases.Assemblies)
+                foreach (Assembly assembly in typeAliases.Assemblies)
                 {
                     boundType = assembly.GetType(typeName, false);
                     if (boundType != null)

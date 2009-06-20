@@ -22,7 +22,7 @@ namespace JsonExSerializerTests
         public void SerializeLongTest(long expected)
         {
             Serializer s = new Serializer(typeof(long));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(CultureInfo.InvariantCulture), result.Trim(), "long did not serialize correctly");
             long actual = (long)s.Deserialize(result);
@@ -39,7 +39,7 @@ namespace JsonExSerializerTests
         public void SerializeIntTest(int expected)
         {
             Serializer s = new Serializer(typeof(int));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(CultureInfo.InvariantCulture), result.Trim(), "Int did not serialize correctly");
         }
@@ -52,7 +52,7 @@ namespace JsonExSerializerTests
         public void SerializeUIntTest(uint expected)
         {
             Serializer s = new Serializer(typeof(uint));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(CultureInfo.InvariantCulture), result.Trim(), "UInt did not serialize correctly");
         }
@@ -66,7 +66,7 @@ namespace JsonExSerializerTests
         public void SerializeShortTest(short expected)
         {
             Serializer s = new Serializer(typeof(short));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected.ToString(CultureInfo.InvariantCulture), result.Trim(), "Short did not serialize correctly");
         }
@@ -77,7 +77,7 @@ namespace JsonExSerializerTests
         public void SerializeBoolTest(bool Value, string Expected)
         {
             Serializer s = new Serializer(typeof(bool));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string result = s.Serialize(Value);
             Assert.AreEqual(Expected, result.Trim(), "Bool did not serialize correctly");
         }
@@ -94,7 +94,7 @@ namespace JsonExSerializerTests
         public void SerializeFloatTest(float expected)
         {
             Serializer s = new Serializer(typeof(float));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             float actual;
             string result = s.Serialize(expected);
             Assert.AreEqual(expected, float.Parse(result, CultureInfo.InvariantCulture), "float did not serialize correctly");
@@ -114,7 +114,7 @@ namespace JsonExSerializerTests
         public void SerializeDoubleTest(double expected)
         {
             Serializer s = new Serializer(typeof(double));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected, double.Parse(result, CultureInfo.InvariantCulture), "double did not serialize correctly");
             double actual = (double)s.Deserialize(result);
@@ -128,7 +128,7 @@ namespace JsonExSerializerTests
         public void SerializeByteTest(byte expected)
         {
             Serializer s = new Serializer(typeof(byte));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected, byte.Parse(result, CultureInfo.InvariantCulture), "byte did not serialize correctly");
             byte actual = (byte)s.Deserialize(result);
@@ -139,7 +139,7 @@ namespace JsonExSerializerTests
         public void SerializeStringTest()
         {
             Serializer s = new Serializer(typeof(string));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string expected = "simple";
             string result = s.Serialize(expected);
             Assert.AreEqual("\"simple\"", result, "String did not serialize correctly.");
@@ -204,7 +204,7 @@ namespace JsonExSerializerTests
         public void TestDate(DateTime expected)
         {
             Serializer s = new Serializer(typeof(DateTime));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             DateTime actual = (DateTime)s.Deserialize(result);
             Assert.AreEqual(expected, actual, "DateTime did not deserialize correctly");
@@ -220,7 +220,7 @@ namespace JsonExSerializerTests
             Debug.WriteLine(decimal.MinValue.ToString(CultureInfo.InvariantCulture));
             decimal expected = decimal.Parse(decimalString, CultureInfo.InvariantCulture);
             Serializer s = new Serializer(typeof(decimal));
-            s.Context.SetJsonStrictOptions();
+            s.Config.SetJsonStrictOptions();
             string result = s.Serialize(expected);
             Assert.AreEqual(expected, decimal.Parse(result, CultureInfo.InvariantCulture), "decimal did not serialize correctly");
             decimal actual = (decimal)s.Deserialize(result);
@@ -257,8 +257,8 @@ namespace JsonExSerializerTests
                 s = new Serializer(typeof(object));
             else
                 s = new Serializer(typeof(Guid?));
-            s.Context.IsCompact = true;
-            s.Context.OutputTypeComment = false;
+            s.Config.IsCompact = true;
+            s.Config.OutputTypeComment = false;
             string result = s.Serialize(value);
             Assert.AreEqual(string.Format(resultFormat, guidString), result, "Expected serialization output");
             Guid? r = (Guid?)s.Deserialize(result);

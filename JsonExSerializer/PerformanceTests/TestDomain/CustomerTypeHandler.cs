@@ -8,23 +8,23 @@ namespace PerformanceTests.TestDomain
 {
     public class CustTypeHandlerFactory : TypeDataRepository
     {
-        public CustTypeHandlerFactory(SerializationContext Context)
-            : base(Context)
+        public CustTypeHandlerFactory(IConfiguration config)
+            : base(config)
         {
         }
 
         protected override TypeData CreateNew(Type forType)
         {
             if (forType == typeof(Customer))
-                return new CustomerTypeHandler(forType, this.Context);
+                return new CustomerTypeHandler(forType, this.Config);
             else
                 return base.CreateNew(forType);
         }
     }
     public class CustomerTypeHandler : TypeData
     {
-        public CustomerTypeHandler(Type t, SerializationContext ctx)
-            : base(t, ctx)
+        public CustomerTypeHandler(Type t, IConfiguration config)
+            : base(t, config)
         {
         }
 

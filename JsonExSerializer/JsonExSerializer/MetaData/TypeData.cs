@@ -42,9 +42,9 @@ namespace JsonExSerializer.MetaData
         private CollectionHandler collectionHandler;
 
         /// <summary>
-        /// The serializer's context
+        /// The serializer's configuration
         /// </summary>
-        protected SerializationContext context;
+        protected IConfiguration config;
 
         /// <summary>
         /// flag indicating whether this type has any properties that are not ignored
@@ -62,9 +62,9 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="type">the .NET type that the metadata is for</param>
         /// <param name="context">the serializer context</param>
-        public TypeData(Type type, SerializationContext context) : base(type)
+        public TypeData(Type type, IConfiguration config) : base(type)
         {
-            this.context = context;
+            this.config = config;
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace JsonExSerializer.MetaData
             if (this.forType.BaseType == typeof(object) || this.forType.BaseType == null)
                 return;
 
-            TypeData baseTypeData = this.context.TypeHandlerFactory[this.forType.BaseType];
+            TypeData baseTypeData = this.config.TypeHandlerFactory[this.forType.BaseType];
             List<IPropertyData> baseProps = new List<IPropertyData>(baseTypeData.AllProperties);
             foreach (IPropertyData baseProp in baseProps)
             {
@@ -271,7 +271,7 @@ namespace JsonExSerializer.MetaData
         protected virtual PropertyData CreatePropertyHandler(PropertyInfo Property)
         {
             PropertyData propData = new PropertyData(Property, this);
-            context.TypeHandlerFactory.ProcessAttributes(propData, Property);
+            config.TypeHandlerFactory.ProcessAttributes(propData, Property);
             return propData;
         }
 
@@ -283,7 +283,7 @@ namespace JsonExSerializer.MetaData
         protected virtual FieldData CreateFieldHandler(FieldInfo Field)
         {
             FieldData fieldData = new FieldData(Field, this);
-            context.TypeHandlerFactory.ProcessAttributes(fieldData, Field);
+            config.TypeHandlerFactory.ProcessAttributes(fieldData, Field);
             return fieldData;
         }
 
@@ -297,9 +297,9 @@ namespace JsonExSerializer.MetaData
             return Activator.CreateInstance(this.ForType, args);
         }
 
-        public virtual SerializationContext Context
+        public virtual IConfiguration Config
         {
-            get { return this.context; }
+            get { return this.config; }
         }
 
         /// <summary>
@@ -407,7 +407,7 @@ namespace JsonExSerializer.MetaData
 
         public CollectionHandler FindCollectionHandler()
         {
-            foreach (CollectionHandler handler in context.CollectionHandlers)
+            foreach (CollectionHandler handler in config.CollectionHandlers)
             {
                 if (handler.IsCollection(ForType))
                 {
@@ -463,7 +463,7 @@ namespace JsonExSerializer.MetaData
                     // if no converter registered, try to use the base converter if applicable
                     if (!tempCreated && converterResult == null && this.ForType.BaseType != null)
                     {
-                        converterResult = converterInstance = this.context.TypeHandlerFactory[this.forType.BaseType].TypeConverter;
+                        converterResult = converterInstance = this.config.TypeHandlerFactory[this.forType.BaseType].TypeConverter;
                     }
                     return converterResult;
                 }
@@ -478,7 +478,7 @@ namespace JsonExSerializer.MetaData
         {
             DefaultValueOption option = base.GetEffectiveDefaultValueSetting();
             if (option == DefaultValueOption.Default)
-                return Context.GetEffectiveDefaultValueSetting();
+                return Config.GetEffectiveDefaultValueSetting();
             else
                 return option;
         }
@@ -488,7 +488,7 @@ namespace JsonExSerializer.MetaData
             get
             {
                 if (_defaultValues == null)
-                    _defaultValues = new DefaultValueCollection(Context.DefaultValues);
+                    _defaultValues = new DefaultValueCollection(Config.DefaultValues);
                 return _defaultValues;
             }
             set
@@ -500,7 +500,7 @@ namespace JsonExSerializer.MetaData
         public virtual object GetDefaultValue(Type forType)
         {
             if (_defaultValues == null)
-                return Context.DefaultValues[forType];
+                return Config.DefaultValues[forType];
             else
                 return _defaultValues[forType];
         }

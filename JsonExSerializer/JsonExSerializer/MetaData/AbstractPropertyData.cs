@@ -132,7 +132,7 @@ namespace JsonExSerializer.MetaData
             return PropertyType.ToString() + " " + Name;
         }
 
-        public bool ShouldWriteValue(SerializationContext context, object value)
+        public bool ShouldWriteValue(IConfiguration config, object value)
         {
             if (GetEffectiveDefaultValueSetting() == DefaultValueOption.SuppressDefaultValues)
             {

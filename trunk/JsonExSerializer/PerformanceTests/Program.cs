@@ -6,57 +6,55 @@ namespace PerformanceTests
 {
     class Program
     {
-        private static bool RunBinary = false;
-        private static bool RunXml = false;
-        private static bool RunJson = false;
-        private static int ObjectCount = 100;
-        private static int Iterations = 2500;
-        private static bool Serialize = false;
-        private static bool Deserialize = false;
-
         public static void Main(string[] args)
         {
             bool help = false;
-            ProcessOptions(args, ref help);
+            PerfTestOptions options = ProcessOptions(args, ref help);
             if (help)
             {
                 ShowHelp();
                 return;
             }
 
-            if (RunBinary)
-                new BinarySerializerTest(ObjectCount,Iterations).RunTests(Serialize, Deserialize);
-            if (RunXml)
-                new XmlSerializerTest(ObjectCount, Iterations).RunTests(Serialize, Deserialize);
-            if (RunJson)
-                new JsonSerializerTest(ObjectCount, Iterations).RunTests(Serialize, Deserialize);
+            if (options.RunBinary)
+                new BinarySerializerTest(options).RunTests();
+            if (options.RunXml)
+                new XmlSerializerTest(options).RunTests();
+            if (options.RunJson)
+                new JsonSerializerTest(options).RunTests();
+            if (options.RunTokens)
+                new TokenStreamTest(options).RunTests();
+
             //new JsonDynamicTests().RunTests();
             //CreateTests.RunCreateTests(10000000);
             //CreateTests.RunCreateTests(10000000);
         }
 
-        public static void ProcessOptions(string[] args, ref bool IsHelp)
+        public static PerfTestOptions ProcessOptions(string[] args, ref bool IsHelp)
         {
             int i = 0;
             IsHelp = false;
+            PerfTestOptions options = new PerfTestOptions();
             while (i < args.Length)
             {
                 string arg = args[i].ToLower();
                 if (arg.StartsWith("-xml"))
-                    RunXml = true;
+                    options.RunXml = true;
                 else if (arg.StartsWith("-json"))
-                    RunJson = true;
+                    options.RunJson = true;
                 else if (arg.StartsWith("-bin"))
-                    RunBinary = true;
+                    options.RunBinary = true;
+                else if (arg.StartsWith("-tok"))
+                    options.RunTokens = true;
                 else if (arg.StartsWith("-i"))
                 {
                     i++;
-                    Iterations = int.Parse(args[i]);
+                    options.Iterations = int.Parse(args[i]);
                 }
                 else if (arg.StartsWith("-o"))
                 {
                     i++;
-                    ObjectCount = int.Parse(args[i]);
+                    options.ObjectCount = int.Parse(args[i]);
                 }
                 else if (arg.StartsWith("-help"))
                 {
@@ -64,19 +62,21 @@ namespace PerformanceTests
                     break;
                 }
                 else if (arg.StartsWith("-s"))
-                    Serialize = true;
+                    options.Serialize = true;
                 else if (arg.StartsWith("-d"))
-                    Deserialize = true;
+                    options.Deserialize = true;
 
                 i++;
             }
 
-            if (!RunBinary && !RunJson && !RunXml)
+            if (!options.RunBinary && !options.RunJson && !options.RunXml && !options.RunTokens)
             {
-                RunBinary = RunJson = RunXml = true;
+                options.RunBinary = options.RunJson = options.RunXml = true;
             }
-            if (!Serialize && !Deserialize)
-                Serialize = Deserialize = true;
+            if (!options.Serialize && !options.Deserialize)
+                options.Serialize = options.Deserialize = true;
+
+            return options;
         }
 
         public static void ShowHelp()

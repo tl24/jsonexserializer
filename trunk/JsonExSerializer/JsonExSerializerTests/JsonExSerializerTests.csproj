@@ -51,6 +51,7 @@
     <Compile Include="Expressions\JsonPathTests.cs" />
     <Compile Include="Expressions\ReferenceTests.cs" />
     <Compile Include="FieldTests.cs" />
+    <Compile Include="Framework\CharacterStreamTests.cs" />
     <Compile Include="Framework\ReflectionUtilTests.cs" />
     <Compile Include="IgnorePropertyActionTests.cs" />
     <Compile Include="JsonWriterComplexTests.cs" />
@@ -92,7 +93,7 @@
     <Compile Include="Mocks\SimpleObject.cs" />
     <Compile Include="SimpleConfigSettingsTests.cs" />
     <Compile Include="AdvancedConfigSettingTests.cs" />
-    <Compile Include="TokenStreamTests.cs" />
+    <Compile Include="Framework\TokenStreamTests.cs" />
     <Compile Include="TypeAliasTests.cs" />
     <Compile Include="TypeHandlerTests.cs" />
   </ItemGroup>

@@ -24,6 +24,19 @@ namespace JsonExSerializerTests
             TestTokens("'He said \"she said\"'", new Token(TokenType.SingleQuotedString, "He said \"she said\""));
         }
 
+        [RowTest]
+        [Row("\"b4 \\b aft\"", "b4 \b aft", Description="bell")]
+        [Row("\"b4 \\n aft\"", "b4 \n aft", Description = "newline")]
+        [Row("\"b4 \\r aft\"", "b4 \r aft", Description = "carriage return")]
+        [Row("\"b4 \\t aft\"", "b4 \t aft", Description = "tab")]
+        [Row("\"b4 \\f aft\"", "b4 \f aft", Description = "form feed")]
+        [Row("\"b4 \\\\ aft\"", "b4 \\ aft", Description = "backslash")]
+        [Row("\"b4 \\/ aft\"", "b4 / aft", Description = "solidus")]
+        [Row("\"b4 \\u0000 aft\"", "b4 \u0000 aft", Description = "unicode")]
+        public void SpecialCharactersStringTest(string input, string value)
+        {
+            TestTokens(input, new Token(TokenType.DoubleQuotedString, value));
+        }
         [Test]
         public void BooleanTrueTest()
         {

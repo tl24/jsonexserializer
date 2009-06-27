@@ -283,7 +283,7 @@ namespace JsonExSerializer.Framework.Parsing
             }
             if (!first)
             {
-                RequireToken(separator, tok, "Items should be separated by " + separator);
+                RequireToken(separator, tok, "Items should be separated by {0}", separator);
                 ReadToken();
             }
             else if (first && tok == separator)
@@ -485,10 +485,11 @@ namespace JsonExSerializer.Framework.Parsing
         /// <param name="expected">the expected token</param>
         /// <param name="actual">the actual token</param>
         /// <param name="message">message to use in the exception if expected != actual</param>
-        private static void RequireToken(Token expected, Token actual, string message)
+        private static void RequireToken(Token expected, Token actual, string message, params object[] args)
         {
             if (actual != expected)
             {
+                message = string.Format(message, args);
                 throw new ParseException(message + " Expected: " + expected + " got: " + actual);
             }
         }

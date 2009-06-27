@@ -13,8 +13,8 @@ namespace PerformanceTests
         protected Serializer serializer;
 
 
-        public JsonSerializerTest(int ObjectCount, int Iterations)
-            : base(ObjectCount, Iterations)
+        public JsonSerializerTest(PerfTestOptions options)
+            : base(options)
         {
         }
 
@@ -58,8 +58,8 @@ namespace PerformanceTests
     public class JsonDynamicTests : JsonSerializerTest
     {
 
-        public JsonDynamicTests(int ObjectCount, int Iterations)
-            : base(ObjectCount, Iterations)
+        public JsonDynamicTests(PerfTestOptions options)
+            : base(options)
         {
         }
 

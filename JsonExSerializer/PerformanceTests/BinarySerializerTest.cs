@@ -10,8 +10,8 @@ namespace PerformanceTests
     {
         BinaryFormatter binFormatter;
 
-        public BinarySerializerTest(int ObjectCount, int Iterations)
-            : base(ObjectCount, Iterations)
+        public BinarySerializerTest(PerfTestOptions options)
+            : base(options)
         {
         }
 

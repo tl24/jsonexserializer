@@ -14,32 +14,35 @@ namespace PerformanceTests
     {
 
         private object _testData;
-        private int _objectCount;
-        private int _iterations;
-
-        public AbstractPerfTestBase(int ObjectCount, int Iterations)
+        protected PerfTestOptions options;
+        public AbstractPerfTestBase(PerfTestOptions options)
         {
-            _objectCount = ObjectCount;
-            _iterations = Iterations;
-            TestObjectFactory factory = new TestObjectFactory(_objectCount);
+            this.options = options;
+            GenerateTestData(options);
+        }
+
+        protected virtual void GenerateTestData(PerfTestOptions options)
+        {
+            TestObjectFactory factory = new TestObjectFactory(options.ObjectCount);
             _testData = factory.ProduceObjects();
         }
-        public List<TestResult> RunTests(bool serializeTests, bool deserializeTests)
+
+        public virtual List<TestResult> RunTests()
         {
             List<TestResult> results = new List<TestResult>();
-            if (serializeTests)
-                results.Add(SerializeTest(_objectCount, _iterations));
-            if (deserializeTests)
-                results.Add(DeserializeTest(_objectCount, _iterations));
+            if (options.Serialize)
+                results.Add(SerializeTest());
+            if (options.Deserialize)
+                results.Add(DeserializeTest());
             return results;
         }
 
-        public TestResult SerializeTest(int objectCount, int iterations)
+        public virtual TestResult SerializeTest()
         {
             Stopwatch sw = new Stopwatch();
             InitSerializer(_testData.GetType());
             sw.Start();
-            for (int i = 0; i < iterations; i++)
+            for (int i = 0; i < options.Iterations; i++)
             {
                 Serialize(_testData);
             }
@@ -49,15 +52,15 @@ namespace PerformanceTests
                 "Serialization Performance Test",
                 SerializerType,
                 new FileInfo(FileName).Length,
-                iterations,
-                objectCount,
+                options.Iterations,
+                options.ObjectCount,
                 sw.ElapsedMilliseconds
              );
             result.WriteToConsole();
             return result;
         }
 
-        public TestResult DeserializeTest(int objectCount, int iterations)
+        public virtual TestResult DeserializeTest()
         {
             Type t = _testData.GetType();
             InitSerializer(t);
@@ -65,7 +68,7 @@ namespace PerformanceTests
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            for (int i = 0; i < iterations; i++)
+            for (int i = 0; i < options.Iterations; i++)
             {
                 object newObject = Deserialize(t);
             }
@@ -74,8 +77,8 @@ namespace PerformanceTests
                 "Deserialization Performance Test",
                 SerializerType,
                 new FileInfo(FileName).Length,
-                iterations,
-                objectCount,
+                options.Iterations,
+                options.ObjectCount,
                 sw.ElapsedMilliseconds
              );
             result.WriteToConsole();

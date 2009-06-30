@@ -16,14 +16,16 @@ namespace PerformanceTests
                 return;
             }
 
-            if (options.RunBinary)
+            if ((options.Run & PerfTestOptions.RunTypes.Binary) > 0)
                 new BinarySerializerTest(options).RunTests();
-            if (options.RunXml)
+            if ((options.Run & PerfTestOptions.RunTypes.Xml) > 0)
                 new XmlSerializerTest(options).RunTests();
-            if (options.RunJson)
+            if ((options.Run & PerfTestOptions.RunTypes.Json) > 0)
                 new JsonSerializerTest(options).RunTests();
-            if (options.RunTokens)
+            if ((options.Run & PerfTestOptions.RunTypes.Tokens) > 0)
                 new TokenStreamTest(options).RunTests();
+            if ((options.Run & PerfTestOptions.RunTypes.Parser) > 0)
+                new ParserTests(options).RunTests();
 
             //new JsonDynamicTests().RunTests();
             //CreateTests.RunCreateTests(10000000);
@@ -39,13 +41,15 @@ namespace PerformanceTests
             {
                 string arg = args[i].ToLower();
                 if (arg.StartsWith("-xml"))
-                    options.RunXml = true;
+                    options.Run |= PerfTestOptions.RunTypes.Xml;
                 else if (arg.StartsWith("-json"))
-                    options.RunJson = true;
+                    options.Run |= PerfTestOptions.RunTypes.Json;
                 else if (arg.StartsWith("-bin"))
-                    options.RunBinary = true;
+                    options.Run |= PerfTestOptions.RunTypes.Binary;
                 else if (arg.StartsWith("-tok"))
-                    options.RunTokens = true;
+                    options.Run |= PerfTestOptions.RunTypes.Tokens;
+                else if (arg.StartsWith("-parse"))
+                    options.Run |= PerfTestOptions.RunTypes.Parser;
                 else if (arg.StartsWith("-i"))
                 {
                     i++;
@@ -69,9 +73,9 @@ namespace PerformanceTests
                 i++;
             }
 
-            if (!options.RunBinary && !options.RunJson && !options.RunXml && !options.RunTokens)
+            if (options.Run == 0)
             {
-                options.RunBinary = options.RunJson = options.RunXml = true;
+                options.Run = PerfTestOptions.RunTypes.Binary | PerfTestOptions.RunTypes.Xml | PerfTestOptions.RunTypes.Json;
             }
             if (!options.Serialize && !options.Deserialize)
                 options.Serialize = options.Deserialize = true;

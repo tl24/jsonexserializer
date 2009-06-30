@@ -24,7 +24,7 @@ namespace JsonExSerializer.Framework.Parsing
         #region Member Variables
 
         private Type _deserializedType;
-        private TokenStream _tokenStream;
+        private ITokenStream _tokenStream;
         private TypeAliasCollection typeAliases;
         #endregion
 
@@ -77,7 +77,7 @@ namespace JsonExSerializer.Framework.Parsing
         }
 
 
-        public Parser(TokenStream tokenStream, TypeAliasCollection typeAliases)
+        public Parser(ITokenStream tokenStream, TypeAliasCollection typeAliases)
         {
             _tokenStream = tokenStream;
             this.typeAliases = typeAliases ?? new TypeAliasCollection();

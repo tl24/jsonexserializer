@@ -71,7 +71,6 @@ namespace JsonExSerializerTests
         [Row("0",Description="Zero")]
         [Row("1234", Description="Nosign Pos Integer")]
         [Row("-4567", Description="Negative Integer")]
-        [Row("+2345", Description="Signed Positive Integer")]
         [Row("1234.567", Description="Unsigned positive Float")]
         [Row("-0.567", Description = "Negative Float")]
         [Row("1.34e+10", Description="Positve Float with Positive Exponent")]

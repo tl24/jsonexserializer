@@ -40,6 +40,7 @@
     <Compile Include="CreateTests.cs" />
     <Compile Include="ISerializer.cs" />
     <Compile Include="JsonSerializerTest.cs" />
+    <Compile Include="ParserTests.cs" />
     <Compile Include="PerfTestOptions.cs" />
     <Compile Include="PerfTests.cs" />
     <Compile Include="Program.cs" />

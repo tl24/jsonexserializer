@@ -66,7 +66,7 @@ namespace PerformanceTests
         public override void InitSerializer(Type t)
         {
             base.InitSerializer(t);
-            serializer.Context.TypeHandlerFactory = new CustomTypeDataRepository(typeof(DynamicTypeData), serializer.Context);
+            serializer.Config.TypeHandlerFactory = new CustomTypeDataRepository(typeof(DynamicTypeData), serializer.Config);
         }
     }
 }

@@ -273,6 +273,7 @@ namespace JsonExSerializer
         /// The current serializer instance that created and is using this
         /// context.
         /// </summary>
+        [Obsolete("This property should not be used any longer")]
         public Serializer SerializerInstance
         {
             get { return this._serializerInstance; }

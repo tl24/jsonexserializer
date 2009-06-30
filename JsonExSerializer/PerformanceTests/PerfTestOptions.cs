@@ -14,7 +14,8 @@ namespace PerformanceTests
             Xml = 2,
             Json = 4,
             Tokens = 8,
-            Parser = 16
+            Parser = 16,
+            Dynamic = 32
         }
 
         public RunTypes Run;

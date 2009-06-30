@@ -40,7 +40,7 @@ namespace PerformanceTests
         public virtual TestResult SerializeTest()
         {
             Stopwatch sw = new Stopwatch();
-            InitSerializer(_testData.GetType());
+            PrepareForSerializerTest();
             sw.Start();
             for (int i = 0; i < options.Iterations; i++)
             {
@@ -60,11 +60,15 @@ namespace PerformanceTests
             return result;
         }
 
+        protected virtual void PrepareForSerializerTest()
+        {
+            InitSerializer(_testData.GetType());
+        }
+
         public virtual TestResult DeserializeTest()
         {
             Type t = _testData.GetType();
-            InitSerializer(t);
-            Serialize(_testData);
+            PrepareForDeserializeTest();
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -83,6 +87,12 @@ namespace PerformanceTests
              );
             result.WriteToConsole();
             return result;
+        }
+
+        protected virtual void PrepareForDeserializeTest()
+        {
+            InitSerializer(_testData.GetType());
+            Serialize(_testData);
         }
 
         public abstract void Serialize(object o);

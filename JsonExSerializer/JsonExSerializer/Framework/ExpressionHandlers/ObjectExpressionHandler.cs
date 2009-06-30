@@ -106,59 +106,64 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             ObjectExpression objectExpression = (ObjectExpression)expression;
             foreach (KeyValueExpression Item in objectExpression.Properties)
             {
-                // evaluate the item and let it assign itself?
-                IPropertyData hndlr = typeHandler.FindProperty(Item.Key);
-                if (hndlr == null)
-                {
-                    throw new Exception(string.Format("Could not find property {0} for type {1}", Item.Key, typeHandler.ForType));
-                }
-                if (hndlr.Ignored)
-                {
-                    switch (Config.IgnoredPropertyAction)
-                    {
-                        case SerializationContext.IgnoredPropertyOption.Ignore:
-                            continue;
-                        case SerializationContext.IgnoredPropertyOption.SetIfPossible:
-                            if (!hndlr.CanWrite)
-                                continue;
-                            break;
-                        case SerializationContext.IgnoredPropertyOption.ThrowException:
-                            throw new Exception(string.Format("Can not set property {0} for type {1} because it is ignored and IgnorePropertyAction is set to ThrowException", Item.Key, typeHandler.ForType));
-                    }
-                }
-                Expression valueExpression = Item.ValueExpression;
-                valueExpression.ResultType = hndlr.PropertyType;
-                object result = null;
-                TypeConverterExpressionHandler converterHandler = null;
-                IJsonTypeConverter converter = null;
-                if (hndlr.HasConverter)
-                {
-                    converterHandler = (TypeConverterExpressionHandler) Config.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
-                    converter = hndlr.TypeConverter;
-                }
-                
-                if (!hndlr.CanWrite)
-                {
-                    result = hndlr.GetValue(existingObject);
-                    if (converterHandler != null)
-                    {
-                        converterHandler.Evaluate(valueExpression, result, deserializer, converter);
+                EvaluateItem(existingObject, deserializer, typeHandler, Item);
+            }
+            return existingObject;
+        }
 
-                    }
-                    else
-                    {
-                        deserializer.Evaluate(valueExpression, result);
-                    }
+        protected virtual void EvaluateItem(object existingObject, IDeserializerHandler deserializer, TypeData typeHandler, KeyValueExpression Item)
+        {
+            // evaluate the item and let it assign itself?
+            IPropertyData hndlr = typeHandler.FindProperty(Item.Key);
+            if (hndlr == null)
+            {
+                throw new Exception(string.Format("Could not find property {0} for type {1}", Item.Key, typeHandler.ForType));
+            }
+            if (hndlr.Ignored)
+            {
+                switch (Config.IgnoredPropertyAction)
+                {
+                    case SerializationContext.IgnoredPropertyOption.Ignore:
+                        return;
+                    case SerializationContext.IgnoredPropertyOption.SetIfPossible:
+                        if (!hndlr.CanWrite)
+                            return;
+                        break;
+                    case SerializationContext.IgnoredPropertyOption.ThrowException:
+                        throw new Exception(string.Format("Can not set property {0} for type {1} because it is ignored and IgnorePropertyAction is set to ThrowException", Item.Key, typeHandler.ForType));
+                }
+            }
+            Expression valueExpression = Item.ValueExpression;
+            valueExpression.ResultType = hndlr.PropertyType;
+            object result = null;
+            TypeConverterExpressionHandler converterHandler = null;
+            IJsonTypeConverter converter = null;
+            if (hndlr.HasConverter)
+            {
+                converterHandler = (TypeConverterExpressionHandler)Config.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
+                converter = hndlr.TypeConverter;
+            }
+
+            if (!hndlr.CanWrite)
+            {
+                result = hndlr.GetValue(existingObject);
+                if (converterHandler != null)
+                {
+                    converterHandler.Evaluate(valueExpression, result, deserializer, converter);
+
                 }
                 else
                 {
-                    if (hndlr.HasConverter)
-                        hndlr.SetValue(existingObject, converterHandler.Evaluate(valueExpression,deserializer,converter));
-                    else
-                        hndlr.SetValue(existingObject, deserializer.Evaluate(valueExpression));
+                    deserializer.Evaluate(valueExpression, result);
                 }
             }
-            return existingObject;
+            else
+            {
+                if (hndlr.HasConverter)
+                    hndlr.SetValue(existingObject, converterHandler.Evaluate(valueExpression, deserializer, converter));
+                else
+                    hndlr.SetValue(existingObject, deserializer.Evaluate(valueExpression));
+            }
         }
 
         /// <summary>

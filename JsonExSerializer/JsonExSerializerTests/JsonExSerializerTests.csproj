@@ -51,7 +51,6 @@
     <Compile Include="Expressions\JsonPathTests.cs" />
     <Compile Include="Expressions\ReferenceTests.cs" />
     <Compile Include="FieldTests.cs" />
-    <Compile Include="Framework\CharacterStreamTests.cs" />
     <Compile Include="Framework\ReflectionUtilTests.cs" />
     <Compile Include="IgnorePropertyActionTests.cs" />
     <Compile Include="JsonWriterComplexTests.cs" />

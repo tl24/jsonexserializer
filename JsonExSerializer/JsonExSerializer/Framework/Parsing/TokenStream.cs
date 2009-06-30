@@ -13,15 +13,19 @@ namespace JsonExSerializer.Framework.Parsing
     /// <summary>
     /// Tokenizes input from the specified reader and returns tokens for the parser to parse.
     /// </summary>
-    public class TokenStream
+    public class TokenStream : JsonExSerializer.Framework.Parsing.ITokenStream
     {
         #region Member Variables
 
         private TextReader _reader;
-        private Queue<Token> _tokens;
+        //private Queue<Token> _tokens;
         private char[] _symbols;
         private FastStringBuilder _buffer;
-        private int _capacity;
+        //private int _capacity;
+        private bool _isEmpty = false;
+        private bool _needToken = true;
+        private Token _nextToken;
+
         #endregion
 
         /// <summary>
@@ -31,8 +35,8 @@ namespace JsonExSerializer.Framework.Parsing
         public TokenStream(TextReader reader)
         {
             _reader = reader;
-            _capacity = 16;
-            _tokens = new Queue<Token>(_capacity);
+            //_capacity = 16;
+            //_tokens = new Queue<Token>(_capacity);
             _symbols = "[]<>():,{}.$".ToCharArray();
             Array.Sort<char>(_symbols);
             _buffer = new FastStringBuilder();
@@ -46,13 +50,12 @@ namespace JsonExSerializer.Framework.Parsing
         /// <see cref="Token.Empty"/>
         public Token PeekToken()
         {
-            if (_tokens.Count == 0)
-                Fill();
-
-            if (_tokens.Count == 0)
-                return Token.Empty;
-            else
-                return _tokens.Peek();
+            if (_needToken)
+            {
+                _nextToken = ReadTokenFromReader();
+                _needToken = false;
+            }
+            return _nextToken;
         }
 
         /// <summary>
@@ -62,13 +65,9 @@ namespace JsonExSerializer.Framework.Parsing
         /// <see cref="Token.Empty"/>
         public Token ReadToken()
         {
-            if (_tokens.Count == 0)
-                Fill();
-
-            if (_tokens.Count > 0)
-                return _tokens.Dequeue();
-            else
-                return Token.Empty;
+            Token result = PeekToken();
+            _needToken = !_isEmpty;
+            return result;
         }
 
         /// <summary>
@@ -79,7 +78,7 @@ namespace JsonExSerializer.Framework.Parsing
         {
             return PeekToken() == Token.Empty;
         }
-
+        /*
         private void Fill()
         {
             Token t;
@@ -89,6 +88,7 @@ namespace JsonExSerializer.Framework.Parsing
             if (t == Token.Empty)
                 _tokens.Enqueue(Token.Empty);
         }
+        */
 
         /// <summary>
         /// Reads a token from the text reader and returns it
@@ -101,27 +101,46 @@ namespace JsonExSerializer.Framework.Parsing
 
             int c;
             char ch;
-
-            while ((c = _reader.Read()) != -1) {
-                ch = (char) c;
-                if (IsQuoteStart(ch)) {
-                    return GetQuotedString(ch, buffer);
-                } else if (IsNumberStart(ch)) {
-                    return GetNumber(ch, buffer);
-                } else if (char.IsWhiteSpace(ch)) {
-                    // nothing
-                } else if (IsIdentifierStart(ch)) {
-                    return  GetIdentifier(ch, buffer);
-                } else if (IsLineCommentStart(ch)) {
-                    ReadLineComment(ch);
-                } else if (IsMultilineCommentStart(ch)) {
-                    ReadMultilineComment(ch);
-                } else if (IsSymbolStart(ch)) {
-                    return GetSymbol(ch);
-                } else {
-                    throw new ParseException("Invalid character");
+            if (!_isEmpty)
+            {
+                while ((c = _reader.Read()) != -1)
+                {
+                    ch = (char)c;
+                    if (IsQuoteStart(ch))
+                    {
+                        return GetQuotedString(ch, buffer);
+                    }
+                    else if (IsNumberStart(ch))
+                    {
+                        return GetNumber(ch, buffer);
+                    }
+                    else if (char.IsWhiteSpace(ch))
+                    {
+                        // nothing
+                    }
+                    else if (IsIdentifierStart(ch))
+                    {
+                        return GetIdentifier(ch, buffer);
+                    }
+                    else if (IsLineCommentStart(ch))
+                    {
+                        ReadLineComment(ch);
+                    }
+                    else if (IsMultilineCommentStart(ch))
+                    {
+                        ReadMultilineComment(ch);
+                    }
+                    else if (IsSymbolStart(ch))
+                    {
+                        return GetSymbol(ch);
+                    }
+                    else
+                    {
+                        throw new ParseException("Invalid character");
+                    }
+                    buffer.Length = 0;
                 }
-                buffer.Length = 0;
+                _isEmpty = true;
             }
             return Token.Empty;
         }

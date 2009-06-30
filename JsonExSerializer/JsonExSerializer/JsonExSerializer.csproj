@@ -82,10 +82,10 @@
     <Compile Include="Framework\ExpressionHandlers\TypeConverterExpressionHandler.cs" />
     <Compile Include="Framework\ExpressionHandlers\ValueExpressionHandler.cs" />
     <Compile Include="Framework\ExpressionHandlers\ExpressionHandlerCollection.cs" />
+    <Compile Include="Framework\Parsing\BufferedTokenStream.cs" />
     <Compile Include="Framework\Parsing\Evaluator.cs" />
     <Compile Include="Framework\Parsing\FastStringBuilder.cs" />
-    <Compile Include="Framework\Parsing\ICharacterStream.cs" />
-    <Compile Include="Framework\Parsing\ReaderCharacterStream.cs" />
+    <Compile Include="Framework\Parsing\ITokenStream.cs" />
     <Compile Include="Framework\ReflectionUtils.cs" />
     <Compile Include="Framework\Visitors\DefaultVisitor.cs" />
     <Compile Include="Framework\Visitors\ReferenceVisitor.cs" />

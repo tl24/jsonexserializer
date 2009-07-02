@@ -420,7 +420,7 @@ namespace JsonExSerializer
         /// <summary>
         /// The default value setting, which is usually inherited from the parent
         /// </summary>
-        Default = 0,
+        InheritParentSetting = 0,
 
         /// <summary>
         /// Default values are suppress for this item

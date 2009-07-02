@@ -174,7 +174,7 @@ namespace JsonExSerializer.MetaData
         public override DefaultValueOption GetEffectiveDefaultValueSetting()
         {
             DefaultValueOption option = base.GetEffectiveDefaultValueSetting();
-            if (option == DefaultValueOption.Default)
+            if (option == DefaultValueOption.InheritParentSetting)
                 return parent.GetEffectiveDefaultValueSetting();
             else
                 return option;

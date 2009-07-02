@@ -19,7 +19,7 @@ namespace JsonExSerializer.MetaData.Attributes
                 {
                     switch (defaultAttr.DefaultValueSetting)
                     {
-                        case DefaultValueOption.Default:
+                        case DefaultValueOption.InheritParentSetting:
                         case DefaultValueOption.SuppressDefaultValues:
                             property.DefaultValueSetting = defaultAttr.DefaultValueSetting;
                             if (defaultAttr.DefaultValueSet)
@@ -41,13 +41,13 @@ namespace JsonExSerializer.MetaData.Attributes
                 {
                     typeData.DefaultValues = new DefaultValueCollection(cache.defaultValues);
                 }
-                if (cache.defaultOption != DefaultValueOption.Default)
+                if (cache.defaultOption != DefaultValueOption.InheritParentSetting)
                     typeData.DefaultValueSetting = cache.defaultOption;
 
                 bool typeSet = false;
                 foreach (JsonExDefaultValuesAttribute attr in attributeProvider.GetCustomAttributes(typeof(JsonExDefaultValuesAttribute), false))
                 {
-                    if (attr.DefaultValueSetting != DefaultValueOption.Default)
+                    if (attr.DefaultValueSetting != DefaultValueOption.InheritParentSetting)
                         typeData.DefaultValueSetting = attr.DefaultValueSetting;
                     if (attr.Type != null)
                     {
@@ -55,7 +55,7 @@ namespace JsonExSerializer.MetaData.Attributes
                         typeSet = true;
                     }
                 }
-                if (typeData.DefaultValueSetting == DefaultValueOption.Default && typeSet)
+                if (typeData.DefaultValueSetting == DefaultValueOption.InheritParentSetting && typeSet)
                     typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             }
         }
@@ -72,7 +72,7 @@ namespace JsonExSerializer.MetaData.Attributes
                 cache = new AssemblyCache(classType.Assembly);
                 foreach (JsonExDefaultValuesAttribute attr in classType.Assembly.GetCustomAttributes(typeof(JsonExDefaultValuesAttribute), false))
                 {
-                    if (attr.DefaultValueSetting != DefaultValueOption.Default)
+                    if (attr.DefaultValueSetting != DefaultValueOption.InheritParentSetting)
                         cache.defaultOption = attr.DefaultValueSetting;
                     if (attr.Type != null)
                     {
@@ -81,7 +81,7 @@ namespace JsonExSerializer.MetaData.Attributes
                         cache.defaultValues[attr.Type] = attr.DefaultValue;
                     }
                 }
-                if (cache.defaultOption == DefaultValueOption.Default && cache.defaultValues != null)
+                if (cache.defaultOption == DefaultValueOption.InheritParentSetting && cache.defaultValues != null)
                     cache.defaultOption = DefaultValueOption.SuppressDefaultValues;
                 _assemblyCache[classType.Assembly] = cache;
             }

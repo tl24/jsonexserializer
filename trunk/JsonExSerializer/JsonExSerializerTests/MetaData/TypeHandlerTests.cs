@@ -9,7 +9,7 @@ using JsonExSerializer.Collections;
 using MbUnit.Core.Exceptions;
 using JsonExSerializer.MetaData.Attributes;
 
-namespace JsonExSerializerTests
+namespace JsonExSerializerTests.MetaData
 {
     [TestFixture]
     public class TypeHandlerTests
@@ -101,6 +101,46 @@ namespace JsonExSerializerTests
             Assert.IsTrue(handler.FindProperty("Salary").Ignored, "XmlIgnore attribute not ignored");
         }
 
+        [Test]
+        public void Ignored_WhenInternalSetter_DefaultsToTrue()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            Assert.IsTrue(handler.FindProperty("InternalInt").Ignored);
+        }
+
+        [Test]
+        public void Ignored_WhenPrivateSetter_DefaultsToTrue()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            Assert.IsTrue(handler.FindProperty("PrivateInt").Ignored);
+        }
+
+        [Test]
+        public void Ignored_WhenProtectedSetter_DefaultsToTrue()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            Assert.IsTrue(handler.FindProperty("ProtectedInt").Ignored);
+        }
+
+        [Test]
+        public void Ignored_WhenNoGetter_DefaultsToTrue()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            Assert.IsTrue(handler.FindProperty("NoGetter").Ignored);
+        }
+
+        [Test]
+        public void Ignored_WhenNoSetter_DefaultsToTrue()
+        {
+            SerializationContext context = new SerializationContext();
+            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            Assert.IsTrue(handler.FindProperty("NoSetter").Ignored);
+        }
+
         public class EmptyClass
         {
         }
@@ -118,7 +158,37 @@ namespace JsonExSerializerTests
         }
 
 
+        public class NonWritableProperty
+        {
 
+            public int InternalInt
+            {
+                get { return 0; }
+                internal set {  }
+            }
+
+            public int PrivateInt
+            {
+                get { return 0; }
+                private set {  }
+            }
+
+            public int ProtectedInt
+            {
+                get { return 0; }
+                protected set {  }
+            }
+
+            public int NoGetter
+            {
+                set {  }
+            }
+
+            public int NoSetter
+            {
+                get { return 0; }
+            }
+        }
 
     }
 

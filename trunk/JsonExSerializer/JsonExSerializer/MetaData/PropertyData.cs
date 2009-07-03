@@ -33,8 +33,8 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         private void Initialize()
         {
-            if (!(Property.GetGetMethod().GetParameters().Length == 0 && Property.CanRead)
-                || (!Property.CanWrite))
+            if (!(Property.CanRead && Property.GetGetMethod().GetParameters().Length == 0)
+                || !Property.CanWrite || !this.PublicWriter || !this.PublicGetter)
             {
                 this.Ignored = true;
             }
@@ -84,6 +84,16 @@ namespace JsonExSerializer.MetaData
         public override bool CanWrite
         {
             get { return Property.CanWrite; }
+        }
+
+        public bool PublicWriter
+        {
+            get { return Property.CanWrite && Property.GetSetMethod(false) != null; }
+        }
+
+        public bool PublicGetter
+        {
+            get { return Property.CanRead && Property.GetGetMethod(false) != null; }
         }
     }
 }

@@ -94,7 +94,7 @@
     <Compile Include="AdvancedConfigSettingTests.cs" />
     <Compile Include="Framework\TokenStreamTests.cs" />
     <Compile Include="TypeAliasTests.cs" />
-    <Compile Include="TypeHandlerTests.cs" />
+    <Compile Include="MetaData\TypeHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JsonExSerializer\JsonExSerializer.csproj">

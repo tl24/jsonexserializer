@@ -87,4 +87,30 @@ namespace JsonExSerializerTests.Mocks
             _convertFromCount = 0;
         }
     }
+
+    public class MyImmutableLine
+    {
+        private MyImmutablePoint _start;
+        private MyImmutablePoint _end;
+
+        public MyImmutableLine(MyImmutablePoint start, MyImmutablePoint end)
+        {
+            _start = start;
+            _end = end;
+        }
+
+        [JsonConvert(typeof(MyLinePointConverter), /* separator */ Context=":")]
+        [ConstructorParameter]
+        public MyImmutablePoint Start
+        {
+            get { return this._start; }
+        }
+
+        [JsonConvert(typeof(MyLinePointConverter), /* separator */ Context=":")]
+        [ConstructorParameter]
+        public MyImmutablePoint End
+        {
+            get { return this._end; }
+        }
+    }
 }

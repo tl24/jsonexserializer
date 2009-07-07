@@ -191,5 +191,18 @@ namespace JsonExSerializerTests
             Type typeResult = (Type)s.Deserialize(result);
             Assert.AreEqual(typeof(int), typeResult, "Type deserialized improperly");
         }
+
+        [Test]
+        public void CtorParmsUsePropertyConverter()
+        {
+            MyImmutablePoint start = new MyImmutablePoint(3, 10);
+            MyImmutablePoint end = new MyImmutablePoint(-5, -15);
+            MyImmutableLine line = new MyImmutableLine(start, end);
+            Serializer s = new Serializer(typeof(MyImmutableLine));
+            string result = s.Serialize(line);
+            MyImmutableLine actual = (MyImmutableLine)s.Deserialize(result);
+            Assert.AreEqual(start, actual.Start, "start");
+            Assert.AreEqual(end, actual.End, "end");
+        }
     }
 }

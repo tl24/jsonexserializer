@@ -205,7 +205,15 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             for (int i = 0; i < args.Length; i++)
             {
                 Expression carg = expression.ConstructorArguments[i];
-                args[i] = deserializer.Evaluate(carg);
+                if (i < handler.ConstructorParameters.Count && handler.ConstructorParameters[i].HasConverter)
+                {
+                    TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)Config.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
+                    args[i] = converterHandler.Evaluate(carg, deserializer, handler.ConstructorParameters[i].TypeConverter);
+                }
+                else
+                {
+                    args[i] = deserializer.Evaluate(carg);
+                }
             }
             object result = handler.CreateInstance(args);
             expression.OnObjectConstructed(result);

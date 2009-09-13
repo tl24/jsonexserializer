@@ -6,6 +6,9 @@ using JsonExSerializer.Framework.ExpressionHandlers;
 using JsonExSerializer.Framework.Expressions;
 using System.Globalization;
 using JsonExSerializer;
+using System.Data;
+using JsonExSerializer.CustomHandlers;
+using JsonExSerializer.TypeConversion;
 
 namespace JsonExSerializerTests.Expressions
 {
@@ -53,6 +56,31 @@ namespace JsonExSerializerTests.Expressions
             Assert.AreSame(s.Config, handler.Config, "IConfigurationAware.Config not set on ExpressionHandler when inserted into Handlers collection");
         }
 
+        [Test]
+        public void DataTableSerialize()
+        {
+            DataTable dt = new DataTable("MyTable");
+            dt.Columns.Add("IntColumn", typeof(int));
+            dt.Columns.Add("StringColumn", typeof(string));
+            dt.Columns.Add("BoolColumn", typeof(bool));
+            dt.Columns.Add("DateTimeColumn", typeof(DateTime));
+            dt.Columns.Add("DoubleColumn", typeof(double));
+            dt.Rows.Add((int)32, "row 1", true, new DateTime(2009, 9, 1), 213.45d);
+            dt.Rows.Add((int)64, "row 2", false, new DateTime(2005, 5, 15), 124.95d);
+
+            Serializer s = new Serializer(typeof(DataTable));
+            s.Config.ExpressionHandlers.Insert(0, new DataTableExpressionHandler());
+            s.Config.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            string result = s.Serialize(dt);
+
+            DataTable dtResult = (DataTable) s.Deserialize(result);
+            DataSet expected = new DataSet();
+            expected.Tables.Add(dt);
+
+            DataSet actual = new DataSet();
+            actual.Tables.Add(dtResult);
+            DataAssert.AreDataEqual(expected, actual);
+        }
         
     }
 }

@@ -33,7 +33,29 @@ namespace JsonExSerializerTests.Expressions
             Assert.AreEqual("test", ((Type2)obj2).S, "obj2.S");
         }
 
-        public class Type1
+        [Test]
+        public void TestResolveConcreteTypeToInterfaceProperty()
+        {
+            Serializer serializer = new Serializer(typeof(Message));
+            string json = @"{ type:'Type1', value: {A:1, B: 2} }";
+            serializer.Context.ParsingStages.Add(new CustomTypeResolver());
+            Message result = (Message)serializer.Deserialize(json);
+            IType value = result.value;
+            Assert.IsNotNull(value, "value not deserialized");
+            Assert.IsInstanceOfType(typeof(Type1), value, "Incorrect type on value");
+            Assert.AreEqual(1, ((Type1)value).A, "obj1.A");
+            Assert.AreEqual(2, ((Type1)value).B, "obj1.B");
+        }
+
+        public class Message
+        {
+            public string type;
+            public IType value;
+        }
+
+        public interface IType { }
+
+        public class Type1 : IType
         {
             private int _a;
             private int _b;
@@ -62,7 +84,7 @@ namespace JsonExSerializerTests.Expressions
 
         }
 
-        public class Type2
+        public class Type2 : IType
         {
             private float _x;
             private string _s;
@@ -108,10 +130,13 @@ namespace JsonExSerializerTests.Expressions
                 if (expression["type"] != null && expression["value"] != null)
                 {
                     string typeIndc = ((ValueExpression)expression["type"]).StringValue;
+                    Type newType = null;
                     if (typeIndc == "Type1")
-                        expression["value"].ResultType = typeof(Type1);
+                        newType = typeof(Type1);
                     else if (typeIndc == "Type2")
-                        expression["value"].ResultType = typeof(Type2);
+                        newType = typeof(Type2);
+                    if (newType != null)
+                        expression["value"] = new CastExpression(newType, expression["value"]);
                 }
             }
         }

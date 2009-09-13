@@ -54,6 +54,7 @@
     <Compile Include="Collections\StackHandler.cs" />
     <Compile Include="Collections\ICollectionBuilder.cs" />
     <Compile Include="ConstructorParameterAttribute.cs" />
+    <Compile Include="CustomHandlers\DataTableExpressionHandler.cs" />
     <Compile Include="DefaultValueCollection.cs" />
     <Compile Include="Framework\ExpressionHandlers\DateTimeExpressionHandler.cs" />
     <Compile Include="Framework\Expressions\CastExpression.cs" />

@@ -31,7 +31,7 @@ namespace JsonExSerializer.Framework
         /// <returns>true if equivalent</returns>
         public static bool AreEquivalentTypes(Type a, Type b)
         {
-            if (a == b)
+            if (a.Equals(b))
                 return true;
 
             if (IsNullableType(a))
@@ -54,7 +54,7 @@ namespace JsonExSerializer.Framework
         /// <returns>true if the type is a nullable type</returns>
         public static bool IsNullableType(Type checkType)
         {
-            return (checkType.IsGenericType && checkType.GetGenericTypeDefinition() == typeof(Nullable<>));
+            return (checkType.IsGenericType && typeof(Nullable<>).Equals(checkType.GetGenericTypeDefinition()));
         }
     }
 }

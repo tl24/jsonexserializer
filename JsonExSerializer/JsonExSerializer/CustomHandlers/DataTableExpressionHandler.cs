@@ -41,6 +41,7 @@ namespace JsonExSerializer.CustomHandlers
             foreach (DataColumn dc in table.Columns)
             {
                 columns.Add(GetColumnExpression(dc, currentPath.Append(colCount), serializer));
+                colCount++;
             }
             return columns;
         }

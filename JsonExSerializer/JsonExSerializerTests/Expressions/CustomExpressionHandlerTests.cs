@@ -70,7 +70,7 @@ namespace JsonExSerializerTests.Expressions
 
             Serializer s = new Serializer(typeof(DataTable));
             s.Config.ExpressionHandlers.Insert(0, new DataTableExpressionHandler());
-            s.Config.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            s.Config.RegisterTypeConverter(typeof(Type), new TypeToStringConverter()); // for DataType property of Column
             string result = s.Serialize(dt);
 
             DataTable dtResult = (DataTable) s.Deserialize(result);

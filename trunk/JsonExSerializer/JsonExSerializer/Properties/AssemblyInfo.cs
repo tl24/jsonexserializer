@@ -21,6 +21,6 @@ using System.Runtime.InteropServices;
 [assembly: GuidAttribute("12d697c6-ebf8-479f-b78a-86fdf09307d0")]
 [assembly: CLSCompliantAttribute(true)]
 [assembly: AssemblyInformationalVersionAttribute("3.1")]
-[assembly: AssemblyVersionAttribute("3.1.0.246")]
-[assembly: AssemblyFileVersionAttribute("3.1.0.246")]
+[assembly: AssemblyVersionAttribute("3.1.0.255")]
+[assembly: AssemblyFileVersionAttribute("3.1.0.255")]
 [assembly: InternalsVisibleTo("JsonExSerializerTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100BBF047AD3730235423C19BBAB2B5321DE1C8422E784080BAB25113E8833EF01AB44F19D5DD023E7F4625F4423F205C85CB049A0061FABD730AC2713E41D655D8C83C0BECA70D0A74168A601FC30957AF5FAA893EE7A0594561AA29DF9D1F9504F3B09C25ED1374168117DD13A9BF618DA7DA5CC311450B598D8D7B1B65240CC3")]

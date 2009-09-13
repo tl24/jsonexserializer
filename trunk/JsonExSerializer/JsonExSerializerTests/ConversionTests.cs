@@ -171,7 +171,7 @@ namespace JsonExSerializerTests
             s.Config.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
             string result = s.Serialize(typeof(SimpleObject));
 
-            Assert.AreEqual("\"" + typeof(SimpleObject).AssemblyQualifiedName + "\"", result, "Type serialized improperly");
+            Assert.AreEqual("\"" + typeof(SimpleObject).FullName + ",JsonExSerializerTests\"", result, "Type serialized improperly");
 
             Type typeResult = (Type) s.Deserialize(result);
             Assert.AreEqual(typeof(SimpleObject), typeResult, "Type deserialized improperly");

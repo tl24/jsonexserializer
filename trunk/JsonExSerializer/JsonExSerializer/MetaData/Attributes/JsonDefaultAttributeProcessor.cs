@@ -9,7 +9,7 @@ namespace JsonExSerializer.MetaData.Attributes
     public class JsonDefaultAttributeProcessor : AttributeProcessor
     {
         private Dictionary<Assembly, AssemblyCache> _assemblyCache;
-        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
+        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
         {
             if (metaData is IPropertyData)
             {

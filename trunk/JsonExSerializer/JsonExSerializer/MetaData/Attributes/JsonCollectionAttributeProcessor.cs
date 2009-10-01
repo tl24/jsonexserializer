@@ -9,7 +9,7 @@ namespace JsonExSerializer.MetaData.Attributes
 {
     public class JsonCollectionAttributeProcessor : AttributeProcessor
     {
-        public override void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
+        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
         {
             TypeData typeData = metaData as TypeData;
             if (typeData == null)

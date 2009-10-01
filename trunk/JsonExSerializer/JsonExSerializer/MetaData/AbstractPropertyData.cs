@@ -14,6 +14,8 @@ namespace JsonExSerializer.MetaData
         protected object defaultValue;
         protected TypeData parent;
         protected bool defaultValueSet;
+        protected string alias;
+
         /// <summary>
         /// Ignored flag
         /// </summary>
@@ -43,6 +45,22 @@ namespace JsonExSerializer.MetaData
         /// Gets the name of the property
         /// </summary>
         public abstract string Name { get; }
+
+        /// <summary>
+        /// Gets or sets the alias for the property.  The alias will be used
+        /// in JSON.
+        /// </summary>
+        public virtual string Alias
+        {
+            get
+            {
+                return this.alias ?? this.Name;
+            }
+            set
+            {
+                this.alias = value;
+            }
+        }
 
         /// <summary>
         /// Returns the 0-based index in the constructor arguments for a constructor parameter
@@ -129,7 +147,7 @@ namespace JsonExSerializer.MetaData
 
         public override string ToString()
         {
-            return PropertyType.ToString() + " " + Name;
+            return PropertyType.ToString() + " " + Alias;
         }
 
         public bool ShouldWriteValue(IConfiguration config, object value)

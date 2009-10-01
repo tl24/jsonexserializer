@@ -384,7 +384,7 @@ namespace JsonExSerializer
 
         /// <summary>
         /// Gets or sets the TypeHandlerFactory which is responsible for
-        /// creating ITypeHandlers which manage type metadata
+        /// creating TypeData instances which manage type metadata
         /// </summary>
         public TypeDataRepository TypeHandlerFactory
         {

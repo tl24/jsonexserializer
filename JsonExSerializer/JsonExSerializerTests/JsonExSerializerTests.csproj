@@ -60,6 +60,7 @@
     <Compile Include="LocalizationTests.cs" />
     <Compile Include="MetaData\ConstructorParameterTests.cs" />
     <Compile Include="MetaData\DynamicMethodUtilTests.cs" />
+    <Compile Include="MetaData\PropertyNamingTests.cs" />
     <Compile Include="MetaData\PropertyInheritanceTests.cs" />
     <Compile Include="Mocks\BoolToIntConverter.cs" />
     <Compile Include="Mocks\Constructors.cs" />

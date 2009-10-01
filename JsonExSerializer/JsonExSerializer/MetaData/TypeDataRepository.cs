@@ -16,6 +16,8 @@ namespace JsonExSerializer.MetaData
         private IConfiguration _config;
         private IDictionary<Type, TypeData> _cache;
         private List<AttributeProcessor> _attributeProcessors;
+        private IPropertyNamingStrategy _propertyNamingStrategy;
+
         public TypeDataRepository(IConfiguration config)
         {
             _config = config;
@@ -27,6 +29,7 @@ namespace JsonExSerializer.MetaData
             _attributeProcessors.Add(new ConstructorParameterAttributeProcessor());
             _attributeProcessors.Add(new TypeConverterAttributeProcessor());
             _attributeProcessors.Add(new JsonCollectionAttributeProcessor());
+            _propertyNamingStrategy = new DefaultPropertyNamingStrategy();
         }
 
         public IConfiguration Config
@@ -42,6 +45,23 @@ namespace JsonExSerializer.MetaData
         public virtual IList<AttributeProcessor> AttributeProcessors
         {
             get { return this._attributeProcessors; }
+        }
+
+        public virtual IPropertyNamingStrategy PropertyNamingStrategy
+        {
+            get { return this._propertyNamingStrategy; }
+        }
+
+        public void SetPropertyNamingStrategy(IPropertyNamingStrategy namingStrategy)
+        {
+            SetPropertyNamingStrategy(namingStrategy, true);
+        }
+
+        public void SetPropertyNamingStrategy(IPropertyNamingStrategy namingStrategy, bool clearExistingMetaData)
+        {
+            _propertyNamingStrategy = namingStrategy;
+            if (clearExistingMetaData)
+                _cache.Clear();
         }
 
         private TypeData CreateTypeHandler(Type forType)
@@ -61,7 +81,7 @@ namespace JsonExSerializer.MetaData
 
         protected virtual TypeData CreateNew(Type forType)
         {
-            return new TypeData(forType, _config);            
+            return new TypeData(forType, this);            
         }
 
         public virtual void RegisterTypeConverter(Type forType, IJsonTypeConverter converter)
@@ -76,7 +96,7 @@ namespace JsonExSerializer.MetaData
             this[forType].FindProperty(PropertyName).TypeConverter = converter;
         }
 
-        public virtual void ProcessAttributes(MetaDataBase metaData, ICustomAttributeProvider attributeProvider)
+        public virtual void ProcessAttributes(IMetaData metaData, ICustomAttributeProvider attributeProvider)
         {
             foreach(AttributeProcessor processor in AttributeProcessors)
             {

@@ -10,7 +10,7 @@ namespace JsonExSerializer.MetaData
     /// <summary>
     /// Base class for <see cref="TypeData" /> and <see cref="PropertyData"/>
     /// </summary>
-    public abstract class MetaDataBase
+    public abstract class MetaDataBase : IMetaData
     {
         protected DefaultValueOption defaultValueSetting;
 

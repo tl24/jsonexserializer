@@ -7,6 +7,6 @@ namespace JsonExSerializer.MetaData.Attributes
 {
     public abstract class AttributeProcessor
     {
-        public abstract void Process(MetaDataBase metaData, ICustomAttributeProvider attributeProvider, IConfiguration config);
+        public abstract void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, IConfiguration config);
     }
 }

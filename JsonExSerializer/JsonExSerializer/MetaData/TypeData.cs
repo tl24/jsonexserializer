@@ -42,6 +42,11 @@ namespace JsonExSerializer.MetaData
         private CollectionHandler collectionHandler;
 
         /// <summary>
+        /// The repository that created this instance
+        /// </summary>
+        private TypeDataRepository _owningRepository;
+
+        /// <summary>
         /// The serializer's configuration
         /// </summary>
         protected IConfiguration config;
@@ -56,15 +61,20 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         private DefaultValueCollection _defaultValues;
 
+        public TypeData(Type type, IConfiguration config)
+            : this(type, config.TypeHandlerFactory)
+        {
+        }
         /// <summary>
         /// Initializes an instance with the specific <paramref name="type"/> and
         /// <paramref name="context" />.
         /// </summary>
         /// <param name="type">the .NET type that the metadata is for</param>
         /// <param name="context">the serializer context</param>
-        public TypeData(Type type, IConfiguration config) : base(type)
+        public TypeData(Type type, TypeDataRepository owningRepository) : base(type)
         {
-            this.config = config;
+            this._owningRepository = owningRepository;
+            this.config = owningRepository.Config;
         }
 
         /// <summary>
@@ -114,6 +124,8 @@ namespace JsonExSerializer.MetaData
                 }
                 if (property != null) {
                     properties.Add(property);
+                    property.Alias = OwningRepository.PropertyNamingStrategy.GetName(property.Name);
+                    OwningRepository.ProcessAttributes(property, member);
                 }
             }
             return properties;
@@ -271,7 +283,6 @@ namespace JsonExSerializer.MetaData
         protected virtual PropertyData CreatePropertyHandler(PropertyInfo Property)
         {
             PropertyData propData = new PropertyData(Property, this);
-            config.TypeHandlerFactory.ProcessAttributes(propData, Property);
             return propData;
         }
 
@@ -283,7 +294,6 @@ namespace JsonExSerializer.MetaData
         protected virtual FieldData CreateFieldHandler(FieldInfo Field)
         {
             FieldData fieldData = new FieldData(Field, this);
-            config.TypeHandlerFactory.ProcessAttributes(fieldData, Field);
             return fieldData;
         }
 
@@ -300,6 +310,14 @@ namespace JsonExSerializer.MetaData
         public virtual IConfiguration Config
         {
             get { return this.config; }
+        }
+
+        /// <summary>
+        /// The repository that created this instance
+        /// </summary>
+        public virtual TypeDataRepository OwningRepository
+        {
+            get { return this._owningRepository; }
         }
 
         /// <summary>
@@ -362,17 +380,41 @@ namespace JsonExSerializer.MetaData
         }
 
         /// <summary>
-        /// Finds a property by its name.  The property must follow the same rules as
-        /// those returned from the Properties list, i.e. must be readable and writable and
-        /// not have an ignore attribute.
+        /// Finds a property by its name or alias.
         /// </summary>
         /// <param name="Name">the name of the property</param>
-        /// <returns>TypeHandlerProperty instance for the property or null if not found</returns>
+        /// <returns>IPropertyData instance for the property or null if not found</returns>
         public IPropertyData FindProperty(string Name)
+        {
+            return FindPropertyByName(Name);
+        }
+
+        /// <summary>
+        /// Finds a property by its name.
+        /// </summary>
+        /// <param name="Name">the name of the property</param>
+        /// <returns>IPropertyData instance for the property or null if not found</returns>
+        public IPropertyData FindPropertyByName(string Name)
         {
             foreach (IPropertyData prop in AllProperties)
             {
-                if (prop.Name == Name)
+                if (prop.Name.Equals(Name))
+                    return prop;
+            }
+            return null;
+        }
+
+
+        /// <summary>
+        /// Finds a property by its alias.
+        /// </summary>
+        /// <param name="alias">the alias of the property to search for</param>
+        /// <returns>IPropertyData instance for the property or null if not found</returns>
+        public IPropertyData FindPropertyByAlias(string alias)
+        {
+            foreach (IPropertyData prop in AllProperties)
+            {
+                if (prop.Alias.Equals(alias))
                     return prop;
             }
             return null;

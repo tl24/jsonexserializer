@@ -30,6 +30,21 @@ namespace JsonExSerializerTests.Mocks
             get { return this._end; }
             set { this._end = value; }
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+            if (this.GetType().Equals(obj.GetType()))
+                return Equals((MyLine)obj);
+            else
+                return base.Equals(obj);
+        }
+
+        public bool Equals(MyLine line)
+        {
+            return this.Start.Equals(line.Start) && this.End.Equals(line.End);
+        }
     }
 
     public class MyLinePointConverter : JsonConverterBase, IJsonTypeConverter

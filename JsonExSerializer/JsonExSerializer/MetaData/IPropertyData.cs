@@ -5,7 +5,7 @@ namespace JsonExSerializer.MetaData
     /// <summary>
     /// Defines data about a property or field of a type
     /// </summary>
-    public interface IPropertyData
+    public interface IPropertyData : IMetaData
     {
         /// <summary>
         /// Gets or sets a value indicating whether this property is ignored.  Ignored properties
@@ -29,6 +29,12 @@ namespace JsonExSerializer.MetaData
         /// Gets the name of the property
         /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Gets or sets the alias for the property.  The alias will be used
+        /// in JSON.
+        /// </summary>
+        string Alias { get; set; }
 
         /// <summary>
         /// Returns the 0-based index in the constructor arguments for a constructor parameter

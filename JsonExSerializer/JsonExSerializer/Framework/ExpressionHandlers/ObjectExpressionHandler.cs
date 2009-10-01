@@ -65,17 +65,17 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             Expression valueExpr;
             if (prop.HasConverter)
             {
-                valueExpr = serializer.Serialize(value, currentPath.Append(prop.Name), prop.TypeConverter);
+                valueExpr = serializer.Serialize(value, currentPath.Append(prop.Alias), prop.TypeConverter);
             }
             else
             {
-                valueExpr = serializer.Serialize(value, currentPath.Append(prop.Name));
+                valueExpr = serializer.Serialize(value, currentPath.Append(prop.Alias));
             }
             if (value != null && !ReflectionUtils.AreEquivalentTypes(value.GetType(), prop.PropertyType))
             {
                 valueExpr = new CastExpression(value.GetType(), valueExpr);
             }
-            expression.Add(prop.Name, valueExpr);
+            expression.Add(prop.Alias, valueExpr);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         protected virtual void EvaluateItem(object existingObject, IDeserializerHandler deserializer, TypeData typeHandler, KeyValueExpression Item)
         {
             // evaluate the item and let it assign itself?
-            IPropertyData hndlr = typeHandler.FindProperty(Item.Key);
+            IPropertyData hndlr = typeHandler.FindPropertyByAlias(Item.Key);
             if (hndlr == null)
             {
                 throw new Exception(string.Format("Could not find property {0} for type {1}", Item.Key, typeHandler.ForType));
@@ -185,7 +185,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             {
                 foreach (IPropertyData parameter in handler.ConstructorParameters)
                 {
-                    int propLocation = expression.IndexOf(parameter.Name);
+                    int propLocation = expression.IndexOf(parameter.Alias);
                     if (propLocation >= 0)
                     {
                         Expression arg = expression.Properties[propLocation].ValueExpression;

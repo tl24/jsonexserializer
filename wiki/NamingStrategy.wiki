@@ -44,18 +44,31 @@ You can use one of the default strategies, or you can build your own.
 = Available Strategies =
 The existing strategies are located in the JsonExSerializer.MetaData namespace.
 
-  * == DefaultPropertyNamingStrategy ==
+=== DefaultPropertyNamingStrategy ===
 This is the default if you do not specify a naming strategy.  It returns what is passed in to it unchanged.
 
-  * == PascalCaseNamingStrategy ==
+=== PascalCaseNamingStrategy ===
 PascalCase is the recommended naming convention for .NET properties, classes, and interfaces, so if you are already naming your properties this way you won't see much difference with this strategy.  Example: AccountBalance.
 
-  * == CamelCaseNamingStrategy ==
+=== CamelCaseNamingStrategy ===
 CamelCase lower-cases the first word in the name and capitalizes the first letter of each subsequent word.  This is the typical naming convention in .NET for method parameters and local variables.  It is also the recommended naming convention for method names in Java. Example: accountBalance
 
-  * == UnderscoreNamingStrategy ==
+=== UnderscoreNamingStrategy ===
 The underscore naming strategy separates words using the underscore character "_".  There a few different styles to determine the case of individual words.  The default behavior if not specified is to use the existing case.  Here are the different styles and their effects:
   * OriginalCase - leaves case unchanged. e.g. AccountBalance => Acccount_Balance
   * MixedCase - uppercases the first letter in each word. e.g. accountBalance =>  Account_Balance
   * LowerCase - lowercases all words. e.g. AccountBalance => account_balance
   * UpperCase - uppercases all words. e.g. AccountBalance => ACCOUNT_BALANCE
+
+=== DelegateNamingStrategy ===
+This strategy takes a delegate to implement the strategy in the event that you don't want to use a full blown class for your naming strategy.  The delegate type is System.Converter<string, string>. Example:
+{{{
+  // 2.0 anonymous delegate syntax
+  new DelegateNamingStrategy(delegate(string old) { return "json_" + old; });
+
+  // 3.5 lambda syntax
+  new DelegateNamingStrategy((x) => ( "json_" + x; ));
+}}}
+
+=== CustomNamingStrategyBase ===
+You can extend this class to create your own custom strategy.  It provides a helper method called GetNameParts that will split a name up into list of strings.  The split logic depends on mixed case and/or underscores to successfully delimit words in the name.

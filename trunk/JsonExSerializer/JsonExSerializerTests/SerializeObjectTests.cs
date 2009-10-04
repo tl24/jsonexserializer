@@ -196,6 +196,38 @@ namespace JsonExSerializerTests
             Assert.AreEqual(value, actual, "Structs not equal");
         }
 
+        [Test]
+        public void DeserializeIntoTest()
+        {
+            SimpleObject so = new SimpleObject();
+            
+            string json = "{ByteValue:255, BoolValue:true, DoubleValue: 3.14}";
+            Serializer s = new Serializer(typeof(SimpleObject));
+            s.Deserialize(json, so);
+            Assert.AreEqual(255, so.ByteValue, "ByteValue");
+            Assert.IsTrue(so.BoolValue, "BoolValue");
+            Assert.AreEqual(3.14, so.DoubleValue, "doubleValue");
+        }
+
+        [Test]
+        [ExpectedArgumentException]
+        public void DeserializeIntoPrimitiveFails()
+        {
+            Serializer s = new Serializer(typeof(int));
+            string json = "32";
+            s.Deserialize(json, 1);
+        }
+
+        [Test]
+        [ExpectedArgumentException]
+        public void DeserializeIntoValueTypeFails()
+        {
+            Serializer s = new Serializer(typeof(int));
+            string json = "{X:5,Y:10}";
+            MockValueType mv = new MockValueType();
+            s.Deserialize(json, mv);
+        }
+
         public object TestStructGetter(object o)
         {
             return ((MockValueType)o).X;

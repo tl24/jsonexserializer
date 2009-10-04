@@ -182,7 +182,9 @@ namespace JsonExSerializer
 
         /// <summary>
         /// Read the serialized data from the stream and return the
-        /// deserialized object.
+        /// deserialized object.  The stream will be closed when the 
+        /// method returns.  To control the stream, use the overload of Deserialize
+        /// that that takes a TextReader.
         /// </summary>
         /// <param name="stream">stream to read the data from</param>
         /// <returns>the deserialized object</returns>
@@ -195,6 +197,25 @@ namespace JsonExSerializer
                 return Deserialize(sr);
             }
         }
+
+        /// <summary>
+        /// Read the serialized data from the stream and update
+        /// the target object.  The stream will be closed when the 
+        /// method returns.  To control the stream, use the overload of Deserialize
+        /// that that takes a TextReader.
+        /// </summary>
+        /// <param name="stream">stream to read the data from</param>
+        /// <param name="target">Target object that will be updated</param>
+        public virtual void Deserialize(Stream stream, object target)
+        {
+            if (stream == null)
+                throw new ArgumentNullException("stream");
+            using (StreamReader sr = new StreamReader(stream))
+            {
+                Deserialize(sr, target);
+            }
+        }
+
         /// <summary>
         /// Read the serialized data from the reader and return the
         /// deserialized object.
@@ -205,6 +226,21 @@ namespace JsonExSerializer
         {
             Expression expr = Parse(reader);
             return Evaluate(expr);
+        }
+
+        /// <summary>
+        /// Read the serialized data from the reader update the target.
+        /// </summary>
+        /// <param name="reader">TextReader to read the data from</param>
+        /// <param name="target">Target object that will be updated</param>
+        public virtual void Deserialize(TextReader reader, object target)
+        {
+            if (target == null)
+                throw new ArgumentNullException("target");
+            if (target.GetType().IsValueType || target.GetType().IsPrimitive)
+                throw new ArgumentException("Target can not be a value type or primitive", "target");
+            Expression expr = Parse(reader);
+            Evaluate(expr, target);
         }
 
         protected virtual Expression Parse(TextReader reader)
@@ -227,6 +263,12 @@ namespace JsonExSerializer
             return eval.Evaluate(expression);
         }
 
+        protected virtual void Evaluate(Expression expression, object target)
+        {
+            Evaluator eval = new Evaluator(this.Config);
+            eval.Evaluate(expression, target);
+        }
+
         /// <summary>
         /// Read the serialized data from the input string and return the
         /// deserialized object.
@@ -237,12 +279,29 @@ namespace JsonExSerializer
         {
             if (input == null)
                 throw new ArgumentNullException("input");
-            StringReader rdr = new StringReader(input);
-            object result = Deserialize(rdr);
-            rdr.Close();
-            return result;
+            using (StringReader rdr = new StringReader(input))
+            {
+                object result = Deserialize(rdr);
+                return result;
+            }
         }
 
+        /// <summary>
+        /// Read the serialized data from the input string and update
+        /// the target from the serialized data.
+        /// </summary>
+        /// <param name="input">the string containing the serialized data</param>
+        /// <param name="target">the target to write the information to</param>
+        public void Deserialize(string input, object target)
+        {
+            if (input == null)
+                throw new ArgumentNullException("input");
+
+            using (StringReader rdr = new StringReader(input))
+            {
+                Deserialize(rdr, target);
+            }
+        }
         #endregion
 
         /// <summary>

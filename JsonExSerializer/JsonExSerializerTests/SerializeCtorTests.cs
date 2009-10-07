@@ -59,9 +59,18 @@ namespace JsonExSerializerTests
             IDExpr.ResultType = typeof(long);
             objExpr.ResultType = typeof(MyObject2);
             Evaluator eval = new Evaluator(s.Config);
-            object result = eval.Evaluate(expr);
+            object result = eval.Evaluate(expr);            
+        }
 
-            
+        [Test]
+        public void Deserialize_NewConstructorStyle_WorksSameAsCast()
+        {
+            Serializer s = new Serializer(typeof(CtorMock));
+            s.Config.TypeAliases.Add(typeof(CtorMock), "CtorMock");
+            s.Config.TypeAliases.Add(typeof(CtorMock2), "CtorMock2");
+            string text = "new CtorMock2(1, 'test')";
+            CtorMock x = (CtorMock)s.Deserialize(text);
+            Assert.IsInstanceOfType(typeof(CtorMock2), x, "Wrong Type");
         }
     }
 

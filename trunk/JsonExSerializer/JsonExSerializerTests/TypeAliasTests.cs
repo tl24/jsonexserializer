@@ -55,6 +55,16 @@ namespace JsonExSerializerTests
             Assert.AreEqual(source, target, "Deserialize");
         }
 
+        [Test]
+        public void AliasedOpenGenericType()
+        {
+            Serializer s = GetSerializer();
+            s.Context.TypeAliases.Add(typeof(Dictionary<,>), "dictionary");
+            string result = s.Serialize(new Dictionary<string, int>());
+            StringAssert.FullMatch(result, @"\s*\(dictionary<string,int>\)\s*\{\s*\}\s*");
+            Dictionary<string, int> targetDictionary = (Dictionary<string, int>)s.Deserialize(result);
+            Assert.AreEqual(0, targetDictionary.Count, "Deserialize");
+        }
         private static Serializer GetSerializer()
         {
             Serializer s = new Serializer(typeof(object));

@@ -143,11 +143,21 @@ namespace JsonExSerializer.MetaData
             get { return GetTypeBinding(alias); }
         }
 
+        /// <summary>
+        /// List of known assemblies.  Any types contained in assemblies in this list will
+        /// not be assembly qualified.
+        /// </summary>
         public virtual IList<Assembly> Assemblies
         {
             get { return this.assemblyList; }
         }
 
+        /// <summary>
+        /// Checks to see if the assembly name should be rendered as part of the type.  This returns
+        /// false for any assembly contained in the Assemblies collection.
+        /// </summary>
+        /// <param name="assembly">the assembly to check</param>
+        /// <returns></returns>
         public virtual bool ShouldWriteAssembly(Assembly assembly)
         {
             return !Assemblies.Contains(assembly);

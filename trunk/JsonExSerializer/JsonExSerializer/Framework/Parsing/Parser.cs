@@ -16,6 +16,7 @@ using System.IO;
 using JsonExSerializer.Framework.Expressions;
 using JsonExSerializer.Framework.ExpressionHandlers;
 using JsonExSerializer.MetaData;
+using System.Text.RegularExpressions;
 
 namespace JsonExSerializer.Framework.Parsing
 {
@@ -413,6 +414,14 @@ namespace JsonExSerializer.Framework.Parsing
             if (typeAliases[typeName] != null)
             {
                 return typeAliases[typeName];
+            }
+            Regex openGenerics = new Regex(@"`\d+$");
+            if (openGenerics.IsMatch(typeName))
+            {
+                // remove the generics and try again
+                string tempName = openGenerics.Replace(typeName, "");
+                if (typeAliases[tempName] != null)
+                    return typeAliases[tempName];
             }
             if (!typeName.Contains(","))
             {

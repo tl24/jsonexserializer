@@ -303,7 +303,7 @@ namespace JsonExSerializer.Framework.Parsing
         ///    new MyType("arg1", "arg2")
         ///    new MyType("argA", "argB") { "argC": "C", "argD": "D" }
         /// </example>
-        private ComplexExpressionBase ParseConstructedObject()
+        private Expression ParseConstructedObject()
         {
             Token tok = ReadToken();    // should be the new keyword
             Debug.Assert(tok == NewToken);
@@ -325,7 +325,8 @@ namespace JsonExSerializer.Framework.Parsing
             }
             value.ResultType = t;
             value.ConstructorArguments = ConstructorArgs;
-            return value;
+            // insert Cast to keep type from being overwritten
+            return new CastExpression(t,value);
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace JsonExSerializer.Collections
     {
 
         private Type _IDictionaryType = typeof(IDictionary);
-        private string _IGenericCollectionName = typeof(ICollection<>).Name;
+        private string _IGenericCollectionName = typeof(ICollection<>).FullName;
 
         public override bool IsCollection(Type collectionType)
         {

@@ -77,5 +77,11 @@ namespace JsonExSerializerTests
             Assert.AreEqual(0, MyLinePointConverter.ConvertFromCount, "Property ConvertFrom not called correct amount of times");
             Assert.AreEqual(0, MyLinePointConverter.ConvertToCount, "Property ConvertTo not called correct amount of times");
         }
+
+        [TearDown]
+        public void Teardown()
+        {
+            MyLinePointConverter.clear();
+        }
     }
 }

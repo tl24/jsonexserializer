@@ -1,0 +1,17 @@
+#summary Actions for Missing Properties (since 3.1)
+
+When your Json text contains properties that do not exist on your class, you can set the MissingPropertyAction to determine how to handle this.
+
+The code for that is
+{{{
+  Serializer s = new Serializer(typeof(MyClass));
+  s.Config.MissingPropertyAction = MissingPropertyOptions.Ignore;
+}}}
+
+= Ignore =
+
+This is the default option, missing properties are ignored.
+
+= ThrowException =
+
+With this option if a missing property is encountered an exception is thrown.

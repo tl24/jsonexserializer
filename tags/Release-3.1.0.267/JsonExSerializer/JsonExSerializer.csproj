@@ -1,0 +1,181 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D0C83979-A672-4C06-99BC-B82D81749405}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JsonExSerializer</RootNamespace>
+    <AssemblyName>JsonExSerializer</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\JsonExSerializer.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>JsonExSerializer.xml</DocumentationFile>
+    <NoWarn>1591,1592,1573,1571,1570,1572</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>JsonExSerializer.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Collections\ArrayBuilder.cs" />
+    <Compile Include="Collections\ArrayHandler.cs" />
+    <Compile Include="Collections\CollectionConstructorHandler.cs" />
+    <Compile Include="Collections\CollectionHandlerWrapper.cs" />
+    <Compile Include="Collections\GenericCollectionBuilder.cs" />
+    <Compile Include="Collections\GenericCollectionCtorBuilder.cs" />
+    <Compile Include="Collections\GenericCollectionHandler.cs" />
+    <Compile Include="Collections\GenericStackBuilder.cs" />
+    <Compile Include="Collections\GenericStackHandler.cs" />
+    <Compile Include="Collections\CollectionHandler.cs" />
+    <Compile Include="Collections\ListHandler.cs" />
+    <Compile Include="Collections\StackBuilder.cs" />
+    <Compile Include="Collections\StackHandler.cs" />
+    <Compile Include="Collections\ICollectionBuilder.cs" />
+    <Compile Include="ConstructorParameterAttribute.cs" />
+    <Compile Include="CustomHandlers\DataTableExpressionHandler.cs" />
+    <Compile Include="DefaultValueCollection.cs" />
+    <Compile Include="Framework\ExpressionHandlers\DateTimeExpressionHandler.cs" />
+    <Compile Include="Framework\Expressions\CastExpression.cs" />
+    <Compile Include="Framework\Expressions\ComplexExpressionBase.cs" />
+    <Compile Include="Framework\Expressions\CtorArgTypeResolver.cs" />
+    <Compile Include="Framework\Expressions\Expression.cs" />
+    <Compile Include="Framework\Expressions\KeyValueExpression.cs" />
+    <Compile Include="Framework\Expressions\ArrayExpression.cs" />
+    <Compile Include="Framework\Expressions\NullExpression.cs" />
+    <Compile Include="Framework\Expressions\ObjectExpression.cs" />
+    <Compile Include="Framework\Expressions\ReferenceExpression.cs" />
+    <Compile Include="Framework\Expressions\JsonPath.cs" />
+    <Compile Include="Framework\ExpressionWriter.cs" />
+    <Compile Include="Framework\ExpressionHandlers\BooleanExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\CastExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\ArrayExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\DictionaryObjectExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\IDeserializerHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\IExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\IExpressionBuilder.cs" />
+    <Compile Include="Framework\ExpressionHandlers\ObjectExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\NullExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\NumericExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\ExpressionHandlerBase.cs" />
+    <Compile Include="Framework\ExpressionHandlers\ReferenceExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\TypeConverterExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\ValueExpressionHandler.cs" />
+    <Compile Include="Framework\ExpressionHandlers\ExpressionHandlerCollection.cs" />
+    <Compile Include="Framework\Parsing\BufferedTokenStream.cs" />
+    <Compile Include="Framework\Parsing\Evaluator.cs" />
+    <Compile Include="Framework\Parsing\FastStringBuilder.cs" />
+    <Compile Include="Framework\Parsing\ITokenStream.cs" />
+    <Compile Include="Framework\ReflectionUtils.cs" />
+    <Compile Include="Framework\Visitors\DefaultVisitor.cs" />
+    <Compile Include="Framework\Visitors\ReferenceVisitor.cs" />
+    <Compile Include="Framework\Expressions\ValueExpression.cs" />
+    <Compile Include="Framework\Parsing\AssignReferenceStage.cs" />
+    <Compile Include="Framework\Parsing\IParsingStage.cs" />
+    <Compile Include="Framework\Visitors\CollectReferencesVisitor.cs" />
+    <Compile Include="IConfiguration.cs" />
+    <Compile Include="IConfigurationAware.cs" />
+    <Compile Include="IDeserializationCallback.cs" />
+    <Compile Include="Framework\IJsonWriter.cs" />
+    <Compile Include="ISerializationCallback.cs" />
+    <Compile Include="Framework\Visitors\IVisitable.cs" />
+    <Compile Include="Framework\Visitors\IVisitor.cs" />
+    <Compile Include="JsonConvertAttribute.cs" />
+    <Compile Include="JsonExCollectionAttribute.cs" />
+    <Compile Include="JsonExDefaultAttribute.cs" />
+    <Compile Include="JsonExDefaultValuesAttribute.cs" />
+    <Compile Include="JsonExIgnoreAttribute.cs" />
+    <Compile Include="Collections\ListCollectionBuilder.cs" />
+    <Compile Include="JsonExSerializationException.cs" />
+    <Compile Include="JsonExPropertyAttribute.cs" />
+    <Compile Include="Framework\JsonWriter.cs" />
+    <Compile Include="MetaData\AbstractPropertyData.cs" />
+    <Compile Include="MetaData\Attributes\AttributeProcessor.cs" />
+    <Compile Include="MetaData\Attributes\ConstructorParameterAttributeProcessor.cs" />
+    <Compile Include="MetaData\Attributes\JsonCollectionAttributeProcessor.cs" />
+    <Compile Include="MetaData\Attributes\JsonDefaultAttributeProcessor.cs" />
+    <Compile Include="MetaData\Attributes\TypeConverterAttributeProcessor.cs" />
+    <Compile Include="MetaData\Attributes\JsonPropertyAttributeProcessor.cs" />
+    <Compile Include="MetaData\Attributes\JsonIgnoreAttributeProcessor.cs" />
+    <Compile Include="MetaData\Attributes\XmlIgnoreAttributeProcessor.cs" />
+    <Compile Include="MetaData\CamelCaseNamingStrategy.cs" />
+    <Compile Include="MetaData\CustomNamingStrategyBase.cs" />
+    <Compile Include="MetaData\CustomTypeDataRepository.cs" />
+    <Compile Include="MetaData\DefaultPropertyNamingStrategy.cs" />
+    <Compile Include="MetaData\DelegateNamingStrategy.cs" />
+    <Compile Include="MetaData\DynamicMethodUtil.cs" />
+    <Compile Include="MetaData\DynamicPropertyData.cs" />
+    <Compile Include="MetaData\DynamicTypeData.cs" />
+    <Compile Include="MetaData\FieldData.cs" />
+    <Compile Include="MetaData\IMetaData.cs" />
+    <Compile Include="MetaData\IPropertyData.cs" />
+    <Compile Include="MetaData\IPropertyNamingStrategy.cs" />
+    <Compile Include="MetaData\MetaDataBase.cs" />
+    <Compile Include="MetaData\MemberInfoPropertyDataBase.cs" />
+    <Compile Include="MetaData\PascalCaseNamingStrategy.cs" />
+    <Compile Include="MetaData\TypeAliasCollection.cs" />
+    <Compile Include="MetaData\TypeDataRepository.cs" />
+    <Compile Include="MetaData\UnderscoreNamingStrategy.cs" />
+    <Compile Include="ParseException.cs" />
+    <Compile Include="Framework\Parsing\Parser.cs" />
+    <Compile Include="Framework\ReferenceEqualityComparer.cs" />
+    <Compile Include="Serializer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Framework\ExpressionBuilder.cs" />
+    <Compile Include="SerializationContext.cs" />
+    <Compile Include="Framework\Parsing\Token.cs" />
+    <Compile Include="Framework\Parsing\TokenStream.cs" />
+    <Compile Include="Framework\TwoWayDictionary.cs" />
+    <Compile Include="TypeConversion\BitArrayConverter.cs" />
+    <Compile Include="TypeConversion\ConverterUtil.cs" />
+    <Compile Include="TypeConversion\DictionaryToListConverter.cs" />
+    <Compile Include="TypeConversion\IJsonTypeConverter.cs" />
+    <Compile Include="TypeConversion\JsonConverterBase.cs" />
+    <Compile Include="TypeConversion\TypeConverterAdapter.cs" />
+    <Compile Include="MetaData\TypeData.cs" />
+    <Compile Include="MetaData\PropertyData.cs" />
+    <Compile Include="Framework\Visitors\VisitorBase.cs" />
+    <Compile Include="TypeConversion\TypeToStringConverter.cs" />
+    <Compile Include="XmlConfigurator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\JsonExSerializer.snk">
+      <Link>JsonExSerializer.snk</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!--
+  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  -->
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

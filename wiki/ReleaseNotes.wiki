@@ -12,7 +12,7 @@
   * Issue 50 - Enhancement: You can now deserialize into an existing object
   * Issue 51 - Bug: Fixed issue when aliasing an open generic type
   * Issue 52 - Bug: Fixed issue where the type info was ignored when using the new operator in the Json text
-  * Issue 54 - Enhancement: Extra properties within the json text that don't exist on the object can now be ignored.
+  * Issue 54 - Enhancement: Extra properties within the json text that don't exist on the object can now be ignored. See MissingProperties.
 == Release 3.0  (Jan 25 2009) ==
   * Issue 24 - Bug: Something wrong in DictionaryToListConverter
   * Issue 25 - Enhancement: Better Support for constructor-less classes

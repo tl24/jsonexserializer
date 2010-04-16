@@ -1,5 +1,18 @@
 #summary Release Notes
-
+== Release 3.1  (Apr 15 2010) ==
+  * Issue 23 - Enhancement: Option to omit properties that have the default value
+  * Issue 36 - Bug: Properties with private setters are not defaulted to Ignored
+  * Issue 38 - Bug: ExpressionHandlersCollection doesn't honor IContextAware when setting default or null handler properties
+  * Issue 39 - Enhancement: Usability enhancements to ExpressionHandlersCollection
+  * Issue 40 - Enhancement: Properties where the actual property type is System.Type are handled now
+  * Issue 41 - Enhancement: Multiple instances of the same System.Type no longer written as references
+  * Issue 42 - Enhancement: Attribute service.  Custom actions can be applied by decorating properties/classes with attributes.
+  * Issue 44 - Bug: Property converters not used when placed on a constructor parameter
+  * Issue 49 - Enhancement: Property names in the json text can be customized using a strategy.
+  * Issue 50 - Enhancement: You can now deserialize into an existing object
+  * Issue 51 - Bug: Fixed issue when aliasing an open generic type
+  * Issue 52 - Bug: Fixed issue where the type info was ignored when using the new operator in the Json text
+  * Issue 54 - Enhancement: Extra properties within the json text that don't exist on the object can now be ignored.
 == Release 3.0  (Jan 25 2009) ==
   * Issue 24 - Bug: Something wrong in DictionaryToListConverter
   * Issue 25 - Enhancement: Better Support for constructor-less classes

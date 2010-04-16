@@ -8,10 +8,10 @@ The code for that is
   s.Config.MissingPropertyAction = MissingPropertyOptions.Ignore;
 }}}
 
-= Ignore =
+== Ignore ==
 
 This is the default option, missing properties are ignored.
 
-= ThrowException =
+== ThrowException ==
 
 With this option if a missing property is encountered an exception is thrown.

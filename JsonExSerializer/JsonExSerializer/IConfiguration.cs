@@ -17,6 +17,12 @@ namespace JsonExSerializer
         void SetJsonStrictOptions();
         SerializationContext.ReferenceOption ReferenceWritingType { get; set; }
         SerializationContext.IgnoredPropertyOption IgnoredPropertyAction { get; set; }
+
+        /// <summary>
+        /// Controls the action taken during deserialization when a property is specified in the Json Text,
+        /// but does not exist on the class or object.
+        /// </summary>
+        MissingPropertyOptions MissingPropertyAction { get; set; }
         #endregion
 
         #region "Parsing"

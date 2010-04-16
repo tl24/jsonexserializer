@@ -21,6 +21,6 @@ using System.Runtime.InteropServices;
 [assembly: GuidAttribute("041b67d7-8bf6-4867-ba57-bc8dc556cbc6")]
 [assembly: CLSCompliantAttribute(false)]
 [assembly: AssemblyInformationalVersionAttribute("3.1")]
-[assembly: AssemblyVersionAttribute("3.1.0.265")]
-[assembly: AssemblyFileVersionAttribute("3.1.0.265")]
+[assembly: AssemblyVersionAttribute("3.1.0.267")]
+[assembly: AssemblyFileVersionAttribute("3.1.0.267")]
 //[assembly: AssemblyKeyFile(@"..\..\..\JsonExSerializer.snk")]

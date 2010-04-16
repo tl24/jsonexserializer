@@ -17,22 +17,22 @@
 	
 	<target name="get-revision"> 
 	  <exec
-	    program="svn.exe"
-	    commandline="info"
+	    program="svnversion.exe"
+	    commandline="-n"
 	    output="${svn.info.log}"
 	    resultproperty="svn.revision"
 	    />
 	         
-	  <!-- Load the content of the file in property svn.revision -->
-	  <loadfile property="svn.revision" file="${svn.info.log}" />
-	    
-	  <!-- Look for the 'vision: ' string -->
-	  <property name="index.of.revision" value="${string::index-of(svn.revision, 'Revision: ')}" />
+		<!-- Load the content of the file in property svn.revision -->
+		<loadfile property="svn.revision" file="${svn.info.log}" />
 
-	  <!-- Make sure we have found the index of the substring -->
-	  <if test="${bool::parse(int::parse(index.of.revision) != -1)}">
+		<!-- Split revision if necessary -->
+		<if test="${string::contains(svn.revision, ':')}">
+			<property name="svn.revision" value="${string::substring(svn.revision, string::index-of(svn.revision, ':') + 1, string::get-length(svn.revision) - string::index-of(svn.revision, ':') - 1)}" />
+		</if>
+		<property name="svn.revision" value="${string::replace(string::replace(svn.revision, 'M',''), 'S', '')}" />
 	   
-	    <property name="build.version" value="${string::substring(svn.revision, int::parse(index.of.revision) + 10, 3)}" verbose="true"/>
+		<property name="build.version" value="${string::trim(svn.revision)}" verbose="true"/>
 		<property name="assembly.version" value="${info.version}.${revision.version}.${build.version}" />		
 		<property name="full.version" value="${info.version}.${revision.version}.${build.version}" />
 		<property name="full.version.tag" value="${full.version}" />
@@ -40,11 +40,10 @@
 			<property name="full.version.tag" value="${full.version}.${version.tag.file}" />
 		</if>
 		<property name="build.dir" value="build/${name}-${full.version.tag}" />
-	    <delete file="${svn.info.log}" />
-	    
-	    <echo message="Rev: ${build.version}"/>    
+		<delete file="${svn.info.log}" />
+
+		<echo message="Rev: ${build.version}"/>    
 	 
-	  </if>                         
 	</target>
 
 	<target name="assembly-info" depends="get-revision">

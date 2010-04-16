@@ -52,7 +52,7 @@
     <Compile Include="Expressions\ReferenceTests.cs" />
     <Compile Include="FieldTests.cs" />
     <Compile Include="Framework\ReflectionUtilTests.cs" />
-    <Compile Include="IgnorePropertyActionTests.cs" />
+    <Compile Include="PropertyOptionTests.cs" />
     <Compile Include="JsonWriterComplexTests.cs" />
     <Compile Include="JsonWriterTestBase.cs" />
     <Compile Include="JsonWriterTests.cs" />

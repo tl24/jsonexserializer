@@ -17,6 +17,11 @@ using JsonExSerializer.Framework.Parsing;
 
 namespace JsonExSerializer
 {
+    public enum MissingPropertyOptions
+    {
+        Ignore,
+        ThrowException
+    }
     /// <summary>
     /// Provides options controlling Serializing and Deserializing of objects.
     /// </summary>
@@ -67,6 +72,7 @@ namespace JsonExSerializer
 
         private IgnoredPropertyOption _ignoredPropertyAction = IgnoredPropertyOption.ThrowException;
 
+        private MissingPropertyOptions _missingPropertyAction = MissingPropertyOptions.Ignore;
         #endregion
 
         #region Constructor
@@ -168,6 +174,15 @@ namespace JsonExSerializer
             set { _ignoredPropertyAction = value; }
         }
 
+        /// <summary>
+        /// Controls the action taken during deserialization when a property is specified in the Json Text,
+        /// but does not exist on the class or object.
+        /// </summary>
+        public virtual MissingPropertyOptions MissingPropertyAction
+        {
+            get { return this._missingPropertyAction; }
+            set { _missingPropertyAction = value; }
+        }
         /// <summary>
         /// Controls whether properties of an object with the default value set are suppressed when being
         /// serialized.  The default is to write all values during serialization.

@@ -8,7 +8,7 @@ using MbUnit.Framework;
 namespace JsonExSerializerTests
 {
     [TestFixture]
-    public class IgnorePropertyActionTests
+    public class PropertyOptionTests
     {
         Serializer serializer;
 
@@ -61,6 +61,33 @@ namespace JsonExSerializerTests
             }
 
             Assert.IsTrue(exception, "Exception not thrown for ignored property when ThrowException set");
+        }
+
+        [Test]
+        public void MissingPropertyAction_WhenThrowException_MissingPropertyThrowsException()
+        {
+            serializer.Config.MissingPropertyAction = MissingPropertyOptions.ThrowException;
+            string result = @" { Foo: 'Bar' }";
+            bool exception = false;
+            try
+            {
+                SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
+            }
+            catch
+            {
+                exception = true;
+            }
+
+            Assert.IsTrue(exception, "Exception not thrown for missing property when MissingPropertyOptions.ThrowException set");
+        }
+
+        [Test]
+        public void MissingPropertyAction_WhenIgnore_MissingPropertyIsIgnored()
+        {
+            serializer.Config.MissingPropertyAction = MissingPropertyOptions.Ignore;
+            string result = @" { Foo: 'Bar', Name: 'Special' }";
+            SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
+            Assert.AreEqual("Special", mock.Name);
         }
     }
 

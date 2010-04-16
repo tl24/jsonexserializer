@@ -117,7 +117,15 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             IPropertyData hndlr = typeHandler.FindPropertyByAlias(Item.Key);
             if (hndlr == null)
             {
-                throw new Exception(string.Format("Could not find property {0} for type {1}", Item.Key, typeHandler.ForType));
+                switch (this.Config.MissingPropertyAction)
+                {
+                    case MissingPropertyOptions.Ignore:
+                        return;
+                    case MissingPropertyOptions.ThrowException:
+                        throw new Exception(string.Format("Could not find property {0} for type {1}", Item.Key, typeHandler.ForType));
+                    default:
+                        throw new InvalidOperationException("Unhandled MissingPropertyAction: " + this.Config.MissingPropertyAction);
+                }
             }
             if (hndlr.Ignored)
             {

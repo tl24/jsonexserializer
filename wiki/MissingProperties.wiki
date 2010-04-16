@@ -8,6 +8,23 @@ The code for that is
   s.Config.MissingPropertyAction = MissingPropertyOptions.Ignore;
 }}}
 
+Here is an example to demonstrate:
+*Class object*
+{{{
+public class Foo {
+   public int ID;
+}
+}}}
+*Json Text*
+{{{
+{
+   ID: 1,
+   Balance: 10.00
+}
+}}}
+
+In this situation, the Balance property in the Json text does not exist on the Foo class.
+
 == Ignore ==
 
 This is the default option, missing properties are ignored.

@@ -1,5 +1,7 @@
 #summary Release Notes
-== Release 3.1  (Apr 15 2010) ==
+== Release 3.1.0.269  (May 8 2010) ==
+  * Issue 55 - Bug: Having multiple complex nodes (IgnoredProperties,TypeConverters,etc) was causing an exception
+== Release 3.1.0.267  (Apr 15 2010) ==
   * Issue 23 - Enhancement: Option to omit properties that have the default value
   * Issue 36 - Bug: Properties with private setters are not defaulted to Ignored
   * Issue 38 - Bug: ExpressionHandlersCollection doesn't honor IContextAware when setting default or null handler properties

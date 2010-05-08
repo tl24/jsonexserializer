@@ -294,7 +294,7 @@ namespace JsonExSerializer
 
             public void Process()
             {
-                while (reader.Read())
+                while (ReadContent())
                 {
                     if (reader.NodeType == XmlNodeType.EndElement && reader.Name == outerTag)
                         break;
@@ -319,6 +319,15 @@ namespace JsonExSerializer
                         method.Method(tag, values);
                     }
                 }
+            }
+
+            bool ReadContent()
+            {
+                bool bMoreNodes = reader.Read();
+                if (bMoreNodes)
+                    bMoreNodes = (null != reader.MoveToContent());
+
+                return bMoreNodes;
             }
         }       
     }

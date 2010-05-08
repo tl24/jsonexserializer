@@ -78,6 +78,14 @@ namespace JsonExSerializerTests
             Assert.AreEqual(0, MyLinePointConverter.ConvertToCount, "Property ConvertTo not called correct amount of times");
         }
 
+        [Test]
+        public void TestMultipleSections()
+        {
+            //this test to fix issue 55
+            Serializer s = new Serializer(typeof(MyLine), "TestMultipleSections");
+            Assert.IsTrue(s.Config.GetTypeHandler(typeof(SimpleObject)).HasConverter, "SimpleObject converter");
+            Assert.IsTrue(s.Config.GetTypeHandler(typeof(MyLine)).FindPropertyByName("Start").Ignored, "MyLine.Start Ignored");
+        }
         [TearDown]
         public void Teardown()
         {

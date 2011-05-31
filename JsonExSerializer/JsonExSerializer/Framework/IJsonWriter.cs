@@ -109,6 +109,13 @@ namespace JsonExSerializer.Framework
         IJsonWriter WriteValue(float value);
 
         /// <summary>
+        /// Writes a decimal value
+        /// </summary>
+        /// <param name="value">decimal</param>
+        /// <returns>this writer instance</returns>
+        IJsonWriter WriteValue(decimal value);
+
+        /// <summary>
         /// Writes a quoted value
         /// </summary>
         /// <param name="value"></param>

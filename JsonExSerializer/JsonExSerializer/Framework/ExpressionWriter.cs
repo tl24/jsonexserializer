@@ -75,8 +75,10 @@ namespace JsonExSerializer.Framework
                     jsonWriter.WriteValue((long)value);
                     break;
                 case TypeCode.Decimal:
+                    jsonWriter.WriteValue((decimal)value);
+                    break;
                 case TypeCode.UInt64:
-                    jsonWriter.WriteSpecialValue(string.Format("{0}", value));
+                    jsonWriter.WriteSpecialValue(string.Format(CultureInfo.InvariantCulture, "{0}", value));
                     break;
                 default:
                     jsonWriter.WriteValue((long)Convert.ChangeType(value, typeof(long), CultureInfo.InvariantCulture));

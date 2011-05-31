@@ -37,7 +37,6 @@ namespace JsonExSerializer.Framework
         private short indentLevel;
         private short indentSize = 4;
         private IState _currentState;
-        private CultureInfo culture;
         private TypeAliasCollection typeAliases;
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace JsonExSerializer.Framework
         /// <param name="indent">setting that specifies whether to indent</param>
         /// <param name="typeAliases">type aliases</param>
         public JsonWriter(TextWriter writer, bool indent)
-            : this(writer, indent, CultureInfo.InvariantCulture, null)
+            : this(writer, indent, null)
         {
         }
 
@@ -59,25 +58,12 @@ namespace JsonExSerializer.Framework
         /// <param name="writer">the text writer that will be written to</param>
         /// <param name="indent">setting that specifies whether to indent</param>
         /// <param name="typeAliases">type aliases</param>
-        public JsonWriter(TextWriter writer, bool indent, TypeAliasCollection typeAliases) 
-            : this(writer, indent, CultureInfo.InvariantCulture, typeAliases)
-        {
-        }
-
-        /// <summary>
-        /// Creates a json writer that writes to the <paramref name="writer"/> and uses
-        /// the InvariantCulture for any formatting.
-        /// </summary>
-        /// <param name="writer">the text writer that will be written to</param>
-        /// <param name="indent">setting that specifies whether to indent</param>
-        /// <param name="culture">The culture to use for formatting</param>
-        public JsonWriter(TextWriter writer, bool indent, CultureInfo culture, TypeAliasCollection typeAliases)
+        public JsonWriter(TextWriter writer, bool indent, TypeAliasCollection typeAliases)             
         {
             if (writer == null)
                 throw new ArgumentNullException("writer");
             this._writer = writer;
             this.typeAliases = typeAliases ?? new TypeAliasCollection();
-            this.culture = culture ?? CultureInfo.InvariantCulture;
 
             _currentState = new InitialState(this);
             if (!indent)
@@ -201,14 +187,21 @@ namespace JsonExSerializer.Framework
         public virtual IJsonWriter WriteValue(double value)
         {
             PreWrite(OpType.OpValue);
-            _writer.Write(value.ToString("R", culture));
+            _writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
             return this;
         }
 
         public virtual IJsonWriter WriteValue(float value)
         {
             PreWrite(OpType.OpValue);
-            _writer.Write(value.ToString("R", culture));
+            _writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
+            return this;
+        }
+
+        public virtual IJsonWriter WriteValue(decimal value)
+        {
+            PreWrite(OpType.OpValue);
+            _writer.Write(value.ToString(CultureInfo.InvariantCulture));
             return this;
         }
 

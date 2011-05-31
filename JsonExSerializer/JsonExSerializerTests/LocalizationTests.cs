@@ -14,6 +14,8 @@ namespace JsonExSerializerTests
         [RowTest]
         [Row(120000.324, "120000.324", "en-US", "de-DE")]
         [Row(120000.324, "120000.324", "de-DE", "en-US")]
+		[Row(24.00, "24", "en-US", "de-DE")]
+		[Row(24.00, "24", "de-DE", "en-US")]
         public void DoublesSerializeCorrectlyInAnyCulture(double value, string expectedValue, string startingCulture, string targetCulture)
         {
             TestSerializationInMultipleLocales(value, expectedValue, startingCulture, targetCulture);
@@ -23,6 +25,16 @@ namespace JsonExSerializerTests
         [Row(-0.324f, "-0.324", "en-US", "de-DE")]
         [Row(-1.999f, "-1.999", "de-DE", "en-US")]
         public void FloatsSerializeCorrectlyInAnyCulture(float value, string expectedValue, string startingCulture, string targetCulture)
+        {
+            TestSerializationInMultipleLocales(value, expectedValue, startingCulture, targetCulture);
+        }
+
+        [RowTest]
+        [Row(120000.324, "120000.324", "en-US", "de-DE")]
+        [Row(120000.324, "120000.324", "de-DE", "en-US")]
+        [Row(24.00, "24", "en-US", "de-DE")]
+        [Row(24.00, "24", "de-DE", "en-US")]
+        public void DecimalsSerializeCorrectlyInAnyCulture(decimal value, string expectedValue, string startingCulture, string targetCulture)
         {
             TestSerializationInMultipleLocales(value, expectedValue, startingCulture, targetCulture);
         }

@@ -5,6 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.ComponentModel;
 
@@ -45,7 +46,7 @@ namespace JsonExSerializer.TypeConversion
 
         public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
         {
-            return _converter.ConvertFromString((string) item);
+            return _converter.ConvertFrom(null, CultureInfo.InvariantCulture, item);
         }
 
         public override Type GetSerializedType(Type sourceType)

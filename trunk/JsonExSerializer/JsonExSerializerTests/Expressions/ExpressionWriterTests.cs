@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.IO;
 using MbUnit.Framework;
@@ -55,7 +56,7 @@ namespace JsonExSerializerTests.Expressions
         {
             NumericExpression expr = new NumericExpression(value);
             _exprWriter.Write(expr);
-            Assert.AreEqual(value.ToString(), _stringWriter.ToString());
+            Assert.AreEqual(String.Format(CultureInfo.InvariantCulture, "{0}", value), _stringWriter.ToString());
         }
 
         [RowTest]

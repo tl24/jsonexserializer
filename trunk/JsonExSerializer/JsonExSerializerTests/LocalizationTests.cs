@@ -90,5 +90,36 @@ namespace JsonExSerializerTests
             if (ex != null)
                 throw ex;
         }
+
+        [RowTest]
+        [Row("en-US", "de-DE")]
+        [Row("de-DE", "en-US")]
+        [Row("en-US", "de-DE")]
+        [Row("de-DE", "en-US")]
+        [Row("en-US", "fr-FR")]
+        public void TestNullable(string startingCulture, string targetCulture)
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo(startingCulture);
+            Serializer serializer = new Serializer(typeof(TestClass));
+            TestClass t = new TestClass(7.6, -0.2f);
+            string json = serializer.Serialize(t);
+
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo(targetCulture);
+            TestClass result = (TestClass)serializer.Deserialize(json);
+            Assert.AreEqual(t.d, result.d);
+            Assert.AreEqual(t.f, result.f);
+        }
+
+        public class TestClass
+        {
+            public TestClass() { }
+
+            public TestClass(double? d, float? f) {
+                this.d = d;
+                this.f = f;
+            }
+            public double? d;
+            public float? f;
+        }
     }
 }

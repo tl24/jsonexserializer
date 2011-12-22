@@ -47,6 +47,7 @@
     <Compile Include="DeserializePrimitiveTests.cs" />
     <Compile Include="Expressions\CustomExpressionHandlerTests.cs" />
     <Compile Include="Expressions\CustomParsingStageTests.cs" />
+    <Compile Include="Expressions\ExpressionHandlerTests.cs" />
     <Compile Include="Expressions\ExpressionWriterTests.cs" />
     <Compile Include="Expressions\JsonPathTests.cs" />
     <Compile Include="Expressions\ReferenceTests.cs" />

@@ -19,7 +19,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
 
         public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
-            ValueExpression value = (ValueExpression)expression;
+            ValueExpression value = CastExpression<ValueExpression>(expression);
             if (value.ResultType.IsEnum)
                 return Enum.Parse(value.ResultType, value.StringValue);
             else if (value.ResultType == typeof(object))

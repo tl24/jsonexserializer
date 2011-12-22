@@ -61,7 +61,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
 
         public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
-            ValueExpression valueExpr = (ValueExpression)expression;
+            ValueExpression valueExpr = CastExpression<ValueExpression>(expression);
             return DateTime.ParseExact(valueExpr.StringValue, dateFormat, Culture, dateTimeStyle);
         }
     }

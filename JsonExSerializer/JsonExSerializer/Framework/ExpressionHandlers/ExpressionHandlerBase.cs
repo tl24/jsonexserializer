@@ -98,5 +98,15 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 return false;
             return this.Config.IsReferenceableType(value.GetType());
         }
+
+        protected T CastExpression<T>(Expression expr) where T : Expression
+        {
+            T result = expr as T;
+            if (result == null)
+            {
+                throw new InvalidOperationException("Expecting " + typeof(T).Name + " but received " + expr.GetType().Name + ".  Perhaps a type converter declaration is missing");
+            }
+            return result;
+        }
     }
 }

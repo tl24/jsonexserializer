@@ -135,6 +135,14 @@ namespace JsonExSerializerTests
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestRegisterPrimitiveTypeConverter_Date()
+        {
+            Serializer s = new Serializer(typeof(object));
+            s.Config.RegisterTypeConverter(typeof(DateTime), new MyImmutablePointConverter());
+        }
+
+        [Test]
         public void DictionaryToListTest()
         {
             Serializer s = new Serializer(typeof(Dictionary<string, SimpleObject>));

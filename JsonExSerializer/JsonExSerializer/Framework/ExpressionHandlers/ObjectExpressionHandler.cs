@@ -86,7 +86,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>deserialized object</returns>
         public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
-            object value = ConstructObject((ObjectExpression)expression, deserializer);
+            object value = ConstructObject(CastExpression<ObjectExpression>(expression), deserializer);
             value = Evaluate(expression, value, deserializer);
             if (value is IDeserializationCallback)
                 ((IDeserializationCallback)value).OnAfterDeserialization();
@@ -103,7 +103,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
             TypeData typeHandler = Config.GetTypeHandler(existingObject.GetType());
-            ObjectExpression objectExpression = (ObjectExpression)expression;
+            ObjectExpression objectExpression = CastExpression<ObjectExpression>(expression);
             foreach (KeyValueExpression Item in objectExpression.Properties)
             {
                 EvaluateItem(existingObject, deserializer, typeHandler, Item);

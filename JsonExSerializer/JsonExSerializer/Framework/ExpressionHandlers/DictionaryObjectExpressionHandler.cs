@@ -92,7 +92,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 _dictionaryValueType = genArgs[1];
             }
 
-            ObjectExpression objectExpression = (ObjectExpression)expression;
+            ObjectExpression objectExpression = CastExpression<ObjectExpression>(expression);
             foreach (KeyValueExpression keyValue in objectExpression.Properties)
             {
                 // if no type set, set one

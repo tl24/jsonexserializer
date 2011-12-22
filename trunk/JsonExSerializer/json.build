@@ -6,7 +6,7 @@
 	<property name="solution" value="${name}.sln" />
 	<property name="svn.info.log" value="svn.version.txt" />
 	<property name="versionfile" value="version.txt" />
-	<property name="revision.version" value="0" />	
+	<property name="revision.version" value="1" />	
 	<property name="main.output.dir" value="${name}/bin/${configuration}" />
 	<property name="test.output.dir" value="${tests}/bin/${configuration}" />
 	<property name="perf.test.output.dir" value="${perf.tests}/bin/${configuration}" />

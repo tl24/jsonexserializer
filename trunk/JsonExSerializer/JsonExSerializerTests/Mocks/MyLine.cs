@@ -18,7 +18,7 @@ namespace JsonExSerializerTests.Mocks
         {
         }
 
-        [JsonConvert(typeof(MyLinePointConverter), /* separator */ Context=":")]
+        [MyLinePointConverter(":")]
         public MyImmutablePoint Start
         {
             get { return this._start; }
@@ -47,12 +47,43 @@ namespace JsonExSerializerTests.Mocks
         }
     }
 
+    public class MyLinePointConverterAttribute : JsonConvertAttribute
+    {
+        public MyLinePointConverterAttribute()
+            : base(typeof(MyLinePointConverter))
+        {
+        }
+
+        public MyLinePointConverterAttribute(string separator)
+            : this()
+        {
+            Separator = separator;
+        }
+
+        /// <summary>
+        /// Gets or sets the separator to use, defaults to comma ','.
+        /// </summary>
+        /// <value>
+        /// The separator.
+        /// </value>
+        public string Separator { get; set; }
+
+        public override IJsonTypeConverter CreateTypeConverter()
+        {
+            return new MyLinePointConverter(Separator);
+        }
+    }
+
     public class MyLinePointConverter : JsonConverterBase, IJsonTypeConverter
     {
         private static int _convertFromCount;
         private static int _convertToCount;
         private string _separator;
 
+        public MyLinePointConverter(string separator)
+        {
+            _separator = separator;
+        }
         public override Type GetSerializedType(Type sourceType)
         {
             return typeof(string);
@@ -114,14 +145,14 @@ namespace JsonExSerializerTests.Mocks
             _end = end;
         }
 
-        [JsonConvert(typeof(MyLinePointConverter), /* separator */ Context=":")]
+        [MyLinePointConverter(":")]
         [ConstructorParameter]
         public MyImmutablePoint Start
         {
             get { return this._start; }
         }
 
-        [JsonConvert(typeof(MyLinePointConverter), /* separator */ Context=":")]
+        [MyLinePointConverter(":")]
         [ConstructorParameter]
         public MyImmutablePoint End
         {

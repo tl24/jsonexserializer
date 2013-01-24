@@ -6,14 +6,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using JsonExSerializer.TypeConversion;
 
 namespace JsonExSerializer
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Enum | AttributeTargets.Struct,AllowMultiple=false,Inherited=false)]
-    public sealed class JsonConvertAttribute : System.Attribute
+    public class JsonConvertAttribute : System.Attribute
     {
         private Type _converter;
-        private object _context;
 
         public JsonConvertAttribute(Type converter)
         {
@@ -25,12 +25,14 @@ namespace JsonExSerializer
             get { return this._converter; }
         }
 
-        public object Context
+        /// <summary>
+        /// Creates the type converter represented by this attribute.
+        /// </summary>
+        /// <returns></returns>
+        public virtual IJsonTypeConverter CreateTypeConverter()
         {
-            get { return this._context; }
-            set { this._context = value; }
+            IJsonTypeConverter converter = (IJsonTypeConverter)Activator.CreateInstance(Converter);
+            return converter;
         }
-
-
     }
 }

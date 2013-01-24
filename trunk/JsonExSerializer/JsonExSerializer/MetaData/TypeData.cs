@@ -223,7 +223,10 @@ namespace JsonExSerializer.MetaData
                         {
                             string parmName = ctorParms[i].Name;
                             if (ctorParms[i].IsDefined(typeof(ConstructorParameterAttribute), false))
-                                parmName = ReflectionUtils.GetAttribute<ConstructorParameterAttribute>(ctorParms[i], false).Name;
+                                parmName = ReflectionUtils.GetAttribute<ConstructorParameterAttribute>(ctorParms[i], false).Name ?? parmName;
+
+                            if (string.IsNullOrEmpty(parmName))
+                                parmName = ctorParms[i].Name;
 
                             if (parmName.Equals(property.ConstructorParameterName, comparison)
                                 && ((exactMatch && ctorParms[i].ParameterType == property.PropertyType)

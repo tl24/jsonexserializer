@@ -1,4 +1,7 @@
 #summary Release Notes
+== Release 3.1.1.283  (Jan 24 2013) ==
+  * Issue 61 - Bug:
+  * Issue 66 - Enhancement:
 == Release 3.1.1.279  (Jun 9 2011) ==
   * Issue 58 - Bug: Nullable doubles and floats do not serialize correctly in non-english locales
   * Issue 57 - Bug: Decimal types do not serialize correctly in non-english locales

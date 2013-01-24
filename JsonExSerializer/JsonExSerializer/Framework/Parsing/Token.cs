@@ -30,10 +30,23 @@ namespace JsonExSerializer.Framework.Parsing
 
         public TokenType type;
         public string value;
+        public int linenumber;
+        public int position;
+
         public Token(TokenType type, string value)
         {
             this.type = type;
             this.value = value;
+            this.linenumber = 0;
+            this.position = 0;
+        }
+
+        public Token(TokenType type, string value, int linenumber, int position)
+        {
+            this.type = type;
+            this.value = value;
+            this.linenumber = linenumber;
+            this.position = position;
         }
 
         public override bool Equals(object other)

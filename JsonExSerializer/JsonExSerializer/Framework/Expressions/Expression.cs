@@ -57,6 +57,25 @@ namespace JsonExSerializer.Framework.Expressions
         }
 
         /// <summary>
+        /// Gets or sets the line number where the expression started in the
+        /// file or stream it was read from.  Only valid during deserialization.
+        /// </summary>
+        /// <value>
+        /// The line number.
+        /// </value>
+        public virtual int LineNumber { get; set; }
+
+        /// <summary>
+        /// Gets or sets the character position on the line where
+        /// the expression started in the file or stream it was 
+        /// read from.  Only valid during deserialization.
+        /// </summary>
+        /// <value>
+        /// The character position.
+        /// </value>
+        public virtual int CharacterPosition { get; set; }
+
+        /// <summary>
         /// The type for the evaluated result
         /// </summary>
         public virtual Type ResultType

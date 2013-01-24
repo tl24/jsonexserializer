@@ -86,7 +86,7 @@ namespace JsonExSerializer.MetaData
 
         public virtual void RegisterTypeConverter(Type forType, IJsonTypeConverter converter)
         {
-            if (forType.IsPrimitive || forType == typeof(string))
+            if (forType.IsPrimitive || forType == typeof(string) || forType == typeof(DateTime))
                 throw new ArgumentException("Converters can not be registered for primitive types or string. " + forType, "forType");
             this[forType].TypeConverter = converter;      
         }

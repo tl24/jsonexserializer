@@ -56,5 +56,16 @@ namespace JsonExSerializer.Framework
         {
             return (checkType.IsGenericType && typeof(Nullable<>).Equals(checkType.GetGenericTypeDefinition()));
         }
+
+        /// <summary>
+        /// Wraps an exception with the same type as the inner exception.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="innerException">The inner exception.</param>
+        /// <returns></returns>
+        public static Exception WrapException(string message, Exception innerException)
+        {
+            return (Exception) Activator.CreateInstance(innerException.GetType(), message, innerException);
+        }
     }
 }

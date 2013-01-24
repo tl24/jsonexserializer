@@ -151,7 +151,7 @@ namespace JsonExSerializer.Framework.Parsing
                 }
                 else
                 {
-                    throw new ParseException("Unexpected token: " + tok);
+                    throw new ParseException(string.Format("Unexpected token: {0} at Line: {1}, Position: {2}", tok, tok.linenumber, tok.position));
                 }
             }
             return value;
@@ -166,7 +166,9 @@ namespace JsonExSerializer.Framework.Parsing
             JsonPath refID = new JsonPath();
             Token tok = ReadToken();
             if (tok != ReferenceStartToken && tok != OldReferenceStartToken)
-                throw new ParseException(string.Format("Invalid starting token for ParseReference, Expected: {0} or {1}, got: {2}", ReferenceStartToken, OldReferenceStartToken,tok));            
+                throw new ParseException(string.Format("Invalid starting token for ParseReference at Line: {0}, Position: {1}, Expected: {2} or {3}, got: {4}", tok.linenumber, tok.position, ReferenceStartToken, OldReferenceStartToken, tok));
+            int line = tok.linenumber;
+            int pos = tok.position;
             while (PeekToken() == PeriodToken || PeekToken() == LSquareToken)
             {
                 tok = ReadToken(); // separator "."
@@ -184,10 +186,10 @@ namespace JsonExSerializer.Framework.Parsing
                 }
                 else
                 {
-                    throw new ParseException("Invalid Reference, must be an identifier or array value: " + tok);
+                    throw new ParseException(string.Format("Invalid Reference at Line: {0}, Position: {1}, must be an identifier or array value: {2}", tok.linenumber, tok.position, tok));
                 }                
             }
-            return new ReferenceExpression(refID);
+            return new ReferenceExpression(refID) {  LineNumber = line, CharacterPosition = pos };
         }
 
         /// <summary>
@@ -201,7 +203,7 @@ namespace JsonExSerializer.Framework.Parsing
             Token tok = ReadToken();
             Debug.Assert(tok == LParenToken, "Invalid starting token for ParseCast: " + tok);
             Type desiredType = ParseTypeSpecifier();
-            CastExpression cast = new CastExpression(desiredType);
+            CastExpression cast = new CastExpression(desiredType) { LineNumber = tok.linenumber, CharacterPosition = tok.position };
             tok = ReadToken();
             RequireToken(RParenToken, tok, "Invalid Type Cast Syntax");
             cast.Expression = ParseExpression();
@@ -216,7 +218,7 @@ namespace JsonExSerializer.Framework.Parsing
         {
             Token tok = ReadToken();
             Debug.Assert(tok == LSquareToken);
-            ArrayExpression value = new ArrayExpression();
+            ArrayExpression value = new ArrayExpression() { LineNumber = tok.linenumber, CharacterPosition = tok.position };
             Expression item;
             bool first = true;
             while (ReadAhead(CommaToken, RSquareToken, new ExpressionMethod(ParseExpression), out item, ref first))
@@ -234,7 +236,7 @@ namespace JsonExSerializer.Framework.Parsing
         {
             Token tok = ReadToken();
             Debug.Assert(tok == LBraceToken);
-            ObjectExpression value = new ObjectExpression();
+            ObjectExpression value = new ObjectExpression() { LineNumber = tok.linenumber, CharacterPosition = tok.position };
             Expression item;
             bool first = true;
             while (ReadAhead(CommaToken, RBraceToken, new ExpressionMethod(ParseKeyValue), out item, ref first))
@@ -288,7 +290,7 @@ namespace JsonExSerializer.Framework.Parsing
                 ReadToken();
             }
             else if (first && tok == separator)
-                throw new ParseException("Error unexpected token " + tok);
+                throw new ParseException(string.Format("Error: unexpected token {0} at Line: {1}, Position: {2}", tok, tok.linenumber, tok.position));
 
             result = meth();
             first = false;
@@ -309,6 +311,9 @@ namespace JsonExSerializer.Framework.Parsing
             Debug.Assert(tok == NewToken);
             Type t = ParseTypeSpecifier();
 
+            int line = tok.linenumber;
+            int pos = tok.position;
+
             tok = ReadToken();
             RequireToken(LParenToken, tok, "Missing constructor arguments");
             Expression arg;
@@ -325,6 +330,8 @@ namespace JsonExSerializer.Framework.Parsing
             }
             value.ResultType = t;
             value.ConstructorArguments = ConstructorArgs;
+            value.LineNumber = line;
+            value.CharacterPosition = pos;
             // insert Cast to keep type from being overwritten
             return new CastExpression(t,value);
         }
@@ -346,7 +353,7 @@ namespace JsonExSerializer.Framework.Parsing
             Token tok = ReadToken();
             if (tok.type != TokenType.Identifier && !IsQuotedString(tok))
             {
-                throw new ParseException("Type expected");
+                throw new ParseException(string.Format("Type expected at Line:{0}, Position: {1}, received {2} instead", tok.linenumber, tok.position, tok));
             }
             typeSpec.Append(tok.value);
             while ((tok = PeekToken()) == PeriodToken)
@@ -356,7 +363,7 @@ namespace JsonExSerializer.Framework.Parsing
                 tok = ReadToken(); // type part
                 if (tok.type != TokenType.Identifier)
                 {
-                    throw new ParseException("Invalid Type specifier, must be an identifier: " + tok);
+                    throw new ParseException(string.Format("Invalid Type specifier at Line:{0}, Position: {1}, must be an identifier: {2}", tok.linenumber, tok.position, tok));
                 }
                 typeSpec.Append(tok.value);
             }
@@ -457,26 +464,23 @@ namespace JsonExSerializer.Framework.Parsing
             switch (tok.type)
             {
                 case TokenType.Number:
-                    return new NumericExpression(tok.value);
-                    break;
+                    return new NumericExpression(tok.value) { LineNumber = tok.linenumber, CharacterPosition = tok.position };
                 case TokenType.Identifier:
                     if (tok.value.Equals("true", StringComparison.CurrentCultureIgnoreCase)
                     || tok.value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        return new BooleanExpression(tok.value);
+                        return new BooleanExpression(tok.value) { LineNumber = tok.linenumber, CharacterPosition = tok.position };
                     }
                     else if (tok.value.Equals("null"))
                     {
-                        return new NullExpression();
+                        return new NullExpression() { LineNumber = tok.linenumber, CharacterPosition = tok.position };
                     }
                     else
                     {
-                        return new ValueExpression(tok.value);
+                        return new ValueExpression(tok.value) { LineNumber = tok.linenumber, CharacterPosition = tok.position };
                     }
-                    break;
                 default:
-                    return new ValueExpression(tok.value);
-                    break;
+                    return new ValueExpression(tok.value) { LineNumber = tok.linenumber, CharacterPosition = tok.position };
             }
         }
 
@@ -486,7 +490,8 @@ namespace JsonExSerializer.Framework.Parsing
         /// <returns>the parsed string or char</returns>
         private Expression ParseString()
         {
-            return new ValueExpression(ReadToken().value);
+            Token tok = ReadToken();
+            return new ValueExpression(tok.value) { LineNumber = tok.linenumber, CharacterPosition = tok.position };
         }
 
         /// <summary>
@@ -500,7 +505,7 @@ namespace JsonExSerializer.Framework.Parsing
             if (actual != expected)
             {
                 message = string.Format(message, args);
-                throw new ParseException(message + " Expected: " + expected + " got: " + actual);
+                throw new ParseException(message + " at Line: " + actual.linenumber + ", Position: " + actual.position + " Expected: " + expected + " got: " + actual);
             }
         }
 

@@ -32,12 +32,7 @@ namespace JsonExSerializer.MetaData.Attributes
         /// <returns>converter</returns>
         private static IJsonTypeConverter CreateTypeConverter(JsonConvertAttribute attribute)
         {
-            IJsonTypeConverter converter = (IJsonTypeConverter)Activator.CreateInstance(attribute.Converter);
-            if (attribute.Context != null)
-            {
-                converter.Context = attribute.Context;
-            }
-            return converter;
+            return attribute.CreateTypeConverter();
         }
 
     }

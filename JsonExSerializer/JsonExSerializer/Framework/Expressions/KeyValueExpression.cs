@@ -26,6 +26,8 @@ namespace JsonExSerializer.Framework.Expressions
         {
             _keyExpression = key;
             _valueExpression = value;
+            this.LineNumber = key.LineNumber;
+            this.CharacterPosition = key.CharacterPosition;
         }
 
         public string Key

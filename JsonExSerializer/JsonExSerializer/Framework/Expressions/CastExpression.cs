@@ -17,6 +17,7 @@ namespace JsonExSerializer.Framework.Expressions
             : this(CastedType)
         {
             _expression = Expression;
+
         }
 
         public override Type ResultType
@@ -25,6 +26,36 @@ namespace JsonExSerializer.Framework.Expressions
             set
             {
                 ; // ignore this 
+            }
+        }
+
+        public override int LineNumber
+        {
+            get
+            {
+                if (Expression != null)
+                    return Expression.LineNumber;
+                else
+                    return base.LineNumber;
+            }
+            set
+            {
+                base.LineNumber = value;
+            }
+        }
+
+        public override int CharacterPosition
+        {
+            get
+            {
+                if (Expression != null)
+                    return Expression.CharacterPosition;
+                else
+                    return base.CharacterPosition;
+            }
+            set
+            {
+                base.CharacterPosition = value;
             }
         }
 

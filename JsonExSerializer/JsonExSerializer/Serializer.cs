@@ -260,13 +260,57 @@ namespace JsonExSerializer
         protected virtual object Evaluate(Expression expression)
         {
             Evaluator eval = new Evaluator(this.Config);
-            return eval.Evaluate(expression);
+            try
+            {
+                return eval.Evaluate(expression);
+            }
+            catch (Exception e)
+            {
+                if (eval.Current != null && eval.Current.LineNumber != 0)
+                {
+                    string path = eval.GetCurrentPath();
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        throw ReflectionUtils.WrapException("Error deserializing expression Path: " + path + " near Line: " + eval.Current.LineNumber + ", Position: " + eval.Current.CharacterPosition + ": " + e.Message, e);
+                    }
+                    else
+                    {
+                        throw ReflectionUtils.WrapException("Error deserializing expression near Line: " + eval.Current.LineNumber + ", Position: " + eval.Current.CharacterPosition + ": " + e.Message, e);
+                    }
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         protected virtual void Evaluate(Expression expression, object target)
         {
             Evaluator eval = new Evaluator(this.Config);
-            eval.Evaluate(expression, target);
+            try
+            {
+                eval.Evaluate(expression, target);
+            }
+            catch (Exception e)
+            {
+                if (eval.Current != null && eval.Current.LineNumber != 0)
+                {
+                    string path = eval.GetCurrentPath();
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        throw ReflectionUtils.WrapException("Error deserializing expression Path: " + path + " near Line: " + eval.Current.LineNumber + ", Position: " + eval.Current.CharacterPosition + ": " + e.Message, e);
+                    }
+                    else
+                    {
+                        throw ReflectionUtils.WrapException("Error deserializing expression near Line: " + eval.Current.LineNumber + ", Position: " + eval.Current.CharacterPosition + ": " + e.Message, e);
+                    }
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         /// <summary>

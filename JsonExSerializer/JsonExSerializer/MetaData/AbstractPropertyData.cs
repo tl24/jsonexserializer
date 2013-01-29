@@ -11,20 +11,9 @@ namespace JsonExSerializer.MetaData
     /// </summary>
     public abstract class AbstractPropertyData : MetaDataBase, IPropertyData
     {
-        protected object defaultValue;
-        protected TypeData parent;
-        protected bool defaultValueSet;
-        protected string alias;
-
-        /// <summary>
-        /// Ignored flag
-        /// </summary>
-        protected bool ignored;
-
-        /// <summary>
-        /// Index in constructor arguments for a constructor parameter
-        /// </summary>
-        protected int position = -1;
+        private object _defaultValue;
+        private bool _defaultValueSet;
+        private string _alias;
 
         /// <summary>
         /// The name of the parameter corresponding to this property in the type's constructor parameter list
@@ -38,7 +27,7 @@ namespace JsonExSerializer.MetaData
         protected AbstractPropertyData(Type forType, TypeData parent)
             : base(forType)
         {
-            this.parent = parent;
+            this.Parent = parent;
         }
 
         /// <summary>
@@ -46,6 +35,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         public abstract string Name { get; }
 
+        protected TypeData Parent { get; set; }
         /// <summary>
         /// Gets or sets the alias for the property.  The alias will be used
         /// in JSON.
@@ -54,29 +44,11 @@ namespace JsonExSerializer.MetaData
         {
             get
             {
-                return this.alias ?? this.Name;
+                return this._alias ?? this.Name;
             }
             set
             {
-                this.alias = value;
-            }
-        }
-
-        /// <summary>
-        /// Returns the 0-based index in the constructor arguments for a constructor parameter
-        /// </summary>
-        [Obsolete("Named constructor parameters should be used instead of Position")]
-        public virtual int Position {
-            get {
-                if (!IsConstructorArgument)
-                    throw new InvalidOperationException("Position is invalid when the property is not a constructor argument");
-                return position; 
-            }
-            set
-            {
-                this.position = value;
-                if (this.position >= 0)
-                    this.Ignored = false;
+                this._alias = value;
             }
         }
 
@@ -104,7 +76,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         public virtual bool IsConstructorArgument
         {
-            get { return this.position != -1 || !string.IsNullOrEmpty(this.constructorParameterName); }
+            get { return !string.IsNullOrEmpty(this.constructorParameterName); }
         }
 
         /// <summary>
@@ -129,13 +101,9 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Gets or sets a value indicating whether this property is ignored.  Ignored properties
         /// do not get written during serialization, and may not be read during deserialization depending
-        /// on the <see cref="JsonExSerializer.SerializationContext.IgnoredPropertyOption" />
+        /// on the <see cref="JsonExSerializer.SerializerSettings.IgnoredPropertyOption" />
         /// </summary>
-        public virtual bool Ignored
-        {
-            get { return this.ignored; }
-            set { this.ignored = value; }
-        }
+        public virtual bool Ignored { get; set; }
 
         /// <summary>
         /// Returns true if this member can be written to
@@ -150,7 +118,7 @@ namespace JsonExSerializer.MetaData
             return PropertyType.ToString() + " " + Alias;
         }
 
-        public bool ShouldWriteValue(IConfiguration config, object value)
+        public bool ShouldWriteValue(ISerializerSettings config, object value)
         {
             if (GetEffectiveDefaultValueSetting() == DefaultValueOption.SuppressDefaultValues)
             {
@@ -166,10 +134,10 @@ namespace JsonExSerializer.MetaData
         {
             get
             {
-                if (defaultValueSet)
-                    return this.defaultValue;
+                if (_defaultValueSet)
+                    return this._defaultValue;
                 else
-                    return parent.GetDefaultValue(this.PropertyType);
+                    return Parent.GetDefaultValue(this.PropertyType);
             }
             set
             {
@@ -184,8 +152,8 @@ namespace JsonExSerializer.MetaData
                     {
                     }
                 }
-                this.defaultValue = newValue;
-                this.defaultValueSet = true;
+                this._defaultValue = newValue;
+                this._defaultValueSet = true;
             }
         }
 
@@ -193,7 +161,7 @@ namespace JsonExSerializer.MetaData
         {
             DefaultValueOption option = base.GetEffectiveDefaultValueSetting();
             if (option == DefaultValueOption.InheritParentSetting)
-                return parent.GetEffectiveDefaultValueSetting();
+                return Parent.GetEffectiveDefaultValueSetting();
             else
                 return option;
         }

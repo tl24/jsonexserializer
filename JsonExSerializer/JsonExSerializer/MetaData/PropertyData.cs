@@ -57,7 +57,7 @@ namespace JsonExSerializer.MetaData
         {
             get { return Property.PropertyType; }
         }
-
+        /*
         /// <summary>
         /// Get the value of the property from the given object
         /// </summary>
@@ -77,6 +77,7 @@ namespace JsonExSerializer.MetaData
         {
             Property.SetValue(instance, value, null);
         }
+        */
 
         /// <summary>
         /// Gets a value indicating whether this property can be written to

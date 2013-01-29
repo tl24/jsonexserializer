@@ -11,9 +11,9 @@ namespace JsonExSerializer.Framework.Expressions
     {
         private ComplexExpressionBase _expression;
         private Type[] _definedParameters;
-        private IConfiguration _config;
+        private ISerializerSettings _config;
 
-        public CtorArgTypeResolver(ComplexExpressionBase expression, IConfiguration config, Type[] definedParameters)
+        public CtorArgTypeResolver(ComplexExpressionBase expression, ISerializerSettings config, Type[] definedParameters)
         {
             if (expression == null)
                 throw new ArgumentNullException("Expression");
@@ -22,7 +22,7 @@ namespace JsonExSerializer.Framework.Expressions
             _config = config;
         }
 
-        public CtorArgTypeResolver(ComplexExpressionBase expression, IConfiguration config)
+        public CtorArgTypeResolver(ComplexExpressionBase expression, ISerializerSettings config)
             : this(expression, config, new Type[0])
         {
         }

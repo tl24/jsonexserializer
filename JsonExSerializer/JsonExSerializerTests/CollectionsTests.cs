@@ -14,20 +14,20 @@ namespace JsonExSerializerTests
         [Test]
         public void StringArrayListTest()
         {
-            Serializer s = new Serializer(typeof(ArrayList));
+            Serializer s = new Serializer();
             ArrayList strings = new ArrayList();
             strings.Add("one");
             strings.Add("two");
             strings.Add("3");
             string result = s.Serialize(strings);
-            ArrayList actual = (ArrayList) s.Deserialize(result);
+            ArrayList actual = s.Deserialize<ArrayList>(result);
             CollectionAssert.AreEqual(strings, actual);            
         }
 
         [Test]
         public void IntListTest()
         {
-            Serializer s = new Serializer(typeof(List<int>));
+            Serializer s = new Serializer();
             List<int> ints = new List<int>();
             ints.Add(0);
             ints.Add(int.MinValue);
@@ -37,14 +37,14 @@ namespace JsonExSerializerTests
             ints.Add(int.MaxValue - 1);
             ints.Add(int.MinValue + 1);
             string result = s.Serialize(ints);
-            List<int> actual = (List<int>)s.Deserialize(result);
+            List<int> actual = s.Deserialize<List<int>>(result);
             CollectionAssert.AreEqual(ints, actual);
         }
 
         [Test]
         public void SimpleObjectLinkedList()
         {
-            Serializer s = new Serializer(typeof(LinkedList<SimpleObject>));
+            Serializer s = new Serializer();
             LinkedList<SimpleObject> objects = new LinkedList<SimpleObject>();
             SimpleObject obj = null;
             
@@ -78,7 +78,7 @@ namespace JsonExSerializerTests
 
             string result = s.Serialize(objects);
 
-            LinkedList<SimpleObject> actual = (LinkedList<SimpleObject>)s.Deserialize(result);
+            LinkedList<SimpleObject> actual = s.Deserialize<LinkedList<SimpleObject>>(result);
 
             CollectionAssert.AreEqual(objects, actual);
         }
@@ -90,10 +90,10 @@ namespace JsonExSerializerTests
             expectedQueue.Enqueue(4);
             expectedQueue.Enqueue(2);
             expectedQueue.Enqueue(1);
-            Serializer s = new Serializer(typeof(Queue));
+            Serializer s = new Serializer();
             string result = s.Serialize(expectedQueue);
 
-            Queue actualQueue = (Queue)s.Deserialize(result);
+            Queue actualQueue = s.Deserialize<Queue>(result);
             CollectionAssert.AreEqual(expectedQueue, actualQueue);
         }
 
@@ -104,10 +104,10 @@ namespace JsonExSerializerTests
             expectedQueue.Enqueue(4.3f);
             expectedQueue.Enqueue(2.9934f);
             expectedQueue.Enqueue(-0.456f);
-            Serializer s = new Serializer(typeof(Queue<float>));
+            Serializer s = new Serializer();
             string result = s.Serialize(expectedQueue);
 
-            Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
+            Queue<float> actualQueue = s.Deserialize<Queue<float>>(result);
             CollectionAssert.AreEqual(expectedQueue, actualQueue);
         }
 
@@ -116,9 +116,9 @@ namespace JsonExSerializerTests
         {
             Queue<float> expectedQueue = new Queue<float>();
             expectedQueue.Enqueue(float.MaxValue);
-            Serializer s = new Serializer(typeof(object));
+            Serializer s = new Serializer();
             string result = s.Serialize(expectedQueue);
-            Queue<float> actualQueue = (Queue<float>)s.Deserialize(result);
+            Queue<float> actualQueue = s.Deserialize<Queue<float>>(result);
             CollectionAssert.AreEqual(expectedQueue, actualQueue);
         }
 
@@ -130,10 +130,10 @@ namespace JsonExSerializerTests
             expectedBits[3] = true;
             expectedBits[4] = true;
 
-            Serializer s = new Serializer(typeof(BitArray));
+            Serializer s = new Serializer();
             string result = s.Serialize(expectedBits);
 
-            BitArray actualBits = (BitArray)s.Deserialize(result);
+            BitArray actualBits = s.Deserialize<BitArray>(result);
             CollectionAssert.AreEqual(expectedBits, actualBits);
             
         }
@@ -147,10 +147,10 @@ namespace JsonExSerializerTests
             expectedStack.Push("3");
             expectedStack.Push("2");
             expectedStack.Push("1");            
-            Serializer s = new Serializer(expectedStack.GetType());
+            Serializer s = new Serializer();
             string result = s.Serialize(expectedStack);
 
-            Stack actualStack = (Stack)s.Deserialize(result);
+            Stack actualStack = s.Deserialize<Stack>(result);
             CollectionAssert.AreEqual(expectedStack, actualStack);
         }
 
@@ -163,10 +163,10 @@ namespace JsonExSerializerTests
             expectedStack.Push(3);
             expectedStack.Push(2);
             expectedStack.Push(1);
-            Serializer s = new Serializer(expectedStack.GetType());
+            Serializer s = new Serializer();
             string result = s.Serialize(expectedStack);
 
-            Stack<int> actualStack = (Stack<int>)s.Deserialize(result);
+            Stack<int> actualStack = s.Deserialize<Stack<int>>(result);
             CollectionAssert.AreEqual(expectedStack, actualStack);
         }
     }

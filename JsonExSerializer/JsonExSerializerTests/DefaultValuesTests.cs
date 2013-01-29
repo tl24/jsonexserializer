@@ -24,8 +24,8 @@ namespace JsonExSerializerTests
         [Row("EnumValue")]
         public void WhenSuppressDefaultValuesOnProperty_ValueIsDefault_PropertyNotWritten(string propertyName)
         {
-            Serializer serializer = new Serializer(typeof(SimpleObject));
-            IConfiguration config = serializer.Config;
+            Serializer serializer = new Serializer();
+            ISerializerSettings config = serializer.Settings;
             IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
             SimpleObject testObject = new SimpleObject();
             property.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
@@ -45,8 +45,8 @@ namespace JsonExSerializerTests
         [Row("EnumValue")]
         public void WhenWriteAllValuesOnProperty_ValueIsDefault_PropertyWritten(string propertyName)
         {
-            Serializer serializer = new Serializer(typeof(SimpleObject));
-            IConfiguration config = serializer.Config;
+            Serializer serializer = new Serializer();
+            ISerializerSettings config = serializer.Settings;
             IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
             SimpleObject testObject = new SimpleObject();
             property.DefaultValueSetting = DefaultValueOption.WriteAllValues;
@@ -64,8 +64,8 @@ namespace JsonExSerializerTests
         [Row("EnumValue", SimpleEnum.EnumValue2)]
         public void WhenSuppressDefaultValuesOnProperty_ValueIsNotDefault_PropertyIsWritten(string propertyName, object value)
         {
-            Serializer serializer = new Serializer(typeof(SimpleObject));
-            IConfiguration config = serializer.Config;
+            Serializer serializer = new Serializer();
+            ISerializerSettings config = serializer.Settings;
             IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
             property.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             Assert.IsTrue(property.ShouldWriteValue(config, value));
@@ -82,8 +82,8 @@ namespace JsonExSerializerTests
         [Row("EnumValue", SimpleEnum.EnumValue3)]
         public void WhenSuppressDefaultValuesOnPropertyWithCustomDefault_ValueIsCustomDefault_PropertyIsNotWritten(string propertyName, object defaultValue)
         {
-            Serializer serializer = new Serializer(typeof(SimpleObject));
-            IConfiguration config = serializer.Config;
+            Serializer serializer = new Serializer();
+            ISerializerSettings config = serializer.Settings;
             IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
             property.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             property.DefaultValue = defaultValue;
@@ -93,7 +93,7 @@ namespace JsonExSerializerTests
         [Test]
         public void TestDefaultPropertyAttributes()
         {
-            IConfiguration config = new SerializationContext();
+            ISerializerSettings config = new SerializerSettings();
             TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValues)];
             IPropertyData intDefault = typeData.FindProperty("IntDefault");
             Assert.AreEqual(DefaultValueOption.SuppressDefaultValues, intDefault.DefaultValueSetting, "IntDefault DefaultValueSetting");
@@ -111,11 +111,10 @@ namespace JsonExSerializerTests
         [Test]
         public void TestDefaultSerialization()
         {
-            Serializer serializer = new Serializer(typeof(MockDefaultValues));
+            Serializer serializer = new Serializer();
             MockDefaultValues mock = new MockDefaultValues();
             mock.StringDefaultDisabled = "test";
-            serializer.Config.IsCompact = true;
-            serializer.Config.OutputTypeComment = false;            
+            serializer.Settings.IsCompact = true;
             string result = serializer.Serialize(mock);
             Assert.AreEqual(@"{""StringDefaultDisabled"":""test""}", result.Trim());
         }
@@ -123,7 +122,7 @@ namespace JsonExSerializerTests
         [Test]
         public void WhenSuppressDefaultValuesOnType_CascadesToProperty()
         {
-            IConfiguration config = new SerializationContext();
+            ISerializerSettings config = new SerializerSettings();
             TypeData typeData = config.TypeHandlerFactory[typeof(SimpleObject)];
             typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("IntValue");
@@ -133,7 +132,7 @@ namespace JsonExSerializerTests
         [Test]
         public void WhenDefaultValuesSetOnType_PropertyInheritsIt()
         {
-            IConfiguration config = new SerializationContext();
+            ISerializerSettings config = new SerializerSettings();
             TypeData typeData = config.TypeHandlerFactory[typeof(SimpleObject)];
             typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             typeData.DefaultValues[typeof(string)] = "FromType";
@@ -145,7 +144,7 @@ namespace JsonExSerializerTests
         [Test]
         public void WhenDefaultValuesSetOnContext_PropertyInheritsFromContextIfNotSetOnType()
         {
-            IConfiguration config = new SerializationContext();
+            ISerializerSettings config = new SerializerSettings();
             TypeData typeData = config.TypeHandlerFactory[typeof(SimpleObject)];
             typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             config.DefaultValues[typeof(string)] = "FromType";
@@ -168,7 +167,7 @@ namespace JsonExSerializerTests
         [Test]
         public void WhenDefaultValuesSetByAttributeOnType_PropertyInheritsIt()
         {
-            IConfiguration config = new SerializationContext();
+            ISerializerSettings config = new SerializerSettings();
             TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
             IPropertyData property = typeData.FindProperty("EmptyString");
             Assert.IsFalse(property.ShouldWriteValue(config, ""));
@@ -178,7 +177,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DefaultValuesOnTypeAreConvertedIfNotSameType()
         {
-            IConfiguration config = new SerializationContext();
+            ISerializerSettings config = new SerializerSettings();
             TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
             IPropertyData property = typeData.FindProperty("ConvertedDefault");
             Assert.IsFalse(property.ShouldWriteValue(config, (short)32));
@@ -188,7 +187,7 @@ namespace JsonExSerializerTests
         [Test]
         public void DefaultValuesOnPropertyAreConvertedIfNotSameType()
         {
-            IConfiguration config = new SerializationContext();
+            ISerializerSettings config = new SerializerSettings();
             TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValues)];
             IPropertyData property = typeData.FindProperty("ConvertedValue");
             Assert.IsFalse(property.ShouldWriteValue(config, (short)32));

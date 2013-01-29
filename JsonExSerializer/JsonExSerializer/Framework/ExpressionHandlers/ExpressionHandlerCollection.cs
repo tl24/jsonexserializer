@@ -24,7 +24,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <summary>
         /// Serialization context
         /// </summary>
-        private IConfiguration _config;
+        private ISerializerSettings _config;
 
         /// <summary>
         /// Cache for finding a handler based on type.  Once a handler is found for a type, the combination
@@ -36,7 +36,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// Initializes an instance with the serialization context and a default set of handlers.
         /// </summary>
         /// <param name="Context">serialization context</param>
-        public ExpressionHandlerCollection(IConfiguration config)
+        public ExpressionHandlerCollection(ISerializerSettings config)
         {
             this.Config = config;
             InitializeDefaultHandlers();
@@ -72,7 +72,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             set
             {
                 this._defaultHandler = value;
-                SerializationContext.SetConfigurationAware(_defaultHandler, Config);
+                SerializerSettings.SetConfigurationAware(_defaultHandler, Config);
             }
         }
 
@@ -85,14 +85,14 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             set
             {
                 this._nullHandler = value;
-                SerializationContext.SetConfigurationAware(_nullHandler, Config);
+                SerializerSettings.SetConfigurationAware(_nullHandler, Config);
             }
         }
 
         /// <summary>
         /// The serialization context
         /// </summary>
-        public IConfiguration Config
+        public ISerializerSettings Config
         {
             get { return this._config; }
             set { this._config = value; }
@@ -317,7 +317,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
             base.OnInsertComplete(index, value);
             InvalidateCache();
-            SerializationContext.SetConfigurationAware(value, Config);
+            SerializerSettings.SetConfigurationAware(value, Config);
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             base.OnSetComplete(index, oldValue, newValue);
             InvalidateCache();
             if (!object.ReferenceEquals(oldValue, newValue))
-                SerializationContext.SetConfigurationAware(newValue, Config);
+                SerializerSettings.SetConfigurationAware(newValue, Config);
         }
 
         /// <summary>

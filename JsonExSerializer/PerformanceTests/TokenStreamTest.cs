@@ -27,7 +27,6 @@ namespace PerformanceTests
             {
                 List<Token> tokens = new List<Token>();
                 TokenStream stream = new TokenStream(fr);
-                Token tok;
                 while (!stream.IsEmpty())
                     tokens.Add(stream.ReadToken());
 

@@ -11,7 +11,7 @@ namespace JsonExSerializer.MetaData
         private delegate object ConstructDelegate();
         private ConstructDelegate _noArgConstructor;
 
-        public DynamicTypeData(Type t, IConfiguration config)
+        public DynamicTypeData(Type t, ISerializerSettings config)
             : base(t, config)
         {
         }

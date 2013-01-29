@@ -10,11 +10,8 @@ namespace JsonExSerializer.Framework
     /// Writes expressions to the JsonWriter
     /// </summary>
     public class ExpressionWriter
-    {
-
-    
-        private Dictionary<Type, WriteMethod> actions;
-        private delegate void WriteMethod(Expression Expression);
+    {    
+        private Dictionary<Type, Action<Expression>> actions;
         private IJsonWriter jsonWriter;
         private bool outputTypeInfo;
 
@@ -27,7 +24,7 @@ namespace JsonExSerializer.Framework
 
         private void InitActions()
         {
-            this.actions = new Dictionary<Type, WriteMethod>();
+            this.actions = new Dictionary<Type, Action<Expression>>();
             this.actions[typeof(BooleanExpression)] = WriteBoolean;
             this.actions[typeof(NumericExpression)] = WriteNumeric;
             this.actions[typeof(ValueExpression)] = WriteValue;

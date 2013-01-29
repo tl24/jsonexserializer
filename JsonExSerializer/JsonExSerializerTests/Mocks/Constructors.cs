@@ -80,7 +80,7 @@ namespace JsonExSerializerTests.Mocks
             this.intProp = IntProp;
         }
 
-        [ConstructorParameter(2)]
+        [ConstructorParameter]
         public int IntProp
         {
             get { return intProp; }

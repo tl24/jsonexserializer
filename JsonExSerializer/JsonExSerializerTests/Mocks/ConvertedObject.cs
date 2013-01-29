@@ -61,13 +61,13 @@ namespace JsonExSerializerTests.Mocks
     /// </summary>
     public class MyImmutablePointConverter : JsonConverterBase, IJsonTypeConverter
     {
-        public override object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, ISerializerSettings serializationContext)
         {
             MyImmutablePoint pt = (MyImmutablePoint) item;
             return pt.X + "," + pt.Y;
         }
 
-        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, ISerializerSettings serializationContext)
         {
             string data = (string)item;
             if (data.IndexOf(',') != -1)

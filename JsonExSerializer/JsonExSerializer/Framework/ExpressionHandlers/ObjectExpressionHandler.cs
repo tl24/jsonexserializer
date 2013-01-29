@@ -24,7 +24,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <summary>
         /// Initializes an instance with a Serialization Context
         /// </summary>
-        public ObjectExpressionHandler(IConfiguration config)
+        public ObjectExpressionHandler(ISerializerSettings config)
             : base(config)
         {
         }
@@ -131,13 +131,13 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             {
                 switch (Config.IgnoredPropertyAction)
                 {
-                    case SerializationContext.IgnoredPropertyOption.Ignore:
+                    case IgnoredPropertyOption.Ignore:
                         return;
-                    case SerializationContext.IgnoredPropertyOption.SetIfPossible:
+                    case IgnoredPropertyOption.SetIfPossible:
                         if (!hndlr.CanWrite)
                             return;
                         break;
-                    case SerializationContext.IgnoredPropertyOption.ThrowException:
+                    case IgnoredPropertyOption.ThrowException:
                         throw new Exception(string.Format("Can not set property {0} for type {1} because it is ignored and IgnorePropertyAction is set to ThrowException", Item.Key, typeHandler.ForType));
                 }
             }
@@ -233,7 +233,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         /// <param name="context">serialization context</param>
         /// <param name="expression">object expression</param>
-        protected static void ResolveConstructorTypes(IConfiguration config, ObjectExpression expression)
+        protected static void ResolveConstructorTypes(ISerializerSettings config, ObjectExpression expression)
         {
             TypeData handler = config.GetTypeHandler(expression.ResultType);
             Type[] definedTypes = GetConstructorParameterTypes(handler.ConstructorParameters);

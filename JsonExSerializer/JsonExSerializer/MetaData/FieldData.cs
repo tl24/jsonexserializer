@@ -35,7 +35,7 @@ namespace JsonExSerializer.MetaData
         {
             get { return Field.FieldType; }
         }
-
+        /*
         /// <summary>
         /// Gets the value of the field from an object instance
         /// </summary>
@@ -55,5 +55,6 @@ namespace JsonExSerializer.MetaData
         {
             Field.SetValue(instance, value);
         }
+         */
     }
 }

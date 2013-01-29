@@ -11,7 +11,7 @@ namespace PerformanceTests
     public class JsonSerializerTest : AbstractPerfTestBase
     {
         protected Serializer serializer;
-
+        protected Type serializedType;
 
         public JsonSerializerTest(PerfTestOptions options)
             : base(options)
@@ -19,8 +19,9 @@ namespace PerformanceTests
         }
 
         public override void InitSerializer(Type t)
-        {            
-            serializer = new Serializer(t);
+        {
+            serializedType = t;
+            serializer = new Serializer();
             //serializer.Context.TypeHandlerFactory = new CustTypeHandlerFactory(serializer.Context);
         }
 
@@ -40,7 +41,7 @@ namespace PerformanceTests
         {
             using (StreamWriter fs = new StreamWriter(FileName, false))
             {
-                serializer.Serialize(o, fs);
+                serializer.Serialize(o, fs, serializedType);
             }
         }
 
@@ -48,7 +49,7 @@ namespace PerformanceTests
         {
             using (StreamReader fr = new StreamReader(FileName))
             {
-                return serializer.Deserialize(fr);
+                return serializer.Deserialize(fr, t);
             }
         }
 
@@ -66,7 +67,7 @@ namespace PerformanceTests
         public override void InitSerializer(Type t)
         {
             base.InitSerializer(t);
-            serializer.Config.TypeHandlerFactory = new CustomTypeDataRepository(typeof(DynamicTypeData), serializer.Config);
+            serializer.Settings.TypeHandlerFactory = new CustomTypeDataRepository(typeof(DynamicTypeData), serializer.Settings);
         }
     }
 }

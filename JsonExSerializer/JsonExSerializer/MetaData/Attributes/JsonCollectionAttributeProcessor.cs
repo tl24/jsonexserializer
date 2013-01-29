@@ -9,7 +9,7 @@ namespace JsonExSerializer.MetaData.Attributes
 {
     public class JsonCollectionAttributeProcessor : AttributeProcessor
     {
-        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
+        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, ISerializerSettings config)
         {
             TypeData typeData = metaData as TypeData;
             if (typeData == null)
@@ -49,7 +49,7 @@ namespace JsonExSerializer.MetaData.Attributes
             
         }
 
-        protected virtual CollectionHandler ConstructOrFindHandler(IConfiguration config, Type collHandlerType, ref bool handlerConstructed)
+        protected virtual CollectionHandler ConstructOrFindHandler(ISerializerSettings config, Type collHandlerType, ref bool handlerConstructed)
         {
             handlerConstructed = false;
             CollectionHandler handler = config.CollectionHandlers.Find(delegate(CollectionHandler h) { return h.GetType() == collHandlerType; });

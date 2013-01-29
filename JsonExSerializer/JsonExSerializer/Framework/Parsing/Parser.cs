@@ -433,7 +433,6 @@ namespace JsonExSerializer.Framework.Parsing
             }
             if (!typeName.Contains(","))
             {
-                bool found = false;
                 Type boundType = null;
                 // assume assembly name is subset of the namespace for the type (usually the case)
                 foreach (Assembly assembly in typeAliases.Assemblies)

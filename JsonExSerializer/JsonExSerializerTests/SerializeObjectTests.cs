@@ -25,9 +25,9 @@ namespace JsonExSerializerTests
             src.ShortValue = short.MaxValue;
             src.StringValue = "The simple string";
 
-            Serializer s = new Serializer(typeof(SimpleObject));
+            Serializer s = new Serializer();
             string result = s.Serialize(src);
-            SimpleObject dst = (SimpleObject) s.Deserialize(result);
+            SimpleObject dst = s.Deserialize<SimpleObject>(result);
             ValidateSimpleObjects(src, dst);
         }
 
@@ -48,9 +48,9 @@ namespace JsonExSerializerTests
             complex.SimpleObject = src;
             complex.Name = "MyComplexObject";
 
-            Serializer s = new Serializer(typeof(SemiComplexObject));
+            Serializer s = new Serializer();
             string result = s.Serialize(complex);
-            SemiComplexObject complexDest = (SemiComplexObject) s.Deserialize(result);
+            SemiComplexObject complexDest = s.Deserialize<SemiComplexObject>(result);
             Assert.AreEqual(complex.Name, complexDest.Name, "SemiComplex Name not deserialized correctly");
             ValidateSimpleObjects(complex.SimpleObject, complexDest.SimpleObject);            
         }
@@ -60,9 +60,9 @@ namespace JsonExSerializerTests
         {
             SpecializedMock expected = new SpecializedMock();
             expected.Name = null;
-            Serializer s = new Serializer(typeof(SpecializedMock));
+            Serializer s = new Serializer();
             string result = s.Serialize(expected);
-            SpecializedMock actual = (SpecializedMock)s.Deserialize(result);
+            SpecializedMock actual = s.Deserialize<SpecializedMock>(result);
             Assert.IsNull(actual.Name, "Null value not serialized, deserialized correctly");
         }
 
@@ -71,9 +71,9 @@ namespace JsonExSerializerTests
         {
             SpecializedMock co = new SpecializedMock(33);
             co.Name = "ThirtyThree";
-            Serializer s = new Serializer(typeof(SpecializedMock));
+            Serializer s = new Serializer();
             string result = s.Serialize(co);
-            SpecializedMock actual = (SpecializedMock)s.Deserialize(result);
+            SpecializedMock actual = s.Deserialize<SpecializedMock>(result);
             Assert.AreEqual(co.Name, actual.Name, "Name properties don't match");
             Assert.AreNotEqual(co.Count, actual.Count, "Read only property not deserialized correctly");
         }
@@ -84,9 +84,9 @@ namespace JsonExSerializerTests
             SpecializedMock co = new SpecializedMock(33);
             co.Name = "ThirtyThree";
             co.IgnoredProp = "IgnoreMe";
-            Serializer s = new Serializer(typeof(SpecializedMock));
+            Serializer s = new Serializer();
             string result = s.Serialize(co);
-            SpecializedMock actual = (SpecializedMock)s.Deserialize(result);
+            SpecializedMock actual = s.Deserialize<SpecializedMock>(result);
             Assert.AreNotEqual(co.IgnoredProp, actual.IgnoredProp, "Ignored property not ignored");
         }
 
@@ -96,9 +96,9 @@ namespace JsonExSerializerTests
             SubClassMock co = new SubClassMock();
             co.Name = "ThirtyThree";
             co.SubClassProp = "Some Subclass";
-            Serializer s = new Serializer(typeof(SubClassMock));
+            Serializer s = new Serializer();
             string result = s.Serialize(co);
-            SubClassMock actual = (SubClassMock)s.Deserialize(result);
+            SubClassMock actual = s.Deserialize<SubClassMock>(result);
             Assert.AreEqual(co.Name, actual.Name, "Base class properties don't match");
             Assert.AreEqual(co.SubClassProp, actual.SubClassProp, "Sub Class properties don't match");
         }
@@ -109,14 +109,14 @@ namespace JsonExSerializerTests
         [Test]
         public void CastWithGenericsTest()
         {
-            Serializer s = new Serializer(typeof(IDictionary<string, int>));
+            Serializer s = new Serializer();
             IDictionary<string, int> dict = new Dictionary<string, int>();
             dict.Add("one", 1);
             dict.Add("two", 2);
             dict.Add("ten", 10);
             string result = s.Serialize(dict);
             // make sure concrete type is correct
-            Dictionary<string, int> actual = (Dictionary<string, int>)s.Deserialize(result);
+            Dictionary<string, int> actual = (Dictionary<string, int>)s.Deserialize<IDictionary<string, int>>(result);
             AssertDictionariesEqual<string, int>(dict, actual, "dictionaries not equal");
         }
 
@@ -126,27 +126,27 @@ namespace JsonExSerializerTests
         [Test]
         public void EnumDictionaryKeyTest()
         {
-            Serializer s = new Serializer(typeof(IDictionary<string, int>));
+            Serializer s = new Serializer();
             IDictionary<SimpleEnum, string> dict = new Dictionary<SimpleEnum, string>();
             dict.Add(SimpleEnum.EnumValue1, "value1");
             dict.Add(SimpleEnum.EnumValue2, "value2");
-            string result = s.Serialize(dict);
+            string result = s.Serialize(dict, typeof(IDictionary<string, int>));
             // make sure concrete type is correct
-            Dictionary<SimpleEnum, string> actual = (Dictionary<SimpleEnum, string>)s.Deserialize(result);
+            Dictionary<SimpleEnum, string> actual = (Dictionary<SimpleEnum, string>)s.Deserialize(result, typeof(IDictionary<string, int>));
             AssertDictionariesEqual<SimpleEnum, string>(actual, dict, "Enum keyed dictionaries not equal");
         }
 
         [Test]
         public void MissingCommaBetweenKeyValuesThrowsException()
         {
-            Serializer s = new Serializer(typeof(Dictionary<string, string>));
+            Serializer s = new Serializer();
             string result = @"{""a"":""1"" ""b"":""2""}";
             try
             {
-                object obj = s.Deserialize(result);
+                object obj = s.Deserialize<Dictionary<string, string>>(result);
                 Assert.Fail("No exception thrown for object with missing comma");
             }
-            catch (ParseException e)
+            catch (ParseException)
             {
             }
             catch (Exception e)
@@ -161,12 +161,11 @@ namespace JsonExSerializerTests
         public void EmptyObjectTest()
         {
             Dictionary<string, int> source = new Dictionary<string, int>();
-            Serializer s = new Serializer(typeof(Dictionary<string, int>));
-            s.Config.IsCompact = true;
-            s.Config.OutputTypeComment = false;
+            Serializer s = new Serializer();
+            s.Settings.IsCompact = true;
             string result = s.Serialize(source);
             StringAssert.FullMatch(result, @"\s*\{\s*\}\s*");
-            Dictionary<string, int> target = (Dictionary<string, int>)s.Deserialize(result);
+            Dictionary<string, int> target = s.Deserialize<Dictionary<string, int>>(result);
             Assert.AreEqual(0, target.Count, "Dictionary count");
         }
 
@@ -174,13 +173,12 @@ namespace JsonExSerializerTests
         public void SingleItemObjectTest()
         {
             Dictionary<string, int> source = new Dictionary<string, int>();
-            Serializer s = new Serializer(typeof(Dictionary<string, int>));
-            s.Config.IsCompact = true;
-            s.Config.OutputTypeComment = false;
+            Serializer s = new Serializer();
+            s.Settings.IsCompact = true;
             source["first"] = 1;
             string result = s.Serialize(source);
             StringAssert.FullMatch(result, @"\s*\{\s*""first""\s*:\s*1\s*\}\s*");
-            Dictionary<string, int> target = (Dictionary<string, int>)s.Deserialize(result);
+            Dictionary<string, int> target = s.Deserialize <Dictionary<string, int>> (result);
             Assert.AreEqual(1, target.Count, "Dictionary count");
             Assert.AreEqual(1, target["first"], "Dictionary item");
         }
@@ -188,11 +186,11 @@ namespace JsonExSerializerTests
         [Test]
         public void StructTypeTest()
         {
-            Serializer s = new Serializer(typeof(MockValueType));
+            Serializer s = new Serializer();
             MockValueType value = new MockValueType(5, 10);
             string result = s.Serialize(value);
 
-            MockValueType actual = (MockValueType)s.Deserialize(result);
+            MockValueType actual = s.Deserialize<MockValueType>(result);
             Assert.AreEqual(value, actual, "Structs not equal");
         }
 
@@ -202,7 +200,7 @@ namespace JsonExSerializerTests
             SimpleObject so = new SimpleObject();
             
             string json = "{ByteValue:255, BoolValue:true, DoubleValue: 3.14}";
-            Serializer s = new Serializer(typeof(SimpleObject));
+            Serializer s = new Serializer();
             s.Deserialize(json, so);
             Assert.AreEqual(255, so.ByteValue, "ByteValue");
             Assert.IsTrue(so.BoolValue, "BoolValue");
@@ -213,7 +211,7 @@ namespace JsonExSerializerTests
         [ExpectedArgumentException]
         public void DeserializeIntoPrimitiveFails()
         {
-            Serializer s = new Serializer(typeof(int));
+            Serializer s = new Serializer();
             string json = "32";
             s.Deserialize(json, 1);
         }
@@ -222,7 +220,7 @@ namespace JsonExSerializerTests
         [ExpectedArgumentException]
         public void DeserializeIntoValueTypeFails()
         {
-            Serializer s = new Serializer(typeof(int));
+            Serializer s = new Serializer();
             string json = "{X:5,Y:10}";
             MockValueType mv = new MockValueType();
             s.Deserialize(json, mv);

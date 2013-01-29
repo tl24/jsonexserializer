@@ -21,13 +21,13 @@ namespace JsonExSerializerTests.Expressions
             // In each of these tests, the expression an handler is expecting
             // is not what it gets and we want to throw meaningful error messages
             // in that case
-            Serializer s = new Serializer(serializedType);
+            Serializer s = new Serializer();
             try
             {
-                object result = s.Deserialize(json);
+                object result = s.Deserialize(json, serializedType);
                 Assert.Fail("InvalidOperationException not thrown");
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 
             }

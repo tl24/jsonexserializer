@@ -14,7 +14,7 @@ namespace JsonExSerializer.TypeConversion
             return typeof(string);
         }
 
-        public override object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, ISerializerSettings serializationContext)
         {
             Type t = (Type)item;
             // TODO: Need a better way to get at this functionality
@@ -31,7 +31,7 @@ namespace JsonExSerializer.TypeConversion
             return sw.ToString();
         }
 
-        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, ISerializerSettings serializationContext)
         {
             string typeNameOrAlias = (string)item;
             Type typeResult = serializationContext.TypeAliases[typeNameOrAlias];

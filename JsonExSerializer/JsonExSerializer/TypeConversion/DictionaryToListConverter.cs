@@ -30,13 +30,13 @@ namespace JsonExSerializer.TypeConversion
             return typeof(Object);
         }
 
-        public override object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, ISerializerSettings serializationContext)
         {
             IDictionary dictionary = (IDictionary)item;
             return dictionary.Values;
         }
 
-        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, ISerializerSettings serializationContext)
         {
             IDictionary dictionary = (IDictionary) Activator.CreateInstance(sourceType);
             ICollection coll = (ICollection)item;

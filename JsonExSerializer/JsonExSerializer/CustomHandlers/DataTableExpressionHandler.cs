@@ -9,7 +9,7 @@ namespace JsonExSerializer.CustomHandlers
 {
     public class DataTableExpressionHandler : ObjectExpressionHandler
     {
-        public DataTableExpressionHandler(IConfiguration config) : base() {
+        public DataTableExpressionHandler(ISerializerSettings config) : base() {
 
         }
 

@@ -6,31 +6,36 @@ namespace JsonExSerializer.Framework.Parsing
 {
     public class FastStringBuilder
     {
+        private const int DefaultCapacity = 128;
         char[] buffer;
         int length = 0;
-        public FastStringBuilder() : this(64)
+
+        public FastStringBuilder()
+            : this(DefaultCapacity)
         {
         }
 
         public FastStringBuilder(int capacity)
         {
-            buffer = new char[capacity];
+            if (capacity < DefaultCapacity)
+                capacity = DefaultCapacity;
+            EnsureCapacity(capacity);
         }
 
         public FastStringBuilder(string source)
         {
-            int capacity = 16;
+            int capacity = DefaultCapacity;
             while (capacity < source.Length)
                 capacity += 16;
-            buffer = new char[capacity];
+            EnsureCapacity(capacity);
             source.CopyTo(0, buffer, 0, source.Length);
             length = source.Length;
         }
 
-        public int Capacity
-        {
-            get { return buffer.Length; }
-        }
+        /// <summary>
+        /// The total amount the current buffer can hold
+        /// </summary>
+        public int Capacity { get; private set; }
 
         public int Length
         {
@@ -39,7 +44,7 @@ namespace JsonExSerializer.Framework.Parsing
             {
                 if (value < 0)
                     throw new ArgumentOutOfRangeException("Length cannot be less than zero");
-                if (value > buffer.Length)
+                if (value > Capacity)
                     EnsureCapacity(value);
                 this.length = value;
             }
@@ -47,17 +52,18 @@ namespace JsonExSerializer.Framework.Parsing
 
         private void EnsureCapacity(int value)
         {
-            if (value <= buffer.Length)
+            if (value <= Capacity)
                 return;
-            int newCapacity = buffer.Length * 2;
+            int newCapacity = Capacity == 0 ? value : Capacity * 2;
             while (newCapacity < value)
-                newCapacity += buffer.Length;
-            Array.Resize(ref buffer, value);
+                newCapacity += Capacity;
+            Array.Resize(ref buffer, newCapacity);
+            Capacity = newCapacity;
         }
 
         public FastStringBuilder Append(char c)
         {
-            if (length + 1> buffer.Length)
+            if (length + 1 > Capacity)
                 EnsureCapacity(Length+1);
             buffer[length++] = c;
             return this;
@@ -65,7 +71,7 @@ namespace JsonExSerializer.Framework.Parsing
 
         public FastStringBuilder Append(string s)
         {
-            if (length + s.Length > buffer.Length) 
+            if (length + s.Length > Capacity) 
                 EnsureCapacity(Length + s.Length);
             s.CopyTo(0, buffer, Length, s.Length);
             this.length += s.Length;

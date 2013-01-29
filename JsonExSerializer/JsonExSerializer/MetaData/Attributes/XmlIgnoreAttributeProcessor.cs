@@ -9,7 +9,7 @@ namespace JsonExSerializer.MetaData.Attributes
 {
     public class XmlIgnoreAttributeProcessor : AttributeProcessor
     {
-        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
+        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, ISerializerSettings config)
         {
             if (metaData is IPropertyData)
             {

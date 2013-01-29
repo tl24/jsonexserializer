@@ -13,7 +13,7 @@ namespace JsonExSerializerTests.MetaData
         [Test]
         public void ChildClassReceivesBaseClassPropertiesPlusItsOwn()
         {
-            SerializationContext context = new SerializationContext();
+            SerializerSettings context = new SerializerSettings();
             TypeData child = new TypeData(typeof(ChildClass), context);
             Assert.IsNotNull(child.FindProperty("BaseProperty"), "BaseProperty");
             Assert.IsNotNull(child.FindProperty("ChildProperty"), "ChildProperty");
@@ -22,7 +22,7 @@ namespace JsonExSerializerTests.MetaData
         [Test]
         public void NonOverridenBaseProperty_SharedByChildren()
         {
-            SerializationContext context = new SerializationContext();
+            SerializerSettings context = new SerializerSettings();
             TypeData child = context.TypeHandlerFactory[typeof(ChildClass)];
             TypeData baseClass = context.TypeHandlerFactory[typeof(BaseClass)];
 
@@ -32,7 +32,7 @@ namespace JsonExSerializerTests.MetaData
         [Test]
         public void OverridenBaseProperty_NotSharedByChildren()
         {
-            SerializationContext context = new SerializationContext();
+            SerializerSettings context = new SerializerSettings();
             TypeData child = context.TypeHandlerFactory[typeof(ChildClass)];
             TypeData baseClass = context.TypeHandlerFactory[typeof(BaseClass)];
 
@@ -42,7 +42,7 @@ namespace JsonExSerializerTests.MetaData
         [Test]
         public void ShadowedBaseProperty_NotSharedByChildren()
         {
-            SerializationContext context = new SerializationContext();
+            SerializerSettings context = new SerializerSettings();
             TypeData child = context.TypeHandlerFactory[typeof(ChildClass)];
             TypeData baseClass = context.TypeHandlerFactory[typeof(BaseClass)];
 
@@ -52,7 +52,7 @@ namespace JsonExSerializerTests.MetaData
         [Test]
         public void IgnoredBaseProperty_SharedByChildren()
         {
-            SerializationContext context = new SerializationContext();
+            SerializerSettings context = new SerializerSettings();
             TypeData child = context.TypeHandlerFactory[typeof(ChildClass)];
             TypeData baseClass = context.TypeHandlerFactory[typeof(BaseClass)];
 

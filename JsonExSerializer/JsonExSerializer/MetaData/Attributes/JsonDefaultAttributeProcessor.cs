@@ -9,7 +9,7 @@ namespace JsonExSerializer.MetaData.Attributes
     public class JsonDefaultAttributeProcessor : AttributeProcessor
     {
         private Dictionary<Assembly, AssemblyCache> _assemblyCache;
-        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
+        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, ISerializerSettings config)
         {
             if (metaData is IPropertyData)
             {
@@ -60,7 +60,7 @@ namespace JsonExSerializer.MetaData.Attributes
             }
         }
 
-        private AssemblyCache GetAssemblyCache(Type classType, IConfiguration config)
+        private AssemblyCache GetAssemblyCache(Type classType, ISerializerSettings config)
         {
             if (_assemblyCache == null)
             {

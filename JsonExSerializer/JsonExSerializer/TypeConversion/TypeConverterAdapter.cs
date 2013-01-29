@@ -39,12 +39,12 @@ namespace JsonExSerializer.TypeConversion
             _converter = converter;
         }
 
-        public override object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, ISerializerSettings serializationContext)
         {
             return _converter.ConvertToString(item);
         }
 
-        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, ISerializerSettings serializationContext)
         {
             return _converter.ConvertFrom(null, CultureInfo.InvariantCulture, item);
         }

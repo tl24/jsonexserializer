@@ -15,9 +15,9 @@ namespace JsonExSerializerTests
         public void PrimitivesAliasedByDefault()
         {
             Serializer s = GetSerializer();
-            string result = s.Serialize(1);
+            string result = s.Serialize<object>(1);
             StringAssert.FullMatch(result, @"\s*\(int\)\s*1\s*");
-            int i = (int)s.Deserialize(result);
+            int i = (int) s.Deserialize<object>(result);
             Assert.AreEqual(1, i, "Deserialize");
         }
 
@@ -25,10 +25,10 @@ namespace JsonExSerializerTests
         public void NonGenericClass()
         {
             Serializer s = GetSerializer();
-            s.Context.TypeAliases.Add(typeof(ArrayList), "array");
-            string result = s.Serialize(new ArrayList());
+            s.Settings.TypeAliases.Add(typeof(ArrayList), "array");
+            string result = s.Serialize<object>(new ArrayList());
             StringAssert.FullMatch(result, @"\s*\(array\)\s*\[\s*\]\s*");
-            ArrayList targetList = (ArrayList)s.Deserialize(result);
+            ArrayList targetList = s.Deserialize<ArrayList>(result);
             Assert.AreEqual(0, targetList.Count, "Deserialize");
         }
 
@@ -36,10 +36,10 @@ namespace JsonExSerializerTests
         public void AliasedGenericArgument()
         {
             Serializer s = GetSerializer();
-            s.Context.TypeAliases.Add(typeof(ArrayList), "array");
-            string result = s.Serialize(new List<ArrayList>());
+            s.Settings.TypeAliases.Add(typeof(ArrayList), "array");
+            string result = s.Serialize<object>(new List<ArrayList>());
             StringAssert.FullMatch(result, @"\s*\(System\.Collections\.Generic\.List<array>\)\s*\[\s*\]\s*");
-            List<ArrayList> targetList = (List<ArrayList>)s.Deserialize(result);
+            List<ArrayList> targetList = s.Deserialize<List<ArrayList>>(result);
             Assert.AreEqual(0, targetList.Count, "Deserialize");
         }
 
@@ -48,10 +48,10 @@ namespace JsonExSerializerTests
         {
             Serializer s = GetSerializer();            
             MockValueType source = new MockValueType(9, 6);
-            s.Context.TypeAliases.Assemblies.Add(typeof(MockValueType).Assembly);
-            string result = s.Serialize(source);
+            s.Settings.TypeAliases.Assemblies.Add(typeof(MockValueType).Assembly);
+            string result = s.Serialize<object>(source);
             StringAssert.FullMatch(result, @"\s*\(JsonExSerializerTests\.Mocks\.MockValueType\)\s*{""X"":9, ""Y"":6}");
-            MockValueType target = (MockValueType)s.Deserialize(result);
+            MockValueType target = s.Deserialize<MockValueType>(result);
             Assert.AreEqual(source, target, "Deserialize");
         }
 
@@ -59,17 +59,16 @@ namespace JsonExSerializerTests
         public void AliasedOpenGenericType()
         {
             Serializer s = GetSerializer();
-            s.Context.TypeAliases.Add(typeof(Dictionary<,>), "dictionary");
-            string result = s.Serialize(new Dictionary<string, int>());
+            s.Settings.TypeAliases.Add(typeof(Dictionary<,>), "dictionary");
+            string result = s.Serialize<object>(new Dictionary<string, int>());
             StringAssert.FullMatch(result, @"\s*\(dictionary<string,int>\)\s*\{\s*\}\s*");
-            Dictionary<string, int> targetDictionary = (Dictionary<string, int>)s.Deserialize(result);
+            Dictionary<string, int> targetDictionary = s.Deserialize<Dictionary<string, int>>(result);
             Assert.AreEqual(0, targetDictionary.Count, "Deserialize");
         }
         private static Serializer GetSerializer()
         {
-            Serializer s = new Serializer(typeof(object));
-            s.Context.OutputTypeComment = false;
-            s.Context.IsCompact = true;
+            Serializer s = new Serializer();
+            s.Settings.IsCompact = true;
             return s;
         }
     }

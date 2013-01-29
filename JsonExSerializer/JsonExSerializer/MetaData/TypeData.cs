@@ -13,6 +13,8 @@ using JsonExSerializer.MetaData;
 using JsonExSerializer.TypeConversion;
 using JsonExSerializer.Framework;
 using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
 
 namespace JsonExSerializer.MetaData
 {
@@ -21,6 +23,9 @@ namespace JsonExSerializer.MetaData
     /// </summary>
     public class TypeData : MetaDataBase
     {
+        private static ConcurrentDictionary<MemberInfo, Func<object, object>> _compiledGetters = new ConcurrentDictionary<MemberInfo,Func<object,object>>();
+        private static ConcurrentDictionary<MemberInfo, Action<object, object>> _compiledSetters = new ConcurrentDictionary<MemberInfo, Action<object, object>>();
+
         /// <summary>
         /// The properties for this type
         /// </summary>
@@ -42,16 +47,6 @@ namespace JsonExSerializer.MetaData
         private CollectionHandler collectionHandler;
 
         /// <summary>
-        /// The repository that created this instance
-        /// </summary>
-        private TypeDataRepository _owningRepository;
-
-        /// <summary>
-        /// The serializer's configuration
-        /// </summary>
-        protected IConfiguration config;
-
-        /// <summary>
         /// flag indicating whether this type has any properties that are not ignored
         /// </summary>
         private bool? empty;
@@ -61,7 +56,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         private DefaultValueCollection _defaultValues;
 
-        public TypeData(Type type, IConfiguration config)
+        public TypeData(Type type, ISerializerSettings config)
             : this(type, config.TypeHandlerFactory)
         {
         }
@@ -73,8 +68,8 @@ namespace JsonExSerializer.MetaData
         /// <param name="context">the serializer context</param>
         public TypeData(Type type, TypeDataRepository owningRepository) : base(type)
         {
-            this._owningRepository = owningRepository;
-            this.config = owningRepository.Config;
+            this.OwningRepository = owningRepository;
+            this.Config = owningRepository.Config;
         }
 
         /// <summary>
@@ -136,10 +131,10 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="properties">property list to merge into</param>
         protected virtual void MergeBaseProperties(IList<IPropertyData> properties) {
-            if (this.forType.BaseType == typeof(object) || this.forType.BaseType == null)
+            if (this.ForType.BaseType == typeof(object) || this.ForType.BaseType == null)
                 return;
 
-            TypeData baseTypeData = this.config.TypeHandlerFactory[this.forType.BaseType];
+            TypeData baseTypeData = this.Config.TypeHandlerFactory[this.ForType.BaseType];
             List<IPropertyData> baseProps = new List<IPropertyData>(baseTypeData.AllProperties);
             foreach (IPropertyData baseProp in baseProps)
             {
@@ -195,52 +190,30 @@ namespace JsonExSerializer.MetaData
                 int matchCount = 0;
                 foreach (IPropertyData property in parameters)
                 {
-                    if (property.Position >= 0)
+                    // named argument, search the list
+                    int i;
+                    for (i = 0; i < ctorParms.Length; i++)
                     {
-                        if (exactMatch && ctorParms[property.Position].ParameterType != property.PropertyType)
-                            break;
+                        string parmName = ctorParms[i].Name;
+                        if (ctorParms[i].IsDefined(typeof(ConstructorParameterAttribute), false))
+                            parmName = ReflectionUtils.GetAttribute<ConstructorParameterAttribute>(ctorParms[i], false).Name ?? parmName;
 
-                        //if (!exactMatch && !ctorParms[property.Position].ParameterType.IsAssignableFrom(property.PropertyType))
-                        //    break;
+                        if (string.IsNullOrEmpty(parmName))
+                            parmName = ctorParms[i].Name;
 
-                        if (result[property.Position] == null)
-                        {
-                            result[property.Position] = property;
-                            matchCount++;
-                        }
-                        else
-                        {
-                            // something else occupies this spot already, so there's a conflict with this constructor so try another
-                            // most likely none of them will work in this situation, but we'll let the outer method determine that
+                        if (parmName.Equals(property.ConstructorParameterName, comparison)
+                            && ((exactMatch && ctorParms[i].ParameterType == property.PropertyType)
+                                || (!exactMatch/* && ctorParms[i].ParameterType.IsAssignableFrom(property.PropertyType)*/)))
                             break;
-                        }
+                    }
+                    if (i < ctorParms.Length && result[i] == null)
+                    {
+                        result[i] = property;
+                        matchCount++;
                     }
                     else
-                    {
-                        // named argument, search the list
-                        int i;
-                        for (i = 0; i < ctorParms.Length; i++)
-                        {
-                            string parmName = ctorParms[i].Name;
-                            if (ctorParms[i].IsDefined(typeof(ConstructorParameterAttribute), false))
-                                parmName = ReflectionUtils.GetAttribute<ConstructorParameterAttribute>(ctorParms[i], false).Name ?? parmName;
+                        break;
 
-                            if (string.IsNullOrEmpty(parmName))
-                                parmName = ctorParms[i].Name;
-
-                            if (parmName.Equals(property.ConstructorParameterName, comparison)
-                                && ((exactMatch && ctorParms[i].ParameterType == property.PropertyType)
-                                    || (!exactMatch/* && ctorParms[i].ParameterType.IsAssignableFrom(property.PropertyType)*/)))
-                                break;
-                        }
-                        if (i < ctorParms.Length && result[i] == null)
-                        {
-                            result[i] = property;
-                            matchCount++;
-                        }
-                        else
-                            break;
-                    }
                 }
                 if (matchCount == result.Length)
                 {
@@ -310,18 +283,12 @@ namespace JsonExSerializer.MetaData
             return Activator.CreateInstance(this.ForType, args);
         }
 
-        public virtual IConfiguration Config
-        {
-            get { return this.config; }
-        }
+        public virtual ISerializerSettings Config { get; private set; }
 
         /// <summary>
         /// The repository that created this instance
         /// </summary>
-        public virtual TypeDataRepository OwningRepository
-        {
-            get { return this._owningRepository; }
-        }
+        public virtual TypeDataRepository OwningRepository { get; private set; }
 
         /// <summary>
         /// Get the list of constructor parameters for this type
@@ -452,7 +419,7 @@ namespace JsonExSerializer.MetaData
 
         public CollectionHandler FindCollectionHandler()
         {
-            foreach (CollectionHandler handler in config.CollectionHandlers)
+            foreach (CollectionHandler handler in Config.CollectionHandlers)
             {
                 if (handler.IsCollection(ForType))
                 {
@@ -463,23 +430,21 @@ namespace JsonExSerializer.MetaData
         }
         
         /// <summary>
-        /// Returns a collection handler if this object is a collection
+        /// Gets the collection handler if this object is a collection
         /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        [Obsolete("Use the CollectionHandler property instead")]
-        public virtual CollectionHandler GetCollectionHandler()
-        {
-            if (IsCollection()) {
-                return collectionHandler;
-            } else {
-                throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
-            }            
-        }
-
         public virtual CollectionHandler CollectionHandler
         {
-            get { return GetCollectionHandler(); }
+            get
+            {
+                if (IsCollection())
+                {
+                    return collectionHandler;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Type " + ForType + " is not recognized as a collection.  A collection handler (ICollectionHandler) may be necessary");
+                }
+            }
             set
             {
                 this.collectionHandler = value;
@@ -508,7 +473,7 @@ namespace JsonExSerializer.MetaData
                     // if no converter registered, try to use the base converter if applicable
                     if (!tempCreated && converterResult == null && this.ForType.BaseType != null)
                     {
-                        converterResult = converterInstance = this.config.TypeHandlerFactory[this.forType.BaseType].TypeConverter;
+                        converterResult = converterInstance = this.Config.TypeHandlerFactory[this.ForType.BaseType].TypeConverter;
                     }
                     return converterResult;
                 }
@@ -548,6 +513,43 @@ namespace JsonExSerializer.MetaData
                 return Config.DefaultValues[forType];
             else
                 return _defaultValues[forType];
+        }
+
+        internal static Func<object, object> GetCompiledGetter(MemberInfo member)
+        {
+            return _compiledGetters.GetOrAdd(member, CompileGetter);
+        }
+
+        internal static Action<object, object> GetCompiledSetter(MemberInfo member)
+        {
+            return _compiledSetters.GetOrAdd(member, CompileSetter);
+        }
+
+        private static Func<object, object> CompileGetter(MemberInfo member)
+        {
+            var objectRef = Expression.Parameter(typeof(object));
+            var access = Expression.MakeMemberAccess(Expression.Convert(objectRef, member.DeclaringType), member);
+            var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(access, typeof(object)), objectRef);
+            return lambda.Compile();
+        }
+
+        private static Action<object, object> CompileSetter(MemberInfo member)
+        {
+            var objectRef = Expression.Parameter(typeof(object));
+            var val = Expression.Parameter(typeof(object));
+            var callSet = Expression.Assign(Expression.MakeMemberAccess(Expression.Convert(objectRef, member.DeclaringType), member), Expression.Convert(val, GetMemberInfoType(member)));
+            var lambda = Expression.Lambda<Action<object, object>>(callSet, objectRef, val);
+            return lambda.Compile();
+        }
+
+        private static Type GetMemberInfoType(MemberInfo member)
+        {
+            if (member is PropertyInfo)
+                return ((PropertyInfo)member).PropertyType;
+            else if (member is FieldInfo)
+                return ((FieldInfo)member).FieldType;
+            else
+                throw new NotSupportedException("MemberInfo type " + member.GetType() + " is not supported");
         }
     }
 }

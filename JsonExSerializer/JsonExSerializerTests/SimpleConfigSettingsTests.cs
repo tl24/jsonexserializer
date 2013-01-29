@@ -10,24 +10,18 @@ namespace JsonExSerializerTests
     public class SimpleConfigSettingsTests
     {
         private Serializer serializer;
-        private SerializationContext context;
+        private ISerializerSettings context;
         [SetUp]
         public void Setup()
         {
-            serializer = new Serializer(typeof(object), "SimpleSettingsConfig");
-            context = serializer.Context;
+            serializer = new Serializer("SimpleSettingsConfig");
+            context = serializer.Settings;
         }
 
         [Test]
         public void TestIsCompactValue()
         {
             Assert.IsTrue(context.IsCompact);
-        }
-
-        [Test]
-        public void TestOutputTypeCommentValue()
-        {
-            Assert.IsFalse(context.OutputTypeComment);
         }
 
         [Test]
@@ -39,7 +33,7 @@ namespace JsonExSerializerTests
         [Test]
         public void TestReferenceWritingTypeValue()
         {
-            Assert.AreEqual(SerializationContext.ReferenceOption.WriteIdentifier, context.ReferenceWritingType);
+            Assert.AreEqual(ReferenceOption.WriteIdentifier, context.ReferenceWritingType);
         }
     }
 }

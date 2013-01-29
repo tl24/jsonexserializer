@@ -8,15 +8,14 @@ using JsonExSerializer.Collections;
 using JsonExSerializer.TypeConversion;
 namespace JsonExSerializer
 {
-    public interface IConfiguration
+    public interface ISerializerSettings
     {
         #region "Options"
         bool IsCompact { get; set; }
-        bool OutputTypeComment { get; set; }
         bool OutputTypeInformation { get; set; }
         void SetJsonStrictOptions();
-        SerializationContext.ReferenceOption ReferenceWritingType { get; set; }
-        SerializationContext.IgnoredPropertyOption IgnoredPropertyAction { get; set; }
+        ReferenceOption ReferenceWritingType { get; set; }
+        IgnoredPropertyOption IgnoredPropertyAction { get; set; }
 
         /// <summary>
         /// Controls the action taken during deserialization when a property is specified in the Json Text,

@@ -40,14 +40,14 @@ namespace PerformanceTests
 
         public override object Deserialize(Type t)
         {
-            Parser p = new Parser(new StaticTokenStream(tokenCache), this.serializer.Config.TypeAliases);
+            Parser p = new Parser(new StaticTokenStream(tokenCache), this.serializer.Settings.TypeAliases);
             Expression e = p.Parse();
             e.ResultType = t;
-            foreach (IParsingStage stage in serializer.Config.ParsingStages)
+            foreach (IParsingStage stage in serializer.Settings.ParsingStages)
             {
                 e = stage.Execute(e);
             }
-            Evaluator eval = new Evaluator(serializer.Config);
+            Evaluator eval = new Evaluator(serializer.Settings);
             return eval.Evaluate(e);
         }
 

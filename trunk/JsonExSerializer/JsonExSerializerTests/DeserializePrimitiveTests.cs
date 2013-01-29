@@ -14,16 +14,16 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeIntTest()
         {
-            Serializer s = new Serializer(typeof(int));
+            Serializer s = new Serializer();
             int value = 32;
-            int result = (int)s.Deserialize(value.ToString(CultureInfo.InvariantCulture));
+            int result = s.Deserialize<int>(value.ToString(CultureInfo.InvariantCulture));
             Assert.AreEqual(value, result, "Int not deserialized correctly");
 
-            result = (int)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<int>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "Int not deserialized correctly with whitespace");
 
             value = -44;
-            result = (int)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<int>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "Negative Int not deserialized correctly with whitespace");
 
         }
@@ -31,16 +31,16 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeLongTest()
         {
-            Serializer s = new Serializer(typeof(long));
+            Serializer s = new Serializer();
             long value = 32;
-            long result = (long)s.Deserialize(value.ToString(CultureInfo.InvariantCulture));
+            long result = s.Deserialize<long>(value.ToString(CultureInfo.InvariantCulture));
             Assert.AreEqual(value, result, "long not deserialized correctly");
 
-            result = (long)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<long>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "long not deserialized correctly with whitespace");
 
             value = -44;
-            result = (long)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<long>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "Negative long not deserialized correctly with whitespace");
 
         }
@@ -48,16 +48,16 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeShortTest()
         {
-            Serializer s = new Serializer(typeof(short));
+            Serializer s = new Serializer();
             short value = 32;
-            short result = (short)s.Deserialize(value.ToString(CultureInfo.InvariantCulture));
+            short result = s.Deserialize<short>(value.ToString(CultureInfo.InvariantCulture));
             Assert.AreEqual(value, result, "short not deserialized correctly");
 
-            result = (short)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<short>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "short not deserialized correctly with whitespace");
 
             value = -44;
-            result = (short)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<short>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "Negative short not deserialized correctly with whitespace");
 
         }
@@ -65,44 +65,44 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeFloatTest()
         {
-            Serializer s = new Serializer(typeof(float));
+            Serializer s = new Serializer();
             float value = 32.44f;
-            float result = (float)s.Deserialize(value.ToString(CultureInfo.InvariantCulture));
+            float result = s.Deserialize<float>(value.ToString(CultureInfo.InvariantCulture));
             Assert.AreEqual(value, result, "float not deserialized correctly");
 
-            result = (float)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<float>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "float not deserialized correctly with whitespace");
 
             value = 0.0f;
-            result = (float)s.Deserialize(value.ToString(CultureInfo.InvariantCulture));
+            result = s.Deserialize<float>(value.ToString(CultureInfo.InvariantCulture));
             Assert.AreEqual(value, result, "float zero not deserialized correctly");
 
             value = -44.56f;
-            result = (float)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<float>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "Negative float not deserialized correctly with whitespace");
 
             value = float.MaxValue;
-            result = (float)s.Deserialize(value.ToString("R", CultureInfo.InvariantCulture));
+            result = s.Deserialize<float>(value.ToString("R", CultureInfo.InvariantCulture));
             Assert.AreEqual(value, result, "Error deserializing float max value");
         }
 
         [Test]
         public void DeserializedoubleTest()
         {
-            Serializer s = new Serializer(typeof(double));
+            Serializer s = new Serializer();
             double value = 32.44;
-            double result = (double)s.Deserialize(value.ToString(CultureInfo.InvariantCulture));
+            double result = s.Deserialize<double>(value.ToString(CultureInfo.InvariantCulture));
             Assert.AreEqual(value, result, "double not deserialized correctly");
 
-            result = (double)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<double>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "double not deserialized correctly with whitespace");
 
             value = 0.0;
-            result = (double)s.Deserialize(value.ToString(CultureInfo.InvariantCulture));
+            result = s.Deserialize<double>(value.ToString(CultureInfo.InvariantCulture));
             Assert.AreEqual(value, result, "double zero not deserialized correctly");
 
             value = -44.56;
-            result = (double)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<double>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "Negative double not deserialized correctly with whitespace");
 
         }
@@ -110,39 +110,39 @@ namespace JsonExSerializerTests
         [Test]
         public void DeserializeBoolTest()
         {
-            Serializer s = new Serializer(typeof(bool));
+            Serializer s = new Serializer();
             bool value = true;
-            bool result = (bool)s.Deserialize(value.ToString(CultureInfo.InvariantCulture));
+            bool result = s.Deserialize<bool>(value.ToString(CultureInfo.InvariantCulture));
             Assert.AreEqual(value, result, "Bool true not deserialized correctly");
 
-            result = (bool)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<bool>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "Bool true not deserialized correctly with whitespace");
 
             value = false;
-            result = (bool)s.Deserialize("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
+            result = s.Deserialize<bool>("  " + value.ToString(CultureInfo.InvariantCulture) + "  ");
             Assert.AreEqual(value, result, "Bool false not deserialized correctly with whitespace");
         }
 
         [Test]
         public void DeserializeStringTest()
         {
-            Serializer s = new Serializer(typeof(string));
+            Serializer s = new Serializer();
             string value = "test";
-            string result = (string)s.Deserialize("\"" + value + "\"");
+            string result = s.Deserialize<string>("\"" + value + "\"");
             Assert.AreEqual(value, result, "Simple double quote string did not deserialize correctly");
 
             value = "I say \"here, here\".";
-            result = (string)s.Deserialize("\"" + value.Replace("\"", "\\\"") + "\"");
+            result = s.Deserialize<string>("\"" + value.Replace("\"", "\\\"") + "\"");
             Assert.AreEqual(value, result, "Embedded quotes double quote string did not deserialize correctly");
         }
 
         [Test]
         public void UnicodeEscapeTest()
         {
-            Serializer s = new Serializer(typeof(string));
+            Serializer s = new Serializer();
             string expected = "\u0164\u0112\u0161\u0164";
             string toDeserialize = @"""\u0164\u0112\u0161\u0164""";
-            string result = (string)s.Deserialize(toDeserialize);
+            string result = s.Deserialize<string>(toDeserialize);
             Assert.AreEqual(expected, result, "Unicode escaped string did not deserialize correctly");
 
 

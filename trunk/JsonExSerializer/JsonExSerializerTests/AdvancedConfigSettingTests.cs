@@ -14,39 +14,39 @@ namespace JsonExSerializerTests
         [Test]
         public void TestAddBinding()
         {
-            Serializer s = new Serializer(typeof(object), "TypeBindingAdd");
-            Assert.AreEqual("SimpleObject", s.Config.TypeAliases[typeof(SimpleObject)]);
+            Serializer s = new Serializer("TypeBindingAdd");
+            Assert.AreEqual("SimpleObject", s.Settings.TypeAliases[typeof(SimpleObject)]);
             // check that defaults are still mapped
-            Assert.AreEqual("int", s.Config.TypeAliases[typeof(int)]);
+            Assert.AreEqual("int", s.Settings.TypeAliases[typeof(int)]);
         }
 
         [Test]
         public void TestRemoveBinding()
         {
-            Serializer s = new Serializer(typeof(object), "TypeBindingRemove");
+            Serializer s = new Serializer("TypeBindingRemove");
             // verify int is not mapped
             // <remove type="System.Int32, mscorlib" />
-            Assert.IsNull(s.Config.TypeAliases[typeof(int)]);
+            Assert.IsNull(s.Settings.TypeAliases[typeof(int)]);
             // verify float is not mapped
             // <remove alias="float" />
-            Assert.IsNull(s.Config.TypeAliases[typeof(float)]);
+            Assert.IsNull(s.Settings.TypeAliases[typeof(float)]);
         }
 
         [Test]
         public void TestClearAddBinding()
         {
-            Serializer s = new Serializer(typeof(object), "TypeBindingClearAdd");
-            Assert.AreEqual("SimpleObject", s.Config.TypeAliases[typeof(SimpleObject)]);
+            Serializer s = new Serializer("TypeBindingClearAdd");
+            Assert.AreEqual("SimpleObject", s.Settings.TypeAliases[typeof(SimpleObject)]);
             // check that defaults are not mapped
-            Assert.IsNull(s.Config.TypeAliases[typeof(int)]);
+            Assert.IsNull(s.Settings.TypeAliases[typeof(int)]);
         }
 
         [Test]
         public void TestRegisterTypeConverter()
         {
-            Serializer s = new Serializer(typeof(object), "TestRegisterTypeConverter");
-            IJsonTypeConverter typeConverter = s.Config.GetTypeHandler(typeof(SimpleObject)).TypeConverter;
-            IJsonTypeConverter propConverter = s.Config.GetTypeHandler(typeof(SimpleObject)).FindProperty("BoolValue").TypeConverter;
+            Serializer s = new Serializer("TestRegisterTypeConverter");
+            IJsonTypeConverter typeConverter = s.Settings.GetTypeHandler(typeof(SimpleObject)).TypeConverter;
+            IJsonTypeConverter propConverter = s.Settings.GetTypeHandler(typeof(SimpleObject)).FindProperty("BoolValue").TypeConverter;
             Assert.IsNotNull(typeConverter, "No converter for simple object registered");
             Assert.IsNotNull(propConverter, "No converter for simple object, BoolValue property registered");
         }
@@ -54,10 +54,10 @@ namespace JsonExSerializerTests
         [Test]
         public void TestCollectionHandler()
         {
-            Serializer s = new Serializer(typeof(MockCollection), "TestCollectionHandlers");
+            Serializer s = new Serializer("TestCollectionHandlers");
             MockCollection coll = new MockCollection("test");
             string result = s.Serialize(coll);
-            MockCollection actual = (MockCollection) s.Deserialize(result);
+            MockCollection actual = s.Deserialize<MockCollection>(result);
             Assert.AreEqual(coll.Value(), actual.Value(), "MockCollectionHandler not configured correctly");
         }
 
@@ -68,9 +68,9 @@ namespace JsonExSerializerTests
             line.Start = new MyImmutablePoint(1, 5);
             line.End = new MyImmutablePoint(2, 12);
 
-            Serializer s = new Serializer(typeof(MyLine), "TestIgnoreProperties");
+            Serializer s = new Serializer("TestIgnoreProperties");
             string result = s.Serialize(line);
-            MyLine actual = (MyLine)s.Deserialize(result);
+            MyLine actual = s.Deserialize<MyLine>(result);
             Assert.IsNull(actual.Start, "Line start should be ignored");
             Assert.IsNull(actual.End, "Line end should be ignored");
             // converters should not be called on ignored properties
@@ -82,9 +82,9 @@ namespace JsonExSerializerTests
         public void TestMultipleSections()
         {
             //this test to fix issue 55
-            Serializer s = new Serializer(typeof(MyLine), "TestMultipleSections");
-            Assert.IsTrue(s.Config.GetTypeHandler(typeof(SimpleObject)).HasConverter, "SimpleObject converter");
-            Assert.IsTrue(s.Config.GetTypeHandler(typeof(MyLine)).FindPropertyByName("Start").Ignored, "MyLine.Start Ignored");
+            Serializer s = new Serializer("TestMultipleSections");
+            Assert.IsTrue(s.Settings.GetTypeHandler(typeof(SimpleObject)).HasConverter, "SimpleObject converter");
+            Assert.IsTrue(s.Settings.GetTypeHandler(typeof(MyLine)).FindPropertyByName("Start").Ignored, "MyLine.Start Ignored");
         }
         [TearDown]
         public void Teardown()

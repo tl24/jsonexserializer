@@ -14,7 +14,7 @@ namespace JsonExSerializer.MetaData
         private Type _typeHandlerType = typeof(TypeData);
         private ConstructorInfo ctor;
 
-        public CustomTypeDataRepository(Type TypeHandlerType, IConfiguration config)
+        public CustomTypeDataRepository(Type TypeHandlerType, ISerializerSettings config)
             : base(config)
         {
             _typeHandlerType = TypeHandlerType;
@@ -29,7 +29,7 @@ namespace JsonExSerializer.MetaData
             {
                 if (parms[i].ParameterType.IsAssignableFrom(typeof(Type)))
                     args[i] = forType;
-                else if (parms[i].ParameterType.IsAssignableFrom(typeof(IConfiguration)))
+                else if (parms[i].ParameterType.IsAssignableFrom(typeof(ISerializerSettings)))
                     args[i] = this.Config;
             }
             return (TypeData)constructor.Invoke(args);
@@ -60,7 +60,7 @@ namespace JsonExSerializer.MetaData
                     foreach (ParameterInfo p in parms)
                     {
                         if (p.ParameterType != typeof(Type)
-                            && !p.ParameterType.IsAssignableFrom(typeof(IConfiguration)))
+                            && !p.ParameterType.IsAssignableFrom(typeof(ISerializerSettings)))
                         {
                             // contains a type we don't recognize, keep looking
                             cantUse = true;

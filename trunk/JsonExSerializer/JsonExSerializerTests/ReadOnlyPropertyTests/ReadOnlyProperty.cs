@@ -15,9 +15,9 @@ namespace JsonExSerializerTests.ReadOnlyPropertyTests
             CollParent parent = new CollParent();
             parent.Items.Add(new CollItem("2"));
             parent.Items.Add(new CollItem("Two"));
-            Serializer s = new Serializer(typeof(CollParent));
+            Serializer s = new Serializer();
             string result = s.Serialize(parent);
-            CollParent actual = (CollParent)s.Deserialize(result);
+            CollParent actual = s.Deserialize<CollParent>(result);
             Assert.AreEqual(2, actual.Items.Count, "Wrong item count on readonly collection");
             Assert.AreEqual("2", actual.Items[0].Value, "Wrong item in first position");
             Assert.AreEqual("Two", actual.Items[1].Value, "Wrong item in first position");
@@ -28,9 +28,9 @@ namespace JsonExSerializerTests.ReadOnlyPropertyTests
         {
             ObjectParent parent = new ObjectParent();
             parent.Item.Value = "TestValue";
-            Serializer s = new Serializer(typeof(ObjectParent));
+            Serializer s = new Serializer();
             string result = s.Serialize(parent);
-            ObjectParent actual = (ObjectParent)s.Deserialize(result);
+            ObjectParent actual = s.Deserialize<ObjectParent>(result);
             Assert.AreEqual("TestValue", actual.Item.Value, "Readonly object value not set properly");
         }
 
@@ -38,12 +38,12 @@ namespace JsonExSerializerTests.ReadOnlyPropertyTests
         public void OnReadOnlyArray_ExceptionIsThrown()
         {
             ArrayParent parent = new ArrayParent();
-            Serializer s = new Serializer(typeof(ArrayParent));
+            Serializer s = new Serializer();
             string result = s.Serialize(parent);
             bool thrown = false;
             try
             {
-                ArrayParent actual = (ArrayParent)s.Deserialize(result);
+                ArrayParent actual = s.Deserialize<ArrayParent>(result);
             }
             catch (InvalidOperationException)
             {

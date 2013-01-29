@@ -107,7 +107,7 @@ namespace JsonExSerializerTests.MetaData
         [Test]
         public void TypeDataNamingStrategy_AppliedToProperties()
         {
-            SerializationContext config = new SerializationContext();
+            SerializerSettings config = new SerializerSettings();
             config.TypeHandlerFactory.SetPropertyNamingStrategy(new UnderscoreNamingStrategy());
             TypeData td = config.TypeHandlerFactory[typeof(SimpleObject)];
             IPropertyData pd = td.FindPropertyByName("ByteValue");
@@ -119,34 +119,33 @@ namespace JsonExSerializerTests.MetaData
         [Test]
         public void SerializationUsesAliases()
         {
-            Serializer s = new Serializer(typeof(MyLine));
-            s.Config.TypeHandlerFactory.SetPropertyNamingStrategy(new DelegateNamingStrategy(delegate(string old) { return "__" + old.ToLower() + "__"; }), true);
+            Serializer s = new Serializer();
+            s.Settings.TypeHandlerFactory.SetPropertyNamingStrategy(new DelegateNamingStrategy(delegate(string old) { return "__" + old.ToLower() + "__"; }), true);
             MyLine source = new MyLine();
             source.Start = new MyImmutablePoint(0,0);
             source.End = new MyImmutablePoint(5, -5);
-            s.Config.OutputTypeComment = false;
-            s.Config.IsCompact = true;
+            s.Settings.IsCompact = true;
             string result = s.Serialize(source);
             string expected = "{\"__start__\":\"(0:0)\", \"__end__\":\"5,-5\"}";
             Assert.AreEqual(expected, result, "serialization");
-            MyLine target = (MyLine)s.Deserialize(result);
+            MyLine target = s.Deserialize<MyLine>(result);
             Assert.AreEqual(source, target, "Deserialization");
         }
 
         [Test]
         public void JsonExProperty_AppliesAlias()
         {
-            Serializer s = new Serializer(typeof(JsonPropertyAlias));
-            IPropertyData pd = s.Config.TypeHandlerFactory[typeof(JsonPropertyAlias)].FindProperty("MyProperty");
+            Serializer s = new Serializer();
+            IPropertyData pd = s.Settings.TypeHandlerFactory[typeof(JsonPropertyAlias)].FindProperty("MyProperty");
             Assert.AreEqual("serialize_this", pd.Alias);
         }
 
         [Test]
         public void JsonExProperty_AliasOverridesNamingStrategy()
         {
-            Serializer s = new Serializer(typeof(JsonPropertyAlias));
-            s.Config.TypeHandlerFactory.SetPropertyNamingStrategy(new DelegateNamingStrategy(delegate(string old) { return "__" + old + "__"; }));
-            IPropertyData pd = s.Config.TypeHandlerFactory[typeof(JsonPropertyAlias)].FindProperty("MyProperty");
+            Serializer s = new Serializer();
+            s.Settings.TypeHandlerFactory.SetPropertyNamingStrategy(new DelegateNamingStrategy(delegate(string old) { return "__" + old + "__"; }));
+            IPropertyData pd = s.Settings.TypeHandlerFactory[typeof(JsonPropertyAlias)].FindProperty("MyProperty");
             Assert.AreEqual("serialize_this", pd.Alias);
         }
 

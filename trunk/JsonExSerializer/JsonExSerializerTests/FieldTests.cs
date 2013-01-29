@@ -15,9 +15,9 @@ namespace JsonExSerializerTests
         {
             MockFields src = new MockFields();
             src.IntValue = 23;
-            Serializer s = new Serializer(typeof(MockFields));
+            Serializer s = new Serializer();
             string result = s.Serialize(src);
-            MockFields dest = (MockFields) s.Deserialize(result);
+            MockFields dest = s.Deserialize<MockFields>(result);
             Assert.AreEqual(23, dest.IntValue);
         }
 
@@ -26,9 +26,9 @@ namespace JsonExSerializerTests
         {
             MockFields src = new MockFields();
             src.SetProtected(true);
-            Serializer s = new Serializer(typeof(MockFields));
+            Serializer s = new Serializer();
             string result = s.Serialize(src);
-            MockFields dest = (MockFields)s.Deserialize(result);
+            MockFields dest = s.Deserialize <MockFields>(result);
             Assert.IsFalse(dest.GetProtected());            
         }
 
@@ -39,9 +39,9 @@ namespace JsonExSerializerTests
             SimpleObject so = new SimpleObject();
             so.IntValue = 23;
             src.SimpleObj = so;
-            Serializer s = new Serializer(typeof(MockFields));
+            Serializer s = new Serializer();
             string result = s.Serialize(src);
-            MockFields dest = (MockFields)s.Deserialize(result);
+            MockFields dest = s.Deserialize<MockFields>(result);
             Assert.AreEqual(23, dest.SimpleObj.IntValue);
 
         }

@@ -13,14 +13,14 @@ namespace JsonExSerializerTests
         [Test]
         public void WhenCustomMetaDataIsReturn_ItsSerializedCorrectly()
         {
-            Serializer s = new Serializer(typeof(CustomClass));
-            s.Config.TypeHandlerFactory = new CustomTypeDataRepository(typeof(CustomClassTypeHandler), s.Config);
+            Serializer s = new Serializer();
+            s.Settings.TypeHandlerFactory = new CustomTypeDataRepository(typeof(CustomClassTypeHandler), s.Settings);
             CustomClass cust = new CustomClass();
             cust.SetID(23);
             cust.SetName("Frank");
             cust.Value = 999;
             string result = s.Serialize(cust);
-            CustomClass dest = (CustomClass)s.Deserialize(result);
+            CustomClass dest = s.Deserialize<CustomClass>(result);
             Assert.AreEqual(23, dest.GetID());
             Assert.AreEqual("Frank", dest.GetName());
             Assert.AreEqual(999, dest.Value);
@@ -62,7 +62,7 @@ namespace JsonExSerializerTests
 
     public class CustomClassTypeHandler : TypeData
     {
-        public CustomClassTypeHandler(Type t, IConfiguration config)
+        public CustomClassTypeHandler(Type t, ISerializerSettings config)
             : base(t, config)
         {
         }

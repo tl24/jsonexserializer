@@ -12,13 +12,6 @@ namespace JsonExSerializer.MetaData
     /// </summary>
     public abstract class MetaDataBase : IMetaData
     {
-        protected DefaultValueOption defaultValueSetting;
-
-        /// <summary>
-        /// The declaring type for this member
-        /// </summary>
-        protected Type forType;
-
         /// <summary>
         /// The converter for this MetaData if applicable
         /// </summary>
@@ -37,16 +30,13 @@ namespace JsonExSerializer.MetaData
         /// <param name="forType">the containing type</param>
         protected MetaDataBase(Type forType)
         {
-            this.forType = forType;
+            this.ForType = forType;
         }
 
         /// <summary>
         /// The declaring type for this member
         /// </summary>
-        public Type ForType
-        {
-            get { return this.forType; }
-        }
+        public Type ForType { get; protected set; }
 
         /// <summary>
         /// Gets or sets the TypeConverter defined for this object
@@ -82,17 +72,7 @@ namespace JsonExSerializer.MetaData
             return null;
         }
 
-        public virtual DefaultValueOption DefaultValueSetting
-        {
-            get
-            {
-                return this.defaultValueSetting;
-            }
-            set
-            {
-                this.defaultValueSetting = value;
-            }
-        }
+        public virtual DefaultValueOption DefaultValueSetting { get; set; }
 
         public virtual DefaultValueOption GetEffectiveDefaultValueSetting()
         {

@@ -17,10 +17,10 @@ namespace JsonExSerializerTests.Expressions
         [Test]
         public void TestCustomTypeResolving()
         {
-            Serializer serializer = new Serializer(typeof(Hashtable));
+            Serializer serializer = new Serializer();
             string json = @"{obj1: { type:'Type1', value: {A:1, B: 2} }, obj2: { type:'Type2', value: { X:12.34, S:'test'} } }";
-            serializer.Context.ParsingStages.Add(new CustomTypeResolver());
-            Hashtable values = (Hashtable) serializer.Deserialize(json);
+            serializer.Settings.ParsingStages.Add(new CustomTypeResolver());
+            Hashtable values = serializer.Deserialize<Hashtable>(json);
             object obj1 = ((Hashtable)values["obj1"])["value"];
             object obj2 = ((Hashtable)values["obj2"])["value"];
             Assert.IsNotNull(obj1, "object 1 not deserialized");
@@ -36,10 +36,10 @@ namespace JsonExSerializerTests.Expressions
         [Test]
         public void TestResolveConcreteTypeToInterfaceProperty()
         {
-            Serializer serializer = new Serializer(typeof(Message));
+            Serializer serializer = new Serializer();
             string json = @"{ type:'Type1', value: {A:1, B: 2} }";
-            serializer.Context.ParsingStages.Add(new CustomTypeResolver());
-            Message result = (Message)serializer.Deserialize(json);
+            serializer.Settings.ParsingStages.Add(new CustomTypeResolver());
+            Message result = serializer.Deserialize<Message>(json);
             IType value = result.value;
             Assert.IsNotNull(value, "value not deserialized");
             Assert.IsInstanceOfType(typeof(Type1), value, "Incorrect type on value");

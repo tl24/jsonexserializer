@@ -19,13 +19,13 @@ namespace JsonExSerializerTests.Mocks
                 this._y = y;
             }
             
-            [ConstructorParameter(0)]
+            [ConstructorParameter]
             public int X
             {
                 get { return _x; }
             }
 
-            [ConstructorParameter(1)]
+            [ConstructorParameter]
             public int Y
             {
                 get { return _y; }

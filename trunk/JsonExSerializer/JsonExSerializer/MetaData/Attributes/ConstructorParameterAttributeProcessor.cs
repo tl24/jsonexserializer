@@ -8,7 +8,7 @@ namespace JsonExSerializer.MetaData.Attributes
 {
     public class ConstructorParameterAttributeProcessor : AttributeProcessor
     {
-        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, IConfiguration config)
+        public override void Process(IMetaData metaData, ICustomAttributeProvider attributeProvider, ISerializerSettings config)
         {
             if (metaData is IPropertyData)
             {
@@ -16,9 +16,7 @@ namespace JsonExSerializer.MetaData.Attributes
                 ConstructorParameterAttribute ctorAttr = ReflectionUtils.GetAttribute<ConstructorParameterAttribute>(attributeProvider, false);
                 if (ctorAttr != null)
                 {
-                    if (ctorAttr.Position >= 0)
-                        property.Position = ctorAttr.Position;
-                    else if (!string.IsNullOrEmpty(ctorAttr.Name))
+                    if (!string.IsNullOrEmpty(ctorAttr.Name))
                         property.ConstructorParameterName = ctorAttr.Name;
                     else
                         property.ConstructorParameterName = property.Name;

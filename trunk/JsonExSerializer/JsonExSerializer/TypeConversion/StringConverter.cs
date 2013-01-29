@@ -16,12 +16,12 @@ namespace JsonExSerializer.TypeConversion
             return typeof(string);
         }
 
-        public override object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, ISerializerSettings serializationContext)
         {
             return item.ToString();
         }
 
-        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, ISerializerSettings serializationContext)
         {
             return Activator.CreateInstance(sourceType, item);
         }

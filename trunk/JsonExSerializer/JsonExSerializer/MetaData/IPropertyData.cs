@@ -10,7 +10,7 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Gets or sets a value indicating whether this property is ignored.  Ignored properties
         /// do not get written during serialization, and may not be read during deserialization depending
-        /// on the <see cref="JsonExSerializer.SerializationContext.IgnoredPropertyOption" />
+        /// on the <see cref="JsonExSerializer.SerializerSettings.IgnoredPropertyOption" />
         /// </summary>
         bool Ignored { get; set; }
 
@@ -35,13 +35,6 @@ namespace JsonExSerializer.MetaData
         /// in JSON.
         /// </summary>
         string Alias { get; set; }
-
-        /// <summary>
-        /// Returns the 0-based index in the constructor arguments for a constructor parameter
-        /// </summary>
-        [Obsolete("Named constructor parameters should be used instead of Position")]
-        int Position { get; set; }
-
 
         /// <summary>
         /// Gets the type of the property
@@ -87,7 +80,7 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         /// <param name="value">the value to be written</param>
         /// <returns>true if the value should be written, false otherwise</returns>
-        bool ShouldWriteValue(IConfiguration config, object value);
+        bool ShouldWriteValue(ISerializerSettings config, object value);
 
         DefaultValueOption DefaultValueSetting { get; set; }
 

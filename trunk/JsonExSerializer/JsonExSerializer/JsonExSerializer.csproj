@@ -81,6 +81,7 @@
     <Compile Include="ConstructorParameterAttribute.cs" />
     <Compile Include="CustomHandlers\DataTableExpressionHandler.cs" />
     <Compile Include="DefaultValueCollection.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Framework\ExpressionHandlers\DateTimeExpressionHandler.cs" />
     <Compile Include="Framework\Expressions\CastExpression.cs" />
     <Compile Include="Framework\Expressions\ComplexExpressionBase.cs" />
@@ -119,7 +120,7 @@
     <Compile Include="Framework\Parsing\AssignReferenceStage.cs" />
     <Compile Include="Framework\Parsing\IParsingStage.cs" />
     <Compile Include="Framework\Visitors\CollectReferencesVisitor.cs" />
-    <Compile Include="IConfiguration.cs" />
+    <Compile Include="ISerializerSettings.cs" />
     <Compile Include="IConfigurationAware.cs" />
     <Compile Include="IDeserializationCallback.cs" />
     <Compile Include="Framework\IJsonWriter.cs" />
@@ -168,7 +169,7 @@
     <Compile Include="Serializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Framework\ExpressionBuilder.cs" />
-    <Compile Include="SerializationContext.cs" />
+    <Compile Include="SerializerSettings.cs" />
     <Compile Include="Framework\Parsing\Token.cs" />
     <Compile Include="Framework\Parsing\TokenStream.cs" />
     <Compile Include="Framework\TwoWayDictionary.cs" />

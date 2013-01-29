@@ -16,18 +16,7 @@ namespace JsonExSerializer
     [global::System.AttributeUsage(AttributeTargets.Property|AttributeTargets.Parameter, Inherited = false, AllowMultiple = false)]
     public sealed class ConstructorParameterAttribute : Attribute
     {
-        readonly int position;
         private readonly string name;
-
-        /// <summary>
-        /// Indicates that this property will be passed to the constructor.
-        /// </summary>
-        /// <param name="index">the 0-based position of the property within the constructor's arguments</param>
-        [Obsolete("ConstructorParameters should be specified by name")]
-        public ConstructorParameterAttribute(int position)
-        {
-            this.position = position;
-        }
 
         /// <summary>
         /// Indicates that this property will be passed to the constructor with a constructor argument with the same name as
@@ -35,7 +24,6 @@ namespace JsonExSerializer
         /// </summary>
         public ConstructorParameterAttribute()
         {
-            this.position = -1;
         }
 
         /// <summary>
@@ -45,19 +33,7 @@ namespace JsonExSerializer
         /// <param name="name">The name of the constructor argument</param>
         public ConstructorParameterAttribute(string name)
         {
-            this.position = -1;
             this.name = name;
-        }
-
-        /// <summary>
-        /// The constructor argument index
-        /// </summary>
-        public int Position
-        {
-            get
-            {
-                return this.position;
-            }
         }
 
         /// <summary>

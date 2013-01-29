@@ -19,21 +19,20 @@ namespace JsonExSerializer
 {
     public class XmlConfigurator
     {
-        private IConfiguration serializationConfig;
+        private ISerializerSettings serializationConfig;
         private XmlReader reader;
         private delegate void MapHandler();
         private Dictionary<string, MapHandler> handlers = new Dictionary<string, MapHandler>();
         private string sectionName;
         private int _collectionInsertPoint;
 
-        private XmlConfigurator(XmlReader reader, IConfiguration serializationConfig, string sectionName)
+        private XmlConfigurator(XmlReader reader, ISerializerSettings serializationConfig, string sectionName)
         {
             this.reader = reader;
             this.serializationConfig = serializationConfig;
             this.sectionName = sectionName;
 
             handlers["IsCompact"] = delegate() { serializationConfig.IsCompact = reader.ReadElementContentAsBoolean(); };
-            handlers["OutputTypeComment"] = delegate() { serializationConfig.OutputTypeComment = reader.ReadElementContentAsBoolean(); };
             handlers["OutputTypeInformation"] = delegate() { serializationConfig.OutputTypeInformation = reader.ReadElementContentAsBoolean(); };
             handlers["ReferenceWritingType"] = new MapHandler(HandleReferenceWritingType);
             handlers["TypeBindings"] = new MapHandler(HandleTypeBindings);
@@ -42,7 +41,24 @@ namespace JsonExSerializer
             handlers["IgnoreProperties"] = new MapHandler(HandleIgnoreProperties);
         }
 
-        public static void Configure(IConfiguration serializationConfig, string configSection)
+        /// <summary>
+        /// Loads the settings for the named <paramref name="configSection"/>.
+        /// </summary>
+        /// <param name="configSection">the name of a json serializer config section</param>
+        /// <returns>configured serializer settings</returns>
+        public static ISerializerSettings Load(string configSection)
+        {
+            var settings = new SerializerSettings();
+            Configure(settings, configSection);
+            return settings;
+        }
+
+        /// <summary>
+        /// Configures the <paramref name="serializerSettings"/> from the <paramref name="configSection"/>
+        /// </summary>
+        /// <param name="serializerSettings">an instance of serializer settings to configure</param>
+        /// <param name="configSection">the name of a json serializer config section</param>
+        public static void Configure(ISerializerSettings serializerSettings, string configSection)
         {
             XmlConfigSection section = (XmlConfigSection)ConfigurationManager.GetSection(configSection);
             if (section == null && configSection != "JsonExSerializer")
@@ -53,10 +69,10 @@ namespace JsonExSerializer
             string xml = section.RawXml;
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(xml);
-            Configure(serializationConfig, XmlReader.Create(new StringReader(xml)), configSection);
+            Configure(serializerSettings, XmlReader.Create(new StringReader(xml)), configSection);
         }
 
-        public static void Configure(IConfiguration serializationConfig, XmlReader reader, string sectionName)
+        private static void Configure(ISerializerSettings serializationConfig, XmlReader reader, string sectionName)
         {
             new XmlConfigurator(reader, serializationConfig, sectionName).Configure();
         }
@@ -214,7 +230,7 @@ namespace JsonExSerializer
         private void HandleReferenceWritingType()
         {
             string value = reader.ReadElementContentAsString();
-            serializationConfig.ReferenceWritingType = (SerializationContext.ReferenceOption) Enum.Parse(serializationConfig.ReferenceWritingType.GetType(), value);
+            serializationConfig.ReferenceWritingType = (ReferenceOption) Enum.Parse(serializationConfig.ReferenceWritingType.GetType(), value);
         }
 
         private delegate void MethodDelegate(string tagName, params string[] values);

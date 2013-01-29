@@ -18,7 +18,7 @@ namespace JsonExSerializer.TypeConversion
         
         /// converts a bit array into a string of the format:  "63,FFEF10002EFA"
         /// length,HexEncodedBits
-        public override object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, ISerializerSettings serializationContext)
         {
             BitArray ba = (BitArray) item;
             int len = ba.Count;
@@ -59,7 +59,7 @@ namespace JsonExSerializer.TypeConversion
             return result;
         }
 
-        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, ISerializerSettings serializationContext)
         {
             string bits = (string)((Hashtable)item)["Bits"];
             int count = (int)((Hashtable)item)["Count"];
@@ -83,11 +83,5 @@ namespace JsonExSerializer.TypeConversion
         {
             return typeof(Hashtable);
         }
-
-        public SerializationContext SerializationContext
-        {
-            set { return; }
-        }
-
     }
 }

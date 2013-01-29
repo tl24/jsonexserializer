@@ -23,11 +23,11 @@ namespace JsonExSerializer.Framework
     public class ExpressionBuilder : IExpressionBuilder
     {
         private Type _serializedType;
-        private IConfiguration _config;
+        private ISerializerSettings _config;
         private const int indentStep = 3;
         private IDictionary<object, ReferenceInfo> _refs;
 
-        internal ExpressionBuilder(Type t, IConfiguration config)
+        internal ExpressionBuilder(Type t, ISerializerSettings config)
         {
             _serializedType = t;
             _config = config;
@@ -126,18 +126,18 @@ namespace JsonExSerializer.Framework
                 JsonPath refPath = refInfo.Path;
                 switch (_config.ReferenceWritingType)
                 {
-                    case SerializationContext.ReferenceOption.WriteIdentifier:
+                    case ReferenceOption.WriteIdentifier:
                         if (!refInfo.CanReference)
                             throw new InvalidOperationException("Can't reference object: " + refPath + " from " + CurrentPath + ", either it is a collection, or it has not been converted yet");
 
                         return new ReferenceExpression(refPath);
-                    case SerializationContext.ReferenceOption.IgnoreCircularReferences:
+                    case ReferenceOption.IgnoreCircularReferences:
                         if (CurrentPath.StartsWith(refPath))
                         {
                             return new NullExpression();
                         }
                         break;
-                    case SerializationContext.ReferenceOption.ErrorCircularReferences:
+                    case ReferenceOption.ErrorCircularReferences:
                         if (CurrentPath.StartsWith(refPath))
                         {
                             throw new InvalidOperationException("Circular reference detected.  Current path: " + CurrentPath + ", reference to: " + refPath);

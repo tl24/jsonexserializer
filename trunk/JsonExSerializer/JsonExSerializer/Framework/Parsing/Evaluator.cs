@@ -11,10 +11,10 @@ namespace JsonExSerializer.Framework.Parsing
     /// </summary>
     public class Evaluator : IDeserializerHandler, IConfigurationAware
     {
-        private IConfiguration _config;
+        private ISerializerSettings _config;
         private Expression _currentExpression;
 
-        public Evaluator(IConfiguration config)
+        public Evaluator(ISerializerSettings config)
         {
             this.Config = config;
         }
@@ -51,7 +51,7 @@ namespace JsonExSerializer.Framework.Parsing
             return result;
         }
 
-        public IConfiguration Config
+        public ISerializerSettings Config
         {
             get
             {

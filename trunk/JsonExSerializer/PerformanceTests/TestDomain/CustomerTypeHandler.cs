@@ -8,7 +8,7 @@ namespace PerformanceTests.TestDomain
 {
     public class CustTypeHandlerFactory : TypeDataRepository
     {
-        public CustTypeHandlerFactory(IConfiguration config)
+        public CustTypeHandlerFactory(ISerializerSettings config)
             : base(config)
         {
         }
@@ -23,7 +23,7 @@ namespace PerformanceTests.TestDomain
     }
     public class CustomerTypeHandler : TypeData
     {
-        public CustomerTypeHandler(Type t, IConfiguration config)
+        public CustomerTypeHandler(Type t, ISerializerSettings config)
             : base(t, config)
         {
         }

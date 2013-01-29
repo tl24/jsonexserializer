@@ -89,7 +89,7 @@ namespace JsonExSerializerTests.Mocks
             return typeof(string);
         }
 
-        public override object ConvertFrom(object item, SerializationContext serializationContext)
+        public override object ConvertFrom(object item, ISerializerSettings serializationContext)
         {
             _convertFromCount++;
             // seperate with ":" and surround with () this time
@@ -97,7 +97,7 @@ namespace JsonExSerializerTests.Mocks
             return "(" + pt.X + _separator + pt.Y + ")";
         }
 
-        public override object ConvertTo(object item, Type sourceType, SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, ISerializerSettings serializationContext)
         {
             _convertToCount++;
             string data = (string)item;

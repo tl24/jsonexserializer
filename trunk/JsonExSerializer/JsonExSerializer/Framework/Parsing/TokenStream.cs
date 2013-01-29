@@ -445,7 +445,6 @@ namespace JsonExSerializer.Framework.Parsing
                     else if (ch == quoteChar)
                     {
                         return new Token(quoteChar == '"' ? TokenType.DoubleQuotedString : TokenType.SingleQuotedString, buffer.ToString(), startLine, startPos);
-                        buffer.Length = 0;
                     }
                     else
                     {

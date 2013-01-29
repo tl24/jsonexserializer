@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using JsonExSerializer.TypeConversion;
+using JsonExSerializer;
 
 namespace JsonExSerializerTests.Mocks
 {
@@ -39,12 +40,12 @@ namespace JsonExSerializerTests.Mocks
             return typeof(int);
         }
 
-        public override object ConvertFrom(object item, JsonExSerializer.SerializationContext serializationContext)
+        public override object ConvertFrom(object item, ISerializerSettings serializationContext)
         {
             return num;
         }
 
-        public override object ConvertTo(object item, Type sourceType, JsonExSerializer.SerializationContext serializationContext)
+        public override object ConvertTo(object item, Type sourceType, ISerializerSettings serializationContext)
         {
             this.num = (int)item;
             return this;

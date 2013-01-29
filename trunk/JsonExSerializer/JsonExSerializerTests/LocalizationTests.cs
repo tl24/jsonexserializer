@@ -47,8 +47,17 @@ namespace JsonExSerializerTests
         public void DatesSerializeCorrectlyInAnyCulture(string startingCulture, string targetCulture, DateTimeKind kind)
         {
             DateTime value = new DateTime(2000, 1, 15, 15, 30, 45, kind);
-            string expectedValue = "2000-01-15T15:30:45.0000000Z";
-            TestSerializationInMultipleLocales(value, "", startingCulture, targetCulture);
+            string expectedValue;
+            if (kind == DateTimeKind.Utc)
+            {
+                expectedValue = "\"2000-01-15T15:30:45.0000000Z\"";
+            }
+            else
+            {
+                var offset = DateTimeOffset.Now.Offset;
+                expectedValue = "\"2000-01-15T15:30:45.0000000" + (offset < TimeSpan.Zero ? "-" : "") + offset.ToString("hh\\:mm") + "\"";
+            }
+            TestSerializationInMultipleLocales(value, expectedValue, startingCulture, targetCulture);
         }
 
         [RowTest]
@@ -68,15 +77,14 @@ namespace JsonExSerializerTests
                 try
                 {
                     Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo(startingCulture);
-                    Serializer s = new Serializer(typeof(T));
-                    s.Config.IsCompact = true;
-                    s.Config.OutputTypeComment = false;
+                    Serializer s = new Serializer();
+                    s.Settings.IsCompact = true;
                     string result = s.Serialize(sourceValue);
                     if (!string.IsNullOrEmpty(expectedValue))
                         Assert.AreEqual(result, expectedValue);
                     Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo(targetCulture);
-                    s = new Serializer(typeof(T));
-                    T deserializedResult = (T)s.Deserialize(result);
+                    s = new Serializer();
+                    T deserializedResult = s.Deserialize<T>(result);
                     Assert.AreEqual(sourceValue, deserializedResult, typeof(T).Name + " deserialized incorrectly in different culture");
                 }
                 catch (Exception e)
@@ -100,12 +108,12 @@ namespace JsonExSerializerTests
         public void TestNullable(string startingCulture, string targetCulture)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo(startingCulture);
-            Serializer serializer = new Serializer(typeof(TestClass));
+            Serializer serializer = new Serializer();
             TestClass t = new TestClass(7.6, -0.2f);
             string json = serializer.Serialize(t);
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo(targetCulture);
-            TestClass result = (TestClass)serializer.Deserialize(json);
+            TestClass result = serializer.Deserialize<TestClass>(json);
             Assert.AreEqual(t.d, result.d);
             Assert.AreEqual(t.f, result.f);
         }

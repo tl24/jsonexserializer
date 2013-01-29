@@ -23,7 +23,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// Initializes an instance with a Serialization Context
         /// </summary>
         /// <param name="Context">the Serialization Context</param>
-        public DictionaryObjectExpressionHandler(IConfiguration config)
+        public DictionaryObjectExpressionHandler(ISerializerSettings config)
             : base(config)
         {
         }

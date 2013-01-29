@@ -23,7 +23,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <summary>
         /// Initializes an instance with a Serialization Context
         /// </summary>
-        public TypeConverterExpressionHandler(IConfiguration config)
+        public TypeConverterExpressionHandler(ISerializerSettings config)
             : base(config)
         {
         }
@@ -61,7 +61,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         public Expression GetExpression(object value, IJsonTypeConverter converter, JsonPath currentPath, IExpressionBuilder serializer)
         {
             //TODO: Cast for now to avoid breaking compatibility
-            object convertedObject = converter.ConvertFrom(value, (SerializationContext) Config);
+            object convertedObject = converter.ConvertFrom(value, (SerializerSettings) Config);
             // call serialize again in case the new type has a converter
             Expression expr = serializer.Serialize(convertedObject, currentPath, null);
             serializer.SetCanReference(value);   // can't reference inside the object
@@ -120,7 +120,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             expression.ResultType = destType;
             object tempResult = deserializer.Evaluate(expression);
             //TODO: Cast for now to avoid breaking compatibility
-            object result = converter.ConvertTo(tempResult, sourceType, (SerializationContext) Config);
+            object result = converter.ConvertTo(tempResult, sourceType, (SerializerSettings) Config);
             expression.OnObjectConstructed(result);
             if (result is IDeserializationCallback)
             {
@@ -157,7 +157,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         public virtual bool IsReferenceable(object value, IJsonTypeConverter converter)
         {
             //TODO: Cast for now to avoid breaking compatibility
-            return converter.SupportsReferences(value.GetType(), (SerializationContext) this.Config);
+            return converter.SupportsReferences(value.GetType(), (SerializerSettings) this.Config);
         }
     }
 }

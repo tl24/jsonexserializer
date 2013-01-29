@@ -13,12 +13,12 @@ namespace JsonExSerializer.MetaData
     public class TypeDataRepository
     {
    
-        private IConfiguration _config;
+        private ISerializerSettings _config;
         private IDictionary<Type, TypeData> _cache;
         private List<AttributeProcessor> _attributeProcessors;
         private IPropertyNamingStrategy _propertyNamingStrategy;
 
-        public TypeDataRepository(IConfiguration config)
+        public TypeDataRepository(ISerializerSettings config)
         {
             _config = config;
             _cache = new Dictionary<Type, TypeData>();
@@ -32,7 +32,7 @@ namespace JsonExSerializer.MetaData
             _propertyNamingStrategy = new DefaultPropertyNamingStrategy();
         }
 
-        public IConfiguration Config
+        public ISerializerSettings Config
         {
             get { return this._config; }
         }

@@ -15,45 +15,45 @@ namespace JsonExSerializerTests
         [SetUp]
         public void TestSetup()
         {
-            serializer = new Serializer(typeof(SpecializedMock));
+            serializer = new Serializer();
         }
 
         [Test]
         public void IgnoredPropertyAction_WhenIgnored_PropertyNotSet()
         {
-            serializer.Config.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.Ignore;
+            serializer.Settings.IgnoredPropertyAction = IgnoredPropertyOption.Ignore;
             string result = @" { IgnoredProp: 'NotIgnored' }";
-            SpecializedMock mock = (SpecializedMock) serializer.Deserialize(result);
+            SpecializedMock mock = serializer.Deserialize<SpecializedMock>(result);
             Assert.AreNotEqual("NotIgnored", mock.IgnoredProp, "IgnoredProp not ignored");
         }
 
         [Test]
         public void IgnoredPropertyAction_WhenSetIfPossible_WriteablePropertyIsSet()
         {
-            serializer.Config.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.SetIfPossible;
+            serializer.Settings.IgnoredPropertyAction = IgnoredPropertyOption.SetIfPossible;
             string result = @" { IgnoredProp: 'NotIgnored' }";
-            SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
+            SpecializedMock mock = serializer.Deserialize<SpecializedMock>(result);
             Assert.AreEqual("NotIgnored", mock.IgnoredProp, "IgnoredProp not set");
         }
 
         [Test]
         public void IgnoredPropertyAction_WhenSetIfPossible_ReadonlyPropertyNotSet()
         {
-            serializer.Config.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.SetIfPossible;
+            serializer.Settings.IgnoredPropertyAction = IgnoredPropertyOption.SetIfPossible;
             string result = @" { Count: 22 }";
-            SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
+            SpecializedMock mock = serializer.Deserialize<SpecializedMock>(result);
             Assert.AreNotEqual(22, mock.Count, "Readonly property set");
         }
 
         [Test]
         public void IgnoredPropertyAction_WhenThrowException_IgnoredPropertyThrowsException()
         {
-            serializer.Config.IgnoredPropertyAction = SerializationContext.IgnoredPropertyOption.ThrowException;
+            serializer.Settings.IgnoredPropertyAction = IgnoredPropertyOption.ThrowException;
             string result = @" { IgnoredProp: 'NotIgnored' }";
             bool exception = false;
             try
             {
-                SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
+                SpecializedMock mock = serializer.Deserialize<SpecializedMock>(result);
             }
             catch
             {
@@ -66,12 +66,12 @@ namespace JsonExSerializerTests
         [Test]
         public void MissingPropertyAction_WhenThrowException_MissingPropertyThrowsException()
         {
-            serializer.Config.MissingPropertyAction = MissingPropertyOptions.ThrowException;
+            serializer.Settings.MissingPropertyAction = MissingPropertyOptions.ThrowException;
             string result = @" { Foo: 'Bar' }";
             bool exception = false;
             try
             {
-                SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
+                SpecializedMock mock = serializer.Deserialize<SpecializedMock>(result);
             }
             catch
             {
@@ -84,9 +84,9 @@ namespace JsonExSerializerTests
         [Test]
         public void MissingPropertyAction_WhenIgnore_MissingPropertyIsIgnored()
         {
-            serializer.Config.MissingPropertyAction = MissingPropertyOptions.Ignore;
+            serializer.Settings.MissingPropertyAction = MissingPropertyOptions.Ignore;
             string result = @" { Foo: 'Bar', Name: 'Special' }";
-            SpecializedMock mock = (SpecializedMock)serializer.Deserialize(result);
+            SpecializedMock mock = serializer.Deserialize<SpecializedMock>(result);
             Assert.AreEqual("Special", mock.Name);
         }
     }

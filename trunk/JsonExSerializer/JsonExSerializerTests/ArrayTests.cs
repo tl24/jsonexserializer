@@ -14,10 +14,10 @@ namespace JsonExSerializerTests
         public void StringArrayTest()
         {
             string[] value = { "one", "two", "three", "four" };
-            Serializer s = new Serializer(value.GetType());
+            Serializer s = new Serializer();
             string result = s.Serialize(value);
 
-            string[] actual = (string[]) s.Deserialize(result);
+            string[] actual = s.Deserialize<string[]>(result);
 
             CompareArrays<string>(value, actual);
         }
@@ -26,10 +26,10 @@ namespace JsonExSerializerTests
         public void IntArrayTest()
         {
             int[] value = { int.MinValue, 0, int.MaxValue, -2, 35 };
-            Serializer s = new Serializer(value.GetType());
+            Serializer s = new Serializer();
             string result = s.Serialize(value);
 
-            int[] actual = (int[])s.Deserialize(result);
+            int[] actual = s.Deserialize<int[]>(result);
 
             CompareArrays<int>(value, actual);
         }
@@ -48,9 +48,9 @@ namespace JsonExSerializerTests
             uint uivalue = 333;
 
             object[] value = { ivalue, svalue, strvalue, fvalue, dvalue, boolvalue, sbvalue, usvalue, uivalue };
-            Serializer s = new Serializer(value.GetType());
+            Serializer s = new Serializer();
             string result = s.Serialize(value);
-            object[] actual = (object[])s.Deserialize(result);
+            object[] actual = s.Deserialize<object[]>(result);
             Assert.AreEqual(ivalue, actual[0]);
             Assert.AreEqual(svalue, actual[1]);
             Assert.AreEqual(strvalue, actual[2]);
@@ -66,12 +66,11 @@ namespace JsonExSerializerTests
         public void EmptyArrayTest()
         {
             List<int> source = new List<int>();
-            Serializer s = new Serializer(typeof(List<int>));
-            s.Config.IsCompact = true;
-            s.Config.OutputTypeComment = false;
+            Serializer s = new Serializer();
+            s.Settings.IsCompact = true;
             string result = s.Serialize(source);
             StringAssert.FullMatch(result, @"\s*\[\s*\]\s*");
-            List<int> target = (List<int>) s.Deserialize(result);
+            List<int> target = s.Deserialize<List<int>>(result);
             Assert.AreEqual(0, target.Count, "List count");
         }
 
@@ -79,13 +78,12 @@ namespace JsonExSerializerTests
         public void SingleItemArrayTest()
         {
             List<int> source = new List<int>();
-            Serializer s = new Serializer(typeof(List<int>));
-            s.Config.IsCompact = true;
-            s.Config.OutputTypeComment = false;
+            Serializer s = new Serializer();
+            s.Settings.IsCompact = true;
             source.Add(5);
             string result = s.Serialize(source);
             StringAssert.FullMatch(result, @"\s*\[\s*5\s*\]\s*");
-            List<int> target = (List<int>)s.Deserialize(result);
+            List<int> target = s.Deserialize<List<int>>(result);
             Assert.AreEqual(1, target.Count, "List count");
             Assert.AreEqual(5, target[0], "single item");
         }
@@ -93,14 +91,14 @@ namespace JsonExSerializerTests
         [Test]
         public void MissingCommaBetweenArrayItemsThrowsException()
         {
-            Serializer s = new Serializer(typeof(List<int>));
+            Serializer s = new Serializer();
             string result = @"[1 2]";
             try
             {
-                object obj = s.Deserialize(result);
+                object obj = s.Deserialize<List<int>>(result);
                 Assert.Fail("No exception thrown for object with missing comma");
             }
-            catch (ParseException e)
+            catch (ParseException)
             {
             }
             catch (Exception e)
@@ -122,9 +120,9 @@ namespace JsonExSerializerTests
         public void TestArrayCast()
         {
             object[] data = { 1, "string", new ArrayList() };
-            Serializer s = new Serializer(typeof(object));
+            Serializer s = new Serializer();
             string result = s.Serialize(data);
-            object[] actual = (object[]) s.Deserialize(result);
+            object[] actual = s.Deserialize<object[]>(result);
             Assert.AreEqual(data.Length, actual.Length, "Invalid counts");
             for (int i = 0; i < data.Length; i++)
             {

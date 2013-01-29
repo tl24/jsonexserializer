@@ -11,9 +11,9 @@ namespace JsonExSerializer.TypeConversion
        
         public abstract Type GetSerializedType(Type sourceType);
 
-        public abstract object ConvertFrom(object item, SerializationContext serializationContext);
+        public abstract object ConvertFrom(object item, ISerializerSettings serializationContext);
 
-        public abstract object ConvertTo(object item, Type sourceType, SerializationContext serializationContext);
+        public abstract object ConvertTo(object item, Type sourceType, ISerializerSettings serializationContext);
 
         /// <summary>
         /// Provides an optional parameter to the converter to control some of its functionality.   The Context
@@ -25,7 +25,7 @@ namespace JsonExSerializer.TypeConversion
             set { _context = value; }
         }
 
-        public virtual bool SupportsReferences(Type sourceType, SerializationContext serializationContext)
+        public virtual bool SupportsReferences(Type sourceType, ISerializerSettings serializationContext)
         {
             Type targetType = GetSerializedType(sourceType);
             return serializationContext.IsReferenceableType(targetType);

@@ -6,6 +6,6 @@ namespace JsonExSerializer
 {
     public interface IConfigurationAware 
     {
-        IConfiguration Config { get; set; }
+        ISerializerSettings Config { get; set; }
     }
 }

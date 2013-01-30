@@ -56,11 +56,11 @@ namespace JsonExSerializer
             CollectionHandlers.Add(new CollectionConstructorHandler());
 
             // type handlers
-            TypeHandlerFactory = new TypeDataRepository(this);
+            Types = new TypeDataRepository(this);
             Parameters = new Hashtable();
 
             // type conversion
-            TypeHandlerFactory.RegisterTypeConverter(typeof(System.Collections.BitArray), new BitArrayConverter());
+            Types.RegisterTypeConverter(typeof(System.Collections.BitArray), new BitArrayConverter());
 
             ExpressionHandlers = new ExpressionHandlerCollection(this);
             DefaultValues = new DefaultValueCollection();
@@ -174,7 +174,7 @@ namespace JsonExSerializer
         {
             IConfigurationAware contextAware = value as IConfigurationAware;
             if (contextAware != null)
-                contextAware.Config = config;
+                contextAware.Settings = config;
         }
 
         /// <summary>
@@ -185,26 +185,6 @@ namespace JsonExSerializer
         public virtual bool IsReferenceableType(Type objectType)
         {
             return objectType.IsClass && objectType != typeof(string);
-        }
-
-        /// <summary>
-        /// Register a type converter with the DefaultConverterFactory.
-        /// </summary>
-        /// <param name="forType">the type to register</param>
-        /// <param name="converter">the converter</param>
-        public void RegisterTypeConverter(Type forType, IJsonTypeConverter converter)
-        {
-            TypeHandlerFactory.RegisterTypeConverter(forType, converter);
-        }
-
-        /// <summary>
-        /// Register a type converter with the DefaultConverterFactory.
-        /// </summary>
-        /// <param name="forType">the property to register</param>
-        /// <param name="converter">the converter</param>
-        public void RegisterTypeConverter(Type forType, string propertyName, IJsonTypeConverter converter)
-        {
-            TypeHandlerFactory.RegisterTypeConverter(forType, propertyName, converter);
         }
 
         /// <summary>
@@ -222,28 +202,12 @@ namespace JsonExSerializer
         /// </summary>
         public List<CollectionHandler> CollectionHandlers { get; private set; }
 
-        public TypeData GetTypeHandler(Type objectType)
-        {
-            return TypeHandlerFactory[objectType];
-        }
-
         /// <summary>
         /// Gets or sets the TypeHandlerFactory which is responsible for
         /// creating TypeData instances which manage type metadata
         /// </summary>
-        public TypeDataRepository TypeHandlerFactory { get; set; }
+        public ITypeSettings Types { get; set; }
 
         public ExpressionHandlerCollection ExpressionHandlers { get; set; }
-
-        /// <summary>
-        /// Ignore a property to keep from being serialized, same as if the JsonExIgnore attribute had been set
-        /// </summary>
-        /// <param name="objectType">the type that contains the property</param>
-        /// <param name="propertyName">the name of the property</param>
-        public void IgnoreProperty(Type objectType, string propertyName)
-        {
-            TypeData handler = GetTypeHandler(objectType);
-            handler.IgnoreProperty(propertyName);
-        }
     }
 }

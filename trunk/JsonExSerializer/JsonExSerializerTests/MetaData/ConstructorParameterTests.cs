@@ -15,7 +15,7 @@ namespace JsonExSerializerTests.MetaData
         public void TestNamedOnlyExact()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData typeData = new TypeData(typeof(NamedOnlyExactConstructor), context);
+            TypeData typeData = new TypeData<NamedOnlyExactConstructor>(context);
             IList<IPropertyData> propData = typeData.ConstructorParameters;
             List<IPropertyData> expected = new List<IPropertyData>();
             expected.Add(typeData.FindProperty("StringPropA"));
@@ -27,7 +27,7 @@ namespace JsonExSerializerTests.MetaData
         public void TestNamedOnlyIgnoreCase()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData typeData = new TypeData(typeof(NamedOnlyIgnoreCaseConstructor), context);
+            TypeData typeData = new TypeData<NamedOnlyIgnoreCaseConstructor>(context);
             IList<IPropertyData> propData = typeData.ConstructorParameters;
             List<IPropertyData> expected = new List<IPropertyData>();
             expected.Add(typeData.FindProperty("StringPropA"));
@@ -39,7 +39,7 @@ namespace JsonExSerializerTests.MetaData
         public void TestMixed()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData typeData = new TypeData(typeof(MixedExactConstructor), context);
+            TypeData typeData = new TypeData<MixedExactConstructor>(context);
             IList<IPropertyData> propData = typeData.ConstructorParameters;
             List<IPropertyData> expected = new List<IPropertyData>();
             expected.Add(typeData.FindProperty("StringPropA"));
@@ -52,7 +52,7 @@ namespace JsonExSerializerTests.MetaData
         public void TestNamedArgumentsNotIgnored()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData typeData = new TypeData(typeof(NamedOnlyExactConstructor), context);
+            ITypeData typeData = new TypeData<NamedOnlyExactConstructor>(context);
             IPropertyData stringPropA = typeData.FindProperty("StringPropA");
             IPropertyData stringPropB = typeData.FindProperty("StringPropB");
             Assert.IsFalse(stringPropA.Ignored, "stringPropA Constructor argument should not be ignored");
@@ -63,7 +63,7 @@ namespace JsonExSerializerTests.MetaData
         public void TestParameterAlias()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData typeData = new TypeData(typeof(AliasedConstructor), context);
+            ITypeData typeData = new TypeData<AliasedConstructor>(context);
             List<IPropertyData> expected = new List<IPropertyData>();
             expected.Add(typeData.FindProperty("IntProp"));
             CollectionAssert.AreElementsEqual(expected, typeData.ConstructorParameters);

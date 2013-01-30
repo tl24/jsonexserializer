@@ -15,13 +15,14 @@ using JsonExSerializer.Framework;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using System.Linq;
 
 namespace JsonExSerializer.MetaData
 {
     /// <summary>
     /// Helper class for dealing with types during serialization
     /// </summary>
-    public class TypeData : MetaDataBase
+    public abstract class TypeData : MetaDataBase, ITypeData
     {
         private static ConcurrentDictionary<MemberInfo, Func<object, object>> _compiledGetters = new ConcurrentDictionary<MemberInfo,Func<object,object>>();
         private static ConcurrentDictionary<MemberInfo, Action<object, object>> _compiledSetters = new ConcurrentDictionary<MemberInfo, Action<object, object>>();
@@ -56,20 +57,30 @@ namespace JsonExSerializer.MetaData
         /// </summary>
         private DefaultValueCollection _defaultValues;
 
-        public TypeData(Type type, ISerializerSettings config)
-            : this(type, config.TypeHandlerFactory)
+        public static ITypeData Create(Type forType, ISerializerSettings settings)
+        {
+            return (ITypeData) typeof(TypeData<>).MakeGenericType(forType).GetConstructor(new[] {typeof(ISerializerSettings)}).Invoke(new[] { settings});
+        }
+
+        public static ITypeData Create(Type forType, TypeDataRepository owningRepository)
+        {
+            return (ITypeData)typeof(TypeData<>).MakeGenericType(forType).GetConstructor(new [] {typeof(TypeDataRepository)}).Invoke(new [] {owningRepository});
+        }
+
+        public TypeData(Type forType, ISerializerSettings config)
+            : this(forType, (TypeDataRepository) config.Types)
         {
         }
         /// <summary>
         /// Initializes an instance with the specific <paramref name="type"/> and
-        /// <paramref name="context" />.
+        /// <paramref name="owningRepository" />.
         /// </summary>
         /// <param name="type">the .NET type that the metadata is for</param>
-        /// <param name="context">the serializer context</param>
-        public TypeData(Type type, TypeDataRepository owningRepository) : base(type)
+        /// <param name="owningRepository">the repository creating this object</param>
+        public TypeData(Type forType, TypeDataRepository owningRepository) : base(forType)
         {
             this.OwningRepository = owningRepository;
-            this.Config = owningRepository.Config;
+            this.Settings = owningRepository.Config;
         }
 
         /// <summary>
@@ -99,8 +110,6 @@ namespace JsonExSerializer.MetaData
         /// <summary>
         /// Reads the properties and constructor arguments from type metadata declared on this type
         /// </summary>
-        /// <param name="Properties">properties collection</param>
-        /// <param name="ConstructorArguments">constructor arguments</param>
         protected virtual IList<IPropertyData> ReadDeclaredProperties()
         {
             IList<IPropertyData> properties = new List<IPropertyData>();
@@ -134,7 +143,7 @@ namespace JsonExSerializer.MetaData
             if (this.ForType.BaseType == typeof(object) || this.ForType.BaseType == null)
                 return;
 
-            TypeData baseTypeData = this.Config.TypeHandlerFactory[this.ForType.BaseType];
+            ITypeData baseTypeData = this.Settings.Types[this.ForType.BaseType];
             List<IPropertyData> baseProps = new List<IPropertyData>(baseTypeData.AllProperties);
             foreach (IPropertyData baseProp in baseProps)
             {
@@ -283,7 +292,10 @@ namespace JsonExSerializer.MetaData
             return Activator.CreateInstance(this.ForType, args);
         }
 
-        public virtual ISerializerSettings Config { get; private set; }
+        /// <summary>
+        /// The serializer settings this was created from
+        /// </summary>
+        public virtual ISerializerSettings Settings { get; private set; }
 
         /// <summary>
         /// The repository that created this instance
@@ -304,38 +316,15 @@ namespace JsonExSerializer.MetaData
         }
 
         /// <summary>
-        /// Indicates whether there are any properties for this object that are not ignored.
+        /// Returns all the properties on the type that are not ignored
         /// </summary>
-        public virtual bool IsEmpty
-        {
-            get
-            {
-                if (!empty.HasValue)
-                    foreach (IPropertyData prop in AllProperties)
-                    {
-                        if (!prop.Ignored)
-                        {
-                            empty = false;
-                            break;
-                        }
-                    }
-                if (!empty.HasValue)
-                    empty = true;
-
-
-                return empty.Value;
-            }
-        }
-
         public virtual IEnumerable<IPropertyData> Properties
         {
             get
             {
-                foreach (IPropertyData prop in AllProperties)
-                {
-                    if (!prop.Ignored)
-                        yield return prop;
-                }
+                return from prop in AllProperties
+                       where !prop.Ignored
+                       select prop;
             }
         }
         /// <summary>
@@ -419,7 +408,7 @@ namespace JsonExSerializer.MetaData
 
         public CollectionHandler FindCollectionHandler()
         {
-            foreach (CollectionHandler handler in Config.CollectionHandlers)
+            foreach (CollectionHandler handler in Settings.CollectionHandlers)
             {
                 if (handler.IsCollection(ForType))
                 {
@@ -473,7 +462,7 @@ namespace JsonExSerializer.MetaData
                     // if no converter registered, try to use the base converter if applicable
                     if (!tempCreated && converterResult == null && this.ForType.BaseType != null)
                     {
-                        converterResult = converterInstance = this.Config.TypeHandlerFactory[this.ForType.BaseType].TypeConverter;
+                        converterResult = converterInstance = this.Settings.Types[this.ForType.BaseType].TypeConverter;
                     }
                     return converterResult;
                 }
@@ -488,7 +477,7 @@ namespace JsonExSerializer.MetaData
         {
             DefaultValueOption option = base.GetEffectiveDefaultValueSetting();
             if (option == DefaultValueOption.InheritParentSetting)
-                return Config.GetEffectiveDefaultValueSetting();
+                return Settings.GetEffectiveDefaultValueSetting();
             else
                 return option;
         }
@@ -498,7 +487,7 @@ namespace JsonExSerializer.MetaData
             get
             {
                 if (_defaultValues == null)
-                    _defaultValues = new DefaultValueCollection(Config.DefaultValues);
+                    _defaultValues = new DefaultValueCollection(Settings.DefaultValues);
                 return _defaultValues;
             }
             set
@@ -510,7 +499,7 @@ namespace JsonExSerializer.MetaData
         public virtual object GetDefaultValue(Type forType)
         {
             if (_defaultValues == null)
-                return Config.DefaultValues[forType];
+                return Settings.DefaultValues[forType];
             else
                 return _defaultValues[forType];
         }
@@ -550,6 +539,34 @@ namespace JsonExSerializer.MetaData
                 return ((FieldInfo)member).FieldType;
             else
                 throw new NotSupportedException("MemberInfo type " + member.GetType() + " is not supported");
+        }
+    }
+
+    public class TypeData<T> : TypeData, ITypeData<T>
+    {
+        public TypeData(ISerializerSettings config)
+            : base(typeof(T), config)
+        {
+        }
+        /// <summary>
+        /// Initializes an instance with the specific <paramref name="type"/> and
+        /// <paramref name="owningRepository" />.
+        /// </summary>
+        /// <param name="type">the .NET type that the metadata is for</param>
+        /// <param name="owningRepository">the repository creating this object</param>
+        public TypeData(TypeDataRepository owningRepository)
+            : base(typeof(T), owningRepository)
+        {
+        }
+
+        public IPropertyData Property<P>(Expression<Func<T, P>> propertyExpression)
+        {
+            return FindPropertyByName(ReflectionUtils.GetPropertyName(propertyExpression));
+        }
+
+        public void IgnoreProperty<P>(Expression<Func<T, P>> propertyExpression)
+        {
+            Property(propertyExpression).Ignored = true;
         }
     }
 }

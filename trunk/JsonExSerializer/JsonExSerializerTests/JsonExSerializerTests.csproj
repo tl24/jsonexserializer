@@ -67,7 +67,6 @@
     <Compile Include="ArrayTests.cs" />
     <Compile Include="CollectionsTests.cs" />
     <Compile Include="ConversionTests.cs" />
-    <Compile Include="CustomPropertyTest.cs" />
     <Compile Include="DefaultValuesTests.cs" />
     <Compile Include="DeserializePrimitiveTests.cs" />
     <Compile Include="Expressions\CustomExpressionHandlerTests.cs" />
@@ -85,7 +84,6 @@
     <Compile Include="JsonWriterTypeTests.cs" />
     <Compile Include="LocalizationTests.cs" />
     <Compile Include="MetaData\ConstructorParameterTests.cs" />
-    <Compile Include="MetaData\DynamicMethodUtilTests.cs" />
     <Compile Include="MetaData\PropertyNamingTests.cs" />
     <Compile Include="MetaData\PropertyInheritanceTests.cs" />
     <Compile Include="Mocks\BoolToIntConverter.cs" />

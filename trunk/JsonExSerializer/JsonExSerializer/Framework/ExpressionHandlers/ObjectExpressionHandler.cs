@@ -38,7 +38,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>json object expression</returns>
         public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
-             TypeData handler = Config.GetTypeHandler(data.GetType());
+            ITypeData handler = Settings.Types[data.GetType()];
 
             ObjectExpression expression = new ObjectExpression();
 
@@ -60,7 +60,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         protected virtual void GenerateItemExpression(object data, JsonPath currentPath, IExpressionBuilder serializer, ObjectExpression expression, IPropertyData prop)
         {
             object value = prop.GetValue(data);
-            if (!prop.ShouldWriteValue(this.Config, value))
+            if (!prop.ShouldWriteValue(this.Settings, value))
                 return;
             Expression valueExpr;
             if (prop.HasConverter)
@@ -102,7 +102,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>deserialized object</returns>
         public override object Evaluate(Expression expression, object existingObject, IDeserializerHandler deserializer)
         {
-            TypeData typeHandler = Config.GetTypeHandler(existingObject.GetType());
+            ITypeData typeHandler = Settings.Types[existingObject.GetType()];
             ObjectExpression objectExpression = CastExpression<ObjectExpression>(expression);
             foreach (KeyValueExpression Item in objectExpression.Properties)
             {
@@ -111,25 +111,25 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             return existingObject;
         }
 
-        protected virtual void EvaluateItem(object existingObject, IDeserializerHandler deserializer, TypeData typeHandler, KeyValueExpression Item)
+        protected virtual void EvaluateItem(object existingObject, IDeserializerHandler deserializer, ITypeData typeHandler, KeyValueExpression Item)
         {
             // evaluate the item and let it assign itself?
             IPropertyData hndlr = typeHandler.FindPropertyByAlias(Item.Key);
             if (hndlr == null)
             {
-                switch (this.Config.MissingPropertyAction)
+                switch (this.Settings.MissingPropertyAction)
                 {
                     case MissingPropertyOptions.Ignore:
                         return;
                     case MissingPropertyOptions.ThrowException:
                         throw new Exception(string.Format("Could not find property {0} for type {1}", Item.Key, typeHandler.ForType));
                     default:
-                        throw new InvalidOperationException("Unhandled MissingPropertyAction: " + this.Config.MissingPropertyAction);
+                        throw new InvalidOperationException("Unhandled MissingPropertyAction: " + this.Settings.MissingPropertyAction);
                 }
             }
             if (hndlr.Ignored)
             {
-                switch (Config.IgnoredPropertyAction)
+                switch (Settings.IgnoredPropertyAction)
                 {
                     case IgnoredPropertyOption.Ignore:
                         return;
@@ -148,7 +148,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             IJsonTypeConverter converter = null;
             if (hndlr.HasConverter)
             {
-                converterHandler = (TypeConverterExpressionHandler)Config.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
+                converterHandler = (TypeConverterExpressionHandler)Settings.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
                 converter = hndlr.TypeConverter;
             }
 
@@ -182,12 +182,12 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>constructed, but unpopulated object</returns>
         protected virtual object ConstructObject(ObjectExpression expression, IDeserializerHandler deserializer)
         {
-            TypeData handler = Config.GetTypeHandler(expression.ResultType);
+            ITypeData handler = Settings.Types[expression.ResultType];
             // set the default type if none set
             if (expression.ConstructorArguments.Count > 0)
             {
                 // old way expects parameters in the constructor list
-                ResolveConstructorTypes(Config, expression);
+                ResolveConstructorTypes(Settings, expression);
             }
             else
             {
@@ -215,7 +215,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
                 Expression carg = expression.ConstructorArguments[i];
                 if (i < handler.ConstructorParameters.Count && handler.ConstructorParameters[i].HasConverter)
                 {
-                    TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)Config.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
+                    TypeConverterExpressionHandler converterHandler = (TypeConverterExpressionHandler)Settings.ExpressionHandlers.Find(typeof(TypeConverterExpressionHandler));
                     args[i] = converterHandler.Evaluate(carg, deserializer, handler.ConstructorParameters[i].TypeConverter);
                 }
                 else
@@ -233,12 +233,12 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// </summary>
         /// <param name="context">serialization context</param>
         /// <param name="expression">object expression</param>
-        protected static void ResolveConstructorTypes(ISerializerSettings config, ObjectExpression expression)
+        protected static void ResolveConstructorTypes(ISerializerSettings settings, ObjectExpression expression)
         {
-            TypeData handler = config.GetTypeHandler(expression.ResultType);
+            ITypeData handler = settings.Types[expression.ResultType];
             Type[] definedTypes = GetConstructorParameterTypes(handler.ConstructorParameters);
 
-            CtorArgTypeResolver resolver = new CtorArgTypeResolver(expression, config, definedTypes);
+            CtorArgTypeResolver resolver = new CtorArgTypeResolver(expression, settings, definedTypes);
             Type[] resolvedTypes = resolver.ResolveTypes();
             for (int i = 0; i < resolvedTypes.Length; i++)
             {

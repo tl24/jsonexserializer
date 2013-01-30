@@ -16,7 +16,7 @@ namespace JsonExSerializer.Framework.Parsing
 
         public Evaluator(ISerializerSettings config)
         {
-            this.Config = config;
+            this.Settings = config;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace JsonExSerializer.Framework.Parsing
         {
             Expression oldExpr = Current;
             _currentExpression = expression;
-            IExpressionHandler handler = Config.ExpressionHandlers.GetHandler(expression);
+            IExpressionHandler handler = Settings.ExpressionHandlers.GetHandler(expression);
             object result = handler.Evaluate(expression, this);
             _currentExpression = oldExpr ?? _currentExpression;
             return result;
@@ -45,13 +45,13 @@ namespace JsonExSerializer.Framework.Parsing
         {
             Expression oldExpr = Current;
             _currentExpression = expression;
-            IExpressionHandler handler = Config.ExpressionHandlers.GetHandler(expression);
+            IExpressionHandler handler = Settings.ExpressionHandlers.GetHandler(expression);
             object result = handler.Evaluate(expression, existingObject, this);
             _currentExpression = oldExpr ?? _currentExpression;
             return result;
         }
 
-        public ISerializerSettings Config
+        public ISerializerSettings Settings
         {
             get
             {

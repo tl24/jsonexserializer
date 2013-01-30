@@ -38,7 +38,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <param name="Context">serialization context</param>
         public ExpressionHandlerCollection(ISerializerSettings config)
         {
-            this.Config = config;
+            this.Settings = config;
             InitializeDefaultHandlers();
         }
 
@@ -51,15 +51,15 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             Add(new NumericExpressionHandler());
             Add(new BooleanExpressionHandler());
             Add(new ValueExpressionHandler());
-            Add(new TypeConverterExpressionHandler(Config));
+            Add(new TypeConverterExpressionHandler(Settings));
             //Add(new GenericQueueHandler(Context));
-            Add(new ArrayExpressionHandler(Config));
-            Add(new DictionaryObjectExpressionHandler(Config));
+            Add(new ArrayExpressionHandler(Settings));
+            Add(new DictionaryObjectExpressionHandler(Settings));
             _nullHandler = new NullExpressionHandler();
             Add(_nullHandler);
             Add(new CastExpressionHandler());
             Add(new ReferenceExpressionHandler());
-            _defaultHandler = new ObjectExpressionHandler(Config);
+            _defaultHandler = new ObjectExpressionHandler(Settings);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             set
             {
                 this._defaultHandler = value;
-                SerializerSettings.SetConfigurationAware(_defaultHandler, Config);
+                SerializerSettings.SetConfigurationAware(_defaultHandler, Settings);
             }
         }
 
@@ -85,14 +85,14 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             set
             {
                 this._nullHandler = value;
-                SerializerSettings.SetConfigurationAware(_nullHandler, Config);
+                SerializerSettings.SetConfigurationAware(_nullHandler, Settings);
             }
         }
 
         /// <summary>
         /// The serialization context
         /// </summary>
-        public ISerializerSettings Config
+        public ISerializerSettings Settings
         {
             get { return this._config; }
             set { this._config = value; }
@@ -317,7 +317,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
             base.OnInsertComplete(index, value);
             InvalidateCache();
-            SerializerSettings.SetConfigurationAware(value, Config);
+            SerializerSettings.SetConfigurationAware(value, Settings);
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             base.OnSetComplete(index, oldValue, newValue);
             InvalidateCache();
             if (!object.ReferenceEquals(oldValue, newValue))
-                SerializerSettings.SetConfigurationAware(newValue, Config);
+                SerializerSettings.SetConfigurationAware(newValue, Settings);
         }
 
         /// <summary>

@@ -10,8 +10,6 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
     /// </summary>
     public abstract class ExpressionHandlerBase : IExpressionHandler, IConfigurationAware
     {
-        private ISerializerSettings _config;
-
         /// <summary>
         /// Initializes a default instance without a Serialization Context.  Protected since the class is abstract.
         /// </summary>
@@ -23,19 +21,15 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// Initializes an instance with a Serialization Context.
         /// </summary>
         /// <param name="Context">the Serialization Context</param>
-        protected ExpressionHandlerBase(ISerializerSettings config)
+        protected ExpressionHandlerBase(ISerializerSettings settings)
         {
-            _config = config;
+            Settings = settings;
         }
 
         /// <summary>
         /// Gets/sets the Serialization Context, which can be used to retrieve type information, serialization options, etc.
         /// </summary>
-        public virtual ISerializerSettings Config
-        {
-            get { return _config; }
-            set { _config = value; }
-        }
+        public virtual ISerializerSettings Settings { get; set; }
 
         /// <summary>
         /// Take an object and convert it to an expression to be serialized.  Child names/indexes should be appended to the
@@ -96,7 +90,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         {
             if (value == null)
                 return false;
-            return this.Config.IsReferenceableType(value.GetType());
+            return this.Settings.IsReferenceableType(value.GetType());
         }
 
         protected T CastExpression<T>(Expression expr) where T : Expression

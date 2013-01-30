@@ -44,7 +44,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
 
         private IJsonTypeConverter GetConverter(object value)
         {
-            TypeData handler = Config.TypeHandlerFactory[value.GetType()];
+            ITypeData handler = Settings.Types[value.GetType()];
             IJsonTypeConverter converter = (handler.HasConverter ? handler.TypeConverter : (IJsonTypeConverter)value);
             return converter;
         }
@@ -61,7 +61,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         public Expression GetExpression(object value, IJsonTypeConverter converter, JsonPath currentPath, IExpressionBuilder serializer)
         {
             //TODO: Cast for now to avoid breaking compatibility
-            object convertedObject = converter.ConvertFrom(value, (SerializerSettings) Config);
+            object convertedObject = converter.ConvertFrom(value, (SerializerSettings) Settings);
             // call serialize again in case the new type has a converter
             Expression expr = serializer.Serialize(convertedObject, currentPath, null);
             serializer.SetCanReference(value);   // can't reference inside the object
@@ -76,7 +76,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>true if this handler handles the type</returns>
         public override bool CanHandle(Type objectType)
         {
-            TypeData handler = Config.TypeHandlerFactory[objectType];
+            ITypeData handler = Settings.Types[objectType];
             return handler.HasConverter || typeof(IJsonTypeConverter).IsAssignableFrom(objectType);
         }
 
@@ -90,7 +90,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         public override object Evaluate(Expression expression, IDeserializerHandler deserializer)
         {
             Type sourceType = expression.ResultType;
-            TypeData handler = Config.TypeHandlerFactory[sourceType];
+            ITypeData handler = Settings.Types[sourceType];
             IJsonTypeConverter converter;
             if (typeof(IJsonTypeConverter).IsAssignableFrom(sourceType))
             {
@@ -120,7 +120,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
             expression.ResultType = destType;
             object tempResult = deserializer.Evaluate(expression);
             //TODO: Cast for now to avoid breaking compatibility
-            object result = converter.ConvertTo(tempResult, sourceType, (SerializerSettings) Config);
+            object result = converter.ConvertTo(tempResult, sourceType, (SerializerSettings) Settings);
             expression.OnObjectConstructed(result);
             if (result is IDeserializationCallback)
             {
@@ -157,7 +157,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         public virtual bool IsReferenceable(object value, IJsonTypeConverter converter)
         {
             //TODO: Cast for now to avoid breaking compatibility
-            return converter.SupportsReferences(value.GetType(), (SerializerSettings) this.Config);
+            return converter.SupportsReferences(value.GetType(), (SerializerSettings) this.Settings);
         }
     }
 }

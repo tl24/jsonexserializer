@@ -19,13 +19,11 @@ namespace JsonExSerializer.Framework.Expressions
     /// for this key, from the parent and checking for a property converter.
     /// </summary>
     public sealed class KeyValueExpression : Expression {
-        private Expression _keyExpression;
-        private Expression _valueExpression;
 
         public KeyValueExpression(Expression key, Expression value)
         {
-            _keyExpression = key;
-            _valueExpression = value;
+            KeyExpression = key;
+            ValueExpression = value;
             this.LineNumber = key.LineNumber;
             this.CharacterPosition = key.CharacterPosition;
         }
@@ -33,23 +31,15 @@ namespace JsonExSerializer.Framework.Expressions
         public string Key
         {
             get {
-                if (!(_keyExpression is ValueExpression))
+                if (!(KeyExpression is ValueExpression))
                     throw new InvalidOperationException("Key property is not valid when key expression is not a ValueExpression");
-                return ((ValueExpression)this._keyExpression).StringValue; 
+                return ((ValueExpression)KeyExpression).StringValue; 
             }
         }
 
-        public Expression KeyExpression
-        {
-            get { return this._keyExpression; }
-            set { this._keyExpression = value; }
-        }
+        public Expression KeyExpression { get; set; }
 
-        public Expression ValueExpression
-        {
-            get { return this._valueExpression; }
-            set { this._valueExpression = value; }
-        }
+        public Expression ValueExpression { get; set; }
 
         public override Type DefaultType
         {

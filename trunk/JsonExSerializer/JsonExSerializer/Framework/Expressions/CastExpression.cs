@@ -6,17 +6,15 @@ namespace JsonExSerializer.Framework.Expressions
 {
     public class CastExpression : Expression
     {
-        private Expression _expression;
-
         public CastExpression(Type CastedType)
         {
             _resultType = CastedType;
         }
 
-        public CastExpression(Type CastedType, Expression Expression)
-            : this(CastedType)
+        public CastExpression(Type castedType, Expression expression)
+            : this(castedType)
         {
-            _expression = Expression;
+            Expression = expression;
 
         }
 
@@ -63,11 +61,8 @@ namespace JsonExSerializer.Framework.Expressions
         {
             get { return typeof(object); }
         }
-        public Expression Expression
-        {
-            get { return this._expression; }
-            set { this._expression = value; }
-        }
+
+        public Expression Expression { get; set; }
 
         public override Expression Parent
         {

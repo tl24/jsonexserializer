@@ -14,11 +14,10 @@ namespace JsonExSerializer.Framework.Expressions
     /// Expression to represent a javascript List/Array
     /// </summary>
     public sealed class ArrayExpression : ComplexExpressionBase {
-        private IList<Expression> _items;
 
         public ArrayExpression()
         {
-            _items = new List<Expression>();
+            Items = new List<Expression>();
             _resultType = typeof(ArrayList);
         }
 
@@ -26,15 +25,12 @@ namespace JsonExSerializer.Framework.Expressions
         {
             get { return typeof(ArrayList); }
         }
-        public IList<Expression> Items
-        {
-            get { return this._items; }
-            set { this._items = value; }
-        }
+
+        public IList<Expression> Items { get; set; }
 
         public void Add(Expression item)
         {
-            _items.Add(item);
+            Items.Add(item);
             item.Parent = this;
         }
 

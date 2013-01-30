@@ -45,8 +45,8 @@ namespace JsonExSerializerTests
         public void TestRegisterTypeConverter()
         {
             Serializer s = new Serializer("TestRegisterTypeConverter");
-            IJsonTypeConverter typeConverter = s.Settings.GetTypeHandler(typeof(SimpleObject)).TypeConverter;
-            IJsonTypeConverter propConverter = s.Settings.GetTypeHandler(typeof(SimpleObject)).FindProperty("BoolValue").TypeConverter;
+            IJsonTypeConverter typeConverter = s.Settings.Type<SimpleObject>().TypeConverter;
+            IJsonTypeConverter propConverter = s.Settings.Type<SimpleObject>().FindProperty("BoolValue").TypeConverter;
             Assert.IsNotNull(typeConverter, "No converter for simple object registered");
             Assert.IsNotNull(propConverter, "No converter for simple object, BoolValue property registered");
         }
@@ -83,8 +83,8 @@ namespace JsonExSerializerTests
         {
             //this test to fix issue 55
             Serializer s = new Serializer("TestMultipleSections");
-            Assert.IsTrue(s.Settings.GetTypeHandler(typeof(SimpleObject)).HasConverter, "SimpleObject converter");
-            Assert.IsTrue(s.Settings.GetTypeHandler(typeof(MyLine)).FindPropertyByName("Start").Ignored, "MyLine.Start Ignored");
+            Assert.IsTrue(s.Settings.Type<SimpleObject>().HasConverter, "SimpleObject converter");
+            Assert.IsTrue(s.Settings.Type<MyLine>().FindPropertyByName("Start").Ignored, "MyLine.Start Ignored");
         }
         [TearDown]
         public void Teardown()

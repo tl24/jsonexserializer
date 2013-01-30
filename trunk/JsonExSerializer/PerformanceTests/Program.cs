@@ -26,8 +26,6 @@ namespace PerformanceTests
                 new TokenStreamTest(options).RunTests();
             if ((options.Run & PerfTestOptions.RunTypes.Parser) > 0)
                 new ParserTests(options).RunTests();
-            if ((options.Run & PerfTestOptions.RunTypes.Dynamic) > 0)
-                new JsonDynamicTests(options).RunTests();
 
             //new JsonDynamicTests().RunTests();
             //CreateTests.RunCreateTests(10000000);
@@ -52,8 +50,6 @@ namespace PerformanceTests
                     options.Run |= PerfTestOptions.RunTypes.Tokens;
                 else if (arg.StartsWith("-parse"))
                     options.Run |= PerfTestOptions.RunTypes.Parser;
-                else if (arg.StartsWith("-dyn"))
-                    options.Run |= PerfTestOptions.RunTypes.Dynamic;
                 else if (arg.StartsWith("-i"))
                 {
                     i++;

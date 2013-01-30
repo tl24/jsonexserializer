@@ -15,18 +15,12 @@ namespace JsonExSerializer.Framework.Expressions
     /// </summary>
     public class ValueExpression: Expression
     {
-        private object _value;
-
         public ValueExpression(object value)
         {
-            _value = value;
+            Value = value;
         }
 
-        public object Value
-        {
-            get { return _value; }
-            set { _value = value; }
-        }
+        public object Value { get; set; }
 
         /// <summary>
         /// The value for the expression
@@ -34,10 +28,10 @@ namespace JsonExSerializer.Framework.Expressions
         public virtual string StringValue
         {
             get {
-                if (this._value == null)
+                if (this.Value == null)
                     return string.Empty;
                 else
-                    return Convert.ToString(this._value, CultureInfo.InvariantCulture);
+                    return Convert.ToString(this.Value, CultureInfo.InvariantCulture);
             }
         }
 

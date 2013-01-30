@@ -42,7 +42,7 @@ namespace JsonExSerializer.TypeConversion
             ICollection coll = (ICollection)item;
             foreach (object colItem in coll)
             {
-                IPropertyData propHandler = serializationContext.GetTypeHandler(colItem.GetType()).FindProperty(Context.ToString());
+                IPropertyData propHandler = serializationContext.Types[colItem.GetType()].FindProperty(Context.ToString());
                 if (propHandler == null)
                 {
                     throw new MissingMemberException("Type: " + item.GetType().Name + " does not have an accessible property: " + Context);

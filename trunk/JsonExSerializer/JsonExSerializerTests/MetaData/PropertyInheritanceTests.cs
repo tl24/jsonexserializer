@@ -14,27 +14,27 @@ namespace JsonExSerializerTests.MetaData
         public void ChildClassReceivesBaseClassPropertiesPlusItsOwn()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData child = new TypeData(typeof(ChildClass), context);
-            Assert.IsNotNull(child.FindProperty("BaseProperty"), "BaseProperty");
-            Assert.IsNotNull(child.FindProperty("ChildProperty"), "ChildProperty");
+            TypeData<ChildClass> child = new TypeData<ChildClass>(context);
+            Assert.IsNotNull(child.Property(t => t.BaseProperty), "BaseProperty");
+            Assert.IsNotNull(child.Property(t => t.ChildProperty), "ChildProperty");
         }
 
         [Test]
         public void NonOverridenBaseProperty_SharedByChildren()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData child = context.TypeHandlerFactory[typeof(ChildClass)];
-            TypeData baseClass = context.TypeHandlerFactory[typeof(BaseClass)];
+            ITypeData<ChildClass> child = context.Type<ChildClass>();
+            ITypeData<BaseClass> baseClass = context.Type<BaseClass>();
 
-            Assert.AreSame(baseClass.FindProperty("BaseProperty"), child.FindProperty("BaseProperty"), "child BaseProperty");
+            Assert.AreSame(baseClass.Property(t => t.BaseProperty), child.Property(t => t.BaseProperty), "child BaseProperty");
         }
 
         [Test]
         public void OverridenBaseProperty_NotSharedByChildren()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData child = context.TypeHandlerFactory[typeof(ChildClass)];
-            TypeData baseClass = context.TypeHandlerFactory[typeof(BaseClass)];
+            ITypeData child = context.Types[typeof(ChildClass)];
+            ITypeData baseClass = context.Types[typeof(BaseClass)];
 
             Assert.AreNotSame(baseClass.FindProperty("OverriddenProperty"), child.FindProperty("OverriddenProperty"), "child OverriddenProperty");
         }
@@ -43,8 +43,8 @@ namespace JsonExSerializerTests.MetaData
         public void ShadowedBaseProperty_NotSharedByChildren()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData child = context.TypeHandlerFactory[typeof(ChildClass)];
-            TypeData baseClass = context.TypeHandlerFactory[typeof(BaseClass)];
+            ITypeData child = context.Types[typeof(ChildClass)];
+            ITypeData baseClass = context.Types[typeof(BaseClass)];
 
             Assert.AreNotSame(baseClass.FindProperty("NewProperty"), child.FindProperty("NewProperty"), "child NewProperty");
         }
@@ -53,8 +53,8 @@ namespace JsonExSerializerTests.MetaData
         public void IgnoredBaseProperty_SharedByChildren()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData child = context.TypeHandlerFactory[typeof(ChildClass)];
-            TypeData baseClass = context.TypeHandlerFactory[typeof(BaseClass)];
+            ITypeData child = context.Types[typeof(ChildClass)];
+            ITypeData baseClass = context.Types[typeof(BaseClass)];
 
             Assert.AreSame(baseClass.FindProperty("IgnoredProperty"), child.FindProperty("IgnoredProperty"), "child IgnoredProperty");
         }

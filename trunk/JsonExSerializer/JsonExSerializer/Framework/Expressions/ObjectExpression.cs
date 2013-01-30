@@ -15,11 +15,10 @@ namespace JsonExSerializer.Framework.Expressions
     /// </summary>
     public sealed class ObjectExpression : ComplexExpressionBase {
 
-        private IList<KeyValueExpression> _properties;
 
         public ObjectExpression()
         {
-            _properties = new List<KeyValueExpression>();
+            Properties = new List<KeyValueExpression>();
         }
 
         public override Type DefaultType
@@ -30,11 +29,7 @@ namespace JsonExSerializer.Framework.Expressions
         /// <summary>
         /// The object's properties
         /// </summary>
-        public IList<KeyValueExpression> Properties
-        {
-            get { return this._properties; }
-            set { this._properties = value; }
-        }
+        public IList<KeyValueExpression> Properties { get; set; }
 
         public Expression this[string key]
         {

@@ -82,6 +82,7 @@
     <Compile Include="CustomHandlers\DataTableExpressionHandler.cs" />
     <Compile Include="DefaultValueCollection.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="MetaDataExtensions.cs" />
     <Compile Include="Framework\ExpressionHandlers\DateTimeExpressionHandler.cs" />
     <Compile Include="Framework\Expressions\CastExpression.cs" />
     <Compile Include="Framework\Expressions\ComplexExpressionBase.cs" />
@@ -147,16 +148,14 @@
     <Compile Include="MetaData\Attributes\XmlIgnoreAttributeProcessor.cs" />
     <Compile Include="MetaData\CamelCaseNamingStrategy.cs" />
     <Compile Include="MetaData\CustomNamingStrategyBase.cs" />
-    <Compile Include="MetaData\CustomTypeDataRepository.cs" />
     <Compile Include="MetaData\DefaultPropertyNamingStrategy.cs" />
     <Compile Include="MetaData\DelegateNamingStrategy.cs" />
-    <Compile Include="MetaData\DynamicMethodUtil.cs" />
-    <Compile Include="MetaData\DynamicPropertyData.cs" />
-    <Compile Include="MetaData\DynamicTypeData.cs" />
     <Compile Include="MetaData\FieldData.cs" />
     <Compile Include="MetaData\IMetaData.cs" />
     <Compile Include="MetaData\IPropertyData.cs" />
     <Compile Include="MetaData\IPropertyNamingStrategy.cs" />
+    <Compile Include="MetaData\ITypeData.cs" />
+    <Compile Include="MetaData\ITypeSettings.cs" />
     <Compile Include="MetaData\MetaDataBase.cs" />
     <Compile Include="MetaData\MemberInfoPropertyDataBase.cs" />
     <Compile Include="MetaData\PascalCaseNamingStrategy.cs" />

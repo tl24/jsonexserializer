@@ -70,7 +70,7 @@ namespace JsonExSerializer.Framework.Expressions
                     inferredType = GetValueType(parameter, (ValueExpression)value);
                 else if (value is ArrayExpression)
                 {
-                    if (_config.GetTypeHandler(parameter.ParameterType).IsCollection())
+                    if (_config.Types[parameter.ParameterType].IsCollection())
                         inferredType = parameter.ParameterType;
                 }
                 constructor.types[i] = GetBestMatch(parameter.ParameterType, definedType, inferredType);

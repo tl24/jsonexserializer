@@ -182,7 +182,7 @@ namespace JsonExSerializerTests
             list.Add(intType);
             Serializer s = new Serializer();
             s.Settings.ReferenceWritingType = ReferenceOption.WriteIdentifier;
-            s.Settings.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            s.Settings.Types.RegisterTypeConverter<Type>(new TypeToStringConverter());
             string result = s.Serialize(list);
             StringAssert.NotLike(result, @"\$");
             StringAssert.NotLike(result, "this");

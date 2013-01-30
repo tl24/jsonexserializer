@@ -14,35 +14,12 @@ namespace JsonExSerializerTests.MetaData
     [TestFixture]
     public class TypeHandlerTests
     {
-        [Test]
-        public void IsEmpty_OnEmptyClass_ReturnsTrue()
-        {
-            SerializerSettings context = new SerializerSettings();
-            TypeData EmptyClassHandler = new TypeData(typeof(EmptyClass), context);
-            Assert.IsTrue(EmptyClassHandler.IsEmpty, "IsEmpty should return true on class with no properties/fields");
-        }
-
-        [Test]
-        public void IsEmpty_OnClassWithOnlyIgnoredFields_ReturnsTrue()
-        {
-            SerializerSettings context = new SerializerSettings();
-            TypeData IgnoredClassHandler = new TypeData(typeof(IgnoredFieldClass), context);
-            Assert.IsTrue(IgnoredClassHandler.IsEmpty, "IsEmpty should return true on class with all properties/fields ignored");
-        }
-
-        [Test]
-        public void IsEmpty_OnNonEmptyClass_ReturnsFalse()
-        {
-            SerializerSettings context = new SerializerSettings();
-            TypeData SimpleObjectHandler = new TypeData(typeof(SimpleObject), context);
-            Assert.IsFalse(SimpleObjectHandler.IsEmpty, "IsEmpty should return false on class with properties/fields");
-        }
 
         [Test]
         public void IsCollection_ReturnsAttributeValueForJsonExCollection()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData CollectionTypeHandler = context.TypeHandlerFactory[typeof(StronglyTypedCollection)];
+            ITypeData CollectionTypeHandler = context.Types[typeof(StronglyTypedCollection)];
             Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
             Assert.IsInstanceOfType(typeof(StronglyTypedCollectionHandler), CollectionTypeHandler.CollectionHandler, "Wrong collection handler");
             Assert.AreSame(typeof(string), CollectionTypeHandler.CollectionHandler.GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
@@ -52,7 +29,7 @@ namespace JsonExSerializerTests.MetaData
         public void IsCollection_ReturnsDefaultValueForJsonExCollection_WhenItemTypeOnlySpecified()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData CollectionTypeHandler = context.TypeHandlerFactory[typeof(StronglyTypedCollection2)];
+            ITypeData CollectionTypeHandler = context.Types[typeof(StronglyTypedCollection2)];
             Assert.IsTrue(CollectionTypeHandler.IsCollection(), "Strongly Typed collection is a collection");
             Assert.IsInstanceOfType(typeof(CollectionHandlerWrapper), CollectionTypeHandler.CollectionHandler, "Wrong collection handler");
             Assert.AreSame(typeof(string), CollectionTypeHandler.CollectionHandler.GetItemType(typeof(StronglyTypedCollection)), "Wrong collection item type");
@@ -62,7 +39,7 @@ namespace JsonExSerializerTests.MetaData
         public void FindProperty_FindsIgnoredProperties()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData handler = context.GetTypeHandler(typeof(IgnoredFieldClass));
+            ITypeData handler = context.Type<IgnoredFieldClass>();
             IPropertyData fieldHandler = handler.FindProperty("IVal");
             Assert.IsNotNull(fieldHandler, "Ignored property not found");
         }
@@ -71,7 +48,7 @@ namespace JsonExSerializerTests.MetaData
         public void IgnoreProperty_DoesNotDeleteField()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData handler = context.GetTypeHandler(typeof(SimpleObject));
+            ITypeData handler = context.Type<SimpleObject>();
             foreach(IPropertyData prop in handler.AllProperties)
                 ;  // force properties to load
 
@@ -88,7 +65,7 @@ namespace JsonExSerializerTests.MetaData
         public void IgnoreProperty_WhenFieldDoesntExist_ThrowsError()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData handler = context.GetTypeHandler(typeof(SimpleObject));
+            ITypeData handler = context.Type<SimpleObject>();
                 handler.IgnoreProperty("Foo");
         }
 
@@ -96,8 +73,8 @@ namespace JsonExSerializerTests.MetaData
         public void AttributeProcessors_CustomProcessor_XmlIgnore()
         {
             SerializerSettings context = new SerializerSettings();
-            context.TypeHandlerFactory.AttributeProcessors.Add(new XmlIgnoreAttributeProcessor());
-            TypeData handler = context.GetTypeHandler(typeof(XmlIgnoreMock));
+            context.Types.AttributeProcessors.Add(new XmlIgnoreAttributeProcessor());
+            ITypeData handler = context.Type<XmlIgnoreMock>();
             Assert.IsTrue(handler.FindProperty("Salary").Ignored, "XmlIgnore attribute not ignored");
         }
 
@@ -105,7 +82,7 @@ namespace JsonExSerializerTests.MetaData
         public void Ignored_WhenInternalSetter_DefaultsToTrue()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            ITypeData handler = context.Types[typeof(NonWritableProperty)];
             Assert.IsTrue(handler.FindProperty("InternalInt").Ignored);
         }
 
@@ -113,7 +90,7 @@ namespace JsonExSerializerTests.MetaData
         public void Ignored_WhenPrivateSetter_DefaultsToTrue()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            ITypeData handler = context.Types[typeof(NonWritableProperty)];
             Assert.IsTrue(handler.FindProperty("PrivateInt").Ignored);
         }
 
@@ -121,7 +98,7 @@ namespace JsonExSerializerTests.MetaData
         public void Ignored_WhenProtectedSetter_DefaultsToTrue()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            ITypeData handler = context.Types[typeof(NonWritableProperty)];
             Assert.IsTrue(handler.FindProperty("ProtectedInt").Ignored);
         }
 
@@ -129,7 +106,7 @@ namespace JsonExSerializerTests.MetaData
         public void Ignored_WhenNoGetter_DefaultsToTrue()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            ITypeData handler = context.Types[typeof(NonWritableProperty)];
             Assert.IsTrue(handler.FindProperty("NoGetter").Ignored);
         }
 
@@ -137,7 +114,7 @@ namespace JsonExSerializerTests.MetaData
         public void Ignored_WhenNoSetter_DefaultsToTrue()
         {
             SerializerSettings context = new SerializerSettings();
-            TypeData handler = context.TypeHandlerFactory[typeof(NonWritableProperty)];
+            ITypeData handler = context.Types[typeof(NonWritableProperty)];
             Assert.IsTrue(handler.FindProperty("NoSetter").Ignored);
         }
 

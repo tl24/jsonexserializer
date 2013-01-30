@@ -55,19 +55,4 @@ namespace PerformanceTests
 
         #endregion
     }
-
-    public class JsonDynamicTests : JsonSerializerTest
-    {
-
-        public JsonDynamicTests(PerfTestOptions options)
-            : base(options)
-        {
-        }
-
-        public override void InitSerializer(Type t)
-        {
-            base.InitSerializer(t);
-            serializer.Settings.TypeHandlerFactory = new CustomTypeDataRepository(typeof(DynamicTypeData), serializer.Settings);
-        }
-    }
 }

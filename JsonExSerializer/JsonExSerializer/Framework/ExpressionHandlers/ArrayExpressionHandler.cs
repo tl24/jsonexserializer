@@ -38,7 +38,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <seealso cref="JsonExSerializer.Collections.ICollectionBuilder"/>
         public override bool CanHandle(Type objectType)
         {
-            return Config.TypeHandlerFactory[objectType].IsCollection();
+            return Settings.Types[objectType].IsCollection();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         /// <returns>a json array expression representation</returns>
         public override Expression GetExpression(object data, JsonPath currentPath, IExpressionBuilder serializer)
         {
-            TypeData handler = Config.GetTypeHandler(data.GetType());
+            ITypeData handler = Settings.Types[data.GetType()];
 
             CollectionHandler collectionHandler = handler.CollectionHandler;
             Type elemType = collectionHandler.GetItemType(handler.ForType);
@@ -146,7 +146,7 @@ namespace JsonExSerializer.Framework.ExpressionHandlers
         protected virtual ICollectionBuilder ConstructBuilder(object collection, ArrayExpression list, out Type itemType)
         {
             Type listType = collection != null ? collection.GetType() : list.ResultType;
-            TypeData typeHandler = Config.GetTypeHandler(listType);
+            ITypeData typeHandler = Settings.Types[listType];
             CollectionHandler collHandler = typeHandler.CollectionHandler;
             itemType = collHandler.GetItemType(listType);
             if (itemType == null)

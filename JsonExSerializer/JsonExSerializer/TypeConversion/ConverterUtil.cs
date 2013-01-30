@@ -17,10 +17,10 @@ namespace JsonExSerializer.TypeConversion
     /// </summary>
     public sealed class ConverterUtil
     {
-        private TypeData _handler;
-        public ConverterUtil(Type forType, SerializerSettings context)
+        private ITypeData _handler;
+        public ConverterUtil(Type forType, SerializerSettings settings)
         {
-            _handler = context.GetTypeHandler(forType);
+            _handler = settings.Types[forType];
         }
 
         /// <summary>

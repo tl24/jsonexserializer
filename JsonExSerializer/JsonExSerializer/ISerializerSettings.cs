@@ -41,12 +41,8 @@ namespace JsonExSerializer
         #region Metadata
         List<CollectionHandler> CollectionHandlers { get; }
         void RegisterCollectionHandler(CollectionHandler handler);
-        void RegisterTypeConverter(Type forType, string propertyName, IJsonTypeConverter converter);
-        void RegisterTypeConverter(Type forType, IJsonTypeConverter converter);
         TypeAliasCollection TypeAliases { get; set; }
-        TypeDataRepository TypeHandlerFactory { get; set; }
-        void IgnoreProperty(Type objectType, string propertyName);
-        TypeData GetTypeHandler(Type objectType);
+        ITypeSettings Types { get; set; }
         #endregion
 
     }

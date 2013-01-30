@@ -23,24 +23,24 @@ namespace JsonExSerializerTests
         public void TestHasConverter()
         {
             SerializerSettings ctx = new SerializerSettings();
-            bool f = ctx.TypeHandlerFactory[typeof(Guid)].HasConverter; 
+            bool f = ctx.Types[typeof(Guid)].HasConverter; 
 
             Assert.IsTrue(f, "Guid should have implicit TypeConverter through System.ComponentModel framework");
 
-            f = ctx.TypeHandlerFactory[typeof(SimpleObject)].HasConverter;
+            f = ctx.Types[typeof(SimpleObject)].HasConverter;
 
             Assert.IsFalse(f, "SimpleObject should not have converter");
 
 
-            f = ctx.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("ByteValue").HasConverter;
+            f = ctx.Types[typeof(SimpleObject)].FindProperty("ByteValue").HasConverter;
 
             Assert.IsFalse(f, "SimpleObject.ByteValue property does not have a converter");
 
             // test primitives
-            f = ctx.TypeHandlerFactory[typeof(int)].HasConverter;
+            f = ctx.Types[typeof(int)].HasConverter;
             Assert.IsFalse(f, "No converters for primitive types");
 
-            f = ctx.TypeHandlerFactory[typeof(string)].HasConverter;
+            f = ctx.Types[typeof(string)].HasConverter;
             Assert.IsFalse(f, "No converters for string");
         }
 
@@ -115,8 +115,8 @@ namespace JsonExSerializerTests
 
             Serializer s = new Serializer();
             // ignore properties (Use both methods)
-            s.Settings.IgnoreProperty(typeof(MyLine), "Start");
-            s.Settings.IgnoreProperty(typeof(MyLine), "End");
+            s.Settings.Types.IgnoreProperty((MyLine t) => t.Start);
+            s.Settings.Types.IgnoreProperty((MyLine t) => t.End);
             string result = s.Serialize(line);
             MyLine actual = s.Deserialize<MyLine>(result);
             Assert.IsNull(actual.Start, "Line start should be ignored");
@@ -131,7 +131,7 @@ namespace JsonExSerializerTests
         public void TestRegisterPrimitiveTypeConverter()
         {
             Serializer s = new Serializer();
-            s.Settings.RegisterTypeConverter(typeof(int), new MyImmutablePointConverter());
+            s.Settings.Types.RegisterTypeConverter<int>(new MyImmutablePointConverter());
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace JsonExSerializerTests
         public void TestRegisterPrimitiveTypeConverter_Date()
         {
             Serializer s = new Serializer();
-            s.Settings.RegisterTypeConverter(typeof(DateTime), new MyImmutablePointConverter());
+            s.Settings.Types.RegisterTypeConverter<DateTime>(new MyImmutablePointConverter());
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace JsonExSerializerTests
             Serializer s = new Serializer();
             DictionaryToListConverter converter = new DictionaryToListConverter();
             converter.Context = "StringValue";
-            s.Settings.RegisterTypeConverter(typeof(Dictionary<string, SimpleObject>), converter);
+            s.Settings.Types.RegisterTypeConverter<Dictionary<string, SimpleObject>>(converter);
             Dictionary<string, SimpleObject> dictionary = new Dictionary<string, SimpleObject>();
             dictionary["One"] = new SimpleObject();
             dictionary["One"].StringValue = "One";
@@ -159,7 +159,7 @@ namespace JsonExSerializerTests
             dictionary["Two"].IntValue = 2;
 
             object list = converter.ConvertFrom(dictionary, s.Settings);
-            Assert.IsTrue(s.Settings.TypeHandlerFactory[list.GetType()].IsCollection(), "Converted list is not a collection");
+            Assert.IsTrue(s.Settings.Types[list.GetType()].IsCollection(), "Converted list is not a collection");
 
             Dictionary<string, SimpleObject> targetDictionary = (Dictionary<string, SimpleObject>) converter.ConvertTo(list, dictionary.GetType(), s.Settings);
             Assert.AreEqual(2, targetDictionary.Count, "Wrong number of items");
@@ -175,7 +175,7 @@ namespace JsonExSerializerTests
         {
             Serializer s = new Serializer();
             s.Settings.IsCompact = true;
-            s.Settings.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            s.Settings.Types.RegisterTypeConverter<Type>(new TypeToStringConverter());
             string result = s.Serialize(typeof(SimpleObject));
 
             Assert.AreEqual("\"" + typeof(SimpleObject).FullName + ",JsonExSerializerTests\"", result, "Type serialized improperly");
@@ -189,7 +189,7 @@ namespace JsonExSerializerTests
         {
             Serializer s = new Serializer();
             s.Settings.IsCompact = true;
-            s.Settings.RegisterTypeConverter(typeof(Type), new TypeToStringConverter());
+            s.Settings.Types.RegisterTypeConverter<Type>(new TypeToStringConverter());
             string result = s.Serialize(typeof(int));
 
             Assert.AreEqual("\"int\"", result, "Type serialized improperly");

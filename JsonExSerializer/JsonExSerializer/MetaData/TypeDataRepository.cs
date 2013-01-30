@@ -10,18 +10,18 @@ namespace JsonExSerializer.MetaData
     /// <summary>
     /// Factory for TypeHandlers
     /// </summary>
-    public class TypeDataRepository
+    public class TypeDataRepository : ITypeSettings
     {
    
         private ISerializerSettings _config;
-        private IDictionary<Type, TypeData> _cache;
+        private IDictionary<Type, ITypeData> _cache;
         private List<AttributeProcessor> _attributeProcessors;
         private IPropertyNamingStrategy _propertyNamingStrategy;
 
         public TypeDataRepository(ISerializerSettings config)
         {
             _config = config;
-            _cache = new Dictionary<Type, TypeData>();
+            _cache = new Dictionary<Type, ITypeData>();
             _attributeProcessors = new List<AttributeProcessor>();
             _attributeProcessors.Add(new JsonIgnoreAttributeProcessor());
             _attributeProcessors.Add(new JsonPropertyAttributeProcessor());
@@ -37,9 +37,14 @@ namespace JsonExSerializer.MetaData
             get { return this._config; }
         }
 
-        public virtual TypeData this[Type forType]
+        public virtual ITypeData this[Type forType]
         {
             get { return CreateTypeHandler(forType); }
+        }
+
+        public virtual ITypeData<T> Type<T>()
+        {
+            return (ITypeData<T>) CreateTypeHandler(typeof(T));
         }
 
         public virtual IList<AttributeProcessor> AttributeProcessors
@@ -50,6 +55,7 @@ namespace JsonExSerializer.MetaData
         public virtual IPropertyNamingStrategy PropertyNamingStrategy
         {
             get { return this._propertyNamingStrategy; }
+            set { SetPropertyNamingStrategy(value); }
         }
 
         public void SetPropertyNamingStrategy(IPropertyNamingStrategy namingStrategy)
@@ -64,9 +70,9 @@ namespace JsonExSerializer.MetaData
                 _cache.Clear();
         }
 
-        private TypeData CreateTypeHandler(Type forType)
+        private ITypeData CreateTypeHandler(Type forType)
         {
-            TypeData handler;
+            ITypeData handler;
             if (!_cache.ContainsKey(forType))
             {
                 _cache[forType] = handler = CreateNew(forType);
@@ -79,9 +85,9 @@ namespace JsonExSerializer.MetaData
             return handler;            
         }
 
-        protected virtual TypeData CreateNew(Type forType)
+        protected virtual ITypeData CreateNew(Type forType)
         {
-            return new TypeData(forType, this);            
+            return TypeData.Create(forType, this);            
         }
 
         public virtual void RegisterTypeConverter(Type forType, IJsonTypeConverter converter)

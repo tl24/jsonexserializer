@@ -26,7 +26,7 @@ namespace JsonExSerializerTests
         {
             Serializer serializer = new Serializer();
             ISerializerSettings config = serializer.Settings;
-            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
+            IPropertyData property = config.Types[typeof(SimpleObject)].FindProperty(propertyName);
             SimpleObject testObject = new SimpleObject();
             property.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             Assert.IsFalse(property.ShouldWriteValue(config, property.GetValue(testObject)));
@@ -47,7 +47,7 @@ namespace JsonExSerializerTests
         {
             Serializer serializer = new Serializer();
             ISerializerSettings config = serializer.Settings;
-            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
+            IPropertyData property = config.Types[typeof(SimpleObject)].FindProperty(propertyName);
             SimpleObject testObject = new SimpleObject();
             property.DefaultValueSetting = DefaultValueOption.WriteAllValues;
             Assert.IsTrue(property.ShouldWriteValue(config, property.GetValue(testObject)));
@@ -66,7 +66,7 @@ namespace JsonExSerializerTests
         {
             Serializer serializer = new Serializer();
             ISerializerSettings config = serializer.Settings;
-            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
+            IPropertyData property = config.Types[typeof(SimpleObject)].FindProperty(propertyName);
             property.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             Assert.IsTrue(property.ShouldWriteValue(config, value));
         }
@@ -84,7 +84,7 @@ namespace JsonExSerializerTests
         {
             Serializer serializer = new Serializer();
             ISerializerSettings config = serializer.Settings;
-            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty(propertyName);
+            IPropertyData property = config.Types[typeof(SimpleObject)].FindProperty(propertyName);
             property.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             property.DefaultValue = defaultValue;
             Assert.IsFalse(property.ShouldWriteValue(config, defaultValue));
@@ -94,7 +94,7 @@ namespace JsonExSerializerTests
         public void TestDefaultPropertyAttributes()
         {
             ISerializerSettings config = new SerializerSettings();
-            TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValues)];
+            ITypeData typeData = config.Types.Type<MockDefaultValues>();
             IPropertyData intDefault = typeData.FindProperty("IntDefault");
             Assert.AreEqual(DefaultValueOption.SuppressDefaultValues, intDefault.DefaultValueSetting, "IntDefault DefaultValueSetting");
             Assert.IsFalse(intDefault.ShouldWriteValue(config, 0));
@@ -123,9 +123,9 @@ namespace JsonExSerializerTests
         public void WhenSuppressDefaultValuesOnType_CascadesToProperty()
         {
             ISerializerSettings config = new SerializerSettings();
-            TypeData typeData = config.TypeHandlerFactory[typeof(SimpleObject)];
+            ITypeData typeData = config.Types[typeof(SimpleObject)];
             typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
-            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("IntValue");
+            IPropertyData property = config.Types[typeof(SimpleObject)].FindProperty("IntValue");
             Assert.IsFalse(property.ShouldWriteValue(config, 0));
         }
 
@@ -133,10 +133,10 @@ namespace JsonExSerializerTests
         public void WhenDefaultValuesSetOnType_PropertyInheritsIt()
         {
             ISerializerSettings config = new SerializerSettings();
-            TypeData typeData = config.TypeHandlerFactory[typeof(SimpleObject)];
+            ITypeData typeData = config.Types[typeof(SimpleObject)];
             typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             typeData.DefaultValues[typeof(string)] = "FromType";
-            IPropertyData property = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("StringValue");
+            IPropertyData property = config.Types[typeof(SimpleObject)].FindProperty("StringValue");
             Assert.IsFalse(property.ShouldWriteValue(config, "FromType"));
             Assert.IsTrue(property.ShouldWriteValue(config, ""));
         }
@@ -145,20 +145,20 @@ namespace JsonExSerializerTests
         public void WhenDefaultValuesSetOnContext_PropertyInheritsFromContextIfNotSetOnType()
         {
             ISerializerSettings config = new SerializerSettings();
-            TypeData typeData = config.TypeHandlerFactory[typeof(SimpleObject)];
+            ITypeData typeData = config.Types[typeof(SimpleObject)];
             typeData.DefaultValueSetting = DefaultValueOption.SuppressDefaultValues;
             config.DefaultValues[typeof(string)] = "FromType";
             typeData.DefaultValues[typeof(int)] = 22;
 
-            IPropertyData stringProperty = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("StringValue");
+            IPropertyData stringProperty = config.Types[typeof(SimpleObject)].FindProperty("StringValue");
             Assert.IsFalse(stringProperty.ShouldWriteValue(config, "FromType"));
             Assert.IsTrue(stringProperty.ShouldWriteValue(config, ""));
 
-            IPropertyData intProperty = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("IntValue");
+            IPropertyData intProperty = config.Types[typeof(SimpleObject)].FindProperty("IntValue");
             Assert.IsFalse(intProperty.ShouldWriteValue(config, 22));
             Assert.IsTrue(intProperty.ShouldWriteValue(config, 0));
 
-            IPropertyData shortProperty = config.TypeHandlerFactory[typeof(SimpleObject)].FindProperty("ShortValue");
+            IPropertyData shortProperty = config.Types[typeof(SimpleObject)].FindProperty("ShortValue");
             shortProperty.DefaultValue = (short)9;
             Assert.IsFalse(shortProperty.ShouldWriteValue(config, (short)9));
             Assert.IsTrue(shortProperty.ShouldWriteValue(config, 0));
@@ -168,7 +168,7 @@ namespace JsonExSerializerTests
         public void WhenDefaultValuesSetByAttributeOnType_PropertyInheritsIt()
         {
             ISerializerSettings config = new SerializerSettings();
-            TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
+            ITypeData typeData = config.Types[typeof(MockDefaultValuesCascade)];
             IPropertyData property = typeData.FindProperty("EmptyString");
             Assert.IsFalse(property.ShouldWriteValue(config, ""));
             Assert.IsTrue(property.ShouldWriteValue(config, null));
@@ -178,7 +178,7 @@ namespace JsonExSerializerTests
         public void DefaultValuesOnTypeAreConvertedIfNotSameType()
         {
             ISerializerSettings config = new SerializerSettings();
-            TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValuesCascade)];
+            ITypeData typeData = config.Types[typeof(MockDefaultValuesCascade)];
             IPropertyData property = typeData.FindProperty("ConvertedDefault");
             Assert.IsFalse(property.ShouldWriteValue(config, (short)32));
             Assert.IsTrue(property.ShouldWriteValue(config, 0));
@@ -188,7 +188,7 @@ namespace JsonExSerializerTests
         public void DefaultValuesOnPropertyAreConvertedIfNotSameType()
         {
             ISerializerSettings config = new SerializerSettings();
-            TypeData typeData = config.TypeHandlerFactory[typeof(MockDefaultValues)];
+            ITypeData typeData = config.Types[typeof(MockDefaultValues)];
             IPropertyData property = typeData.FindProperty("ConvertedValue");
             Assert.IsFalse(property.ShouldWriteValue(config, (short)32));
             Assert.IsTrue(property.ShouldWriteValue(config, 0));

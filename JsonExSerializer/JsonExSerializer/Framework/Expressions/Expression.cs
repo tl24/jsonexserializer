@@ -32,7 +32,6 @@ namespace JsonExSerializer.Framework.Expressions
     public abstract class Expression : IVisitable
     {
 
-        private Expression _parent;
         protected Type _resultType; // the desired type of the result        
 
         protected Expression()
@@ -50,11 +49,7 @@ namespace JsonExSerializer.Framework.Expressions
             }
         }
 
-        public virtual Expression Parent
-        {
-            get { return this._parent; }
-            set { this._parent = value; }
-        }
+        public virtual Expression Parent { get; set; }
 
         /// <summary>
         /// Gets or sets the line number where the expression started in the

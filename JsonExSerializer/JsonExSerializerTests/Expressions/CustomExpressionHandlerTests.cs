@@ -53,7 +53,7 @@ namespace JsonExSerializerTests.Expressions
             ValueExpressionHandler handler = new ValueExpressionHandler();
             Serializer s = new Serializer();
             s.Settings.ExpressionHandlers.Insert(0, handler);
-            Assert.AreSame(s.Settings, handler.Config, "IConfigurationAware.Config not set on ExpressionHandler when inserted into Handlers collection");
+            Assert.AreSame(s.Settings, handler.Settings, "IConfigurationAware.Config not set on ExpressionHandler when inserted into Handlers collection");
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace JsonExSerializerTests.Expressions
 
             Serializer s = new Serializer();
             s.Settings.ExpressionHandlers.Insert(0, new DataTableExpressionHandler());
-            s.Settings.RegisterTypeConverter(typeof(Type), new TypeToStringConverter()); // for DataType property of Column
+            s.Settings.Types.RegisterTypeConverter<Type>(new TypeToStringConverter()); // for DataType property of Column
             string result = s.Serialize(dt);
 
             DataTable dtResult = s.Deserialize<DataTable>(result);

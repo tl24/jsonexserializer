@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace JsonExSerializer.Framework
 {
@@ -66,6 +68,19 @@ namespace JsonExSerializer.Framework
         public static Exception WrapException(string message, Exception innerException)
         {
             return (Exception) Activator.CreateInstance(innerException.GetType(), message, innerException);
+        }
+
+        public static MemberInfo GetMemberInfo<TSourceType, TProperty>(Expression<Func<TSourceType, TProperty>> bindExpression)
+        {
+            var lambda = (LambdaExpression)bindExpression;
+
+            MemberExpression memberExpression = (MemberExpression)lambda.Body;
+            return memberExpression.Member;
+        }
+
+        public static string GetPropertyName<TSourceType, TProperty>(Expression<Func<TSourceType, TProperty>> bindExpression)
+        {
+            return GetMemberInfo(bindExpression).Name;
         }
     }
 }
